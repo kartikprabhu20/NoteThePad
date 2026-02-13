@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.domain.util
+package com.mintanable.notethepad.feature_note.presentation.util
 
 sealed class Screen(val route:String){
     object NotesScreen: Screen("notes_screen")

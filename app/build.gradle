@@ -12,7 +12,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.plcoding.cleanarchitecturenoteapp"
+        applicationId "com.mintanable.notethepad"
         minSdk 24 // Updated to 24 for better library compatibility
         targetSdk 34
         versionCode 1

@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -16,20 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.mintanable.notethepad.features.domain.util.Screen
-import com.mintanable.notethepad.features.presentation.modify.AddEditNoteViewModel
+import com.mintanable.notethepad.feature_note.presentation.util.Screen
 import com.mintanable.notethepad.features.presentation.notes.NotesEvent
 import com.mintanable.notethepad.features.presentation.notes.NotesViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NotesScreen (
     navController : NavController,
-    viewModel : NotesViewModel = hiltViewModel(),
-    viewModel2 : AddEditNoteViewModel = hiltViewModel()
+    viewModel : NotesViewModel = hiltViewModel()
 ){
-   val state = viewModel.state.value
+    val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     
@@ -46,11 +43,12 @@ fun NotesScreen (
             }
         },
         scaffoldState = scaffoldState
-    ) {
+    ) { paddingValue ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(paddingValue)
+                .padding(horizontal = 16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -58,7 +56,7 @@ fun NotesScreen (
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
-                    text = "Your note",
+                    text = "Your notes",
                     style = MaterialTheme.typography.h4
                 )
                 IconButton(
@@ -67,7 +65,7 @@ fun NotesScreen (
                     }
                 ){
                     Icon(
-                        imageVector = Icons.Default.Sort,
+                        imageVector = Icons.AutoMirrored.Filled.Sort,
                         contentDescription = "Sort"
                     )
                 }

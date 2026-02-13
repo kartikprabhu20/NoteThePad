@@ -1,8 +1,10 @@
 package com.mintanable.notethepad.features.presentation.modify.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.features.domain.util.NoteOrder
 import com.mintanable.notethepad.features.domain.util.OrderType
@@ -53,5 +55,16 @@ fun OrderSection (
                 onSelect = {onOrderChange(noteOrder.copy(OrderType.Descending))}
             )
         }
+    }
+}
+
+
+@Preview(showBackground = true, name = "Order_Section States")
+@Composable
+fun DefaultOrderSectionPreview() {
+    MaterialTheme {
+        OrderSection(
+            onOrderChange = { }
+        )
     }
 }

@@ -56,6 +56,8 @@ fun AddEditNoteScreen(
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
                     navController.navigateUp()
                 }
+
+                else -> {}
             }
         }
     }
@@ -70,13 +72,14 @@ fun AddEditNoteScreen(
             }
         },
         scaffoldState = scaffoldState
-    ) {
+    ) { paddingValue ->
         Column(
             modifier =
             Modifier
                 .fillMaxSize()
                 .background(noteBackgroundAnimatable.value)
-                .padding(16.dp)
+                .padding(paddingValue)
+                .padding(horizontal = 16.dp)
         ) {
             Row(
                 modifier = Modifier

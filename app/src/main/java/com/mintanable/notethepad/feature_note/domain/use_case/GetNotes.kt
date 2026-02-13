@@ -12,7 +12,7 @@ class GetNotes(
     ) {
 
     operator fun invoke(
-        noteOrder: NoteOrder =  NoteOrder.Date(OrderType.Descending)
+        noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending)
     ): Flow<List<Note>>{
         return repository.getNotes().map { notes ->
             when(noteOrder.orderType){
