@@ -63,6 +63,7 @@ fun AddEditNoteScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.systemBars,
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 viewModel.onEvent(AddEditNoteEvent.SaveNote)

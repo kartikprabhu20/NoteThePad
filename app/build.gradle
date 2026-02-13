@@ -9,12 +9,12 @@ plugins {
 android {
     namespace 'com.mintanable.notethepad'
     // Target and Compile SDK 34/35 is standard for current Play Store requirements
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.mintanable.notethepad"
         minSdk 24 // Updated to 24 for better library compatibility
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -53,6 +53,8 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.compose.material3:material3-android:1.4.0'
+
     // Use BOM to manage Compose versions automatically
     def composeBom = platform('androidx.compose:compose-bom:2024.02.01')
     implementation composeBom

@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.features.presentation.modify.components
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,12 +11,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mintanable.notethepad.feature_note.presentation.modify.components.SearchBar
 import com.mintanable.notethepad.feature_note.presentation.util.Screen
 import com.mintanable.notethepad.features.presentation.notes.NotesEvent
 import com.mintanable.notethepad.features.presentation.notes.NotesViewModel
@@ -27,10 +30,13 @@ fun NotesScreen (
     viewModel : NotesViewModel = hiltViewModel()
 ){
     val state = viewModel.state.value
+    val searchQuery = viewModel.searchInputText.collectAsState().value
+
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     
-    Scaffold(  
+    Scaffold(
+        contentWindowInsets = WindowInsets.systemBars,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -52,12 +58,20 @@ fun NotesScreen (
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                 horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Text(
-                    text = "Your notes",
-                    style = MaterialTheme.typography.h4
+                SearchBar(
+                    text = searchQuery,
+                    modifier = Modifier.weight(1f),
+                    onValueChange = {
+                        viewModel.onEvent(NotesEvent.SearchBarValueChange(it))
+                    },
+                    onFocusChanged = {
+                    },
+                    onClearClicked = {
+                        viewModel.onEvent(NotesEvent.SearchBarValueChange(""))
+                    }
                 )
                 IconButton(
                     onClick = {
