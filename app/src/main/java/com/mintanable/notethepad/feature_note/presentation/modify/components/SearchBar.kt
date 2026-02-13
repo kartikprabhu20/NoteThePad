@@ -8,10 +8,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -27,11 +31,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -61,6 +68,7 @@ fun SearchBar(
             .onFocusChanged { focusState ->
                 onFocusChanged(focusState)
             }
+            .clip(RoundedCornerShape(25.dp))
             .fillMaxWidth()
             .heightIn(min = 56.dp),
         leadingIcon = {
@@ -93,8 +101,8 @@ fun SearchBar(
             }
         },
         colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
-            focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
         ),
         placeholder = {
             Text(hint)
@@ -104,11 +112,61 @@ fun SearchBar(
     )
 }
 
-@Preview
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewSearchBar(modifier: Modifier = Modifier) {
-    MaterialTheme {
+    NoteThePadTheme{
         var searchQuery by  remember{ mutableStateOf("")}
         SearchBar(searchQuery,onValueChange = {searchQuery=it}, onFocusChanged = {}, onClearClicked = {searchQuery=""})
+    }
+}
+
+@Composable
+fun TopSearchBar(
+    searchQuery: String,
+    onValueChange: (String) -> Unit,
+    onFocusChanged: (FocusState) -> Unit,
+    onClearClicked: () -> Unit,
+    onExpandClicked: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SearchBar(
+            text = searchQuery,
+            modifier = Modifier.weight(1f),
+            onValueChange = onValueChange,
+            onFocusChanged = onFocusChanged,
+            onClearClicked = onClearClicked
+        )
+        IconButton(
+            onClick = onExpandClicked
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Sort,
+                contentDescription = "Sort"
+            )
+        }
+    }
+}
+
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewTopSearchBar(modifier: Modifier = Modifier) {
+    NoteThePadTheme{
+        var searchQuery by  remember{ mutableStateOf("")}
+        TopSearchBar(searchQuery,onValueChange = {searchQuery=it}, onFocusChanged = {}, onClearClicked = {searchQuery=""}, onExpandClicked = {})
     }
 }

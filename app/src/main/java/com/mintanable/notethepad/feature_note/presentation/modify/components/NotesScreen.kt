@@ -7,23 +7,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.mintanable.notethepad.feature_note.presentation.modify.components.SearchBar
+import com.mintanable.notethepad.feature_note.presentation.modify.components.TopSearchBar
 import com.mintanable.notethepad.feature_note.presentation.util.Screen
 import com.mintanable.notethepad.features.presentation.notes.NotesEvent
 import com.mintanable.notethepad.features.presentation.notes.NotesViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen (
     navController : NavController,
@@ -41,13 +41,51 @@ fun NotesScreen (
         drawerContent = {
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("NoteThePad", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+                Text(
+                    "NoteThePad",
+                    modifier = Modifier.padding(16.dp),
+                    style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+                )
                 HorizontalDivider()
             }
         }
-    ) {
+    ){
         Scaffold(
             contentWindowInsets = WindowInsets.systemBars,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        TopSearchBar(
+                            searchQuery,
+                            onValueChange = {
+                                viewModel.onEvent(NotesEvent.SearchBarValueChange(it))
+                            },
+                            onFocusChanged = {
+                            },
+                            onClearClicked = {
+                                viewModel.onEvent(NotesEvent.SearchBarValueChange(""))
+                            },
+                            onExpandClicked = {
+                                viewModel.onEvent(NotesEvent.ToggleOrderSection)
+                            }
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                drawerState.apply {
+                                    if (isClosed) open() else close()
+                                }
+                            }
+                        }) {
+                            Icon(  //Show Menu Icon on TopBar
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
+                    }
+                )
+            },
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
@@ -67,34 +105,6 @@ fun NotesScreen (
                     .padding(paddingValue)
                     .padding(horizontal = 16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    SearchBar(
-                        text = searchQuery,
-                        modifier = Modifier.weight(1f),
-                        onValueChange = {
-                            viewModel.onEvent(NotesEvent.SearchBarValueChange(it))
-                        },
-                        onFocusChanged = {
-                        },
-                        onClearClicked = {
-                            viewModel.onEvent(NotesEvent.SearchBarValueChange(""))
-                        }
-                    )
-                    IconButton(
-                        onClick = {
-                            viewModel.onEvent(NotesEvent.ToggleOrderSection)
-                        }
-                    ){
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = "Sort"
-                        )
-                    }
-                }
                 AnimatedVisibility(
                     visible = state.isOrderSectionVisible,
                     enter = fadeIn() + slideInVertically(),
