@@ -11,43 +11,56 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.NavigationDrawerViewModel
+import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TopSearchBar
 import com.mintanable.notethepad.feature_note.presentation.util.Screen
 import com.mintanable.notethepad.features.presentation.notes.NotesEvent
 import com.mintanable.notethepad.features.presentation.notes.NotesViewModel
+import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen (
     navController : NavController,
-    viewModel : NotesViewModel = hiltViewModel()
+    notesViewModel : NotesViewModel = hiltViewModel(),
+    navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel()
 ){
-    val state = viewModel.state.value
-    val searchQuery = viewModel.searchInputText.collectAsState().value
+    val state = notesViewModel.state.value
+    val navigationDrawerState = navigationDrawerViewModel.navigationDrawerState.value
+    val searchQuery = notesViewModel.searchInputText.collectAsState().value
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    "NoteThePad",
-                    modifier = Modifier.padding(16.dp),
-                    style = androidx.compose.material3.MaterialTheme.typography.titleLarge
-                )
-                HorizontalDivider()
-            }
+            AppDrawer(
+                items = navigationDrawerState.items,
+                selectedItemIndex =  selectedItemIndex,
+                onItemSelected = {
+                    selectedItemIndex = it
+                    scope.launch {
+                        drawerState.close()
+                    }
+                }
+            )
         }
     ){
         Scaffold(
@@ -58,15 +71,15 @@ fun NotesScreen (
                         TopSearchBar(
                             searchQuery,
                             onValueChange = {
-                                viewModel.onEvent(NotesEvent.SearchBarValueChange(it))
+                                notesViewModel.onEvent(NotesEvent.SearchBarValueChange(it))
                             },
                             onFocusChanged = {
                             },
                             onClearClicked = {
-                                viewModel.onEvent(NotesEvent.SearchBarValueChange(""))
+                                notesViewModel.onEvent(NotesEvent.SearchBarValueChange(""))
                             },
                             onExpandClicked = {
-                                viewModel.onEvent(NotesEvent.ToggleOrderSection)
+                                notesViewModel.onEvent(NotesEvent.ToggleOrderSection)
                             }
                         )
                     },
@@ -117,7 +130,7 @@ fun NotesScreen (
                             .padding(16.dp),
                         noteOrder = state.noteOrder,
                         onOrderChange = {
-                            viewModel.onEvent(NotesEvent.Order(it))
+                            notesViewModel.onEvent(NotesEvent.Order(it))
                         }
                     )
                 }
@@ -135,14 +148,14 @@ fun NotesScreen (
                                     )
                                 },
                             onDeleteClick = {
-                                viewModel.onEvent(NotesEvent.DeleteNote(note))
+                                notesViewModel.onEvent(NotesEvent.DeleteNote(note))
                                 scope.launch {
                                     val result = snackBarHostState.showSnackbar(
                                         message = "Note deleted",
                                         actionLabel = "Undo"
                                     )
                                     if(result == SnackbarResult.ActionPerformed){
-                                        viewModel.onEvent(NotesEvent.RestoreNote)
+                                        notesViewModel.onEvent(NotesEvent.RestoreNote)
                                     }
                                 }
                             }
@@ -153,5 +166,17 @@ fun NotesScreen (
             }
         }
     }
+}
 
+@Preview
+@Composable
+fun test(){
+    NoteThePadTheme {
+        Text(
+            "NoteThePad",
+            modifier = Modifier
+                .padding(16.dp),
+            style = MaterialTheme.typography.titleLarge
+        )
+    }
 }
