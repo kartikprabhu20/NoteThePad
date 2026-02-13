@@ -1,13 +1,13 @@
 package com.mintanable.notethepad.features.presentation.modify.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.features.domain.util.NoteOrder
 import com.mintanable.notethepad.features.domain.util.OrderType
+import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
 @Composable
 fun OrderSection (
@@ -58,11 +58,13 @@ fun OrderSection (
     }
 }
 
-
-@Preview(showBackground = true, name = "Order_Section States")
-@Composable
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)@Composable
 fun DefaultOrderSectionPreview() {
-    MaterialTheme {
+    NoteThePadTheme {
         OrderSection(
             onOrderChange = { }
         )
