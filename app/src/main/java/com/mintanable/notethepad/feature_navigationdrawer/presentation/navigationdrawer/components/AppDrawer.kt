@@ -21,7 +21,7 @@ fun AppDrawer(
     items: List<NavigationDrawerItem>,
     selectedItemIndex: Int,
     modifier: Modifier = Modifier,
-    onItemSelected: (Int) -> Unit
+    onItemSelected: (Int, NavigationDrawerItem) -> Unit
 ) {
     ModalDrawerSheet(modifier = Modifier) {
         DrawerHeader(modifier = modifier)
@@ -31,7 +31,7 @@ fun AppDrawer(
                 label = { Text(text = item.title) },
                 selected = index == selectedItemIndex,
                 onClick = {
-                    onItemSelected(index)
+                    onItemSelected(index, item)
                 },
                 icon = {
                     Icon(

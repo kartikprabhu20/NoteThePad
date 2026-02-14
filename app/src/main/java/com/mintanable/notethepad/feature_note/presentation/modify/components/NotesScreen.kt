@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TopSearchBar
-import com.mintanable.notethepad.feature_note.presentation.util.Screen
+import com.mintanable.notethepad.ui.util.Screen
 import com.mintanable.notethepad.features.presentation.notes.NotesEvent
 import com.mintanable.notethepad.features.presentation.notes.NotesViewModel
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -54,10 +54,11 @@ fun NotesScreen (
             AppDrawer(
                 items = navigationDrawerState.items,
                 selectedItemIndex =  selectedItemIndex,
-                onItemSelected = {
-                    selectedItemIndex = it
+                onItemSelected = { index, navigationItem ->
+                    selectedItemIndex = index
                     scope.launch {
                         drawerState.close()
+                        navController.navigate(navigationItem.route)
                     }
                 }
             )
@@ -91,7 +92,7 @@ fun NotesScreen (
                                 }
                             }
                         }) {
-                            Icon(  //Show Menu Icon on TopBar
+                            Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Menu"
                             )
