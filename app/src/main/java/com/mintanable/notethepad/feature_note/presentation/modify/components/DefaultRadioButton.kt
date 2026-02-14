@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

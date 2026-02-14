@@ -1,6 +1,6 @@
-package com.mintanable.notethepad.features.domain.repository
+package com.mintanable.notethepad.feature_note.domain.repository
 
-import com.mintanable.notethepad.features.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Note
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {

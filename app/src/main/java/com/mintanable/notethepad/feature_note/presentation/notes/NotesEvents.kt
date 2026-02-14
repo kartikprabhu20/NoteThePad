@@ -1,7 +1,7 @@
-package com.mintanable.notethepad.features.presentation.notes
+package com.mintanable.notethepad.feature_note.presentation.notes
 
-import com.mintanable.notethepad.features.domain.model.Note
-import com.mintanable.notethepad.features.domain.util.NoteOrder
+import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 
 sealed class NotesEvent{
     data class Order(val noteOrder: NoteOrder): NotesEvent()

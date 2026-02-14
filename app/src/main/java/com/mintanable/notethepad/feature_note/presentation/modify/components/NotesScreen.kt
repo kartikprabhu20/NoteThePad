@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
@@ -26,8 +26,8 @@ import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigatio
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TopSearchBar
 import com.mintanable.notethepad.ui.util.Screen
-import com.mintanable.notethepad.features.presentation.notes.NotesEvent
-import com.mintanable.notethepad.features.presentation.notes.NotesViewModel
+import com.mintanable.notethepad.feature_note.presentation.notes.NotesEvent
+import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
 

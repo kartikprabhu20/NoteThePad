@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.domain.util
+package com.mintanable.notethepad.feature_note.domain.util
 
 data class NoteTextFieldState(
     val text: String = "",

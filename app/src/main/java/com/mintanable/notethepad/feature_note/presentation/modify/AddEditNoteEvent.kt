@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.modify
+package com.mintanable.notethepad.feature_note.presentation.modify
 
 import androidx.compose.ui.focus.FocusState
 

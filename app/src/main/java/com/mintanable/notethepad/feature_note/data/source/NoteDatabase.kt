@@ -1,8 +1,8 @@
-package com.mintanable.notethepad.features.data.source
+package com.mintanable.notethepad.feature_note.data.source
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.mintanable.notethepad.features.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Note
 
 @Database(
     entities = [Note::class],

@@ -1,13 +1,13 @@
-package com.mintanable.notethepad.features.presentation.notes
+package com.mintanable.notethepad.feature_note.presentation.notes
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.features.domain.model.Note
-import com.mintanable.notethepad.features.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.features.domain.util.NoteOrder
-import com.mintanable.notethepad.features.domain.util.OrderType
+import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
+import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

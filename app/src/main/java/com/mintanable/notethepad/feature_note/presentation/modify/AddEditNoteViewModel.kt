@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.modify
+package com.mintanable.notethepad.feature_note.presentation.modify
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -6,10 +6,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.features.domain.model.InvalidNoteException
-import com.mintanable.notethepad.features.domain.model.Note
-import com.mintanable.notethepad.features.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.features.domain.util.NoteTextFieldState
+import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
+import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -36,7 +37,7 @@ class AddEditNoteViewModel @Inject constructor(
     )
     val noteContent : State<NoteTextFieldState> = _noteContent
 
-    private val _noteColor =  mutableStateOf<Int>(Note.noteColors.random().toArgb())
+    private val _noteColor =  mutableStateOf<Int>(NoteColors.colors.random().toArgb())
     val noteColor: State<Int> = _noteColor
 
     private val _eventFlow = MutableSharedFlow< UiEvent>()

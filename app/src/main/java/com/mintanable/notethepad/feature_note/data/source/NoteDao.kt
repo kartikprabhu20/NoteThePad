@@ -1,7 +1,7 @@
-package com.mintanable.notethepad.features.data.source
+package com.mintanable.notethepad.feature_note.data.source
 
 import androidx.room.*
-import com.mintanable.notethepad.features.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Note
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -12,9 +12,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mintanable.notethepad.feature_note.presentation.util.Screen
-import com.mintanable.notethepad.features.presentation.modify.AddEditNoteScreen
-import com.mintanable.notethepad.features.presentation.modify.components.NotesScreen
+import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
+import com.mintanable.notethepad.feature_firebase.presentation.components.SignUpScreen
+import com.mintanable.notethepad.ui.util.Screen
+import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
+import com.mintanable.notethepad.feature_note.presentation.modify.components.NotesScreen
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -63,12 +65,17 @@ class MainActivity : AppCompatActivity() {
                         }
                     )
                 ) {
-
                     val color = it.arguments?.getInt("noteColor") ?: -1
                     AddEditNoteScreen(
                         navController = navController,
                         noteColor = color
                     )
+                }
+                composable(route = Screen.FirebaseLoginScreen.route) {
+                    LoginScreen(navController = navController)
+                }
+                composable(route = Screen.FirebaseSignUpScreen.route) {
+                    SignUpScreen(navController = navController)
                 }
             }
         }

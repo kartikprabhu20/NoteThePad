@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.notes.components
+package com.mintanable.notethepad.feature_note.presentation.notes.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

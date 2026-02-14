@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.modify
+package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.provider.ContactsContract
 import androidx.compose.animation.Animatable
@@ -23,8 +23,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.mintanable.notethepad.features.domain.model.Note
-import com.mintanable.notethepad.features.presentation.notes.components.TransparentHintTextField
+import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -88,7 +89,7 @@ fun AddEditNoteScreen(
                     .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Note.noteColors.forEach { color->
+                NoteColors.colors.forEach { color->
                     val colorInt = color.toArgb()
                     Box(
                         modifier = Modifier

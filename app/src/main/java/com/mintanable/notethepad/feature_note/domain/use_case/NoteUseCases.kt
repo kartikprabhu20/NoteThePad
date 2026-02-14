@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.domain.use_case
+package com.mintanable.notethepad.feature_note.domain.use_case
 
 data class NoteUseCases(
     val getNotes: GetNotes,

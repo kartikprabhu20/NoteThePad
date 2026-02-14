@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.features.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
-import com.mintanable.notethepad.features.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.ui.theme.RedOrange
 
 @Composable
