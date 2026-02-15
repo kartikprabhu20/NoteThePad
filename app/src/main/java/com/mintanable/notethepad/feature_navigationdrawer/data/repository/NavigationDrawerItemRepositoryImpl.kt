@@ -33,7 +33,7 @@ class NavigationDrawerItemRepositoryImpl: NavigationDrawerItemRepository {
             NavigationDrawerItem(
                 title = "Logout",
                 icon = Icons.AutoMirrored.Filled.Logout,
-                route = Screen.FirebaseLoginScreen.route
+                route = Screen.LogOut.route
             )
         )
         return flowOf(items)

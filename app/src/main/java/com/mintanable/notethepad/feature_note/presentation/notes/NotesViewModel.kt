@@ -65,7 +65,6 @@ class NotesViewModel @Inject constructor(
                 _searchInputText.value = event.searchQuery
                 getNotes(state.value.noteOrder, event.searchQuery)
             }
-
             else -> {}
         }
     }
@@ -88,6 +87,4 @@ class NotesViewModel @Inject constructor(
                 )
         }.launchIn(viewModelScope)
     }
-
 }
-

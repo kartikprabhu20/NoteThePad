@@ -1,41 +1,42 @@
 package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.NavigationDrawerItem
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import android.util.Log
 
 @HiltViewModel
 class NavigationDrawerViewModel @Inject constructor(
     private val getNavigationDrawerItems: GetNavigationDrawerItems
 ): ViewModel() {
 
-    private val _navigationDrawerState = mutableStateOf(NavigationDrawerState())
-    val navigationDrawerState : State<NavigationDrawerState> = _navigationDrawerState
+    private val _isLoggedIn = MutableStateFlow(false)
 
-    private var getNavigationDrawerItemsJob: Job? = null
+    val navigationDrawerState: StateFlow<NavigationDrawerState> = _isLoggedIn
+        .flatMapLatest { loggedIn ->
+            Log.i("kptest", "navigationDrawerState loggin changed: $loggedIn")
+            getNavigationDrawerItems(loggedIn)
+        }
+        .map { items ->
+            NavigationDrawerState(items = items)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NavigationDrawerState()
+        )
 
-
-    init {
-        collectNavigationDrawerItemList()
-    }
-
-    private fun collectNavigationDrawerItemList() {
-        getNavigationDrawerItemsJob?.cancel()
-        getNavigationDrawerItemsJob = getNavigationDrawerItems(isLoggedIn = false)
-            .onEach { items ->
-
-                _navigationDrawerState.value = navigationDrawerState.value.copy(
-                    items = items,
-                )
-            }.launchIn(viewModelScope)
+    fun onLoggedIn(isLoggedIn: Boolean) {
+        _isLoggedIn.value = isLoggedIn
     }
 }
 

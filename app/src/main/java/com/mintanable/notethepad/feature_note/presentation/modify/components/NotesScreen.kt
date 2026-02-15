@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,10 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
-import com.mintanable.notethepad.feature_note.presentation.modify.components.TopSearchBar
 import com.mintanable.notethepad.ui.util.Screen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesEvent
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
@@ -34,13 +37,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen (
-    navController : NavController,
-    notesViewModel : NotesViewModel = hiltViewModel(),
-    navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel()
+    navController: NavController,
+    notesViewModel: NotesViewModel = hiltViewModel(),
+    navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
+    onLogOut: suspend () -> Unit
 ){
     val state = notesViewModel.state.value
-    val navigationDrawerState = navigationDrawerViewModel.navigationDrawerState.value
+    val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery = notesViewModel.searchInputText.collectAsState().value
+    val user by authViewModel.currentUser.collectAsStateWithLifecycle()
+    Log.i("kotest", "user: $user")
 
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -48,17 +55,28 @@ fun NotesScreen (
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
 
+    LaunchedEffect(user) {
+        navigationDrawerViewModel.onLoggedIn(user != null)
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             AppDrawer(
+                user = user,
                 items = navigationDrawerState.items,
                 selectedItemIndex =  selectedItemIndex,
                 onItemSelected = { index, navigationItem ->
                     selectedItemIndex = index
                     scope.launch {
                         drawerState.close()
-                        navController.navigate(navigationItem.route)
+
+                        if(navigationItem.route == "logout"){
+                            authViewModel.signOut()
+                            onLogOut()
+                        } else {
+                            navController.navigate(navigationItem.route)
+                        }
                     }
                 }
             )
