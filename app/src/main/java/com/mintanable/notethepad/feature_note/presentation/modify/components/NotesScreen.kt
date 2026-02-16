@@ -35,6 +35,7 @@ import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import com.mintanable.notethepad.feature_note.domain.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -47,11 +48,10 @@ fun NotesScreen (
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
 ){
-    val state = notesViewModel.state.value
+    val state by notesViewModel.state
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery = notesViewModel.searchInputText.collectAsState().value
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
-    Log.i("kotest", "user: $user")
 
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -93,6 +93,14 @@ fun NotesScreen (
     ){
 
         with(sharedTransitionScope){
+            val onNoteClick = remember(navController) {
+                { note: Note ->
+                    navController.navigate(
+                        Screen.AddEditNoteScreen.route + "?noteId=${note.id}&noteColor=${note.color}"
+                    )
+                }
+            }
+
             Scaffold(
                 contentWindowInsets = WindowInsets.systemBars,
                 topBar = {
@@ -167,7 +175,11 @@ fun NotesScreen (
                     Spacer(modifier = Modifier.height(16.dp))
 
                     LazyColumn(modifier = Modifier.fillMaxSize()){
-                        items(state.notes){note->
+                        items(
+                            state.notes,
+                            key = { note -> note.id ?: -1 },
+                            contentType = { "note_item" }
+                        ){ note->
                             NoteItem(
                                 note = note,
                                 modifier = Modifier
@@ -175,12 +187,7 @@ fun NotesScreen (
                                     .sharedElement(
                                         sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-${note.id}"),
                                         animatedVisibilityScope = animatedVisibilityScope)
-                                    .clickable {
-                                        navController.navigate(
-                                            Screen.AddEditNoteScreen.route +
-                                                    "?noteId=${note.id}&noteColor=${note.color}"
-                                        )
-                                    },
+                                    .clickable { onNoteClick(note) },
                                 onDeleteClick = {
                                     notesViewModel.onEvent(NotesEvent.DeleteNote(note))
                                     scope.launch {
