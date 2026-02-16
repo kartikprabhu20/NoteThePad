@@ -84,7 +84,8 @@ fun DrawerHeader(
         Text(
             text = title,
             modifier = Modifier.padding(16.dp), // Use fixed modifiers inside
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         user?.photoUrl?.let { url ->
@@ -109,7 +110,8 @@ fun DrawerHeader(
                 Text(
                     text = name,
                     modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -117,7 +119,11 @@ fun DrawerHeader(
     }
 }
 
-@Preview
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun previewDrawHeader(){
     NoteThePadTheme {
