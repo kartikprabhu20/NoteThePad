@@ -23,7 +23,6 @@ class NavigationDrawerViewModel @Inject constructor(
 
     val navigationDrawerState: StateFlow<NavigationDrawerState> = _isLoggedIn
         .flatMapLatest { loggedIn ->
-            Log.i("kptest", "navigationDrawerState loggin changed: $loggedIn")
             getNavigationDrawerItems(loggedIn)
         }
         .map { items ->

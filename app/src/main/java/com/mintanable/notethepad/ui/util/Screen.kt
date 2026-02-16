@@ -5,4 +5,5 @@ sealed class Screen(val route:String){
     object AddEditNoteScreen : Screen("add_edit_note_screen")
     object FirebaseLoginScreen : Screen("firebase_login_screen")
     object LogOut : Screen("logout")
+    object SettingsScreen : Screen("settings_screen")
 }

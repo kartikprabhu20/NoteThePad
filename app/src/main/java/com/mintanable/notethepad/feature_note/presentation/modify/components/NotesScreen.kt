@@ -33,15 +33,19 @@ import com.mintanable.notethepad.feature_note.presentation.notes.NotesEvent
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun NotesScreen (
     navController: NavController,
     notesViewModel: NotesViewModel = hiltViewModel(),
     navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
-    onLogOut: suspend () -> Unit
+    onLogOut: suspend () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedContentScope
 ){
     val state = notesViewModel.state.value
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
@@ -70,116 +74,128 @@ fun NotesScreen (
                     selectedItemIndex = index
                     scope.launch {
                         drawerState.close()
+                    }
 
-                        if(navigationItem.route == "logout"){
+                    if(navigationItem.route == "logout"){
+                        scope.launch {
                             authViewModel.signOut()
                             onLogOut()
-                        } else {
-                            navController.navigate(navigationItem.route)
+                        }
+                    } else {
+                        navController.navigate(navigationItem.route) {
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 }
             )
         }
     ){
-        Scaffold(
-            contentWindowInsets = WindowInsets.systemBars,
-            topBar = {
-                TopAppBar(
-                    title = {
-                        TopSearchBar(
-                            searchQuery,
-                            onValueChange = {
-                                notesViewModel.onEvent(NotesEvent.SearchBarValueChange(it))
-                            },
-                            onFocusChanged = {
-                            },
-                            onClearClicked = {
-                                notesViewModel.onEvent(NotesEvent.SearchBarValueChange(""))
-                            },
-                            onExpandClicked = {
-                                notesViewModel.onEvent(NotesEvent.ToggleOrderSection)
-                            }
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.apply {
-                                    if (isClosed) open() else close()
-                                }
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu"
-                            )
-                        }
-                    }
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigate(Screen.AddEditNoteScreen.route)
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
-                }
-            },
-            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-            ) { paddingValue ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValue)
-                    .padding(horizontal = 16.dp)
-            ) {
-                AnimatedVisibility(
-                    visible = state.isOrderSectionVisible,
-                    enter = fadeIn() + slideInVertically(),
-                    exit = fadeOut() + slideOutVertically()
 
-                ) {
-                    OrderSection(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        noteOrder = state.noteOrder,
-                        onOrderChange = {
-                            notesViewModel.onEvent(NotesEvent.Order(it))
-                        }
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(modifier = Modifier.fillMaxSize()){
-                    items(state.notes){note->
-                        NoteItem(
-                            note = note,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    navController.navigate(
-                                        Screen.AddEditNoteScreen.route +
-                                                "?noteId=${note.id}&noteColor=${note.color}"
-                                    )
+        with(sharedTransitionScope){
+            Scaffold(
+                contentWindowInsets = WindowInsets.systemBars,
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            TopSearchBar(
+                                searchQuery,
+                                onValueChange = {
+                                    notesViewModel.onEvent(NotesEvent.SearchBarValueChange(it))
                                 },
-                            onDeleteClick = {
-                                notesViewModel.onEvent(NotesEvent.DeleteNote(note))
+                                onFocusChanged = {
+                                },
+                                onClearClicked = {
+                                    notesViewModel.onEvent(NotesEvent.SearchBarValueChange(""))
+                                },
+                                onExpandClicked = {
+                                    notesViewModel.onEvent(NotesEvent.ToggleOrderSection)
+                                }
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
                                 scope.launch {
-                                    val result = snackBarHostState.showSnackbar(
-                                        message = "Note deleted",
-                                        actionLabel = "Undo"
-                                    )
-                                    if(result == SnackbarResult.ActionPerformed){
-                                        notesViewModel.onEvent(NotesEvent.RestoreNote)
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
                                     }
                                 }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menu"
+                                )
+                            }
+                        }
+                    )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigate(Screen.AddEditNoteScreen.route)
+                        },
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
+                    }
+                },
+                snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ) { paddingValue ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValue)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    AnimatedVisibility(
+                        visible = state.isOrderSectionVisible,
+                        enter = fadeIn() + slideInVertically(),
+                        exit = fadeOut() + slideOutVertically()
+
+                    ) {
+                        OrderSection(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            noteOrder = state.noteOrder,
+                            onOrderChange = {
+                                notesViewModel.onEvent(NotesEvent.Order(it))
                             }
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    LazyColumn(modifier = Modifier.fillMaxSize()){
+                        items(state.notes){note->
+                            NoteItem(
+                                note = note,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .sharedElement(
+                                        sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-${note.id}"),
+                                        animatedVisibilityScope = animatedVisibilityScope)
+                                    .clickable {
+                                        navController.navigate(
+                                            Screen.AddEditNoteScreen.route +
+                                                    "?noteId=${note.id}&noteColor=${note.color}"
+                                        )
+                                    },
+                                onDeleteClick = {
+                                    notesViewModel.onEvent(NotesEvent.DeleteNote(note))
+                                    scope.launch {
+                                        val result = snackBarHostState.showSnackbar(
+                                            message = "Note deleted",
+                                            actionLabel = "Undo"
+                                        )
+                                        if(result == SnackbarResult.ActionPerformed){
+                                            notesViewModel.onEvent(NotesEvent.RestoreNote)
+                                        }
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
                 }
             }

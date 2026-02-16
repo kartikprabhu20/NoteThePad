@@ -23,7 +23,7 @@ class NavigationDrawerItemRepositoryImpl: NavigationDrawerItemRepository {
             NavigationDrawerItem(
                 title = "Settings",
                 icon = Icons.Filled.Settings,
-                route = Screen.NotesScreen.route
+                route = Screen.SettingsScreen.route
             ),
             NavigationDrawerItem(
                 title = "Login",
