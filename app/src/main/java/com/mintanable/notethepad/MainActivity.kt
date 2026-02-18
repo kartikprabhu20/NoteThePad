@@ -59,12 +59,13 @@ class MainActivity : AppCompatActivity() {
             color = MaterialTheme.colorScheme.background
         ) {
             val navController = rememberNavController()
-            NavHost(
-                navController = navController,
-                startDestination = Screen.NotesScreen.route
-            ) {
-                composable(route = Screen.NotesScreen.route) {
-                     SharedTransitionLayout {
+            SharedTransitionLayout {
+
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.NotesScreen.route
+                ) {
+                    composable(route = Screen.NotesScreen.route) {
                         NotesScreen(
                             navController = navController,
                             onLogOut = { credentialHelper.clearCredentials() },
@@ -72,26 +73,24 @@ class MainActivity : AppCompatActivity() {
                             animatedVisibilityScope = this@composable
                         )
                     }
-                }
-                composable(
-                    route = Screen.AddEditNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}",
-                    arguments = listOf(
-                        navArgument(
-                            name = "noteId"
-                        ) {
-                            type = NavType.IntType
-                            defaultValue = -1
-                        },
-                        navArgument(
-                            name = "noteColor"
-                        ) {
-                            type = NavType.IntType
-                            defaultValue = -1
-                        }
-                    )
-                ) {
-                    val color = it.arguments?.getInt("noteColor") ?: -1
-                    SharedTransitionLayout {
+                    composable(
+                        route = Screen.AddEditNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}",
+                        arguments = listOf(
+                            navArgument(
+                                name = "noteId"
+                            ) {
+                                type = NavType.IntType
+                                defaultValue = -1
+                            },
+                            navArgument(
+                                name = "noteColor"
+                            ) {
+                                type = NavType.IntType
+                                defaultValue = -1
+                            }
+                        )
+                    ) {
+                        val color = it.arguments?.getInt("noteColor") ?: -1
                         AddEditNoteScreen(
                             noteId = it.arguments?.getInt("noteId"),
                             navController = navController,
@@ -100,38 +99,38 @@ class MainActivity : AppCompatActivity() {
                             animatedVisibilityScope = this@composable
                         )
                     }
-                }
-                composable(route = Screen.FirebaseLoginScreen.route) {
-                    val viewModel: AuthViewModel = hiltViewModel()
+                    composable(route = Screen.FirebaseLoginScreen.route) {
+                        val viewModel: AuthViewModel = hiltViewModel()
 
-                    LoginScreen(
-                        navController = navController,
-                        onGoogleSigInClick = {
-                            lifecycleScope.launch {
-                                val token = credentialHelper.getGoogleCredential()
-                                if (token != null) {
-                                    viewModel.onEvent(AuthEvent.GoogleSignIn(token))
+                        LoginScreen(
+                            navController = navController,
+                            onGoogleSigInClick = {
+                                lifecycleScope.launch {
+                                    val token = credentialHelper.getGoogleCredential()
+                                    if (token != null) {
+                                        viewModel.onEvent(AuthEvent.GoogleSignIn(token))
+                                    }
                                 }
-                            }
-                        },
-                        onFacebookSignInClick = {
+                            },
+                            onFacebookSignInClick = {
 
-                        }
-                    )
-                }
-                composable(route = Screen.SettingsScreen.route) {
-                    SettingsScreen(
-                        onBackPressed = {
-                            navController.navigateUp()
-                        },
-                        currentSettings = settings,
-                        onThemeChanged = { theme ->
-                            settingsViewModel.updateTheme(theme)
-                        },
-                        onBackupSettingsChanged = { backupEnabled ->
-                            settingsViewModel.toggleBackup(backupEnabled)
-                        }
-                    )
+                            }
+                        )
+                    }
+                    composable(route = Screen.SettingsScreen.route) {
+                        SettingsScreen(
+                            onBackPressed = {
+                                navController.navigateUp()
+                            },
+                            currentSettings = settings,
+                            onThemeChanged = { theme ->
+                                settingsViewModel.updateTheme(theme)
+                            },
+                            onBackupSettingsChanged = { backupEnabled ->
+                                settingsViewModel.toggleBackup(backupEnabled)
+                            }
+                        )
+                    }
                 }
             }
         }

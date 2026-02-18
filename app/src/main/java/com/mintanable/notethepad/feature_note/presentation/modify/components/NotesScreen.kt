@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -35,6 +34,8 @@ import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import com.mintanable.notethepad.feature_note.domain.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
@@ -142,7 +143,16 @@ fun NotesScreen (
                         onClick = {
                             navController.navigate(Screen.AddEditNoteScreen.route)
                         },
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .sharedBounds(
+                            sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "notescreens_fab"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
+                                              },
+                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                        ).renderInSharedTransitionScopeOverlay(zIndexInOverlay = 1f)
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
                     }
@@ -174,7 +184,10 @@ fun NotesScreen (
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    LazyColumn(modifier = Modifier.fillMaxSize()){
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                    ){
                         items(
                             state.notes,
                             key = { note -> note.id ?: -1 },
@@ -184,9 +197,14 @@ fun NotesScreen (
                                 note = note,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .sharedElement(
+                                    .sharedBounds(
                                         sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-${note.id}"),
-                                        animatedVisibilityScope = animatedVisibilityScope)
+                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        boundsTransform = { _, _ ->
+                                            spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
+                                        },
+                                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                                    )
                                     .clickable { onNoteClick(note) },
                                 onDeleteClick = {
                                     notesViewModel.onEvent(NotesEvent.DeleteNote(note))
@@ -199,7 +217,9 @@ fun NotesScreen (
                                             notesViewModel.onEvent(NotesEvent.RestoreNote)
                                         }
                                     }
-                                }
+                                },
+                                sharedTransitionScope = sharedTransitionScope,
+                                animatedVisibilityScope = animatedVisibilityScope
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }

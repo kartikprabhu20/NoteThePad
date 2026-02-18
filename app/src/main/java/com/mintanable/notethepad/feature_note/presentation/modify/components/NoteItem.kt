@@ -1,5 +1,10 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -14,10 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,7 +37,9 @@ fun NoteItem(
     modifier:Modifier=Modifier,
     cornerRadius: Dp = 10.dp,
     cutCornerSize : Dp = 30.dp,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedContentScope
 ) {
     Box(
         modifier=modifier
@@ -70,21 +75,35 @@ fun NoteItem(
                 .padding(16.dp)
                 .padding(end = 32.dp)
         ) {
-            Text(
-                text = note.title,
-                style = MaterialTheme.typography.h6,
-                color = MaterialTheme.colors.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = note.content,
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface,
-                maxLines = 10,
-                overflow = TextOverflow.Ellipsis
-            )
+
+            with(sharedTransitionScope) {
+
+                Text(
+                    text = note.title,
+                    style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .sharedElement(
+                            sharedContentState = rememberSharedContentState(key = "note-title-${note.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = note.content,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onSurface,
+                    maxLines = 10,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .sharedElement(
+                            sharedContentState = rememberSharedContentState(key = "note-content-${note.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                )
+            }
         }
         IconButton(
             onClick = onDeleteClick,
@@ -105,6 +124,8 @@ fun NoteItem(
 @Composable
 fun NoteItemPreview() {
     MaterialTheme {
+        SharedTransitionLayout {
+            AnimatedVisibility(visible = true) {
         NoteItem(
             note = Note(
                 title = "Meeting Notes",
@@ -114,8 +135,12 @@ fun NoteItemPreview() {
                 id = 1
             ),
             modifier = Modifier.fillMaxWidth(),
-            onDeleteClick = {}
+            onDeleteClick = {},
+            sharedTransitionScope = this@SharedTransitionLayout,
+            animatedVisibilityScope = this@AnimatedVisibility as AnimatedContentScope
         )
+            }
+        }
     }
 }
 

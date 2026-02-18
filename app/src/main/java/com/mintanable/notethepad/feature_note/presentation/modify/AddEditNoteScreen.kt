@@ -80,19 +80,22 @@ fun AddEditNoteScreen(
                 }
             },
             scaffoldState = scaffoldState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .sharedElement(
-                    sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-$noteId"),
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    boundsTransform = { _, _ ->
-                        spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessHigh )
-                    }
-                ),
+            modifier = Modifier.fillMaxSize()
+            ,
         ) { paddingValue ->
             Column(
                 modifier =
                     Modifier
+                        .sharedBounds(
+                            sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                key = if (noteId == -1) "notescreens_fab" else "note-$noteId"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
+                            },
+                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                        )
                         .fillMaxSize()
                         .background(noteBackgroundAnimatable.value)
                         .padding(paddingValue)
@@ -145,7 +148,18 @@ fun AddEditNoteScreen(
                     },
                     isHintVisible = titleState.isHintVisible,
                     isSingleLine = true,
-                    textStyle = MaterialTheme.typography.h5
+                    textStyle = MaterialTheme.typography.h5,
+                    modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                key = "note-title-${noteId}"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                tween()
+                            },
+                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                        )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -161,7 +175,16 @@ fun AddEditNoteScreen(
                     isHintVisible = contentState.isHintVisible,
                     isSingleLine = false,
                     textStyle = MaterialTheme.typography.body1,
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier.fillMaxHeight().sharedBounds(
+                        sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                            key = "note-content-${noteId}"
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = { _, _ ->
+                            tween()
+                        },
+                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                    )
                 )
             }
         }
