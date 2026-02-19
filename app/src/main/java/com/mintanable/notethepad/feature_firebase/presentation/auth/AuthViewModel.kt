@@ -2,14 +2,15 @@ package com.mintanable.notethepad.feature_firebase.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.feature_firebase.data.repository.toDomainUser
 import com.mintanable.notethepad.feature_firebase.domain.model.User
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -19,28 +20,34 @@ class AuthViewModel @Inject constructor(
     private val repository: AuthRepository
 ): ViewModel() {
 
-    private val _authState = MutableStateFlow<AuthState>(
-        repository.getSignedInUser()?.let { AuthState.Success(it) } ?: AuthState.Idle
+    private val manualStateTrigger = MutableSharedFlow<AuthState>()
+    val authState: StateFlow<AuthState> = merge (
+        repository.getSignedInFirebaseUser()
+        .map { user ->
+            if (user != null) AuthState.Success(user) else AuthState.Idle
+        },
+        manualStateTrigger
     )
-    val authState: StateFlow<AuthState> = _authState.asStateFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AuthState.Idle
+        )
 
-    val currentUser: StateFlow<User?> = authState.map { state ->
-        (state as? AuthState.Success)?.user
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = repository.getSignedInUser()
-    )
+    val currentUser: StateFlow<User?> = authState
+        .map { state ->
+            (state as? AuthState.Success)?.user
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     fun signOut() {
         viewModelScope.launch {
             repository.signOut()
-            _authState.value = AuthState.Idle
         }
-    }
-
-    fun resetState() {
-        _authState.value = AuthState.Idle
     }
 
     fun onEvent(event: AuthEvent) {
@@ -53,10 +60,13 @@ class AuthViewModel @Inject constructor(
 
     private fun performAuth(authBlock: suspend () -> Result<User>) {
         viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            authBlock()
-                .onSuccess { _authState.value = AuthState.Success(it) }
-                .onFailure { _authState.value = AuthState.Error(it.localizedMessage ?: "Error") }
+            manualStateTrigger.emit(AuthState.Loading)
+
+            authBlock().onFailure { error ->
+                manualStateTrigger.emit(
+                    AuthState.Error(error.localizedMessage ?: "Error")
+                )
+            }
         }
     }
 }

@@ -17,10 +17,11 @@ import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 fun SettingSwitchItem(
     title: String,
     checked: Boolean,
+    enableSettings: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth().enabled(enableSettings).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = title, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
@@ -36,6 +37,18 @@ fun SettingSwitchItem(
 @Composable
 fun PreviewSettingSwitchItem(){
     NoteThePadTheme {
-        SettingSwitchItem("test", true, {})
+        SettingSwitchItem("test", true,true, {})
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewSettingSwitchItem2(){
+    NoteThePadTheme {
+        SettingSwitchItem("test", true,false, {})
     }
 }

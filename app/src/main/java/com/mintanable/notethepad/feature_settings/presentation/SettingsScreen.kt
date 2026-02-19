@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingSwitchItem
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -68,8 +69,17 @@ fun SettingsScreen(
         ) {
 
             item {
-                SettingSwitchItem("Backup on Google Drive", currentSettings.backupEnabled) {
+                SettingSwitchItem("Backup on Google Drive", currentSettings.backupEnabled, currentSettings.googleAccount?.isNotBlank()==true) {
                     onBackupSettingsChanged(it)
+                }
+            }
+
+            if(currentSettings.backupEnabled && currentSettings.googleAccount?.isNotBlank() == true) {
+                item {
+                    SettingItem(
+                        "Google Account",
+                        currentSettings.googleAccount
+                    ) { }
                 }
             }
 

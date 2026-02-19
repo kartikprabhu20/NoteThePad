@@ -18,6 +18,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +30,7 @@ import com.mintanable.notethepad.feature_navigationdrawer.domain.model.Navigatio
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.google.firebase.auth.GoogleAuthProvider
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
 @Composable
@@ -79,7 +81,8 @@ fun DrawerHeader(
     user: User?,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = title,
@@ -128,7 +131,12 @@ fun DrawerHeader(
 fun previewDrawHeader(){
     NoteThePadTheme {
         DrawerHeader("NoteThePad",
-            User("1","test@gmail.com", "testUser","testuri"),
+            User(
+                "1",
+                "test@gmail.com",
+                "testUser",
+                "testuri",
+                false),
             Modifier)
     }
 }

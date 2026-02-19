@@ -8,6 +8,9 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.FacebookAuthProvider
 import com.mintanable.notethepad.feature_firebase.domain.model.User
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
 
@@ -43,8 +46,14 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) { Result.failure(e) }
     }
 
-    override fun getSignedInUser(): User? {
-        return firebaseAuth.currentUser?.toDomainUser()
+    override fun getSignedInFirebaseUser(): Flow<User?> = callbackFlow {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            this.trySend(auth.currentUser?.toDomainUser())
+        }
+        firebaseAuth.addAuthStateListener(listener)
+        awaitClose {
+            firebaseAuth.removeAuthStateListener(listener)
+        }
     }
 
     override suspend fun signOut() {
@@ -56,6 +65,12 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun isUserSignedInWithGoogle(): Boolean {
+        val user = firebaseAuth.currentUser
+        return user?.providerData?.any { it.providerId == GoogleAuthProvider.PROVIDER_ID } ?: false
+    }
+
 }
 
-fun FirebaseUser.toDomainUser() = User(uid, email, displayName, photoUrl.toString())
+fun FirebaseUser.toDomainUser() = User(uid, email, displayName, photoUrl.toString(),
+    providerData.any { it.providerId == GoogleAuthProvider.PROVIDER_ID })
