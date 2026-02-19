@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_settings.domain.repository
+package com.mintanable.notethepad.feature_settings.data.repository
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey

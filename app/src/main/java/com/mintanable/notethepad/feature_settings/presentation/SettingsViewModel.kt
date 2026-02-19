@@ -1,11 +1,10 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
-import com.mintanable.notethepad.feature_settings.domain.repository.UserPreferencesRepository
+import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

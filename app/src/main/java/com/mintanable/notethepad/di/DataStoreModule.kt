@@ -1,7 +1,7 @@
 package com.mintanable.notethepad.di
 
 import android.content.Context
-import com.mintanable.notethepad.feature_settings.domain.repository.UserPreferencesRepository
+import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
 import dagger.Module
