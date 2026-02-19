@@ -21,6 +21,7 @@ class UserPreferencesRepository(private val context: Context) {
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val BACKUP_ENABLED = booleanPreferencesKey("backup_enabled")
+        val GRID_VIEW_ENABLED =  booleanPreferencesKey("gridview_enabled")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -31,11 +32,13 @@ class UserPreferencesRepository(private val context: Context) {
             val notifications = preferences[PreferencesKeys.NOTIFICATIONS_ENABLED] ?: true
             val theme = preferences[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name
             val backupEnabled = preferences[PreferencesKeys.BACKUP_ENABLED] ?: false
+            val isGridViewEnabled = preferences[PreferencesKeys.GRID_VIEW_ENABLED] ?: false
 
             Settings(
                 backupEnabled = backupEnabled,
                 notificationsEnabled = notifications,
                 themeMode = ThemeMode.valueOf(theme),
+                isGridViewSelected = isGridViewEnabled
             )
         }
 
@@ -54,6 +57,12 @@ class UserPreferencesRepository(private val context: Context) {
     suspend fun updateTheme(mode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = mode.name
+        }
+    }
+
+    suspend fun gridviewEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.GRID_VIEW_ENABLED] = enabled
         }
     }
 }

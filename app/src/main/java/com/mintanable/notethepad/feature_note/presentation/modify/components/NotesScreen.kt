@@ -3,8 +3,6 @@ package com.mintanable.notethepad.feature_note.presentation.modify.components
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
@@ -36,6 +34,10 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import com.mintanable.notethepad.feature_note.domain.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
@@ -53,6 +55,7 @@ fun NotesScreen (
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery = notesViewModel.searchInputText.collectAsState().value
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
+    val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -109,6 +112,10 @@ fun NotesScreen (
                         title = {
                             TopSearchBar(
                                 searchQuery,
+                                isGridView = isGridView,
+                                onToogleGridView = {
+                                    notesViewModel.toggleGridView(it)
+                                },
                                 onValueChange = {
                                     notesViewModel.onEvent(NotesEvent.SearchBarValueChange(it))
                                 },
@@ -146,13 +153,15 @@ fun NotesScreen (
                         containerColor = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .sharedBounds(
-                            sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "notescreens_fab"),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = { _, _ ->
-                                spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
-                                              },
-                            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                        ).renderInSharedTransitionScopeOverlay(zIndexInOverlay = 1f)
+                                sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "notescreens_fab"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                exit = fadeOut(tween(durationMillis = 100)),
+                                boundsTransform = { _, _ ->
+                                    spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
+                                                  },
+                                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                )
+//                            .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 1f)
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
                     }
@@ -184,9 +193,11 @@ fun NotesScreen (
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                    LazyVerticalStaggeredGrid(
+                        columns = StaggeredGridCells.Fixed(if (isGridView) 2 else 1),                        modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 16.dp),
+                        verticalItemSpacing = 8.dp,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ){
                         items(
                             state.notes,
@@ -196,6 +207,14 @@ fun NotesScreen (
                             NoteItem(
                                 note = note,
                                 modifier = Modifier
+//                                    .animateItem(
+//                                        fadeInSpec = tween(300),
+//                                        fadeOutSpec = tween(300),
+//                                        placementSpec = spring(
+//                                            dampingRatio = Spring.DampingRatioLowBouncy,
+//                                            stiffness = Spring.StiffnessMedium
+//                                        )
+//                                    )
                                     .fillMaxWidth()
                                     .sharedBounds(
                                         sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-${note.id}"),
@@ -203,8 +222,9 @@ fun NotesScreen (
                                         boundsTransform = { _, _ ->
                                             spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
                                         },
-                                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                                     )
+//                                    .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 0f)
                                     .clickable { onNoteClick(note) },
                                 onDeleteClick = {
                                     notesViewModel.onEvent(NotesEvent.DeleteNote(note))
@@ -221,7 +241,6 @@ fun NotesScreen (
                                 sharedTransitionScope = sharedTransitionScope,
                                 animatedVisibilityScope = animatedVisibilityScope
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }

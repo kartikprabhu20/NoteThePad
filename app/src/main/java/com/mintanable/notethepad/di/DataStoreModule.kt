@@ -2,6 +2,8 @@ package com.mintanable.notethepad.di
 
 import android.content.Context
 import com.mintanable.notethepad.feature_settings.domain.repository.UserPreferencesRepository
+import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
+import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,5 +21,17 @@ object DataStoreModule {
         @ApplicationContext context: Context
     ): UserPreferencesRepository {
         return UserPreferencesRepository(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetLayoutSettings(repository: UserPreferencesRepository): GetLayoutSettings {
+        return GetLayoutSettings(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideToggleLayoutSettings(repository: UserPreferencesRepository): ToggleLayoutSettings {
+        return ToggleLayoutSettings(repository)
     }
 }

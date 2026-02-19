@@ -20,24 +20,25 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ): ViewModel(){
 
-    private val _noteTitle = mutableStateOf(
-        NoteTextFieldState(
-        hint = "Enter title..."
-    )
-    )
+    private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
+    private val isEditMode = passedNoteId != -1
+
+    private val _noteTitle = mutableStateOf(NoteTextFieldState(hint = "Enter title..."))
     val noteTitle : State<NoteTextFieldState> = _noteTitle
 
-    private val _noteContent = mutableStateOf(
-        NoteTextFieldState(
-        hint = "Enter some content..."
-    )
-    )
+    private val _noteContent = mutableStateOf(NoteTextFieldState(hint = "Enter some content..."))
     val noteContent : State<NoteTextFieldState> = _noteContent
 
-    private val _noteColor =  mutableStateOf<Int>(NoteColors.colors.random().toArgb())
+    private val _noteColor = mutableStateOf(
+        if (isEditMode)
+            savedStateHandle.get<Int>("noteColor")
+                ?: NoteColors.colors.random().toArgb()
+        else
+            NoteColors.colors.random().toArgb()
+    )
     val noteColor: State<Int> = _noteColor
 
     private val _eventFlow = MutableSharedFlow< UiEvent>()
@@ -47,24 +48,18 @@ class AddEditNoteViewModel @Inject constructor(
 
 
     init {
-        savedStateHandle.get<Int>("noteId")?.let { noteId ->
-            if (noteId != -1) {
-                viewModelScope.launch() {
-                    noteUseCases.getNote(noteId)?.also { note ->
-                        currentNoteId = note.id
-                        _noteTitle.value = noteTitle.value.copy(
-                            text = note.title,
-                            isHintVisible = false
-                        )
+        if (isEditMode) {
+            loadNote(passedNoteId)
+        }
+    }
 
-                        _noteContent.value = noteContent.value.copy(
-                            text = note.content,
-                            isHintVisible = false
-                        )
-
-                        _noteColor.value = note.color
-                    }
-                }
+    private fun loadNote(id: Int) {
+        viewModelScope.launch {
+            noteUseCases.getNote(id)?.also { note ->
+                currentNoteId = note.id
+                _noteTitle.value = _noteTitle.value.copy(text = note.title, isHintVisible = false)
+                _noteContent.value = _noteContent.value.copy(text = note.content, isHintVisible = false)
+                _noteColor.value = note.color
             }
         }
     }

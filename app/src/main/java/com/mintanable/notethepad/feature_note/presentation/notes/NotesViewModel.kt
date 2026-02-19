@@ -8,18 +8,24 @@ import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
+import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
+import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val noteUseCases: NoteUseCases
+    private val noteUseCases: NoteUseCases,
+    private val getLayoutSettings: GetLayoutSettings,
+    private val toggleLayoutSettings: ToggleLayoutSettings
 ) :ViewModel() {
 
     private val _state = mutableStateOf(NotesState())
@@ -30,6 +36,13 @@ class NotesViewModel @Inject constructor(
     private val _searchInputText: MutableStateFlow<String> =
         MutableStateFlow("")
     val searchInputText: StateFlow<String> = _searchInputText
+
+    val isGridViewEnabled: StateFlow<Boolean> = getLayoutSettings()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 
     init {
         getNotes(NoteOrder.Date(OrderType.Descending))
@@ -86,5 +99,9 @@ class NotesViewModel @Inject constructor(
                     noteOrder = noteOrder
                 )
         }.launchIn(viewModelScope)
+    }
+
+    fun toggleGridView(enabled: Boolean) {
+        viewModelScope.launch { toggleLayoutSettings(enabled) }
     }
 }
