@@ -2,7 +2,6 @@ package com.mintanable.notethepad.feature_firebase.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.feature_firebase.data.repository.toDomainUser
 import com.mintanable.notethepad.feature_firebase.domain.model.User
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

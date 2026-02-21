@@ -16,21 +16,22 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.DriveScopes
 import com.mintanable.notethepad.core.security.CryptoManager
-import com.mintanable.notethepad.feature_backup.domain.repository.DriveRepository
+import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import com.mintanable.notethepad.BuildConfig
 import kotlinx.coroutines.flow.first
 import android.util.Log
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class DriveRepositoryImpl @Inject constructor(
+class GoogleAuthRepositoryImpl @Inject constructor(
     private val cryptoManager: CryptoManager,
     private val dataStore: DataStore<Preferences>,
     @ApplicationContext private val context: Context
-): DriveRepository {
+): GoogleAuthRepository {
     companion object {
         val REFRESH_TOKEN_KEY = stringPreferencesKey("google_refresh_token")
         val clientId = BuildConfig.DRIVE_CLIENT_ID
@@ -97,6 +98,20 @@ class DriveRepositoryImpl @Inject constructor(
     override suspend fun getDecryptedRefreshToken(): String? {
         val encryptedToken = dataStore.data.first()[REFRESH_TOKEN_KEY] ?: return null
         return cryptoManager.decrypt(encryptedToken)
+    }
+
+    override suspend fun refreshAccessToken(refreshToken: String): String {
+        return withContext(Dispatchers.IO) {
+            val response = GoogleRefreshTokenRequest(
+                NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                refreshToken,
+                clientId,
+                clientSecret
+            ).execute()
+
+            response.accessToken // This lasts for 1 hour
+        }
     }
 
     override suspend fun getAuthCodeFromIntent(data: Intent?): String? {

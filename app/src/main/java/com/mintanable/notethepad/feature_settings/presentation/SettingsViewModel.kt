@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.feature_backup.domain.repository.DriveRepository
+import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val dataStore: UserPreferencesRepository,
     private val authRepository: AuthRepository,
-    private val driveRepository: DriveRepository
+    private val driveRepository: GoogleAuthRepository
 ) : ViewModel() {
 
     val settingsState: StateFlow<Settings> = combine(

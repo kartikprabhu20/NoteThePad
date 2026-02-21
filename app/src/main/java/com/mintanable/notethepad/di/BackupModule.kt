@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.mintanable.notethepad.core.security.CryptoManager
-import com.mintanable.notethepad.feature_backup.data.repository.DriveRepositoryImpl
-import com.mintanable.notethepad.feature_backup.domain.repository.DriveRepository
+import com.mintanable.notethepad.feature_backup.data.repository.GoogleAuthRepositoryImpl
+import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +24,7 @@ object BackupModule {
         cryptoManager: CryptoManager,
         dataStore: DataStore<Preferences>,
         @ApplicationContext context: Context
-    ): DriveRepository {
-        return DriveRepositoryImpl(cryptoManager, dataStore, context)
+    ): GoogleAuthRepository {
+        return GoogleAuthRepositoryImpl(cryptoManager, dataStore, context)
     }
 }
