@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,9 @@ class UserPreferencesRepository(private val context: Context) {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val BACKUP_ENABLED = booleanPreferencesKey("backup_enabled")
         val GRID_VIEW_ENABLED =  booleanPreferencesKey("gridview_enabled")
+        val BACKUP_INTERVAL = stringPreferencesKey("backup_interval")
+        val BACKUP_TIME_HOUR = intPreferencesKey("backup_time_hour")
+        val BACKUP_TIME_MINUTE = intPreferencesKey("backup_time_minute")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -33,14 +38,33 @@ class UserPreferencesRepository(private val context: Context) {
             val theme = preferences[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name
             val backupEnabled = preferences[PreferencesKeys.BACKUP_ENABLED] ?: false
             val isGridViewEnabled = preferences[PreferencesKeys.GRID_VIEW_ENABLED] ?: false
+            val backupInterval = preferences[PreferencesKeys.BACKUP_INTERVAL] ?: BackupFrequency.OFF.name
+            val backupTimeHour = preferences[PreferencesKeys.BACKUP_TIME_HOUR] ?: 2
+            val backupTimeMinutes = preferences[PreferencesKeys.BACKUP_TIME_MINUTE] ?: 0
 
             Settings(
                 backupEnabled = backupEnabled,
                 notificationsEnabled = notifications,
                 themeMode = ThemeMode.valueOf(theme),
-                isGridViewSelected = isGridViewEnabled
+                isGridViewSelected = isGridViewEnabled,
+                backupFrequency = BackupFrequency.valueOf(backupInterval),
+                backupTimeHour = backupTimeHour,
+                backupTimeMinutes = backupTimeMinutes
             )
         }
+
+    suspend fun updateBackupFrequency(mode: BackupFrequency) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.BACKUP_INTERVAL] = mode.name
+        }
+    }
+
+    suspend fun updateBackupTime(hour: Int, minutes: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.BACKUP_TIME_HOUR] = hour
+            preferences[PreferencesKeys.BACKUP_TIME_MINUTE] = minutes
+        }
+    }
 
     suspend fun updateBackup(enabled: Boolean) {
         context.dataStore.edit { preferences ->

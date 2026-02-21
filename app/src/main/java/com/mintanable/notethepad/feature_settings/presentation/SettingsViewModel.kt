@@ -10,6 +10,7 @@ import com.mintanable.notethepad.feature_firebase.domain.repository.AuthReposito
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
+import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,6 +47,14 @@ class SettingsViewModel @Inject constructor(
 
     fun toggleNotifications(enabled: Boolean) {
         viewModelScope.launch { dataStore.updateNotifications(enabled) }
+    }
+
+    fun updateBackupTime(hours: Int, minutes: Int) {
+        viewModelScope.launch { dataStore.updateBackupTime(hours, minutes) }
+    }
+
+    fun updateBackupFrequency(backupFrequency: BackupFrequency) {
+        viewModelScope.launch { dataStore.updateBackupFrequency(backupFrequency) }
     }
 
     fun updateTheme(mode: ThemeMode) {

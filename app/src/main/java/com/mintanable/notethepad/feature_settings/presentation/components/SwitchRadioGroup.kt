@@ -18,13 +18,15 @@ import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
 @Composable
 fun <T : Enum<T>> SettingRadioGroup(
-    title: String,
+    title: String? = null,
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
     entries: Iterable<T>
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+        title?.let {
+            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+        }
         entries.forEach { entry ->
             Row(
                 Modifier.fillMaxWidth().selectable(
