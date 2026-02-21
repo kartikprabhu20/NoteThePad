@@ -16,20 +16,17 @@ class GoogleClientHelper(private val context: Context) {
     private val credentialManager = CredentialManager.create(context)
 
     suspend fun getGoogleCredential(): String? {
-        // 1. Create the Google ID Request
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(context.getString(R.string.default_web_client_id))
             .setAutoSelectEnabled(true)
             .build()
 
-        // 2. Create the GetRequest
         val request = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()
 
         return try {
-            // 3. Launch the selector
             val result = credentialManager.getCredential(
                 context = context,
                 request = request

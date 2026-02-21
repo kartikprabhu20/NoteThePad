@@ -2,15 +2,20 @@ package com.mintanable.notethepad.core.security
 
 import android.content.Context
 import android.util.Base64
+import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.Aead
-import com.google.crypto.tink.KeyTemplates
+import com.google.crypto.tink.aead.AesGcmKeyManager
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 
 class CryptoManager(context: Context) {
+    init {
+        AeadConfig.register()
+    }
+
     private val aead: Aead by lazy {
         val keysetHandle = AndroidKeysetManager.Builder()
             .withSharedPref(context, "tink_keyset", "tink_prefs")
-            .withKeyTemplate(KeyTemplates.get("AES256_GCM"))
+            .withKeyTemplate(AesGcmKeyManager.aes256GcmTemplate())
             .withMasterKeyUri("android-keystore://master_key")
             .build()
             .keysetHandle

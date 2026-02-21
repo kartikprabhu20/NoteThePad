@@ -69,7 +69,6 @@ class AuthRepositoryImpl @Inject constructor(
         val user = firebaseAuth.currentUser
         return user?.providerData?.any { it.providerId == GoogleAuthProvider.PROVIDER_ID } ?: false
     }
-
 }
 
 fun FirebaseUser.toDomainUser() = User(uid, email, displayName, photoUrl.toString(),

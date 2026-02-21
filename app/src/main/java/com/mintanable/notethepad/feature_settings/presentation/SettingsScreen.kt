@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_settings.presentation
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,8 +33,10 @@ import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 fun SettingsScreen(
     onBackPressed: () -> Unit,
     currentSettings: Settings,
+    isProcessing: Boolean,
     onThemeChanged: (ThemeMode) -> Unit,
-    onBackupSettingsChanged: (Boolean) -> Unit
+    onBackupSettingsChanged: (Boolean) -> Unit,
+    showToast: (String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -69,8 +73,19 @@ fun SettingsScreen(
         ) {
 
             item {
-                SettingSwitchItem("Backup on Google Drive", currentSettings.backupEnabled, currentSettings.googleAccount?.isNotBlank()==true) {
-                    onBackupSettingsChanged(it)
+                val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
+                SettingSwitchItem(
+                    "Backup on Google Drive",
+                    currentSettings.backupEnabled,
+                    true) { checked ->
+                    if (!isGoogleLinked && checked) {
+                        showToast("Please sign in with Google to enable backups")
+                    } else {
+                        onBackupSettingsChanged(checked)
+                    }
+                }
+                if (isProcessing) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
             }
 
@@ -105,7 +120,9 @@ fun PreviewSettingsScreen(
             onBackPressed = {},
             currentSettings = Settings(),
             onBackupSettingsChanged = {},
-            onThemeChanged = {}
+            onThemeChanged = {},
+            showToast = {},
+            isProcessing = false
         )
     }
 }

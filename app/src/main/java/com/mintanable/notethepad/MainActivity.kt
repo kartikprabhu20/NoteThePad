@@ -1,8 +1,14 @@
 package com.mintanable.notethepad
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +61,14 @@ class MainActivity : AppCompatActivity() {
     @Composable
     fun MainScreen(settingsViewModel: SettingsViewModel, settings: Settings) {
 
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartIntentSenderForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                settingsViewModel.onAuthResultCompleted(result.data, { error -> showToast(error) } )
+            }
+        }
+
         Surface(
             color = MaterialTheme.colorScheme.background
         ) {
@@ -68,7 +82,11 @@ class MainActivity : AppCompatActivity() {
                     composable(route = Screen.NotesScreen.route) {
                         NotesScreen(
                             navController = navController,
-                            onLogOut = { credentialHelper.clearCredentials() },
+                            onLogOut =
+                                {
+                                    credentialHelper.clearCredentials()
+                                    settingsViewModel.signOut()
+                                },
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@composable
                         )
@@ -118,21 +136,43 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                     composable(route = Screen.SettingsScreen.route) {
+                        val isProcessing by settingsViewModel.isProcessingBackupToggle.collectAsStateWithLifecycle()
                         SettingsScreen(
                             onBackPressed = {
                                 navController.navigateUp()
                             },
+                            isProcessing = isProcessing,
                             currentSettings = settings,
                             onThemeChanged = { theme ->
                                 settingsViewModel.updateTheme(theme)
                             },
                             onBackupSettingsChanged = { backupEnabled ->
-                                settingsViewModel.toggleBackup(backupEnabled)
+                                settingsViewModel.toggleBackup(
+                                    backupEnabled,
+                                    { pendingIntent ->
+                                        launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
+                                    },
+                                    { error ->
+                                        showToast(error)
+                                    }
+                                )
+                            },
+                            showToast = { message ->
+                                showToast(message)
                             }
                         )
                     }
                 }
             }
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(
+            this@MainActivity,
+            message,
+            Toast.LENGTH_LONG
+        )
+            .show()
     }
 }

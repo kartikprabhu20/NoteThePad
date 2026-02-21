@@ -40,7 +40,7 @@ fun LoginScreen(
         }
         if(state is AuthState.Error) {
             Toast.makeText(context,
-                "Error occured whil signing in, try again!",
+                "Error occured while signing in, try again!",
                 Toast.LENGTH_LONG)
                 .show()
         }

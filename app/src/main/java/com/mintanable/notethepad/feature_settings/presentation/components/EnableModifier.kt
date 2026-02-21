@@ -14,7 +14,8 @@ fun Modifier.enabled(enabled: Boolean): Modifier {
             else Modifier.pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
-                        awaitPointerEvent()
+                        val event = awaitPointerEvent()
+                        event.changes.forEach { it.consume() }
                     }
                 }
             }
