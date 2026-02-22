@@ -157,10 +157,10 @@ class MainActivity : AppCompatActivity() {
                                 )
                             },
                             onBackupIntervalChanged = { backupFrequency ->
-                                settingsViewModel.updateBackupFrequency(backupFrequency)
+                                settingsViewModel.updateBackupSettings(backupFrequency, settings.backupTimeHour, settings.backupTimeMinutes)
                             },
                             onBackupTimeChanged = { hours,minutes ->
-                                settingsViewModel.updateBackupTime(hours,minutes)
+                                settingsViewModel.updateBackupSettings(settings.backupFrequency, hours, minutes)
                             },
                             showToast = { message ->
                                 showToast(message)

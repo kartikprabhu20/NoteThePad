@@ -53,6 +53,15 @@ class UserPreferencesRepository(private val context: Context) {
             )
         }
 
+
+    suspend fun updateBackupSettings(mode: BackupFrequency, hour: Int, minutes: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.BACKUP_INTERVAL] = mode.name
+            preferences[PreferencesKeys.BACKUP_TIME_HOUR] = hour
+            preferences[PreferencesKeys.BACKUP_TIME_MINUTE] = minutes
+        }
+    }
+
     suspend fun updateBackupFrequency(mode: BackupFrequency) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.BACKUP_INTERVAL] = mode.name

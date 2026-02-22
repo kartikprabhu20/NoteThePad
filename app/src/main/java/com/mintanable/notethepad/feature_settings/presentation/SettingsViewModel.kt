@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
+import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledBackupUsecase
+import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
@@ -25,7 +27,9 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val dataStore: UserPreferencesRepository,
     private val authRepository: AuthRepository,
-    private val driveRepository: GoogleAuthRepository
+    private val driveRepository: GoogleAuthRepository,
+    private val scheduleBackup: ScheduleBackupUseCase,
+    private val cancelScheduledBackup: CancelScheduledBackupUsecase
 ) : ViewModel() {
 
     val settingsState: StateFlow<Settings> = combine(
@@ -81,7 +85,7 @@ class SettingsViewModel @Inject constructor(
                                 _isProcessingBackupToggle.value = false
                             } else {
                                 Log.d("kptest", "Attempting Silent Exchange")
-                                exhangeCodeForTokens(result.serverAuthCode, onFailure)
+                                exchangeCodeForTokens(result.serverAuthCode, onFailure)
                                 _isProcessingBackupToggle.value = false
                             }
                         }
@@ -95,7 +99,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun exhangeCodeForTokens(code: String?, onFailure: (String) -> Unit) {
+    private suspend fun exchangeCodeForTokens(code: String?, onFailure: (String) -> Unit) {
         if (code != null) {
             val exchangeResult = driveRepository.exchangeCodeForTokens(code)
             exchangeResult
@@ -117,7 +121,7 @@ class SettingsViewModel @Inject constructor(
             _isProcessingBackupToggle.value = true
             val authCode = driveRepository.getAuthCodeFromIntent(data)
             Log.d("kptest", "onAuthResultCompleted")
-            exhangeCodeForTokens(authCode,onFailure)
+            exchangeCodeForTokens(authCode,onFailure)
             _isProcessingBackupToggle.value = false
         }
     }
@@ -127,6 +131,20 @@ class SettingsViewModel @Inject constructor(
             driveRepository.clearDriveCredentials()
             dataStore.updateBackup(false)
             authRepository.signOut()
+        }
+    }
+
+    fun updateBackupSettings(
+        frequency: BackupFrequency,
+        hour: Int,
+        minute: Int
+    ) {
+        viewModelScope.launch {
+            dataStore.updateBackupSettings(frequency,hour,minute)
+            cancelScheduledBackup()
+            if(frequency!=BackupFrequency.OFF) {
+                scheduleBackup(frequency, hour, minute)
+            }
         }
     }
 }
