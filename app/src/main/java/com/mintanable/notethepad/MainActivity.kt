@@ -135,13 +135,18 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                     composable(route = Screen.SettingsScreen.route) {
-                        val isProcessing by settingsViewModel.isProcessingBackupToggle.collectAsStateWithLifecycle()
+                        val isAuthorisingBackup by settingsViewModel.isAuthorisingBackup.collectAsStateWithLifecycle()
+                        val workInfo by settingsViewModel.backupWorkInfo.collectAsStateWithLifecycle()
+                        val backupUiState by settingsViewModel.backupUiState.collectAsStateWithLifecycle()
                         SettingsScreen(
                             onBackPressed = {
                                 navController.navigateUp()
                             },
-                            isProcessing = isProcessing,
+                            isAuthorisingBackup = isAuthorisingBackup,
                             currentSettings = settings,
+                            backupWorkInfo = workInfo,
+                            backupUiState = backupUiState,
+                            onLoadBackupInfo = { settingsViewModel.loadBackupInfo() },
                             onThemeChanged = { theme ->
                                 settingsViewModel.updateTheme(theme)
                             },
@@ -161,6 +166,9 @@ class MainActivity : AppCompatActivity() {
                             },
                             onBackupTimeChanged = { hours,minutes ->
                                 settingsViewModel.updateBackupSettings(settings.backupFrequency, hours, minutes)
+                            },
+                            onBackupNowClicked = {
+                                settingsViewModel.updateBackupSettings(settings.backupFrequency, settings.backupTimeHour, settings.backupTimeMinutes, true)
                             },
                             showToast = { message ->
                                 showToast(message)

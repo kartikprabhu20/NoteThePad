@@ -7,6 +7,7 @@ import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
@@ -17,47 +18,72 @@ import androidx.work.workDataOf
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-const val KEY_FREQUENCY = "frequency"
-const val KEY_HOUR = "hour"
-const val KEY_MINUTE = "minute"
-
 class BackupSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : BackupScheduler {
+
     companion object {
         const val WORK_NAME = "backup_work"
+        const val KEY_FREQUENCY = "frequency"
+        const val KEY_HOUR = "hour"
+        const val KEY_MINUTE = "minute"
+        const val KEY_BACKUP_NOW = "backupNow"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun scheduleBackup(frequency: BackupFrequency, hour: Int, minute: Int) {
-        val interval = when (frequency) {
-            BackupFrequency.DAILY -> 1L to TimeUnit.DAYS
-            BackupFrequency.WEEKLY -> 7L to TimeUnit.DAYS
-            BackupFrequency.MONTHLY -> 30L to TimeUnit.DAYS
-            BackupFrequency.OFF -> return
+    override fun scheduleBackup(frequency: BackupFrequency, hour: Int, minute: Int, backupNow: Boolean) {
+        val workdata = workDataOf(
+            KEY_FREQUENCY to frequency.name,
+            KEY_HOUR to hour,
+            KEY_MINUTE to minute,
+            KEY_BACKUP_NOW to backupNow
+        )
+
+        if (backupNow) {
+            scheduleImmediately(workdata)
+            return
         }
 
-        if(frequency==BackupFrequency.MONTHLY)
-            scheduleMonthly(hour,minute)
-        else
-            schedulePeriodic(interval,frequency, hour, minute)
+        if (frequency == BackupFrequency.OFF) {
+            cancelBackup()
+            return
+        }
+
+        if(frequency==BackupFrequency.MONTHLY) {
+            scheduleMonthly(hour, minute, workdata)
+        } else {
+            val interval = when (frequency) {
+                BackupFrequency.DAILY -> 1L to TimeUnit.DAYS
+                BackupFrequency.WEEKLY -> 7L to TimeUnit.DAYS
+                else -> 1L to TimeUnit.DAYS
+            }
+            schedulePeriodic(interval, frequency, hour, minute, workdata)
+        }
+    }
+
+    private fun scheduleImmediately(workdata: Data){
+        val instantRequest = OneTimeWorkRequestBuilder<BackupWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST) // Priority
+            .setInputData(workdata)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            instantRequest
+        )
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun scheduleMonthly(hour: Int, minute: Int) {
+    private fun scheduleMonthly(hour: Int, minute: Int, workdata: Data) {
 
         val delay = ScheduleHelper.calculateNextMonthlyDelay(hour, minute)
 
         val request =
             OneTimeWorkRequestBuilder<BackupWorker>()
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .setInputData(
-                    workDataOf(
-                        KEY_FREQUENCY to BackupFrequency.MONTHLY.name,
-                        KEY_HOUR to hour,
-                        KEY_MINUTE to minute
-                    )
-                )
+                .setInputData(workdata)
                 .build()
 
         WorkManager.getInstance(context)
@@ -69,7 +95,7 @@ class BackupSchedulerImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun schedulePeriodic(interval: Pair<Long, TimeUnit>, frequency: BackupFrequency, hour: Int, minute: Int){
+    private fun schedulePeriodic(interval: Pair<Long, TimeUnit>, frequency: BackupFrequency, hour: Int, minute: Int, workdata: Data){
         val delay = ScheduleHelper.calculateInitialDelay(hour, minute, frequency)
 
         val request = PeriodicWorkRequestBuilder<BackupWorker>(
@@ -77,6 +103,7 @@ class BackupSchedulerImpl @Inject constructor(
             interval.second
         )
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(workdata)
             .build()
 
         WorkManager.getInstance(context)
@@ -93,15 +120,16 @@ class BackupSchedulerImpl @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onWorkCompleted(inputData: Data) {
-        val frequency = inputData.getString("frequency")
+        val frequency = inputData.getString(KEY_FREQUENCY)
             ?.let { BackupFrequency.valueOf(it) }
             ?: return
 
-        if (frequency == BackupFrequency.MONTHLY) {
+        val backupNow = inputData.getBoolean(KEY_BACKUP_NOW, false)
+
+        if(backupNow || frequency == BackupFrequency.MONTHLY){
             val hour = inputData.getInt(KEY_HOUR, 2)
             val minute = inputData.getInt(KEY_MINUTE, 0)
-             scheduleMonthly(hour, minute)
+            scheduleBackup(frequency, hour, minute, false)
         }
     }
-
 }

@@ -4,7 +4,7 @@ import androidx.work.Data
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 
 interface BackupScheduler {
-    fun scheduleBackup(frequency: BackupFrequency, hour: Int, minute: Int)
+    fun scheduleBackup(frequency: BackupFrequency, hour: Int, minute: Int, backupNow: Boolean = false)
     fun cancelBackup()
     fun onWorkCompleted(inputData: Data)
 }

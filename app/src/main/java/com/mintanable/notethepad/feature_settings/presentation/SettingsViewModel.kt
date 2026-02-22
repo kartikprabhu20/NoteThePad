@@ -5,9 +5,13 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
+import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledBackupUsecase
+import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
+import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
@@ -19,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,8 +34,22 @@ class SettingsViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val driveRepository: GoogleAuthRepository,
     private val scheduleBackup: ScheduleBackupUseCase,
-    private val cancelScheduledBackup: CancelScheduledBackupUsecase
+    private val cancelScheduledBackup: CancelScheduledBackupUsecase,
+    private val checkForExistingBackup: CheckForExistingBackup,
+    private val workManager: WorkManager
 ) : ViewModel() {
+
+    val backupWorkInfo = workManager
+        .getWorkInfosForUniqueWorkFlow(BackupSchedulerImpl.WORK_NAME)
+        .map { it.firstOrNull() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    private val _backupUiState = MutableStateFlow<BackupUiState>(BackupUiState.Loading)
+    val backupUiState = _backupUiState.asStateFlow()
 
     val settingsState: StateFlow<Settings> = combine(
         authRepository.getSignedInFirebaseUser(),
@@ -45,7 +64,7 @@ class SettingsViewModel @Inject constructor(
     )
 
     private val _isProcessingBackupToggle = MutableStateFlow(false)
-    val isProcessingBackupToggle = _isProcessingBackupToggle.asStateFlow()
+    val isAuthorisingBackup = _isProcessingBackupToggle.asStateFlow()
 
     val isGoogleSignedIn = authRepository.isUserSignedInWithGoogle()
 
@@ -137,13 +156,27 @@ class SettingsViewModel @Inject constructor(
     fun updateBackupSettings(
         frequency: BackupFrequency,
         hour: Int,
-        minute: Int
+        minute: Int,
+        backupNow: Boolean = false
     ) {
         viewModelScope.launch {
             dataStore.updateBackupSettings(frequency,hour,minute)
             cancelScheduledBackup()
             if(frequency!=BackupFrequency.OFF) {
-                scheduleBackup(frequency, hour, minute)
+                scheduleBackup(frequency, hour, minute, backupNow)
+            }
+        }
+    }
+
+    fun loadBackupInfo() {
+        viewModelScope.launch {
+            _backupUiState.value = BackupUiState.Loading
+            checkForExistingBackup().collect { metadata ->
+                _backupUiState.value = if (metadata != null) {
+                    BackupUiState.HasBackup(metadata)
+                } else {
+                    BackupUiState.NoBackup
+                }
             }
         }
     }
