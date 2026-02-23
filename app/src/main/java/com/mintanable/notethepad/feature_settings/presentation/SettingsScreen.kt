@@ -33,7 +33,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
@@ -42,6 +44,7 @@ import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
+import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
@@ -71,12 +74,22 @@ fun SettingsScreen(
         onLoadBackupInfo()
     }
 
+    var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
     val notificationPermissionState = rememberPermissionState(
         android.Manifest.permission.POST_NOTIFICATIONS
     )
+    val checkAndRequestNotificationPermission = { action: () -> Unit ->
+        action()
+
+        when{
+            notificationPermissionState.status.isGranted -> { } //Do nothing
+            notificationPermissionState.status.shouldShowRationale -> { showRationaleDialog = true }
+            else -> { notificationPermissionState.launchPermissionRequest() }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -121,11 +134,11 @@ fun SettingsScreen(
                     },
                 )
                 if (isAuthorisingBackup) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
                 }
             }
 
-            if(isGoogleLinked){
+            if(isGoogleLinked && currentSettings.backupSettings.backupFrequency != BackupFrequency.OFF){
                 item {
                     Row(modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -145,7 +158,7 @@ fun SettingsScreen(
 
                         Button(
                             modifier = Modifier.padding(8.dp).clip(RectangleShape),
-                            onClick = { onBackupNowClicked() }
+                            onClick = { checkAndRequestNotificationPermission{onBackupNowClicked()} }
                         ) {
                             Text("Backup Now")
                         }
@@ -154,7 +167,7 @@ fun SettingsScreen(
                     BackupStatusUI(
                         backupUploadDownloadState = backupUploadDownloadState,
                         backupUiState = backupUiState,
-                        onRestoreClicked = { onRestoreClicked() }
+                        onRestoreClicked = { checkAndRequestNotificationPermission { onRestoreClicked() }}
                     )
                 }
 
@@ -198,7 +211,12 @@ fun SettingsScreen(
                     showIntervalDialog = false
                 },
                 onConfirm = { backupFrequency ->
-                    onBackupSettingsChanged(currentSettings.backupSettings.copy(backupFrequency=backupFrequency))
+                    val newSettings = currentSettings.backupSettings.copy(backupFrequency = backupFrequency)
+                    if (backupFrequency != BackupFrequency.OFF) {
+                        checkAndRequestNotificationPermission { onBackupSettingsChanged(newSettings) }
+                    } else {
+                        onBackupSettingsChanged(newSettings)
+                    }
                     showIntervalDialog = false
                 },
             )
@@ -213,6 +231,16 @@ fun SettingsScreen(
                 onBackupSettingsChanged(currentSettings.backupSettings.copy(backupTimeHour = hours, backupTimeMinutes = minutes))
                 showTimePickerDialog = false
             }
+        }
+
+        if (showRationaleDialog) {
+            PermissionRationaleDialog(
+                onConfirmClicked = {
+                    showRationaleDialog = false
+                    notificationPermissionState.launchPermissionRequest()
+                },
+                onDismissRequest = {showRationaleDialog = false}
+            )
         }
     }
 }

@@ -7,6 +7,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,4 +38,16 @@ fun TimePickerDialog(
             TimePicker(state = timePickerState)
         }
     )
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewTimePickerDialog(){
+    NoteThePadTheme {
+        TimePickerDialog(1, 1, {}, {hour,minute-> })
+    }
 }

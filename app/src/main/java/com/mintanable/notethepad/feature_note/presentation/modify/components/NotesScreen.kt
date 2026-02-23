@@ -39,6 +39,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -199,6 +200,7 @@ fun NotesScreen (
                         verticalItemSpacing = 8.dp,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ){
+                        Log.d("kptest"," Displaying notes: ${state.notes.size}")
                         items(
                             state.notes,
                             key = { note -> note.id ?: -1 },
