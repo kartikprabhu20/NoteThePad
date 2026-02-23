@@ -42,14 +42,17 @@ class GoogleAuthRepositoryImpl @Inject constructor(
         return try {
             val requestedScopes = listOf(Scope(DriveScopes.DRIVE_APPDATA))
             val googleAccount = Account(accountEmail, "com.google")
-            val authorizationRequest = AuthorizationRequest.builder()
+            val authorizationRequestBuilder = AuthorizationRequest.builder()
                 .setRequestedScopes(requestedScopes)
                 .requestOfflineAccess("$clientId")
                 .setAccount(googleAccount)
-                .build()
+
+            if(!hasDriveAccess()){
+                authorizationRequestBuilder.setPrompt(AuthorizationRequest.Prompt.CONSENT)
+            }
 
             val result = Identity.getAuthorizationClient(context)
-                .authorize(authorizationRequest)
+                .authorize(authorizationRequestBuilder.build())
                 .await()
 
             Result.success(result)
