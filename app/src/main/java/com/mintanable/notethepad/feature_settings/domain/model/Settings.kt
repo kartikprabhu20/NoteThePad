@@ -6,11 +6,14 @@ data class Settings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isGridViewSelected: Boolean = false,
     val googleAccount: String? = null,
+    val backupSettings: BackupSettings = BackupSettings()
+)
+
+data class BackupSettings(
     val backupFrequency: BackupFrequency = BackupFrequency.OFF,
     val backupTimeHour: Int = 2,
     val backupTimeMinutes: Int = 0
 )
-
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
 
 enum class BackupFrequency(val days: Long, val title: String) {

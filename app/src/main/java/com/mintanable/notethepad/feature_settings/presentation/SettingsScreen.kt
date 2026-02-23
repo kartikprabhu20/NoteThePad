@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,23 +32,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.work.WorkInfo
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
+import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
-import com.mintanable.notethepad.feature_settings.presentation.components.SettingSwitchItem
 import com.mintanable.notethepad.feature_settings.presentation.components.TimePickerDialog
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsScreen(
     onBackPressed: () -> Unit,
@@ -56,13 +60,11 @@ fun SettingsScreen(
     backupUiState: BackupUiState,
     isAuthorisingBackup: Boolean,
     onThemeChanged: (ThemeMode) -> Unit,
-    onBackupSettingsChanged: (Boolean) -> Unit,
-    onBackupTimeChanged: (Int, Int) -> Unit,
-    onBackupIntervalChanged: (BackupFrequency) -> Unit,
     showToast: (String) -> Unit,
     onBackupNowClicked: () -> Unit,
     onRestoreClicked: () -> Unit,
-    onDummyDataCreate: () -> Unit
+    onDummyDataCreate: () -> Unit,
+    onBackupSettingsChanged: (BackupSettings) -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -72,6 +74,9 @@ fun SettingsScreen(
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
+    val notificationPermissionState = rememberPermissionState(
+        android.Manifest.permission.POST_NOTIFICATIONS
+    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -103,24 +108,10 @@ fun SettingsScreen(
             .padding(paddingValue)
             .padding(horizontal = 16.dp)
         ) {
-
-            item {
-                SettingSwitchItem(
-                    "Backup on Google Drive",
-                    currentSettings.backupEnabled,
-                    true) { checked ->
-                    if (!isGoogleLinked && checked) {
-                        showToast("Please sign in with Google to enable backups")
-                    } else {
-                        onBackupSettingsChanged(checked)
-                    }
-                }
-            }
-
             item {
                 SettingItem(
                     "Automatic backup on Google drive",
-                    currentSettings.backupFrequency.name.lowercase(),
+                    currentSettings.backupSettings.backupFrequency.name.lowercase(),
                     onClick = {
                         if (!isGoogleLinked) {
                             showToast("Please sign in with Google to enable backups")
@@ -142,8 +133,8 @@ fun SettingsScreen(
                         val formattedTime = String.format(
                             Locale.ENGLISH,
                             "%02d:%02d",
-                            currentSettings.backupTimeHour,
-                            currentSettings.backupTimeMinutes
+                            currentSettings.backupSettings.backupTimeHour,
+                            currentSettings.backupSettings.backupTimeMinutes
                         )
                         SettingItem(
                             "Backup time",
@@ -201,13 +192,13 @@ fun SettingsScreen(
 
         if(showIntervalDialog){
             RadioButtonsAlertDialog(
-                currentInterval= currentSettings.backupFrequency,
+                currentInterval= currentSettings.backupSettings.backupFrequency,
                 entries = BackupFrequency.entries,
                 onDismiss = {
                     showIntervalDialog = false
                 },
                 onConfirm = { backupFrequency ->
-                    onBackupIntervalChanged(backupFrequency)
+                    onBackupSettingsChanged(currentSettings.backupSettings.copy(backupFrequency=backupFrequency))
                     showIntervalDialog = false
                 },
             )
@@ -215,11 +206,11 @@ fun SettingsScreen(
 
         if(showTimePickerDialog){
             TimePickerDialog(
-                initialHour = currentSettings.backupTimeHour,
-                initialMinute = currentSettings.backupTimeMinutes,
+                initialHour = currentSettings.backupSettings.backupTimeHour,
+                initialMinute = currentSettings.backupSettings.backupTimeMinutes,
                 onDismiss = { showTimePickerDialog = false }
             ){ hours, minutes ->
-                onBackupTimeChanged(hours,minutes)
+                onBackupSettingsChanged(currentSettings.backupSettings.copy(backupTimeHour = hours, backupTimeMinutes = minutes))
                 showTimePickerDialog = false
             }
         }
@@ -227,6 +218,7 @@ fun SettingsScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Preview(name = "Light Mode", showBackground = true)
 @Preview(
     name = "Dark Mode",
@@ -240,18 +232,16 @@ fun PreviewSettingsScreen(
         SettingsScreen(
             onBackPressed = {},
             currentSettings = Settings(googleAccount="test@google.com"),
+            onLoadBackupInfo = {},
+            backupUploadDownloadState = BackupStatus.Idle,
+            backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2)),
             isAuthorisingBackup = false,
             onThemeChanged = {},
             onBackupSettingsChanged = {},
-            onBackupTimeChanged = {hours,minutes ->},
-            onBackupIntervalChanged = {},
             showToast = {},
             onBackupNowClicked = {},
-            backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2)), // 2MB
-            backupUploadDownloadState = BackupStatus.Idle,
-            onLoadBackupInfo = {},
             onRestoreClicked = {},
-            onDummyDataCreate = {}
+            onDummyDataCreate = {},
         )
     }
 }

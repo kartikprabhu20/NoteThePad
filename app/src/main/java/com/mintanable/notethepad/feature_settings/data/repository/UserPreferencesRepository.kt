@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
+import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -47,18 +48,20 @@ class UserPreferencesRepository(private val context: Context) {
                 notificationsEnabled = notifications,
                 themeMode = ThemeMode.valueOf(theme),
                 isGridViewSelected = isGridViewEnabled,
-                backupFrequency = BackupFrequency.valueOf(backupInterval),
-                backupTimeHour = backupTimeHour,
-                backupTimeMinutes = backupTimeMinutes
+                backupSettings = BackupSettings (
+                    backupFrequency = BackupFrequency.valueOf(backupInterval),
+                    backupTimeHour = backupTimeHour,
+                    backupTimeMinutes =backupTimeMinutes
+                )
             )
         }
 
 
-    suspend fun updateBackupSettings(mode: BackupFrequency, hour: Int, minutes: Int) {
+    suspend fun updateBackupSettings(backupSettings: BackupSettings) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.BACKUP_INTERVAL] = mode.name
-            preferences[PreferencesKeys.BACKUP_TIME_HOUR] = hour
-            preferences[PreferencesKeys.BACKUP_TIME_MINUTE] = minutes
+            preferences[PreferencesKeys.BACKUP_INTERVAL] = backupSettings.backupFrequency.name
+            preferences[PreferencesKeys.BACKUP_TIME_HOUR] = backupSettings.backupTimeHour
+            preferences[PreferencesKeys.BACKUP_TIME_MINUTE] = backupSettings.backupTimeMinutes
         }
     }
 

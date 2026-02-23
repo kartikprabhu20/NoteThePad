@@ -15,6 +15,7 @@ import com.mintanable.notethepad.feature_backup.presentation.BackupWorker
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import java.util.concurrent.TimeUnit
 import androidx.work.workDataOf
+import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -31,7 +32,11 @@ class BackupSchedulerImpl @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun scheduleBackup(frequency: BackupFrequency, hour: Int, minute: Int, backupNow: Boolean) {
+    override fun scheduleBackup(backupSettings: BackupSettings, backupNow: Boolean) {
+        val frequency = backupSettings.backupFrequency
+        val hour = backupSettings.backupTimeHour
+        val minute = backupSettings.backupTimeMinutes
+
         val workdata = workDataOf(
             KEY_FREQUENCY to frequency.name,
             KEY_HOUR to hour,
@@ -129,7 +134,7 @@ class BackupSchedulerImpl @Inject constructor(
         if(backupNow || frequency == BackupFrequency.MONTHLY){
             val hour = inputData.getInt(KEY_HOUR, 2)
             val minute = inputData.getInt(KEY_MINUTE, 0)
-            scheduleBackup(frequency, hour, minute, false)
+            scheduleBackup(BackupSettings(frequency, hour, minute), false)
         }
     }
 }

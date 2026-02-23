@@ -1,6 +1,7 @@
 package com.mintanable.notethepad
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var credentialHelper: GoogleClientHelper
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Composable
     fun MainScreen(settingsViewModel: SettingsViewModel, settings: Settings) {
 
@@ -67,6 +71,8 @@ class MainActivity : AppCompatActivity() {
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 settingsViewModel.onAuthResultCompleted(result.data, { error -> showToast(error) } )
+            } else {
+                settingsViewModel.onAuthCancelled()
             }
         }
 
@@ -165,25 +171,28 @@ class MainActivity : AppCompatActivity() {
                             onThemeChanged = { theme ->
                                 settingsViewModel.updateTheme(theme)
                             },
-                            onBackupSettingsChanged = { backupEnabled ->
-                                settingsViewModel.toggleBackup(
-                                    backupEnabled,
-                                    { pendingIntent ->
-                                        launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
-                                    },
-                                    { error ->
+                            onBackupSettingsChanged = { backupSettings ->
+                                settingsViewModel.updateBackupSettings(
+                                    backupSettings = backupSettings,
+                                    onAuthRequired =
+                                        { pendingIntent ->
+                                            launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
+                                        },
+                                    onFailure = { error ->
                                         showToast(error)
                                     }
                                 )
                             },
-                            onBackupIntervalChanged = { backupFrequency ->
-                                settingsViewModel.updateBackupSettings(backupFrequency, settings.backupTimeHour, settings.backupTimeMinutes)
-                            },
-                            onBackupTimeChanged = { hours,minutes ->
-                                settingsViewModel.updateBackupSettings(settings.backupFrequency, hours, minutes)
-                            },
                             onBackupNowClicked = {
-                                settingsViewModel.updateBackupSettings(settings.backupFrequency, settings.backupTimeHour, settings.backupTimeMinutes, true)
+                                settingsViewModel.updateBackupSettings(settings.backupSettings, true,
+                                    onAuthRequired =
+                                        { pendingIntent ->
+                                            launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
+                                        },
+                                    onFailure = { error ->
+                                        showToast(error)
+                                    }
+                                )
                             },
                             onRestoreClicked = {
                                 settingsViewModel.startRestore()

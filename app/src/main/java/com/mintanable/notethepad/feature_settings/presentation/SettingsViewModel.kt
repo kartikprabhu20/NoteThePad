@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
@@ -26,6 +27,7 @@ import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
+import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -50,10 +52,15 @@ class SettingsViewModel @Inject constructor(
     private val scheduleBackup: ScheduleBackupUseCase,
     private val cancelScheduledBackup: CancelScheduledBackupUsecase,
     private val checkForExistingBackup: CheckForExistingBackup,
-    private val workManager: WorkManager,
+    workManager: WorkManager,
     private val noteUseCases: NoteUseCases,
-    private val downloadBackup: DownloadBackup
+    private val downloadBackup: DownloadBackup,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    companion object {
+        private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
+    }
 
     private val _backupUploadStatus = workManager
         .getWorkInfosForUniqueWorkFlow(BackupSchedulerImpl.WORK_NAME)
@@ -70,6 +77,7 @@ class SettingsViewModel @Inject constructor(
                 }
                 workInfo.state == WorkInfo.State.SUCCEEDED ->{
                     Log.d("kptest", "upload successful")
+                    loadBackupInfo()
                     BackupStatus.Success
                 }
                 workInfo.state == WorkInfo.State.FAILED -> BackupStatus.Error("Background backup failed")
@@ -119,36 +127,48 @@ class SettingsViewModel @Inject constructor(
         initialValue = Settings()
     )
 
-    private val _isProcessingBackupToggle = MutableStateFlow(false)
-    val isAuthorisingBackup = _isProcessingBackupToggle.asStateFlow()
-
-    val isGoogleSignedIn = authRepository.isUserSignedInWithGoogle()
-
-    fun toggleNotifications(enabled: Boolean) {
-        viewModelScope.launch { dataStore.updateNotifications(enabled) }
-    }
-
-    fun updateBackupTime(hours: Int, minutes: Int) {
-        viewModelScope.launch { dataStore.updateBackupTime(hours, minutes) }
-    }
-
-    fun updateBackupFrequency(backupFrequency: BackupFrequency) {
-        viewModelScope.launch { dataStore.updateBackupFrequency(backupFrequency) }
-    }
+    private val _isAuthorisingBackup = MutableStateFlow(false)
+    val isAuthorisingBackup = _isAuthorisingBackup.asStateFlow()
 
     fun updateTheme(mode: ThemeMode) {
         viewModelScope.launch { dataStore.updateTheme(mode) }
     }
 
-    fun toggleBackup(enabled: Boolean, onAuthRequired: (PendingIntent) -> Unit, onFailure:(String)->Unit) {
+    fun signOut(){
         viewModelScope.launch {
-            if (!enabled) {
-                dataStore.updateBackup(false)
+            driveRepository.clearDriveCredentials()
+            resetBackupSettings()
+            authRepository.signOut()
+        }
+    }
+
+    private fun resetBackupSettings() {
+        viewModelScope.launch {
+            dataStore.updateBackupSettings(
+                settingsState.value.backupSettings.copy(
+                    backupFrequency = BackupFrequency.OFF
+                )
+            )
+        }
+    }
+
+    fun updateBackupSettings(
+        backupSettings: BackupSettings,
+        backupNow: Boolean = false,
+        onAuthRequired: (PendingIntent) -> Unit,
+        onFailure:(String)->Unit
+    ) {
+        viewModelScope.launch {
+            if(backupSettings.backupFrequency==BackupFrequency.OFF) {
+                dataStore.updateBackupSettings(backupSettings)
+                cancelScheduledBackup()
                 return@launch
             }
 
+            dataStore.updateBackupSettings(backupSettings)
             if (driveRepository.hasDriveAccess()) {
-                dataStore.updateBackup(true)
+                cancelScheduledBackup()
+                scheduleBackup(backupSettings, backupNow)
             } else {
                 val email = settingsState.value.googleAccount
                 if (email != null) {
@@ -156,16 +176,28 @@ class SettingsViewModel @Inject constructor(
                         .onSuccess { result ->
                             Log.d("kptest", "Has Resolution: ${result.hasResolution()}")
                             if (result.hasResolution()) {
+                                savedStateHandle[KEY_PENDING_BACKUP_NOW] = backupNow
                                 result.pendingIntent?.let { onAuthRequired(it) }
-                                _isProcessingBackupToggle.value = false
+                                _isAuthorisingBackup.value = true
                             } else {
                                 Log.d("kptest", "Attempting Silent Exchange")
-                                exchangeCodeForTokens(result.serverAuthCode, onFailure)
-                                _isProcessingBackupToggle.value = false
+                                exchangeCodeForTokens(
+                                    result.serverAuthCode, 
+                                    onSuccess = 
+                                        { 
+                                            cancelScheduledBackup()
+                                            scheduleBackup(backupSettings, backupNow) 
+                                        }, 
+                                    onFailure = { message ->
+                                        onFailure(message)
+                                        resetBackupSettings()
+                                    })
+                                _isAuthorisingBackup.value = false
                             }
                         }
                         .onFailure { exception ->
-                            _isProcessingBackupToggle.value = false
+                            _isAuthorisingBackup.value = false
+                            dataStore.updateBackupSettings(backupSettings.copy(backupFrequency = BackupFrequency.OFF))
                             val errorMessage = exception.localizedMessage ?: exception.message ?: "Authorization failed"
                             onFailure(errorMessage)
                         }
@@ -174,13 +206,17 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun exchangeCodeForTokens(code: String?, onFailure: (String) -> Unit) {
+    private suspend fun exchangeCodeForTokens(
+        code: String?,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         if (code != null) {
             val exchangeResult = driveRepository.exchangeCodeForTokens(code)
             exchangeResult
                 .onSuccess {
                     Log.d("kptest", "Successfully exchanged tokens")
-                    dataStore.updateBackup(true)
+                    onSuccess()
                 }
                 .onFailure { error ->
                     Log.e("kptest", "Token exchange failed ${error.message}")
@@ -193,35 +229,31 @@ class SettingsViewModel @Inject constructor(
 
     fun onAuthResultCompleted(data: Intent?, onFailure:(String)->Unit) {
         viewModelScope.launch {
-            _isProcessingBackupToggle.value = true
+            _isAuthorisingBackup.value = true
             val authCode = driveRepository.getAuthCodeFromIntent(data)
             Log.d("kptest", "onAuthResultCompleted")
-            exchangeCodeForTokens(authCode,onFailure)
-            _isProcessingBackupToggle.value = false
+            exchangeCodeForTokens(
+                authCode,
+                onSuccess =
+                    {
+                        val wasBackupNowRequested = savedStateHandle.get<Boolean>(KEY_PENDING_BACKUP_NOW) ?: false
+                        cancelScheduledBackup()
+                        scheduleBackup(settingsState.value.backupSettings, wasBackupNowRequested)
+                        savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
+                    },
+                onFailure = { message ->
+                    resetBackupSettings()
+                    onFailure(message)
+                }
+            )
+            _isAuthorisingBackup.value = false
         }
     }
 
-    fun signOut(){
-        viewModelScope.launch {
-            driveRepository.clearDriveCredentials()
-            dataStore.updateBackup(false)
-            authRepository.signOut()
-        }
-    }
-
-    fun updateBackupSettings(
-        frequency: BackupFrequency,
-        hour: Int,
-        minute: Int,
-        backupNow: Boolean = false
-    ) {
-        viewModelScope.launch {
-            dataStore.updateBackupSettings(frequency,hour,minute)
-            cancelScheduledBackup()
-            if(frequency!=BackupFrequency.OFF) {
-                scheduleBackup(frequency, hour, minute, backupNow)
-            }
-        }
+    fun onAuthCancelled() {
+        resetBackupSettings()
+        _isAuthorisingBackup.value = false
+        savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
     }
 
     fun loadBackupInfo() {
