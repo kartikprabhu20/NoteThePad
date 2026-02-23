@@ -1,7 +1,5 @@
 package com.mintanable.notethepad.di
 
-import android.app.Application
-import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.mintanable.notethepad.feature_firebase.data.repository.AuthRepositoryImpl
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
@@ -9,7 +7,7 @@ import com.mintanable.notethepad.feature_navigationdrawer.data.repository.Naviga
 import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
 import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
-import com.mintanable.notethepad.feature_note.data.source.NoteDatabase
+import com.mintanable.notethepad.feature_note.data.source.NoteDao
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.*
 import dagger.Module
@@ -21,25 +19,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
     @Provides
-    @Singleton
-    fun provideNoteDatabase(app:Application):NoteDatabase{
-        return Room.databaseBuilder(
-            app,
-            NoteDatabase::class.java,
-            NoteDatabase.DATABASE_NAME
-        ).build()
+    fun provideNoteRepository(dao: NoteDao): NoteRepository {
+        return NoteRepositoryImpl(dao)
     }
 
     @Provides
-    @Singleton
-    fun provideNoteRepository(db: NoteDatabase): NoteRepository{
-        return NoteRepositoryImpl(db.noteDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideNoteUseCases(repository: NoteRepository):NoteUseCases {
+    fun provideNoteUseCases(repository: NoteRepository): NoteUseCases {
         return NoteUseCases(
             getNotes = GetNotes(repository),
             deleteNote = DeleteNote(repository),
@@ -56,7 +43,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNavigationDrawerRepository(): NavigationDrawerItemRepository{
+    fun provideNavigationDrawerRepository(): NavigationDrawerItemRepository {
         return NavigationDrawerItemRepositoryImpl()
     }
 

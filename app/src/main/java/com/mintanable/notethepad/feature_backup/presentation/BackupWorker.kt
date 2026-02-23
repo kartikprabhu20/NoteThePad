@@ -18,6 +18,8 @@ import androidx.work.ForegroundInfo
 import androidx.work.workDataOf
 import com.mintanable.notethepad.R
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 @HiltWorker

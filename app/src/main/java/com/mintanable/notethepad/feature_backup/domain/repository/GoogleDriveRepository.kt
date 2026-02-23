@@ -7,6 +7,6 @@ import java.io.File
 
 interface GoogleDriveRepository{
     suspend fun uploadFileWithProgress(accessToken: String, dbFile: File): Flow<BackupStatus>
-    suspend fun downloadBackupFile()
+    suspend fun downloadBackupFile(accessToken: String, dbFile: File): Flow<BackupStatus>
     suspend fun checkForExistingBackup(accessToken: String): Flow<DriveFileMetadata?>
 }

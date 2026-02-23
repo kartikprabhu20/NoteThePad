@@ -3,26 +3,40 @@ package com.mintanable.notethepad.feature_settings.presentation
 import android.app.PendingIntent
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledBackupUsecase
 import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
+import com.mintanable.notethepad.feature_backup.domain.use_case.DownloadBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
+import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
+import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
+import com.mintanable.notethepad.feature_backup.presentation.UploadDownload
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
+import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,20 +50,62 @@ class SettingsViewModel @Inject constructor(
     private val scheduleBackup: ScheduleBackupUseCase,
     private val cancelScheduledBackup: CancelScheduledBackupUsecase,
     private val checkForExistingBackup: CheckForExistingBackup,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val noteUseCases: NoteUseCases,
+    private val downloadBackup: DownloadBackup
 ) : ViewModel() {
 
-    val backupWorkInfo = workManager
+    private val _backupUploadStatus = workManager
         .getWorkInfosForUniqueWorkFlow(BackupSchedulerImpl.WORK_NAME)
-        .map { it.firstOrNull() }
+        .map { list ->
+            val workInfo = list.firstOrNull()
+            Log.d("kptest", "upload status :${workInfo?.state}")
+
+            when {
+                workInfo == null -> BackupStatus.Idle
+                workInfo.state == WorkInfo.State.RUNNING -> {
+                    val progress = workInfo.progress.getInt("percent", 0)
+                    Log.d("kptest", "upload status progress:$progress")
+                    BackupStatus.Progress(progress, UploadDownload.UPLOAD)
+                }
+                workInfo.state == WorkInfo.State.SUCCEEDED ->{
+                    Log.d("kptest", "upload successful")
+                    BackupStatus.Success
+                }
+                workInfo.state == WorkInfo.State.FAILED -> BackupStatus.Error("Background backup failed")
+                else -> BackupStatus.Idle
+            }
+        }
+        .distinctUntilChanged()
         .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = BackupStatus.Idle
+    )
+
+    private val _backupDownloadState = MutableStateFlow<BackupStatus>(BackupStatus.Idle)
+
+    val backupUploadDownloadState: StateFlow<BackupStatus> = combine(
+        _backupUploadStatus,
+        _backupDownloadState
+    ){ upload, download ->
+        when{
+            download is BackupStatus.Progress -> download
+            upload is BackupStatus.Progress -> upload
+            download is BackupStatus.Success || download is BackupStatus.Error -> download
+            else -> upload
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = BackupStatus.Idle
+    )
 
     private val _backupUiState = MutableStateFlow<BackupUiState>(BackupUiState.Loading)
     val backupUiState = _backupUiState.asStateFlow()
+
+    private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
+    val restoreEvents = _restoreEvents.asSharedFlow()
 
     val settingsState: StateFlow<Settings> = combine(
         authRepository.getSignedInFirebaseUser(),
@@ -177,6 +233,32 @@ class SettingsViewModel @Inject constructor(
                 } else {
                     BackupUiState.NoBackup
                 }
+            }
+        }
+    }
+
+    fun startRestore() {
+        viewModelScope.launch {
+            _backupDownloadState.value = BackupStatus.Progress(0,UploadDownload.DOWNLOAD)
+            downloadBackup().collect { status ->
+                _backupDownloadState.value = status
+
+                if (status is BackupStatus.Success) {
+                    _restoreEvents.emit(RestoreEvent.NavigateToHome)
+                    delay(500)
+                    _backupDownloadState.value = BackupStatus.Idle
+                }
+            }
+        }
+    }
+
+    fun createMassiveDummyData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            for (i in 1..10000){
+                noteUseCases.addNote(Note(title = "Note #$i",
+                    content = "Content for $i",
+                    timestamp = System.currentTimeMillis(),
+                    color = NoteColors.colors.random().toArgb()))
             }
         }
     }

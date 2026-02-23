@@ -13,6 +13,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper
@@ -136,15 +138,28 @@ class MainActivity : AppCompatActivity() {
                     }
                     composable(route = Screen.SettingsScreen.route) {
                         val isAuthorisingBackup by settingsViewModel.isAuthorisingBackup.collectAsStateWithLifecycle()
-                        val workInfo by settingsViewModel.backupWorkInfo.collectAsStateWithLifecycle()
                         val backupUiState by settingsViewModel.backupUiState.collectAsStateWithLifecycle()
+                        val backupUploadDownloadState by settingsViewModel.backupUploadDownloadState.collectAsStateWithLifecycle()
+
+                        LaunchedEffect(Unit) {
+                            settingsViewModel.restoreEvents.collect { event ->
+                                when (event) {
+                                    is RestoreEvent.NavigateToHome -> {
+                                        navController.navigate(Screen.NotesScreen.route) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         SettingsScreen(
                             onBackPressed = {
                                 navController.navigateUp()
                             },
                             isAuthorisingBackup = isAuthorisingBackup,
                             currentSettings = settings,
-                            backupWorkInfo = workInfo,
+                            backupUploadDownloadState = backupUploadDownloadState,
                             backupUiState = backupUiState,
                             onLoadBackupInfo = { settingsViewModel.loadBackupInfo() },
                             onThemeChanged = { theme ->
@@ -170,8 +185,14 @@ class MainActivity : AppCompatActivity() {
                             onBackupNowClicked = {
                                 settingsViewModel.updateBackupSettings(settings.backupFrequency, settings.backupTimeHour, settings.backupTimeMinutes, true)
                             },
+                            onRestoreClicked = {
+                                settingsViewModel.startRestore()
+                            },
                             showToast = { message ->
                                 showToast(message)
+                            },
+                            onDummyDataCreate = {
+                                settingsViewModel.createMassiveDummyData()
                             }
                         )
                     }

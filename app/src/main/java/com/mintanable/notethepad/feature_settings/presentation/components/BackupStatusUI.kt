@@ -11,7 +11,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,30 +18,43 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.work.WorkInfo
+import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
+import com.mintanable.notethepad.feature_backup.presentation.UploadDownload
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
 @Composable
 fun BackupStatusUI(
-    workInfo: WorkInfo?,
+    backupUploadDownloadState: BackupStatus,
     backupUiState: BackupUiState,
     onRestoreClicked: () -> Unit
 ) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        val progress = workInfo?.progress?.getInt("percent", -1) ?: -1
-        val isRunning = workInfo?.state == WorkInfo.State.RUNNING
+        val isRunning = backupUploadDownloadState is BackupStatus.Progress
+        val progress = if (backupUploadDownloadState is BackupStatus.Progress) {
+            backupUploadDownloadState.percentage * 1f
+        } else {
+            0f
+        }
 
         if (isRunning && progress >= 0) {
-            Text("Uploading to Drive: $progress%", style = MaterialTheme.typography.bodySmall)
+            val type = if (backupUploadDownloadState is BackupStatus.Progress) { backupUploadDownloadState.type} else null
+            Text(
+                if(type==UploadDownload.UPLOAD) {
+                    "Uploading to Drive: $progress%"
+                } else {
+                    "Downloading from Drive: $progress%"
+                },
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            )
             LinearProgressIndicator(
                 progress = { progress / 100f },
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 16.dp)
             )
         }
 
@@ -96,7 +108,7 @@ fun BackupStatusUI(
 fun PreviewBackupHasData() {
     NoteThePadTheme {
         BackupStatusUI(
-            workInfo = null,
+            backupUploadDownloadState = BackupStatus.Idle,
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
             ),
@@ -110,7 +122,7 @@ fun PreviewBackupHasData() {
 fun PreviewBackupUINoBackup() {
     NoteThePadTheme {
         BackupStatusUI(
-            workInfo = null,
+            backupUploadDownloadState = BackupStatus.Idle,
             backupUiState = BackupUiState.NoBackup,
             onRestoreClicked = {}
         )
@@ -122,7 +134,7 @@ fun PreviewBackupUINoBackup() {
 fun PreviewBackupUILoading() {
     NoteThePadTheme {
         BackupStatusUI(
-            workInfo = null,
+            backupUploadDownloadState = BackupStatus.Idle,
             backupUiState = BackupUiState.Loading,
             onRestoreClicked = {}
         )
@@ -135,11 +147,7 @@ fun PreviewBackupUILoading() {
 fun PreviewBackupUIWorkInfoUploading() {
     NoteThePadTheme {
         BackupStatusUI(
-            workInfo = WorkInfo(
-                id = UUID.fromString("test"),
-                state = WorkInfo.State.RUNNING,
-                tags = setOf("testTag")
-            ),
+            backupUploadDownloadState = BackupStatus.Progress(12, UploadDownload.UPLOAD),
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
             ),

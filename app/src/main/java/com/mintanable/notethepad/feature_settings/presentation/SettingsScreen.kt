@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.work.WorkInfo
+import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
@@ -51,7 +52,7 @@ fun SettingsScreen(
     onBackPressed: () -> Unit,
     currentSettings: Settings,
     onLoadBackupInfo: () -> Unit,
-    backupWorkInfo: WorkInfo?,
+    backupUploadDownloadState: BackupStatus,
     backupUiState: BackupUiState,
     isAuthorisingBackup: Boolean,
     onThemeChanged: (ThemeMode) -> Unit,
@@ -59,7 +60,9 @@ fun SettingsScreen(
     onBackupTimeChanged: (Int, Int) -> Unit,
     onBackupIntervalChanged: (BackupFrequency) -> Unit,
     showToast: (String) -> Unit,
-    onBackupNowClicked: () -> Unit
+    onBackupNowClicked: () -> Unit,
+    onRestoreClicked: () -> Unit,
+    onDummyDataCreate: () -> Unit
 ) {
 
     LaunchedEffect(Unit) {
@@ -158,10 +161,19 @@ fun SettingsScreen(
                     }
 
                     BackupStatusUI(
-                        workInfo = backupWorkInfo,
+                        backupUploadDownloadState = backupUploadDownloadState,
                         backupUiState = backupUiState,
-                        onRestoreClicked = {  }
+                        onRestoreClicked = { onRestoreClicked() }
                     )
+                }
+
+                item {
+                    Button(
+                        modifier = Modifier.padding(8.dp).clip(RectangleShape).fillMaxWidth(),
+                        onClick = { onDummyDataCreate() }
+                    ) {
+                        Text("Create dummy data")
+                    }
                 }
 
             }
@@ -236,8 +248,10 @@ fun PreviewSettingsScreen(
             showToast = {},
             onBackupNowClicked = {},
             backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2)), // 2MB
-            backupWorkInfo = null,
-            onLoadBackupInfo = {}
+            backupUploadDownloadState = BackupStatus.Idle,
+            onLoadBackupInfo = {},
+            onRestoreClicked = {},
+            onDummyDataCreate = {}
         )
     }
 }

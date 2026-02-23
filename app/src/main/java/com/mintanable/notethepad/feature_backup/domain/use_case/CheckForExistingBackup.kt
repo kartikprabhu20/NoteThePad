@@ -12,7 +12,7 @@ class CheckForExistingBackup@Inject constructor(
     private val googleDriveRepository: GoogleDriveRepository,
     private val googleAuthRepository: GoogleAuthRepository
 ) {
-    suspend operator fun invoke(): Flow<DriveFileMetadata?> = flow {
+    operator fun invoke(): Flow<DriveFileMetadata?> = flow {
         try {
             val refreshToken = googleAuthRepository.getDecryptedRefreshToken()
 
