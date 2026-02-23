@@ -156,7 +156,7 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                         id = googleFile.id,
                         name = googleFile.name,
                         modifiedTime = googleFile.modifiedTime.value,
-                        size = googleFile.size.toLong()
+                        size = googleFile.getSize()
                     )
                 )
             } else {
