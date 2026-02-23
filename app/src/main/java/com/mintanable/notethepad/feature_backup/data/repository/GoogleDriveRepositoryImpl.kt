@@ -116,6 +116,7 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                         MediaHttpDownloader.DownloadState.MEDIA_COMPLETE -> {
                             trySend(BackupStatus.Progress(100, UploadDownload.DOWNLOAD))
                             trySend(BackupStatus.Success)
+                            close()
                         }
                         else -> Unit
                     }

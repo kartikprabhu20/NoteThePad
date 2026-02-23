@@ -91,7 +91,33 @@ class SettingsViewModel @Inject constructor(
         initialValue = BackupStatus.Idle
     )
 
-    private val _backupDownloadState = MutableStateFlow<BackupStatus>(BackupStatus.Idle)
+    private val _backupDownloadState = workManager
+        .getWorkInfosForUniqueWorkFlow(DownloadBackup.DOWNLOAD_BACKUP_TASK)
+        .map { list ->
+            val workInfo = list.firstOrNull()
+            Log.d("kptest", "Download status :${workInfo?.state}")
+
+            when {
+                workInfo == null -> BackupStatus.Idle
+                workInfo.state == WorkInfo.State.RUNNING -> {
+                    val progress = workInfo.progress.getInt("percent", 0)
+                    Log.d("kptest", "Download status progress:$progress")
+                    BackupStatus.Progress(progress, UploadDownload.DOWNLOAD)
+                }
+                workInfo.state == WorkInfo.State.SUCCEEDED ->{
+                    Log.d("kptest", "Restore successful")
+                    BackupStatus.Success
+                }
+                workInfo.state == WorkInfo.State.FAILED -> BackupStatus.Error("Background restore failed")
+                else -> BackupStatus.Idle
+            }
+        }
+        .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = BackupStatus.Idle
+        )
 
     val backupUploadDownloadState: StateFlow<BackupStatus> = combine(
         _backupUploadStatus,
@@ -270,18 +296,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun startRestore() {
-        viewModelScope.launch {
-            _backupDownloadState.value = BackupStatus.Progress(0,UploadDownload.DOWNLOAD)
-            downloadBackup().collect { status ->
-                _backupDownloadState.value = status
-
-                if (status is BackupStatus.Success) {
-                    _restoreEvents.emit(RestoreEvent.NavigateToHome)
-                    delay(500)
-                    _backupDownloadState.value = BackupStatus.Idle
-                }
-            }
-        }
+            downloadBackup()
     }
 
     fun createMassiveDummyData() {
