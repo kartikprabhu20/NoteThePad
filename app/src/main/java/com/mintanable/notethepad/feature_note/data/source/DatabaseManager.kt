@@ -26,7 +26,9 @@ class DatabaseManager @Inject constructor(
             context,
             NoteDatabase::class.java,
             NoteDatabase.DATABASE_NAME
-        ).build()
+        )
+            .addMigrations(NoteDatabase.MIGRATION_1_2)
+            .build()
     }
 
     fun swapDatabase(tempFile: File) {

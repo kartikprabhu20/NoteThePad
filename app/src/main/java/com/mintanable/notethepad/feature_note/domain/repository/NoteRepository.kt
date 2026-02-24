@@ -1,11 +1,12 @@
 package com.mintanable.notethepad.feature_note.domain.repository
 
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
 
-    fun getNotes(): Flow<List<Note>>
+    fun getNotes(noteOrder: NoteOrder): Flow<List<Note>>
 
     suspend fun getNoteById(id:Int):Note?
 

@@ -66,7 +66,6 @@ class SettingsViewModel @Inject constructor(
         private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
     }
 
-
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
         tryEmit(Unit)
     }

@@ -30,7 +30,6 @@ import com.mintanable.notethepad.feature_note.presentation.notes.NotesEvent
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -39,9 +38,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import com.mintanable.notethepad.feature_note.domain.model.Note
-import android.util.Log
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesScreen (
     navController: NavController,
@@ -52,11 +50,13 @@ fun NotesScreen (
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
 ){
-    val state by notesViewModel.state
+    val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery = notesViewModel.searchInputText.collectAsState().value
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
+    val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
+    val currentOrder by notesViewModel.noteOrder.collectAsState()
 
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -177,7 +177,7 @@ fun NotesScreen (
                         .padding(horizontal = 16.dp)
                 ) {
                     AnimatedVisibility(
-                        visible = state.isOrderSectionVisible,
+                        visible = isOrderSectionVisible,
                         enter = fadeIn() + slideInVertically(),
                         exit = fadeOut() + slideOutVertically()
 
@@ -186,7 +186,7 @@ fun NotesScreen (
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            noteOrder = state.noteOrder,
+                            noteOrder = currentOrder,
                             onOrderChange = {
                                 notesViewModel.onEvent(NotesEvent.Order(it))
                             }
@@ -200,7 +200,6 @@ fun NotesScreen (
                         verticalItemSpacing = 8.dp,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ){
-                        Log.d("kptest"," Displaying notes: ${state.notes.size}")
                         items(
                             state.notes,
                             key = { note -> note.id ?: -1 },

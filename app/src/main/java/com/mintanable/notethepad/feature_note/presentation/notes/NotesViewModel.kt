@@ -1,7 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_note.domain.model.Note
@@ -11,31 +10,71 @@ import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
-    private val getLayoutSettings: GetLayoutSettings,
+    getLayoutSettings: GetLayoutSettings,
     private val toggleLayoutSettings: ToggleLayoutSettings
 ) :ViewModel() {
 
-    private val _state = mutableStateOf(NotesState())
-    val state : State<NotesState> = _state
     private var recentlyDeletedNote: Note? = null
-    private var getNotesJob : Job? = null
+
+    private val _noteOrder = MutableStateFlow<NoteOrder>(NoteOrder.Date(OrderType.Descending))
+    val noteOrder = _noteOrder.asStateFlow()
+
+    private val _isOrderSectionVisible = MutableStateFlow(false)
+    val isOrderSectionVisible = _isOrderSectionVisible.asStateFlow()
 
     private val _searchInputText: MutableStateFlow<String> =
         MutableStateFlow("")
-    val searchInputText: StateFlow<String> = _searchInputText
+    val searchInputText = _searchInputText
+
+    val state: StateFlow<NotesState> = combine(
+        _noteOrder,
+        _searchInputText.debounce(300L).distinctUntilChanged(),
+        _noteOrder.flatMapLatest { order ->
+            noteUseCases.getNotes(order)
+        }
+    ) { order, query, notes ->
+        Log.d("kptest", "order: $order, query: $query")
+        val filtered =
+            if (query.isBlank()) {
+                notes
+            }
+            else {
+                notes.filter {
+                    it.title.contains(query, ignoreCase = true) ||
+                            it.content.contains(query, ignoreCase = true)
+                }
+            }
+
+        NotesState(
+            notes = filtered
+        )
+    }
+        .flowOn(Dispatchers.Default)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NotesState()
+        )
 
     val isGridViewEnabled: StateFlow<Boolean> = getLayoutSettings()
         .stateIn(
@@ -44,19 +83,11 @@ class NotesViewModel @Inject constructor(
             initialValue = false
         )
 
-    init {
-        getNotes(NoteOrder.Date(OrderType.Descending))
-    }
-
     fun onEvent(event:NotesEvent){
         when(event){
-            is NotesEvent.Order ->{
-                if(state.value.noteOrder::class == event.noteOrder::class &&
-                        state.value.noteOrder.orderType == event.noteOrder.orderType){
-                    return
-                }
-                getNotes(event.noteOrder, searchInputText.value)
-            }
+            is NotesEvent.Order ->{ _noteOrder.value = event.noteOrder }
+            is NotesEvent.ToggleOrderSection ->{ _isOrderSectionVisible.value = !_isOrderSectionVisible.value }
+            is NotesEvent.SearchBarValueChange -> { _searchInputText.value = event.searchQuery }
             is NotesEvent.DeleteNote ->{
                 viewModelScope.launch {
                     noteUseCases.deleteNote(event.note)
@@ -69,36 +100,7 @@ class NotesViewModel @Inject constructor(
                     recentlyDeletedNote = null
                 }
             }
-            is NotesEvent.ToggleOrderSection ->{
-                _state.value = state.value.copy(
-                    isOrderSectionVisible = !state.value.isOrderSectionVisible
-                )
-            }
-            is NotesEvent.SearchBarValueChange -> {
-                _searchInputText.value = event.searchQuery
-                getNotes(state.value.noteOrder, event.searchQuery)
-            }
-            else -> {}
         }
-    }
-
-    private fun getNotes(noteOrder: NoteOrder, searchQuery: String = "") {
-        getNotesJob?.cancel()
-        getNotesJob = noteUseCases.getNotes(noteOrder)
-            .onEach { notes ->
-                val filteredNotes = if (searchQuery.isBlank()) {
-                    notes
-                } else {
-                    notes.filter {
-                        it.title.contains(searchQuery, ignoreCase = true) ||
-                                it.content.contains(searchQuery, ignoreCase = true)
-                    }
-                }
-                _state.value = state.value.copy(
-                    notes = filteredNotes,
-                    noteOrder = noteOrder
-                )
-        }.launchIn(viewModelScope)
     }
 
     fun toggleGridView(enabled: Boolean) {
