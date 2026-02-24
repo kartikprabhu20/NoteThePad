@@ -62,62 +62,16 @@ class SettingsViewModel @Inject constructor(
         private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
     }
 
-    private val _backupUploadStatus = workManager
-        .getWorkInfosForUniqueWorkFlow(BackupSchedulerImpl.WORK_NAME)
-        .map { list ->
-            val workInfo = list.firstOrNull()
-            Log.d("kptest", "upload status :${workInfo?.state}")
-
-            when {
-                workInfo == null -> BackupStatus.Idle
-                workInfo.state == WorkInfo.State.RUNNING -> {
-                    val progress = workInfo.progress.getInt("percent", 0)
-                    Log.d("kptest", "upload status progress:$progress")
-                    BackupStatus.Progress(progress, UploadDownload.UPLOAD)
-                }
-                workInfo.state == WorkInfo.State.SUCCEEDED ->{
-                    Log.d("kptest", "upload successful")
-                    loadBackupInfo()
-                    BackupStatus.Success
-                }
-                workInfo.state == WorkInfo.State.FAILED -> BackupStatus.Error("Background backup failed")
-                else -> BackupStatus.Idle
-            }
-        }
-        .distinctUntilChanged()
-        .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = BackupStatus.Idle
+    private val _backupUploadStatus = workManager.getBackupStatusFlow(
+        workName = BackupSchedulerImpl.WORK_NAME,
+        type = UploadDownload.UPLOAD,
+        onSuccess = { loadBackupInfo() }
     )
 
-    private val _backupDownloadState = workManager
-        .getWorkInfosForUniqueWorkFlow(DownloadBackup.DOWNLOAD_BACKUP_TASK)
-        .map { list ->
-            val workInfo = list.firstOrNull()
-            Log.d("kptest", "Download status :${workInfo?.state}")
-
-            when {
-                workInfo == null -> BackupStatus.Idle
-                workInfo.state == WorkInfo.State.RUNNING -> {
-                    val progress = workInfo.progress.getInt("percent", 0)
-                    Log.d("kptest", "Download status progress:$progress")
-                    BackupStatus.Progress(progress, UploadDownload.DOWNLOAD)
-                }
-                workInfo.state == WorkInfo.State.SUCCEEDED ->{
-                    Log.d("kptest", "Restore successful")
-                    BackupStatus.Success
-                }
-                workInfo.state == WorkInfo.State.FAILED -> BackupStatus.Error("Background restore failed")
-                else -> BackupStatus.Idle
-            }
-        }
-        .distinctUntilChanged()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = BackupStatus.Idle
-        )
+    private val _backupDownloadState = workManager.getBackupStatusFlow(
+        workName = DownloadBackup.DOWNLOAD_BACKUP_TASK,
+        type = UploadDownload.DOWNLOAD
+    )
 
     val backupUploadDownloadState: StateFlow<BackupStatus> = combine(
         _backupUploadStatus,
@@ -185,51 +139,57 @@ class SettingsViewModel @Inject constructor(
         onFailure:(String)->Unit
     ) {
         viewModelScope.launch {
+            dataStore.updateBackupSettings(backupSettings)
+
             if(backupSettings.backupFrequency==BackupFrequency.OFF) {
-                dataStore.updateBackupSettings(backupSettings)
                 cancelScheduledBackup()
                 return@launch
             }
 
-            dataStore.updateBackupSettings(backupSettings)
             if (driveRepository.hasDriveAccess()) {
-                cancelScheduledBackup()
-                scheduleBackup(backupSettings, backupNow)
-            } else {
-                val email = settingsState.value.googleAccount
-                if (email != null) {
-                    driveRepository.authorizeDriveAccess(email)
-                        .onSuccess { result ->
-                            Log.d("kptest", "Has Resolution: ${result.hasResolution()}")
-                            if (result.hasResolution()) {
-                                savedStateHandle[KEY_PENDING_BACKUP_NOW] = backupNow
-                                result.pendingIntent?.let { onAuthRequired(it) }
-                                _isAuthorisingBackup.value = true
-                            } else {
-                                Log.d("kptest", "Attempting Silent Exchange")
-                                exchangeCodeForTokens(
-                                    result.serverAuthCode, 
-                                    onSuccess = 
-                                        { 
-                                            cancelScheduledBackup()
-                                            scheduleBackup(backupSettings, backupNow) 
-                                        }, 
-                                    onFailure = { message ->
-                                        onFailure(message)
-                                        resetBackupSettings()
-                                    })
-                                _isAuthorisingBackup.value = false
-                            }
-                        }
-                        .onFailure { exception ->
-                            _isAuthorisingBackup.value = false
-                            dataStore.updateBackupSettings(backupSettings.copy(backupFrequency = BackupFrequency.OFF))
-                            val errorMessage = exception.localizedMessage ?: exception.message ?: "Authorization failed"
-                            onFailure(errorMessage)
-                        }
-                }
+                rescheduleBackup(backupSettings, backupNow)
+            }else{
+                handleNewAuthorization(backupNow, onAuthRequired, onFailure)
             }
         }
+    }
+
+    private fun rescheduleBackup(settings: BackupSettings, now: Boolean) {
+        cancelScheduledBackup()
+        scheduleBackup(settings, now)
+    }
+
+    private suspend fun handleNewAuthorization(
+        backupNow: Boolean,
+        onAuthRequired: (PendingIntent) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        _isAuthorisingBackup.value = true
+
+        driveRepository.authorizeDriveAccess(settingsState.value.googleAccount!!)
+            .onSuccess { result ->
+                if (result.hasResolution()) {
+                    savedStateHandle[KEY_PENDING_BACKUP_NOW] = backupNow
+                    result.pendingIntent?.let { onAuthRequired(it) }
+                } else {
+                    exchangeCodeForTokens(
+                        code = result.serverAuthCode,
+                        onSuccess = {
+                            rescheduleBackup(settingsState.value.backupSettings, backupNow)
+                        },
+                        onFailure = { message ->
+                            onFailure(message)
+                            resetBackupSettings()
+                        }
+                    )
+                    _isAuthorisingBackup.value = false
+                }
+            }
+            .onFailure { exception ->
+                _isAuthorisingBackup.value = false
+                resetBackupSettings()
+                onFailure(exception.localizedMessage ?: "Authorization failed")
+            }
     }
 
     private suspend fun exchangeCodeForTokens(
