@@ -167,7 +167,6 @@ class MainActivity : AppCompatActivity() {
                             currentSettings = settings,
                             backupUploadDownloadState = backupUploadDownloadState,
                             backupUiState = backupUiState,
-                            onLoadBackupInfo = { settingsViewModel.loadBackupInfo() },
                             onThemeChanged = { theme ->
                                 settingsViewModel.updateTheme(theme)
                             },

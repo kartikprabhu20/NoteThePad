@@ -58,7 +58,6 @@ import java.util.Locale
 fun SettingsScreen(
     onBackPressed: () -> Unit,
     currentSettings: Settings,
-    onLoadBackupInfo: () -> Unit,
     backupUploadDownloadState: BackupStatus,
     backupUiState: BackupUiState,
     isAuthorisingBackup: Boolean,
@@ -69,10 +68,6 @@ fun SettingsScreen(
     onDummyDataCreate: () -> Unit,
     onBackupSettingsChanged: (BackupSettings) -> Unit
 ) {
-
-    LaunchedEffect(Unit) {
-        onLoadBackupInfo()
-    }
 
     var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
@@ -260,7 +255,6 @@ fun PreviewSettingsScreen(
         SettingsScreen(
             onBackPressed = {},
             currentSettings = Settings(googleAccount="test@google.com"),
-            onLoadBackupInfo = {},
             backupUploadDownloadState = BackupStatus.Idle,
             backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2)),
             isAuthorisingBackup = false,

@@ -30,6 +30,7 @@ import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -65,7 +68,7 @@ class SettingsViewModel @Inject constructor(
     private val _backupUploadStatus = workManager.getBackupStatusFlow(
         workName = BackupSchedulerImpl.WORK_NAME,
         type = UploadDownload.UPLOAD,
-        onSuccess = { loadBackupInfo() }
+        onSuccess = { refreshTrigger.tryEmit(Unit) }
     )
 
     private val _backupDownloadState = workManager.getBackupStatusFlow(
@@ -89,9 +92,6 @@ class SettingsViewModel @Inject constructor(
         initialValue = BackupStatus.Idle
     )
 
-    private val _backupUiState = MutableStateFlow<BackupUiState>(BackupUiState.Loading)
-    val backupUiState = _backupUiState.asStateFlow()
-
     private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
     val restoreEvents = _restoreEvents.asSharedFlow()
 
@@ -106,6 +106,31 @@ class SettingsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = Settings()
     )
+
+    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
+        tryEmit(Unit)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val backupUiState: StateFlow<BackupUiState> = combine(
+        settingsState.map { it.googleAccount }.distinctUntilChanged(),
+        refreshTrigger
+    ) { email, _ ->
+        email
+    }
+        .flatMapLatest { email ->
+            if (email == null) return@flatMapLatest flowOf(BackupUiState.NoBackup)
+
+            checkForExistingBackup().map { metadata ->
+                if (metadata != null) BackupUiState.HasBackup(metadata)
+                else BackupUiState.NoBackup
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = BackupUiState.Loading
+        )
 
     private val _isAuthorisingBackup = MutableStateFlow(false)
     val isAuthorisingBackup = _isAuthorisingBackup.asStateFlow()
@@ -240,19 +265,6 @@ class SettingsViewModel @Inject constructor(
         resetBackupSettings()
         _isAuthorisingBackup.value = false
         savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
-    }
-
-    fun loadBackupInfo() {
-        viewModelScope.launch {
-            _backupUiState.value = BackupUiState.Loading
-            checkForExistingBackup().collect { metadata ->
-                _backupUiState.value = if (metadata != null) {
-                    BackupUiState.HasBackup(metadata)
-                } else {
-                    BackupUiState.NoBackup
-                }
-            }
-        }
     }
 
     fun startRestore() {
