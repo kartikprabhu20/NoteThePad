@@ -7,9 +7,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
+import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledBackupUsecase
 import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
@@ -31,7 +31,6 @@ import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,8 +39,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -58,11 +58,17 @@ class SettingsViewModel @Inject constructor(
     workManager: WorkManager,
     private val noteUseCases: NoteUseCases,
     private val downloadBackup: DownloadBackup,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     companion object {
         private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
+    }
+
+
+    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
+        tryEmit(Unit)
     }
 
     private val _backupUploadStatus = workManager.getBackupStatusFlow(
@@ -107,23 +113,36 @@ class SettingsViewModel @Inject constructor(
         initialValue = Settings()
     )
 
-    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
-        tryEmit(Unit)
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val backupUiState: StateFlow<BackupUiState> = combine(
         settingsState.map { it.googleAccount }.distinctUntilChanged(),
         refreshTrigger
-    ) { email, _ ->
-        email
-    }
+    ) { email, _ -> email }
         .flatMapLatest { email ->
-            if (email == null) return@flatMapLatest flowOf(BackupUiState.NoBackup)
+            if (email == null) {
+                flow<BackupUiState> { emit(BackupUiState.NoBackup) }
+            }else {
 
-            checkForExistingBackup().map { metadata ->
-                if (metadata != null) BackupUiState.HasBackup(metadata)
-                else BackupUiState.NoBackup
+                flow<BackupUiState> {
+                    emit(BackupUiState.Loading)
+                    try {
+                        checkForExistingBackup().collect { metadata ->
+                            emit(
+                                if (metadata != null)
+                                    BackupUiState.HasBackup(metadata)
+                                else
+                                    BackupUiState.NoBackup
+                            )
+                        }
+                    } catch (e: Exception) {
+                        val errorMessage = if (e is java.io.IOException) {
+                            "No internet connection"
+                        } else {
+                            "Failed to check backup"
+                        }
+                        emit(BackupUiState.Error(errorMessage))
+                    }
+                }
             }
         }
         .stateIn(
@@ -166,6 +185,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             dataStore.updateBackupSettings(backupSettings)
 
+            if (!canPerformNetworkTask(onFailure)) return@launch
             if(backupSettings.backupFrequency==BackupFrequency.OFF) {
                 cancelScheduledBackup()
                 return@launch
@@ -267,8 +287,31 @@ class SettingsViewModel @Inject constructor(
         savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
     }
 
-    fun startRestore() {
+    fun startRestore(onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            if (!canPerformNetworkTask(onFailure)) return@launch
             downloadBackup()
+        }
+
+    }
+
+    private suspend fun canPerformNetworkTask(
+        onFailure: (String) -> Unit
+    ): Boolean {
+        if (!networkMonitor.isOnline.first()) {
+            onFailure("You are offline. Check your connection.")
+            return false
+        }
+        val isMetered = !networkMonitor.isUnmetered.first()
+
+        val allowMetered = false //dataStore.settingsFlow.first().allowMeteredBackup
+
+        if (isMetered && !allowMetered) {
+            onFailure("Warning: Using Cellular. Enable 'Backup/Restore on Cellular' in settings.")
+            return false
+        }
+
+        return true
     }
 
     fun createMassiveDummyData() {

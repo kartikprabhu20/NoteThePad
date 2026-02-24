@@ -3,10 +3,12 @@ package com.mintanable.notethepad.di
 import android.content.Context
 import androidx.work.WorkManager
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
+import com.mintanable.notethepad.feature_backup.data.network.AndroidNetworkMonitor
 import com.mintanable.notethepad.feature_backup.data.repository.GoogleAuthRepositoryImpl
 import com.mintanable.notethepad.feature_backup.data.repository.GoogleDriveRepositoryImpl
 import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
 import com.mintanable.notethepad.feature_backup.domain.GoogleDriveService
+import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
 import dagger.Binds
@@ -38,6 +40,12 @@ abstract class BackupModule {
     abstract fun bindBackupScheduler(
         impl: BackupSchedulerImpl
     ): BackupScheduler
+
+    @Binds
+    @Singleton
+    abstract fun bindNetworkMonitor(
+        impl: AndroidNetworkMonitor
+    ): NetworkMonitor
 
     companion object {
         @Provides

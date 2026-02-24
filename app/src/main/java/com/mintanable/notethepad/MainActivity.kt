@@ -183,7 +183,9 @@ class MainActivity : AppCompatActivity() {
                                 )
                             },
                             onBackupNowClicked = {
-                                settingsViewModel.updateBackupSettings(settings.backupSettings, true,
+                                settingsViewModel.updateBackupSettings(
+                                    backupSettings = settings.backupSettings,
+                                    backupNow = true,
                                     onAuthRequired =
                                         { pendingIntent ->
                                             launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
@@ -194,7 +196,11 @@ class MainActivity : AppCompatActivity() {
                                 )
                             },
                             onRestoreClicked = {
-                                settingsViewModel.startRestore()
+                                settingsViewModel.startRestore(
+                                    onFailure = { error ->
+                                        showToast(error)
+                                    }
+                                )
                             },
                             showToast = { message ->
                                 showToast(message)

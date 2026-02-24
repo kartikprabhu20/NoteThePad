@@ -99,6 +99,12 @@ fun BackupStatusUI(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(horizontal = 16.dp))
             }
+            is BackupUiState.Error -> {
+                Text( backupUiState.message,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
         }
     }
 }
@@ -151,6 +157,18 @@ fun PreviewBackupUIWorkInfoUploading() {
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
             ),
+            onRestoreClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewBackupUIError() {
+    NoteThePadTheme {
+        BackupStatusUI(
+            backupUploadDownloadState =  BackupStatus.Idle,
+            backupUiState = BackupUiState.Error("No internet connection"),
             onRestoreClicked = {}
         )
     }
