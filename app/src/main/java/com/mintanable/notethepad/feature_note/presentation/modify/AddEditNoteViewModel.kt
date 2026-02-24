@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
@@ -13,7 +14,10 @@ import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,6 +47,9 @@ class AddEditNoteViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow< UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    private val _attachedImages = MutableStateFlow<List<Uri>>(emptyList())
+    val attachedImageUris = _attachedImages.asStateFlow()
 
     private var currentNoteId: Int? = null
 
@@ -115,6 +122,16 @@ class AddEditNoteViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+
+            is AddEditNoteEvent.AttachImage -> {
+                _attachedImages.update { current ->
+                    if (current.contains(event.uri)) current else current + event.uri
+                }
+            }
+
+            is AddEditNoteEvent.RemoveImage -> {
+                _attachedImages.update { it - event.uri }
             }
 
             else -> {}

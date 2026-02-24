@@ -1,5 +1,10 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
@@ -12,6 +17,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -29,17 +36,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
-import com.mintanable.notethepad.feature_note.domain.util.AttachmentOption
+import com.mintanable.notethepad.feature_note.domain.util.AttachmentOptions
 import com.mintanable.notethepad.feature_note.domain.util.BottomSheetType
+import com.mintanable.notethepad.feature_note.domain.util.ImageSourceOptions
+import com.mintanable.notethepad.feature_note.domain.util.MoreSettingsOptions
+import com.mintanable.notethepad.feature_note.domain.util.ReminderOptions
+import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteActionButtons
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
+import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun AddEditNoteScreen(
     navController: NavController,
@@ -52,37 +66,35 @@ fun AddEditNoteScreen(
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
     val snackBarHostState = remember { SnackbarHostState() }
+    val noteBackgroundAnimatable = remember{ Animatable(Color(if(noteColor!=-1) noteColor else viewModel.noteColor.value)) }
 
-    val noteBackgroundAnimatable = remember{
-        Animatable(
-            Color(if(noteColor!=-1) noteColor else viewModel.noteColor.value)
-        )
-    }
-
-    val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-    var currentSheetType by rememberSaveable { mutableStateOf(BottomSheetType.ATTACH) }
-    var showSheet by rememberSaveable { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var currentSheetType by rememberSaveable { mutableStateOf(BottomSheetType.NONE) }
 
-    if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showSheet = false },
-            sheetState = sheetState,
-            dragHandle = { BottomSheetDefaults.DragHandle() }
-        ) {
-            BottomSheetContent(
-                type = currentSheetType,
-                optionSelected = { additionalOption ->  
-                    when(additionalOption){
-                        AttachmentOption.Image -> {
-
-                        }
-                        else -> {}
-                    }
-                }
-            )
+    val attachedImageUris by viewModel.attachedImageUris.collectAsStateWithLifecycle()
+    var zoomedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            uri?.let { viewModel.onEvent(AddEditNoteEvent.AttachImage(it)) }
         }
-    }
+    )
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview(),
+        onResult = { bitmap -> /* Handle Bitmap */ }
+    )
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                cameraLauncher.launch(null)
+            } else {
+                // Show rationale or snackbar: "Camera permission denied"
+            }
+        }
+    )
 
     LaunchedEffect(key1 = true){
         viewModel.eventFlow.collectLatest { event->
@@ -109,7 +121,6 @@ fun AddEditNoteScreen(
                     modifier = Modifier,
                     onActionClick = { sheetType ->
                         currentSheetType = sheetType
-                        showSheet = true
                     },
                     onSaveClick = {
                         viewModel.onEvent(AddEditNoteEvent.SaveNote)
@@ -119,24 +130,7 @@ fun AddEditNoteScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(noteBackgroundAnimatable.value)
-//                .sharedBounds(
-//                    sharedContentState = rememberSharedContentState(
-//                        key = if (noteId == -1) "notescreens_fab" else "note-$noteId"
-//                    ),
-//                    animatedVisibilityScope = animatedVisibilityScope,
-//                    enter = fadeIn(tween(200)),
-//                    exit = fadeOut(tween(300)),
-//                    boundsTransform = { _, _ ->
-//                        spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
-//                    },
-//                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-//                )
-//             .renderInSharedTransitionScopeOverlay(
-//                 zIndexInOverlay = if (animatedVisibilityScope.transition.isRunning) 2f else 0f
-//             )
-            ,
         ) { paddingValue ->
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -198,6 +192,40 @@ fun AddEditNoteScreen(
                             )
                         }
                     }
+
+                    if (attachedImageUris.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+
+                            items(
+                                items = attachedImageUris,
+                                key = { uri -> uri.toString() },
+                            ) { uri ->
+                                AttachedImageItem(
+                                    uri = uri,
+                                    onDelete = { deletedUri ->
+                                        viewModel.onEvent(
+                                            AddEditNoteEvent.RemoveImage(
+                                                deletedUri
+                                            )
+                                        )
+                                    },
+                                    onClick = { attachedUri ->
+                                        zoomedImageUri = attachedUri
+                                              },
+                                    modifier = Modifier.sharedBounds(
+                                        sharedContentState = rememberSharedContentState(key = "image-${uri}"),
+                                        animatedVisibilityScope = animatedVisibilityScope
+                                    )
+                                )
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
                     TransparentHintTextField(
                         text = titleState.text,
@@ -237,18 +265,82 @@ fun AddEditNoteScreen(
                         isHintVisible = contentState.isHintVisible,
                         isSingleLine = false,
                         textStyle = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxHeight().sharedBounds(
-                            sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                key = "note-content-${noteId}"
-                            ),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = { _, _ ->
-                                tween()
-                            },
-                            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                        )
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .sharedBounds(
+                                sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                    key = "note-content-${noteId}"
+                                ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = { _, _ ->
+                                    tween()
+                                },
+                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                            )
                     )
                 }
+            }
+        }
+
+        if(zoomedImageUri != null){
+            ZoomedImageOverlay(
+                uri = zoomedImageUri!!,
+                onClick = { zoomedImageUri = null },
+                transitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    }
+
+    val sheetItems = remember(currentSheetType) {
+        when (currentSheetType) {
+            BottomSheetType.ATTACH -> AttachmentOptions.entries
+            BottomSheetType.REMINDER -> ReminderOptions.entries
+            BottomSheetType.MORE_SETTINGS -> MoreSettingsOptions.entries
+            BottomSheetType.IMAGE_SOURCES -> ImageSourceOptions.entries
+            else -> emptyList()
+        }
+    }
+
+    if (currentSheetType != BottomSheetType.NONE) {
+        ModalBottomSheet(
+            onDismissRequest =
+                {
+                    currentSheetType = BottomSheetType.NONE
+                },
+            sheetState = sheetState,
+            dragHandle = { BottomSheetDefaults.DragHandle() }
+        ) {
+            if (currentSheetType != BottomSheetType.IMAGE_SOURCES) {
+                BottomSheetContent(
+                    items = sheetItems,
+                    optionSelected = { additionalOption ->
+                        when(additionalOption){
+                            AttachmentOptions.IMAGE -> {
+                                currentSheetType = BottomSheetType.IMAGE_SOURCES
+                            }
+                            else -> {}
+                        }
+                    }
+                )
+            } else {
+
+                BottomSheetContent(
+                    items = ImageSourceOptions.entries,
+                    optionSelected = { additionalOption ->
+                        when(additionalOption){
+                            ImageSourceOptions.PHOTO_GALLERY -> {
+                                currentSheetType = BottomSheetType.NONE
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
+                            ImageSourceOptions.CAMERA -> {
+
+                            }
+                        }
+                    }
+                )
             }
         }
     }
