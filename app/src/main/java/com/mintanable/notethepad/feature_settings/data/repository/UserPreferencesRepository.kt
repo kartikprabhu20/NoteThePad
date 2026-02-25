@@ -11,14 +11,18 @@ import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
-class UserPreferencesRepository(private val context: Context) {
+class UserPreferencesRepository @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
 
     private object PreferencesKeys {
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")

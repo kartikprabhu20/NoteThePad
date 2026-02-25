@@ -1,7 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,11 +34,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentOptions
 import com.mintanable.notethepad.feature_note.domain.util.BottomSheetType
@@ -51,6 +54,10 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Not
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
+import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
+import com.mintanable.notethepad.feature_settings.presentation.util.MediaType
+import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
+import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -64,6 +71,8 @@ fun AddEditNoteScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
 ){
+    val context = LocalContext.current
+
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
     val snackBarHostState = remember { SnackbarHostState() }
@@ -81,21 +90,48 @@ fun AddEditNoteScreen(
             uri?.let { viewModel.onEvent(AddEditNoteEvent.AttachImage(it)) }
         }
     )
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview(),
-        onResult = { bitmap -> /* Handle Bitmap */ }
-    )
 
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                cameraLauncher.launch(null)
-            } else {
-                // Show rationale or snackbar: "Camera permission denied"
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
+                cameraImageUri?.let { uri ->
+                    viewModel.onEvent(AddEditNoteEvent.AttachImage(uri))
+                }
             }
         }
     )
+
+    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var showCameraPermissionRationaleDialog by rememberSaveable { mutableStateOf(false) }
+    val cameraPermissionState = rememberPermissionState(
+        android.Manifest.permission.CAMERA
+    )
+    val checkAndRequestCameraPermission = {
+        scope.launch {
+            when {
+                cameraPermissionState.status.isGranted -> {
+                    val uri = viewModel.generateTempUri(MediaType.IMAGE)
+                    cameraImageUri = uri
+                    cameraLauncher.launch(uri)
+                }
+
+                cameraPermissionState.status.shouldShowRationale -> {
+                    showCameraPermissionRationaleDialog = true
+                }
+
+                else -> {
+                    if (viewModel.hasAskedForCameraPermissionBefore()) {
+                        showSettingsDialog = true
+                    } else {
+                        cameraPermissionState.launchPermissionRequest()
+                        viewModel.markCameraPermissionRequested()
+                    }
+                }
+            }
+        }
+    }
 
     LaunchedEffect(key1 = true){
         viewModel.eventFlow.collectLatest { event->
@@ -299,6 +335,28 @@ fun AddEditNoteScreen(
                     animatedVisibilityScope = animatedVisibilityScope
                 )
             }
+
+            if (showCameraPermissionRationaleDialog) {
+                PermissionRationaleDialog(
+                    permissionRationaleType = PermissionRationaleType.CAMERA,
+                    onConfirmClicked = {
+                        showCameraPermissionRationaleDialog = false
+                        cameraPermissionState.launchPermissionRequest()
+                    },
+                    onDismissRequest = { showCameraPermissionRationaleDialog = false }
+                )
+            }
+
+            if (showSettingsDialog) {
+                PermissionRationaleDialog(
+                    permissionRationaleType = PermissionRationaleType.CAMERA_DENIED,
+                    onConfirmClicked = {
+                        showSettingsDialog = false
+                        NavigatationHelper.openAppSettings(context = context )
+                    },
+                    onDismissRequest = { showSettingsDialog = false }
+                )
+            }
         }
     }
 
@@ -346,7 +404,8 @@ fun AddEditNoteScreen(
                                 )
                             }
                             ImageSourceOptions.CAMERA -> {
-
+                                currentSheetType = BottomSheetType.NONE
+                                checkAndRequestCameraPermission()
                             }
                         }
                     }

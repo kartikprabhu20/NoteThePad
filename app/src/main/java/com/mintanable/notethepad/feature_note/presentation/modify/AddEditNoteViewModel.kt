@@ -15,6 +15,9 @@ import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
+import com.mintanable.notethepad.feature_settings.presentation.use_cases.GetCameraPermissionFlag
+import com.mintanable.notethepad.feature_settings.presentation.use_cases.MarkCameraPermissionFlag
+import com.mintanable.notethepad.feature_settings.presentation.util.MediaType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,7 +33,9 @@ class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext val context: Context,
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val markCameraPermissionFlag: MarkCameraPermissionFlag,
+    private val getCameraPermissionFlag: GetCameraPermissionFlag,
 ): ViewModel(){
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
@@ -59,6 +64,15 @@ class AddEditNoteViewModel @Inject constructor(
 
     private var currentNoteId: Int? = null
 
+    suspend fun hasAskedForCameraPermissionBefore(): Boolean {
+        return getCameraPermissionFlag()
+    }
+
+    fun markCameraPermissionRequested() {
+        viewModelScope.launch {
+            markCameraPermissionFlag()
+        }
+    }
 
     init {
         if (isEditMode) {
@@ -118,11 +132,11 @@ class AddEditNoteViewModel @Inject constructor(
                                 timestamp = System.currentTimeMillis(),
                                 color = noteColor.value,
                                 id = currentNoteId,
-                                imageUris = attachedImageUris.value.map { uri ->
+                                imageUris = attachedImageUris.value.mapNotNull { uri ->
                                     if (uri.toString().contains(context.packageName)) {
                                         uri.toString()
                                     } else {
-                                        fileManager.copyFileToInternalStorage(uri, context)
+                                        fileManager.saveMediaToStorage(uri)
                                     }
                                 }
                             )
@@ -153,6 +167,9 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
+    fun generateTempUri(image: MediaType): Uri? {
+        return fileManager.createTempUri(image.extension)
+    }
 
 
     sealed class UiEvent{

@@ -49,6 +49,7 @@ import com.mintanable.notethepad.feature_settings.presentation.components.RadioB
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
 import com.mintanable.notethepad.feature_settings.presentation.components.TimePickerDialog
+import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import java.util.Locale
 
@@ -77,7 +78,7 @@ fun SettingsScreen(
         android.Manifest.permission.POST_NOTIFICATIONS
     )
     val checkAndRequestNotificationPermission = { action: () -> Unit ->
-        action()
+        action() //Perform action in anycase, since backup progress can be foreground too
 
         when{
             notificationPermissionState.status.isGranted -> { } //Do nothing
@@ -230,6 +231,7 @@ fun SettingsScreen(
 
         if (showRationaleDialog) {
             PermissionRationaleDialog(
+                permissionRationaleType = PermissionRationaleType.NOTIFICATION,
                 onConfirmClicked = {
                     showRationaleDialog = false
                     notificationPermissionState.launchPermissionRequest()

@@ -5,19 +5,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.tooling.preview.Preview
+import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
 @Composable
 fun PermissionRationaleDialog(
+    permissionRationaleType: PermissionRationaleType,
     onConfirmClicked: () -> Unit,
     onDismissRequest: () -> Unit,
-
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text("Backup Notifications") },
+        title = { Text(permissionRationaleType.title) },
         text = {
-            Text("We use notifications to show you the upload progress. Without this, you won't know if the backup finishes successfully while the app is in the background.")
+            Text(permissionRationaleType.message)
         },
         confirmButton = {
             TextButton(onClick = onConfirmClicked) {
@@ -41,6 +42,6 @@ fun PermissionRationaleDialog(
 @Composable
 fun PreviewPermissionRationaleDialog(){
     NoteThePadTheme {
-        PermissionRationaleDialog( {}, {})
+        PermissionRationaleDialog(PermissionRationaleType.NOTIFICATION, {}, {})
     }
 }
