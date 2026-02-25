@@ -39,6 +39,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {  }
+        create("canary") {
+            initWith(getByName("debug"))
+            matchingFallbacks.add("debug")
+        }
     }
     compileOptions {
         // Updated to Java 17, required for modern Android/Gradle versions
@@ -69,6 +74,8 @@ android {
 }
 
 dependencies {
+    canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+
     implementation 'androidx.compose.material3:material3-android:1.4.0'
     implementation 'androidx.work:work-runtime-ktx:2.10.0'
 
