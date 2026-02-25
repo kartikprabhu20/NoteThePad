@@ -64,6 +64,9 @@ class AddEditNoteViewModel @Inject constructor(
     private val _attachedImages = MutableStateFlow<List<Uri>>(emptyList())
     val attachedImageUris = _attachedImages.asStateFlow()
 
+    private val _attachedAudioUris = MutableStateFlow<List<Uri>>(emptyList())
+    val attachedAudioUris = _attachedAudioUris.asStateFlow()
+
     private var currentNoteId: Int? = null
 
     suspend fun hasAskedForCameraPermissionBefore(): Boolean {

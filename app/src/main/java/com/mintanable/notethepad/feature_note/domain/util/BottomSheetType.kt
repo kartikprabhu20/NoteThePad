@@ -18,7 +18,8 @@ enum class BottomSheetType {
     REMINDER,
     MORE_SETTINGS,
     IMAGE_SOURCES,
-    VIDEO_SOURCES
+    VIDEO_SOURCES,
+    AUDIO_SOURCES
 }
 
 interface AdditionalOption {
