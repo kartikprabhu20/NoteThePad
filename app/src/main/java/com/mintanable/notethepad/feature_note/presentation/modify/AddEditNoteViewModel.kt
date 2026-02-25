@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.util.Log
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.State
@@ -14,10 +15,11 @@ import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
+import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.GetCameraPermissionFlag
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.MarkCameraPermissionFlag
-import com.mintanable.notethepad.feature_settings.presentation.util.MediaType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -87,7 +89,10 @@ class AddEditNoteViewModel @Inject constructor(
                 _noteTitle.value = _noteTitle.value.copy(text = note.title, isHintVisible = false)
                 _noteContent.value = _noteContent.value.copy(text = note.content, isHintVisible = false)
                 _noteColor.value = note.color
-                _attachedImages.value = note.imageUris.map { it.toUri() }
+                _attachedImages.value = note.imageUris.map {
+                    Log.d("kptest", "load: $it")
+                    it.toUri()
+                }
             }
         }
     }
@@ -133,10 +138,11 @@ class AddEditNoteViewModel @Inject constructor(
                                 color = noteColor.value,
                                 id = currentNoteId,
                                 imageUris = attachedImageUris.value.mapNotNull { uri ->
+                                    val uri = uri
                                     if (uri.toString().contains(context.packageName)) {
                                         uri.toString()
                                     } else {
-                                        fileManager.saveMediaToStorage(uri)
+                                        fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
                                     }
                                 }
                             )
@@ -163,12 +169,18 @@ class AddEditNoteViewModel @Inject constructor(
                 viewModelScope.launch { fileManager.deleteFileFromUris(listOf(event.uri)) }
             }
 
+            is AddEditNoteEvent.AttachVideo -> {
+                _attachedImages.update { current ->
+                    if (current.contains(event.uri)) current else current + event.uri
+                }
+            }
+
             else -> {}
         }
     }
 
-    fun generateTempUri(image: MediaType): Uri? {
-        return fileManager.createTempUri(image.extension)
+    fun generateTempUri(attachmentType: AttachmentType): Uri? {
+        return fileManager.createTempUri(attachmentType.extension)
     }
 
 

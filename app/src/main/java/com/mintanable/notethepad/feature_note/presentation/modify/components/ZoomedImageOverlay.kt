@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
+import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 
 @Composable
 fun ZoomedImageOverlay(
@@ -27,6 +31,9 @@ fun ZoomedImageOverlay(
     transitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
+    val context = LocalContext.current
+    val attachmentType = rememberSaveable(uri) { AttachmentHelper.getAttachmentType(context, uri) }
+
     with(transitionScope){
         Box(
             modifier = Modifier
@@ -43,16 +50,20 @@ fun ZoomedImageOverlay(
                     .sharedBounds(
                         sharedContentState = rememberSharedContentState(key = "image-${uri}"),
                         animatedVisibilityScope = animatedVisibilityScope,
-                        // Standard tween for a smooth "pop"
                         boundsTransform = { _, _ -> tween(400) }
                     )
             ) {
-                AsyncImage(
-                    model = uri,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+
+                if (attachmentType == AttachmentType.VIDEO) {
+                    VideoPlayer(uri = uri)
+                } else {
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }

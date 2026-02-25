@@ -6,9 +6,3 @@ enum class PermissionRationaleType(val title: String,val message: String) {
     MICROPHONE("Microphone permission", "We use microphone to record and attach voice notes. Without this you will not be able to create voice notes."),
     CAMERA_DENIED("Camera Permission Required", "You have permanently denied camera access. To take photos for your notes, please enable it in the app settings.")
 }
-
-enum class MediaType(val extension: String) {
-    IMAGE("jpg"),
-    VIDEO("mp4"),
-    AUDIO(extension = "mp3")
-}

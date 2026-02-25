@@ -12,4 +12,5 @@ sealed class AddEditNoteEvent{
     object SaveNote: AddEditNoteEvent()
     data class AttachImage(val uri: Uri): AddEditNoteEvent()
     data class RemoveImage(val uri: Uri): AddEditNoteEvent()
+    data class AttachVideo(val uri: Uri): AddEditNoteEvent()
 }

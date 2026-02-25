@@ -45,17 +45,19 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentOptions
+import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.BottomSheetType
 import com.mintanable.notethepad.feature_note.domain.util.ImageSourceOptions
 import com.mintanable.notethepad.feature_note.domain.util.MoreSettingsOptions
 import com.mintanable.notethepad.feature_note.domain.util.ReminderOptions
+import com.mintanable.notethepad.feature_note.domain.util.VideoSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteActionButtons
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
+import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
-import com.mintanable.notethepad.feature_settings.presentation.util.MediaType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import kotlinx.coroutines.flow.collectLatest
@@ -103,18 +105,35 @@ fun AddEditNoteScreen(
         }
     )
 
+    var cameraVideoUri by remember { mutableStateOf<Uri?>(null) }
+    val videoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo(),
+        onResult = { success ->
+            if (success) {
+                cameraVideoUri?.let { uri ->
+                    viewModel.onEvent(AddEditNoteEvent.AttachImage(uri))
+                }
+            }
+        }
+    )
+
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showCameraPermissionRationaleDialog by rememberSaveable { mutableStateOf(false) }
     val cameraPermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     )
-    val checkAndRequestCameraPermission = {
+    val checkAndRequestCameraPermission = { attachmentType: AttachmentType ->
         scope.launch {
             when {
                 cameraPermissionState.status.isGranted -> {
-                    val uri = viewModel.generateTempUri(MediaType.IMAGE)
-                    cameraImageUri = uri
-                    cameraLauncher.launch(uri)
+                    val uri = viewModel.generateTempUri(attachmentType)
+                    if (attachmentType == AttachmentType.IMAGE) {
+                        cameraImageUri = uri
+                        cameraLauncher.launch(uri!!)
+                    } else {
+                        cameraVideoUri = uri
+                        videoLauncher.launch(uri!!)
+                    }
                 }
 
                 cameraPermissionState.status.shouldShowRationale -> {
@@ -250,8 +269,8 @@ fun AddEditNoteScreen(
                                                 )
                                             )
                                         },
-                                        onClick = { attachedUri ->
-                                            zoomedImageUri = attachedUri
+                                        onClick = { uri ->
+                                            zoomedImageUri = uri
                                         },
                                         modifier = Modifier.sharedBounds(
                                             sharedContentState = rememberSharedContentState(key = "image-${uri}"),
@@ -366,6 +385,7 @@ fun AddEditNoteScreen(
             BottomSheetType.REMINDER -> ReminderOptions.entries
             BottomSheetType.MORE_SETTINGS -> MoreSettingsOptions.entries
             BottomSheetType.IMAGE_SOURCES -> ImageSourceOptions.entries
+            BottomSheetType.VIDEO_SOURCES -> VideoSourceOptions.entries
             else -> emptyList()
         }
     }
@@ -379,7 +399,9 @@ fun AddEditNoteScreen(
             sheetState = sheetState,
             dragHandle = { BottomSheetDefaults.DragHandle() }
         ) {
-            if (currentSheetType != BottomSheetType.IMAGE_SOURCES) {
+
+
+            if (currentSheetType != BottomSheetType.NONE) {
                 BottomSheetContent(
                     items = sheetItems,
                     optionSelected = { additionalOption ->
@@ -387,26 +409,34 @@ fun AddEditNoteScreen(
                             AttachmentOptions.IMAGE -> {
                                 currentSheetType = BottomSheetType.IMAGE_SOURCES
                             }
-                            else -> {}
-                        }
-                    }
-                )
-            } else {
 
-                BottomSheetContent(
-                    items = ImageSourceOptions.entries,
-                    optionSelected = { additionalOption ->
-                        when(additionalOption){
+                            AttachmentOptions.VIDEO -> {
+                                currentSheetType = BottomSheetType.VIDEO_SOURCES
+                            }
+
                             ImageSourceOptions.PHOTO_GALLERY -> {
                                 currentSheetType = BottomSheetType.NONE
                                 photoPickerLauncher.launch(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )
                             }
-                            ImageSourceOptions.CAMERA -> {
+                            ImageSourceOptions.PHOTO_CAMERA -> {
                                 currentSheetType = BottomSheetType.NONE
-                                checkAndRequestCameraPermission()
+                                checkAndRequestCameraPermission(AttachmentType.IMAGE)
                             }
+
+                            VideoSourceOptions.VIDEO_CAMERA -> {
+                                currentSheetType = BottomSheetType.NONE
+                                checkAndRequestCameraPermission(AttachmentType.VIDEO)
+                            }
+
+                            VideoSourceOptions.VIDEO_GALLERY -> {
+                                currentSheetType = BottomSheetType.NONE
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
+                                )
+                            }
+                            else -> {}
                         }
                     }
                 )

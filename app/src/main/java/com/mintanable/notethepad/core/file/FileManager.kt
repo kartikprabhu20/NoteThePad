@@ -1,14 +1,15 @@
 package com.mintanable.notethepad.core.file
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
@@ -25,13 +26,14 @@ class FileManager @Inject constructor(
         return dir
     }
 
-    suspend fun saveMediaToStorage(uri: Uri, extension: String = "jpg"): String? {
+    suspend fun saveMediaToStorage(uri: Uri, prefix: String?): String? {
         return withContext(Dispatchers.IO) {
             try {
-
-                val fileName = "media_${System.currentTimeMillis()}_${UUID.randomUUID()}.$extension"
-                val destFile = File(getMediaDir(), fileName)
-
+                val extension = getExtensionFromUri(uri)
+                val fileName = (if(prefix.isNullOrBlank()) "media" else "$prefix")+ "_${System.currentTimeMillis()}_${UUID.randomUUID()}.$extension"
+                val mediaDir = getMediaDir()
+                if (!mediaDir.exists()) mediaDir.mkdirs()
+                val destFile = File(mediaDir, fileName)
                 context.contentResolver.openInputStream(uri)?.use { input ->
                     destFile.outputStream().use { output ->
                         input.copyTo(output)
@@ -42,6 +44,16 @@ class FileManager @Inject constructor(
                 null
             }
         }
+    }
+
+    private fun getExtensionFromUri(uri: Uri): String {
+        val extension = if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+            val mimeType = context.contentResolver.getType(uri)
+            MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+        } else {
+            MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+        }
+        return if (extension.isNullOrBlank()) "bin" else extension
     }
 
     suspend fun deleteFileFromUris(list: List<Uri>){
