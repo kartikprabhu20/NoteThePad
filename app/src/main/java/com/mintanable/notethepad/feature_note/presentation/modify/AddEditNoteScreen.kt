@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -107,188 +108,197 @@ fun AddEditNoteScreen(
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
                     navController.navigateUp()
                 }
-
-                else -> {}
             }
         }
     }
 
     with(sharedTransitionScope) {
-        Scaffold(
-            contentWindowInsets = WindowInsets.systemBars,
-            floatingActionButton = {
-                NoteActionButtons(
-                    modifier = Modifier,
-                    onActionClick = { sheetType ->
-                        currentSheetType = sheetType
-                    },
-                    onSaveClick = {
-                        viewModel.onEvent(AddEditNoteEvent.SaveNote)
-                    }
-                )
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(noteBackgroundAnimatable.value)
-        ) { paddingValue ->
-            Box(
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                contentWindowInsets = WindowInsets.systemBars,
+                floatingActionButton = {
+                    NoteActionButtons(
+                        modifier = Modifier,
+                        onActionClick = { sheetType ->
+                            currentSheetType = sheetType
+                        },
+                        onSaveClick = {
+                            viewModel.onEvent(AddEditNoteEvent.SaveNote)
+                        }
+                    )
+                },
                 modifier = Modifier
                     .fillMaxSize()
                     .background(noteBackgroundAnimatable.value)
-                    .sharedBounds(
-                        sharedContentState = rememberSharedContentState(
-                            key = if (noteId == -1) "notescreens_fab" else "note-$noteId"
-                        ),
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        enter = fadeIn(tween(200)),
-                        exit = fadeOut(tween(300)),
-                        boundsTransform = { _, _ ->
-                            spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
-                        },
-                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                    )
+            ) { paddingValue ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(noteBackgroundAnimatable.value)
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState(
+                                key = if (noteId == -1) "notescreens_fab" else "note-$noteId"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            enter = fadeIn(tween(200)),
+                            exit = fadeOut(tween(300)),
+                            boundsTransform = { _, _ ->
+                                spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
+                            },
+                            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                        )
 //                    .renderInSharedTransitionScopeOverlay(
 //                        zIndexInOverlay = if (animatedVisibilityScope.transition.isRunning) 2f else 0f
 //                    )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValue)
-                        .padding(horizontal = 16.dp)
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .fillMaxSize()
+                            .padding(paddingValue)
+                            .padding(horizontal = 16.dp)
                     ) {
-                        NoteColors.colors.forEach { color ->
-                            val colorInt = color.toArgb()
-                            Box(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .shadow(15.dp, CircleShape)
-                                    .clip(CircleShape)
-                                    .background(color)
-                                    .border(
-                                        width = 3.dp,
-                                        color = if (viewModel.noteColor.value == colorInt) {
-                                            Color.Black
-                                        } else Color.Transparent,
-                                        shape = CircleShape
-                                    )
-                                    .clickable {
-                                        scope.launch {
-                                            noteBackgroundAnimatable.animateTo(
-                                                targetValue = Color(colorInt),
-                                                animationSpec = tween(
-                                                    durationMillis = 500
-                                                )
-                                            )
-                                        }
-                                        viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
-                                    }
-                            )
-                        }
-                    }
-
-                    if (attachedImageUris.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-
-                            items(
-                                items = attachedImageUris,
-                                key = { uri -> uri.toString() },
-                            ) { uri ->
-                                AttachedImageItem(
-                                    uri = uri,
-                                    onDelete = { deletedUri ->
-                                        viewModel.onEvent(
-                                            AddEditNoteEvent.RemoveImage(
-                                                deletedUri
-                                            )
+                            NoteColors.colors.forEach { color ->
+                                val colorInt = color.toArgb()
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .shadow(15.dp, CircleShape)
+                                        .clip(CircleShape)
+                                        .background(color)
+                                        .border(
+                                            width = 3.dp,
+                                            color = if (viewModel.noteColor.value == colorInt) {
+                                                Color.Black
+                                            } else Color.Transparent,
+                                            shape = CircleShape
                                         )
-                                    },
-                                    onClick = { attachedUri ->
-                                        zoomedImageUri = attachedUri
-                                              },
-                                    modifier = Modifier.sharedBounds(
-                                        sharedContentState = rememberSharedContentState(key = "image-${uri}"),
-                                        animatedVisibilityScope = animatedVisibilityScope
-                                    )
+                                        .clickable {
+                                            scope.launch {
+                                                noteBackgroundAnimatable.animateTo(
+                                                    targetValue = Color(colorInt),
+                                                    animationSpec = tween(
+                                                        durationMillis = 500
+                                                    )
+                                                )
+                                            }
+                                            viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
+                                        }
                                 )
                             }
                         }
+
+                        if (attachedImageUris.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+
+                                items(
+                                    items = attachedImageUris,
+                                    key = { uri -> uri.toString() },
+                                ) { uri ->
+                                    AttachedImageItem(
+                                        uri = uri,
+                                        onDelete = { deletedUri ->
+                                            viewModel.onEvent(
+                                                AddEditNoteEvent.RemoveImage(
+                                                    deletedUri
+                                                )
+                                            )
+                                        },
+                                        onClick = { attachedUri ->
+                                            zoomedImageUri = attachedUri
+                                        },
+                                        modifier = Modifier.sharedBounds(
+                                            sharedContentState = rememberSharedContentState(key = "image-${uri}"),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TransparentHintTextField(
+                            text = titleState.text,
+                            hint = titleState.hint,
+                            onValueChange = {
+                                viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
+                            },
+                            onFocusChange = {
+                                viewModel.onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
+                            },
+                            isHintVisible = titleState.isHintVisible,
+                            isSingleLine = true,
+                            textStyle = MaterialTheme.typography.headlineLarge,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                        key = "note-title-${noteId}"
+                                    ),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    boundsTransform = { _, _ ->
+                                        tween()
+                                    },
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                ),
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TransparentHintTextField(
+                            text = contentState.text,
+                            hint = contentState.hint,
+                            onValueChange = {
+                                viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
+                            },
+                            onFocusChange = {
+                                viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
+                            },
+                            isHintVisible = contentState.isHintVisible,
+                            isSingleLine = false,
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .sharedBounds(
+                                    sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                        key = "note-content-${noteId}"
+                                    ),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    boundsTransform = { _, _ ->
+                                        tween()
+                                    },
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                )
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TransparentHintTextField(
-                        text = titleState.text,
-                        hint = titleState.hint,
-                        onValueChange = {
-                            viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
-                        },
-                        onFocusChange = {
-                            viewModel.onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
-                        },
-                        isHintVisible = titleState.isHintVisible,
-                        isSingleLine = true,
-                        textStyle = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier
-                            .sharedBounds(
-                                sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                    key = "note-title-${noteId}"
-                                ),
-                                animatedVisibilityScope = animatedVisibilityScope,
-                                boundsTransform = { _, _ ->
-                                    tween()
-                                },
-                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                            ),
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TransparentHintTextField(
-                        text = contentState.text,
-                        hint = contentState.hint,
-                        onValueChange = {
-                            viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
-                        },
-                        onFocusChange = {
-                            viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
-                        },
-                        isHintVisible = contentState.isHintVisible,
-                        isSingleLine = false,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .sharedBounds(
-                                sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                    key = "note-content-${noteId}"
-                                ),
-                                animatedVisibilityScope = animatedVisibilityScope,
-                                boundsTransform = { _, _ ->
-                                    tween()
-                                },
-                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                            )
-                    )
                 }
             }
-        }
 
-        if(zoomedImageUri != null){
-            ZoomedImageOverlay(
-                uri = zoomedImageUri!!,
-                onClick = { zoomedImageUri = null },
-                transitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope
+            val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = navigationBarHeight + 8.dp)
+                    .padding(start = 16.dp, end = 100.dp)
             )
+
+            if (zoomedImageUri != null) {
+                ZoomedImageOverlay(
+                    uri = zoomedImageUri!!,
+                    onClick = { zoomedImageUri = null },
+                    transitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
         }
     }
 
