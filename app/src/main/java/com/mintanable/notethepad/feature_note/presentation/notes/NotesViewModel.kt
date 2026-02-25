@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_note.presentation.notes
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
@@ -31,7 +32,8 @@ import javax.inject.Inject
 class NotesViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     getLayoutSettings: GetLayoutSettings,
-    private val toggleLayoutSettings: ToggleLayoutSettings
+    private val toggleLayoutSettings: ToggleLayoutSettings,
+    private val fileManager: FileManager
 ) :ViewModel() {
 
     private var recentlyDeletedNote: Note? = null
@@ -90,6 +92,7 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.SearchBarValueChange -> { _searchInputText.value = event.searchQuery }
             is NotesEvent.DeleteNote ->{
                 viewModelScope.launch {
+                    fileManager.deleteFilesFromPaths(event.note.imageUris)
                     noteUseCases.deleteNote(event.note)
                     recentlyDeletedNote =  event.note
                 }

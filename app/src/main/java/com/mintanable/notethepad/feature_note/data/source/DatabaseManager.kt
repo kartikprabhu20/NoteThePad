@@ -28,6 +28,7 @@ class DatabaseManager @Inject constructor(
             NoteDatabase.DATABASE_NAME
         )
             .addMigrations(NoteDatabase.MIGRATION_1_2)
+            .addMigrations(NoteDatabase.MIGRATION_2_3)
             .build()
     }
 

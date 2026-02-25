@@ -131,7 +131,8 @@ fun NoteItemPreview() {
                 content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
                 timestamp = System.currentTimeMillis(),
                 color = RedOrange.toArgb(),
-                id = 1
+                id = 1,
+                imageUris = emptyList()
             ),
             modifier = Modifier.fillMaxWidth(),
             onDeleteClick = {},

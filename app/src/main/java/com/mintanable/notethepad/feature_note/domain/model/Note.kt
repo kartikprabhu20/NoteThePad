@@ -19,7 +19,8 @@ data class Note(
     val title: String,
     val content: String,
     val timestamp: Long,
-    val color: Int
+    val color: Int,
+    val imageUris: List<String> = emptyList()
 )
 
 class InvalidNoteException(message: String):Exception(message)

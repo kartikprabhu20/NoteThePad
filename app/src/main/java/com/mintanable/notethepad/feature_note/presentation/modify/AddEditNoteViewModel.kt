@@ -1,18 +1,22 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,7 +28,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    @ApplicationContext val context: Context,
+    private val fileManager: FileManager
 ): ViewModel(){
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
@@ -45,7 +51,7 @@ class AddEditNoteViewModel @Inject constructor(
     )
     val noteColor: State<Int> = _noteColor
 
-    private val _eventFlow = MutableSharedFlow< UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     private val _attachedImages = MutableStateFlow<List<Uri>>(emptyList())
@@ -67,6 +73,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _noteTitle.value = _noteTitle.value.copy(text = note.title, isHintVisible = false)
                 _noteContent.value = _noteContent.value.copy(text = note.content, isHintVisible = false)
                 _noteColor.value = note.color
+                _attachedImages.value = note.imageUris.map { it.toUri() }
             }
         }
     }
@@ -110,7 +117,14 @@ class AddEditNoteViewModel @Inject constructor(
                                 content = noteContent.value.text,
                                 timestamp = System.currentTimeMillis(),
                                 color = noteColor.value,
-                                id = currentNoteId
+                                id = currentNoteId,
+                                imageUris = attachedImageUris.value.map { uri ->
+                                    if (uri.toString().contains(context.packageName)) {
+                                        uri.toString()
+                                    } else {
+                                        fileManager.copyFileToInternalStorage(uri, context)
+                                    }
+                                }
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
@@ -132,11 +146,15 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.RemoveImage -> {
                 _attachedImages.update { it - event.uri }
+                viewModelScope.launch { fileManager.deleteFileFromUris(listOf(event.uri)) }
             }
 
             else -> {}
         }
     }
+
+
+
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
         object SaveNote: UiEvent()
