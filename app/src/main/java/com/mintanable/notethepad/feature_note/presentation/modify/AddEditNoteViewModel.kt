@@ -2,21 +2,19 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
-import com.mintanable.notethepad.feature_note.presentation.notes.NoteTextFieldState
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
+import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,59 +38,20 @@ class AddEditNoteViewModel @Inject constructor(
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
     private val isEditMode = passedNoteId != -1
+    private var currentNoteId: Int? = null
+    private var currentRecordingFile: File? = null
 
-    private val _noteTitle = mutableStateOf(NoteTextFieldState(hint = "Enter title..."))
-    val noteTitle : State<NoteTextFieldState> = _noteTitle
-
-    private val _noteContent = mutableStateOf(NoteTextFieldState(hint = "Enter some content..."))
-    val noteContent : State<NoteTextFieldState> = _noteContent
-
-    private val _noteColor = mutableStateOf(
-        if (isEditMode)
-            savedStateHandle.get<Int>("noteColor")
-                ?: NoteColors.colors.random().toArgb()
-        else
-            NoteColors.colors.random().toArgb()
+    private val _uiState = MutableStateFlow(
+        AddEditNoteUiState(
+            noteColor = if (isEditMode) {
+                savedStateHandle.get<Int>("noteColor") ?: NoteColors.colors.random().toArgb()
+            } else NoteColors.colors.random().toArgb()
+        )
     )
-    val noteColor: State<Int> = _noteColor
-
-    private val _isSaving = MutableStateFlow(false)
-    val isSaving = _isSaving.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
-
-    private val _attachedImages = MutableStateFlow<List<Uri>>(emptyList())
-    val attachedImageUris = _attachedImages.asStateFlow()
-
-    private val _attachedAudioUris = MutableStateFlow<List<Uri>>(emptyList())
-    val attachedAudioUris = _attachedAudioUris.asStateFlow()
-
-    private var currentNoteId: Int? = null
-
-    suspend fun hasAskedForCameraPermissionBefore(): Boolean {
-        return permissionUsecases.getCameraPermissionFlag()
-    }
-
-    fun markCameraPermissionRequested() {
-        viewModelScope.launch {
-            permissionUsecases.markCameraPermissionFlag()
-        }
-    }
-
-    suspend fun hasAskedForMicrophonePermissionBefore(): Boolean {
-        return permissionUsecases.getMicrophonePermissionFlag()
-    }
-
-    fun markMicrophonePermissionRequested() {
-        viewModelScope.launch {
-            permissionUsecases.markMicrophonePermissionFlag()
-        }
-    }
-
-    private var currentRecordingFile: File? = null
-    private val _isRecording = MutableStateFlow(false)
-    val isRecording = _isRecording.asStateFlow()
 
     init {
         if (isEditMode) {
@@ -104,111 +63,131 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             noteUseCases.getNote(id)?.also { note ->
                 currentNoteId = note.id
-                _noteTitle.value = _noteTitle.value.copy(text = note.title, isHintVisible = false)
-                _noteContent.value = _noteContent.value.copy(text = note.content, isHintVisible = false)
-                _noteColor.value = note.color
-                _attachedImages.value = note.imageUris.map { it.toUri() }
-                _attachedAudioUris.value = note.audioUris.map { it.toUri() }
+                _uiState.update {
+                    it.copy(
+                        titleState = it.titleState.copy(text = note.title, isHintVisible = false),
+                        contentState = it.contentState.copy(text = note.content, isHintVisible = false),
+                        noteColor = note.color,
+                        attachedImages = note.imageUris.map { it.toUri() },
+                        attachedAudios = note.audioUris.map { it.toUri() }
+                    )
+                }
             }
         }
     }
 
     fun onEvent(event:AddEditNoteEvent){
         when(event){
-            is AddEditNoteEvent.EnteredTitle->{
-                _noteTitle.value = noteTitle.value.copy(
-                    text = event.value
-                )
+            is AddEditNoteEvent.EnteredTitle -> {
+                _uiState.update { it.copy(
+                    titleState = it.titleState.copy(text = event.value)
+                )}
             }
             is AddEditNoteEvent.ChangeTitleFocus -> {
-                _noteTitle.value = noteTitle.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            noteTitle.value.text.isBlank()
-                )
+                _uiState.update { it.copy(
+                    titleState = it.titleState.copy(
+                        isHintVisible = !event.focusState.isFocused && it.titleState.text.isBlank()
+                    )
+                )}
             }
-
-            is AddEditNoteEvent.EnteredContent->{
-                _noteContent.value = noteContent.value.copy(
-                    text = event.value
-                )
+            is AddEditNoteEvent.EnteredContent -> {
+                _uiState.update { it.copy(
+                    contentState = it.contentState.copy(text = event.value)
+                )}
             }
             is AddEditNoteEvent.ChangeContentFocus -> {
-                _noteContent.value = noteContent.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            noteContent.value.text.isBlank()
-                )
+                _uiState.update { it.copy(
+                    contentState = it.contentState.copy(
+                        isHintVisible = !event.focusState.isFocused && it.contentState.text.isBlank()
+                    )
+                )}
             }
-
             is AddEditNoteEvent.ChangeColor -> {
-                _noteColor.value = event.color
+                _uiState.update { it.copy(noteColor = event.color) }
             }
-
-            is AddEditNoteEvent.SaveNote ->{
-                viewModelScope.launch {
-                    _isSaving.value = true
-
-                    noteUseCases.saveNoteWithAttachments(
-                        id = currentNoteId,
-                        title = noteTitle.value.text,
-                        content = noteContent.value.text,
-                        timestamp = System.currentTimeMillis(),
-                        color = noteColor.value,
-                        imageUris = attachedImageUris.value,
-                        audioUris = attachedAudioUris.value
-                    ).onSuccess {
-                        _eventFlow.emit(UiEvent.SaveNote)
-                    }.onFailure { e ->
-                        _isSaving.value = false
-                        _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
-                    }
-                }
+            is AddEditNoteEvent.SaveNote -> {
+                saveNote()
             }
 
             is AddEditNoteEvent.AttachImage -> {
-                _attachedImages.update { current ->
-                    if (current.contains(event.uri)) current else current + event.uri
-                }
+                _uiState.update { it.copy(
+                    attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
+                )}
             }
-
             is AddEditNoteEvent.RemoveImage -> {
-                _attachedImages.update { it - event.uri }
+                _uiState.update { it.copy(attachedImages = it.attachedImages - event.uri) }
                 viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
             }
-
             is AddEditNoteEvent.AttachVideo -> {
-                _attachedImages.update { current ->
-                    if (current.contains(event.uri)) current else current + event.uri
-                }
+                _uiState.update { it.copy(
+                    attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
+                )}
             }
-
-            is AddEditNoteEvent.ToggleAudioRecording -> {
-                viewModelScope.launch {
-                    if (_isRecording.value) {
-                        // STOP
-                        audioRecorder.stopRecording()
-                        _isRecording.value = false
-                        currentRecordingFile?.let { file ->
-                            val uri = Uri.fromFile(file)
-                            _attachedAudioUris.update { it + uri }
-                        }
-                    } else {
-                        // START
-                        val file = fileIOUseCases.createTempFile(".mp4")
-                        currentRecordingFile = file
-                        file?.let {
-                            audioRecorder.startRecording(it)
-                            _isRecording.value = true
-                        }
-                    }
-                }
-            }
-
             is AddEditNoteEvent.RemoveAudio -> {
-                Log.d("kptest", "RemoveAudio ${event.uri} ${_attachedAudioUris.value}")
-                _attachedAudioUris.update { it - event.uri }
+                _uiState.update { it.copy(attachedAudios = it.attachedAudios - event.uri) }
             }
-
+            is AddEditNoteEvent.ToggleAudioRecording -> {
+                handleRecording()
+            }
+            is AddEditNoteEvent.DismissDialogs -> {
+                _uiState.update { it.copy(
+                    showCameraRationale = false,
+                    showMicrophoneRationale = false,
+                    settingsDeniedType = null
+                )}
+            }
+            is AddEditNoteEvent.UpdateSheetType -> {
+                _uiState.update { it.copy(currentSheetType = event.sheetType) }
+            }
+            is AddEditNoteEvent.ToggleZoom -> {
+                _uiState.update { it.copy(zoomedImageUri = event.uri) }
+            }
+            is AddEditNoteEvent.UpdateNowPlaying -> {
+                _uiState.update { it.copy(nowPlayingAudioUri = event.uri) }
+            }
             else -> {}
+        }
+    }
+
+    private fun handleRecording() {
+        viewModelScope.launch {
+            if (uiState.value.isRecording) {
+                audioRecorder.stopRecording()
+                _uiState.update { it.copy(isRecording = false) }
+                currentRecordingFile?.let { file ->
+                    val uri = Uri.fromFile(file)
+                    _uiState.update { it.copy(attachedAudios = it.attachedAudios + uri) }
+                }
+            } else {
+                val file = fileIOUseCases.createTempFile(".mp4")
+                currentRecordingFile = file
+                file?.let {
+                    audioRecorder.startRecording(it)
+                    _uiState.update { state -> state.copy(isRecording = true) }
+                }
+            }
+        }
+    }
+
+    private fun saveNote() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) }
+            val state = uiState.value
+
+            noteUseCases.saveNoteWithAttachments(
+                id = currentNoteId,
+                title = state.titleState.text,
+                content = state.contentState.text,
+                timestamp = System.currentTimeMillis(),
+                color = state.noteColor,
+                imageUris = state.attachedImages,
+                audioUris = state.attachedAudios
+            ).onSuccess {
+                _eventFlow.emit(UiEvent.SaveNote)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSaving = false) }
+                _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
+            }
         }
     }
 
@@ -216,51 +195,26 @@ class AddEditNoteViewModel @Inject constructor(
         return fileIOUseCases.createTempUri(attachmentType.extension)
     }
 
-    fun checkMicrophonePermission(
-        isGranted: Boolean,
-        shouldShowRationale: Boolean
-    ) {
+    fun checkMicrophonePermission(isGranted: Boolean, shouldShowRationale: Boolean) {
         viewModelScope.launch {
             val hasAskedBefore = permissionUsecases.getMicrophonePermissionFlag()
-
             when {
-                isGranted -> {
-                    _eventFlow.emit(UiEvent.LaunchAudioRecorder)
-                }
-                shouldShowRationale -> {
-                    _eventFlow.emit(UiEvent.ShowAudioRationale)
-                }
-                hasAskedBefore -> {
-                    _eventFlow.emit(UiEvent.OpenMicrophoneSettings)
-                }
-                else -> {
-                    permissionUsecases.markMicrophonePermissionFlag()
-                }
+                isGranted -> _eventFlow.emit(UiEvent.LaunchAudioRecorder)
+                shouldShowRationale -> _uiState.update { it.copy(showMicrophoneRationale = true) }
+                hasAskedBefore -> _uiState.update { it.copy(settingsDeniedType = DeniedType.MICROPHONE) }
+                else -> permissionUsecases.markMicrophonePermissionFlag()
             }
         }
     }
 
-    fun checkCameraPermission(
-        isGranted: Boolean,
-        shouldShowRationale: Boolean,
-        attachmentType: AttachmentType
-    ) {
+    fun checkCameraPermission(isGranted: Boolean, shouldShowRationale: Boolean, attachmentType: AttachmentType) {
         viewModelScope.launch {
             val hasAskedBefore = permissionUsecases.getCameraPermissionFlag()
-
             when {
-                isGranted -> {
-                    _eventFlow.emit(UiEvent.LaunchCamera(attachmentType))
-                }
-                shouldShowRationale -> {
-                    _eventFlow.emit(UiEvent.ShowCameraRationale)
-                }
-                hasAskedBefore -> {
-                    _eventFlow.emit(UiEvent.OpenCameraSettings)
-                }
-                else -> {
-                    permissionUsecases.markCameraPermissionFlag()
-                }
+                isGranted -> _eventFlow.emit(UiEvent.LaunchCamera(attachmentType))
+                shouldShowRationale -> _uiState.update { it.copy(showCameraRationale = true) }
+                hasAskedBefore -> _uiState.update { it.copy(settingsDeniedType = DeniedType.CAMERA) }
+                else -> permissionUsecases.markCameraPermissionFlag()
             }
         }
     }

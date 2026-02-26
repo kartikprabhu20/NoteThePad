@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.net.Uri
 import androidx.compose.ui.focus.FocusState
+import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 
 sealed class AddEditNoteEvent{
     data class EnteredTitle(val value:String): AddEditNoteEvent()
@@ -16,4 +17,8 @@ sealed class AddEditNoteEvent{
     data class AttachAudio(val uri: Uri): AddEditNoteEvent()
     data class RemoveAudio(val uri: Uri): AddEditNoteEvent()
     object ToggleAudioRecording: AddEditNoteEvent()
+    object DismissDialogs: AddEditNoteEvent()
+    data class UpdateSheetType(val sheetType: BottomSheetType): AddEditNoteEvent()
+    data class ToggleZoom(val uri: Uri): AddEditNoteEvent()
+    data class UpdateNowPlaying(val uri: Uri): AddEditNoteEvent()
 }
