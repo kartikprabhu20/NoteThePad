@@ -62,6 +62,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Bot
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
+import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import kotlinx.coroutines.flow.collectLatest
@@ -122,7 +123,7 @@ fun AddEditNoteScreen(
         }
     )
 
-    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var settingsDeniedType by rememberSaveable { mutableStateOf<DeniedType?>(null) }
     var showCameraPermissionRationaleDialog by rememberSaveable { mutableStateOf(false) }
     val cameraPermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
@@ -170,8 +171,11 @@ fun AddEditNoteScreen(
                 is AddEditNoteViewModel.UiEvent.ShowAudioRationale -> {
                     showMicrophonePermissionRationaleDialog = true
                 }
-                is AddEditNoteViewModel.UiEvent.OpenSettings -> {
-                    showSettingsDialog = true
+                is AddEditNoteViewModel.UiEvent.OpenCameraSettings -> {
+                    settingsDeniedType = DeniedType.CAMERA
+                }
+                is AddEditNoteViewModel.UiEvent.OpenMicrophoneSettings -> {
+                    settingsDeniedType = DeniedType.MICROPHONE
                 }
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
                     currentSheetType = BottomSheetType.AUDIO_RECORDER
@@ -188,9 +192,6 @@ fun AddEditNoteScreen(
                 }
                 is AddEditNoteViewModel.UiEvent.ShowCameraRationale -> {
                     showCameraPermissionRationaleDialog = true
-                }
-                is AddEditNoteViewModel.UiEvent.OpenSettings -> {
-                    showSettingsDialog = true
                 }
             }
         }
@@ -434,14 +435,20 @@ fun AddEditNoteScreen(
                 )
             }
 
-            if (showSettingsDialog) {
+            settingsDeniedType?.let { type ->
                 PermissionRationaleDialog(
-                    permissionRationaleType = PermissionRationaleType.CAMERA_DENIED,
+                    permissionRationaleType =
+                        if (type == DeniedType.CAMERA)
+                            PermissionRationaleType.CAMERA_DENIED
+                        else
+                            PermissionRationaleType.MICROPHONE_DENIED,
                     onConfirmClicked = {
-                        showSettingsDialog = false
-                        NavigatationHelper.openAppSettings(context = context )
+                        settingsDeniedType = null // Resets both cases at once
+                        NavigatationHelper.openAppSettings(context)
                     },
-                    onDismissRequest = { showSettingsDialog = false }
+                    onDismissRequest = {
+                        settingsDeniedType = null
+                    }
                 )
             }
         }

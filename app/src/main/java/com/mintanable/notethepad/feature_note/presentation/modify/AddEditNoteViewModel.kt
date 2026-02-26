@@ -231,7 +231,7 @@ class AddEditNoteViewModel @Inject constructor(
                     _eventFlow.emit(UiEvent.ShowAudioRationale)
                 }
                 hasAskedBefore -> {
-                    _eventFlow.emit(UiEvent.OpenSettings)
+                    _eventFlow.emit(UiEvent.OpenMicrophoneSettings)
                 }
                 else -> {
                     permissionUsecases.markMicrophonePermissionFlag()
@@ -256,7 +256,7 @@ class AddEditNoteViewModel @Inject constructor(
                     _eventFlow.emit(UiEvent.ShowCameraRationale)
                 }
                 hasAskedBefore -> {
-                    _eventFlow.emit(UiEvent.OpenSettings)
+                    _eventFlow.emit(UiEvent.OpenCameraSettings)
                 }
                 else -> {
                     permissionUsecases.markCameraPermissionFlag()
@@ -270,7 +270,8 @@ class AddEditNoteViewModel @Inject constructor(
         object SaveNote: UiEvent()
         object ShowAudioRationale : UiEvent()
         object ShowCameraRationale : UiEvent()
-        object OpenSettings : UiEvent()
+        object OpenCameraSettings : UiEvent()
+        object OpenMicrophoneSettings : UiEvent()
         object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()
     }
