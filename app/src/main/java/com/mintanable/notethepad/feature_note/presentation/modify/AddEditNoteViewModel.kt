@@ -57,6 +57,9 @@ class AddEditNoteViewModel @Inject constructor(
     )
     val noteColor: State<Int> = _noteColor
 
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving = _isSaving.asStateFlow()
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -143,23 +146,21 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.SaveNote ->{
                 viewModelScope.launch {
-                    try{
-                        noteUseCases.saveNoteWithAttachments(
-                            id = currentNoteId,
-                            title = noteTitle.value.text,
-                            content = noteContent.value.text,
-                            timestamp = System.currentTimeMillis(),
-                            color = noteColor.value,
-                            imageUris = attachedImageUris.value,
-                            audioUris = attachedAudioUris.value
-                        )
+                    _isSaving.value = true
+
+                    noteUseCases.saveNoteWithAttachments(
+                        id = currentNoteId,
+                        title = noteTitle.value.text,
+                        content = noteContent.value.text,
+                        timestamp = System.currentTimeMillis(),
+                        color = noteColor.value,
+                        imageUris = attachedImageUris.value,
+                        audioUris = attachedAudioUris.value
+                    ).onSuccess {
                         _eventFlow.emit(UiEvent.SaveNote)
-                    }catch(e: InvalidNoteException){
-                        _eventFlow.emit(
-                            UiEvent.ShowSnackbar(
-                                message = e.message?: "Could not save note"
-                            )
-                        )
+                    }.onFailure { e ->
+                        _isSaving.value = false
+                        _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
                     }
                 }
             }

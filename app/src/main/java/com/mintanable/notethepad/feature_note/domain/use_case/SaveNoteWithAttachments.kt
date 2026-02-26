@@ -24,42 +24,49 @@ class SaveNoteWithAttachments(
         repository.insertNote(note)
     }
 
-    @Throws(InvalidNoteException::class)
     suspend operator fun invoke( id: Int?,
                                  title: String,
                                  content: String,
                                  timestamp: Long,
                                  color: Int,
                                  imageUris: List<Uri> = emptyList(),
-                                 audioUris: List<Uri> = emptyList()) {
-        if(title.isBlank()){
-            throw InvalidNoteException("The title of the note cant be empty")
-        }
+                                 audioUris: List<Uri> = emptyList()) : Result<Unit> {
 
-        val imageUriList = imageUris.mapNotNull { uri ->
-            if (uri.toString().contains(context.packageName)) {
-                uri.toString()
-            } else {
-                fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+       try{
+            if(title.isBlank()){
+                return Result.failure(InvalidNoteException("The title of the note cant be empty"))
             }
-        }
 
-        val audioUriList = audioUris.mapNotNull { uri ->
-            if (uri.toString().contains(context.packageName)) {
-                uri.toString()
-            } else {
-                fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+            val imageUriList = imageUris.mapNotNull { uri ->
+                if (uri.toString().contains(context.packageName)) {
+                    uri.toString()
+                } else {
+                    fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+                }
             }
-        }
 
-        repository.insertNote(Note(
-            id = id,
-            title = title,
-            content = content,
-            timestamp = timestamp,
-            color = color,
-            imageUris = imageUriList,
-            audioUris = audioUriList
-        ))
+            val audioUriList = audioUris.mapNotNull { uri ->
+                if (uri.toString().contains(context.packageName)) {
+                    uri.toString()
+                } else {
+                    fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+                }
+            }
+
+            repository.insertNote(
+                Note(
+                    id = id,
+                    title = title,
+                    content = content,
+                    timestamp = timestamp,
+                    color = color,
+                    imageUris = imageUriList,
+                    audioUris = audioUriList
+                )
+            )
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
     }
 }

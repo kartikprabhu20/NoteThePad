@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -78,6 +79,7 @@ fun AddEditNoteScreen(
 ){
     val context = LocalContext.current
 
+    val isSaving by viewModel.isSaving.collectAsStateWithLifecycle()
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
     val snackBarHostState = remember { SnackbarHostState() }
@@ -532,6 +534,26 @@ fun AddEditNoteScreen(
                             else -> {}
                         }
                     }
+                )
+            }
+        }
+    }
+
+    if (isSaving) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f))
+                .pointerInput(Unit) {}, // Blocks touch events
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(color = Color.White)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Saving Note...",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
