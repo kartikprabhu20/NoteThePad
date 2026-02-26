@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.domain.util
+package com.mintanable.notethepad.feature_note.presentation.notes
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
