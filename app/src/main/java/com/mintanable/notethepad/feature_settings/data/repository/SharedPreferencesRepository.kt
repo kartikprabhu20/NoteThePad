@@ -16,6 +16,7 @@ class SharedPreferencesRepository @Inject constructor(
 ) {
     private object PreferencesKeys {
         val HAS_ASKED_CAMERA = booleanPreferencesKey("has_asked_camera_permission")
+        val HAS_ASKED_MICROPHONE= booleanPreferencesKey("has_asked_microphone_permission")
     }
     val askedCameraPermission: Flow<Boolean> = context.dataStore.data
         .map { preferences -> preferences[PreferencesKeys.HAS_ASKED_CAMERA] ?: false }
@@ -23,6 +24,15 @@ class SharedPreferencesRepository @Inject constructor(
     suspend fun markCameraPermissionRequested() {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.HAS_ASKED_CAMERA] = true
+        }
+    }
+
+    val askedMicrophonePermission: Flow<Boolean> = context.dataStore.data
+        .map { preferences -> preferences[PreferencesKeys.HAS_ASKED_MICROPHONE] ?: false }
+
+    suspend fun markMicrophonePermissionRequested() {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.HAS_ASKED_MICROPHONE] = true
         }
     }
 }
