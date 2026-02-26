@@ -14,7 +14,9 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,13 +30,14 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
+import kotlinx.coroutines.delay
 
 @Composable
-fun AudioPlayerProvider(
+fun AudioPlayerUI(
     uri: Uri,
-    progress: Float,
-    onDelete: () -> Unit,
-    onPlayPause: () -> Unit) {
+    nowPlaying: Boolean,
+    onDelete: (Uri) -> Unit,
+    onPlayPause: (Uri) -> Unit) {
 
     val context = LocalContext.current
     val exoPlayer = remember {
@@ -44,12 +47,20 @@ fun AudioPlayerProvider(
         }
     }
     var isPlaying by remember { mutableStateOf(false) }
+    var currentPosition by remember { mutableLongStateOf(0L) }
+    var totalDuration by remember { mutableLongStateOf(0L) }
 
     // Update isPlaying state based on player events
     DisposableEffect(exoPlayer) {
         val listener = object : Player.Listener {
             override fun onIsPlayingChanged(playing: Boolean) {
                 isPlaying = playing
+            }
+
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY) {
+                    totalDuration = exoPlayer.duration.coerceAtLeast(0L)
+                }
             }
         }
         exoPlayer.addListener(listener)
@@ -59,13 +70,32 @@ fun AudioPlayerProvider(
         }
     }
 
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            while (true) {
+                currentPosition = exoPlayer.currentPosition
+                delay(500)
+            }
+        }
+    }
+
+    LaunchedEffect(nowPlaying) {
+        if (nowPlaying) exoPlayer.play() else exoPlayer.pause()
+    }
+
+
+    val progress = if (totalDuration > 0) currentPosition.toFloat() / totalDuration.toFloat() else 0f
     AudioPlayer(
         isPlaying = isPlaying,
+        progress = progress,
+        totalDuration = totalDuration,
         onPlayPause = {
             if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
+            onPlayPause(uri)
         },
-        progress = progress,
-        onDelete = onDelete
+        onDelete = {
+            onDelete(uri)
+        },
     )
 }
 
@@ -73,6 +103,7 @@ fun AudioPlayerProvider(
 fun AudioPlayer(
     isPlaying: Boolean,
     progress: Float,
+    totalDuration: Long,
     onPlayPause: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -94,7 +125,10 @@ fun AudioPlayer(
                 )
             }
 
-            LinearProgressIndicator( progress = { progress / 100f })
+            LinearProgressIndicator( progress = { progress},
+                modifier = Modifier.padding(end = 4.dp))
+
+            Text(formatMillisToTime(totalDuration))
 
             IconButton(onClick = onDelete) {
                 Icon(
@@ -102,7 +136,6 @@ fun AudioPlayer(
                     contentDescription = null
                 )
             }
-
         }
     }
 
@@ -116,6 +149,23 @@ fun AudioPlayer(
 @Composable
 fun PreviewAudioPlayer(){
     NoteThePadTheme {
-        AudioPlayer(isPlaying = true, progress = 50F, {}, {})
+        AudioPlayer(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {})
+    }
+}
+
+fun formatMillisToTime(ms: Long): String {
+    if (ms <= 0L) return "00:00"
+
+    val totalSeconds = ms / 1000
+    val seconds = totalSeconds % 60
+    val minutes = (totalSeconds / 60) % 60
+    val hours = totalSeconds / 3600
+
+    return if (hours > 0) {
+        // Format: 01:30:15
+        "%02d:%02d:%02d".format(hours, minutes, seconds)
+    } else {
+        // Format: 05:45
+        "%02d:%02d".format(minutes, seconds)
     }
 }
