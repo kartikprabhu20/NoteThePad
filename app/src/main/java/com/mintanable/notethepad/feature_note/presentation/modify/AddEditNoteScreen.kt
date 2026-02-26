@@ -440,8 +440,9 @@ fun AddEditNoteScreen(
         ModalBottomSheet(
             onDismissRequest =
                 {
-                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
-
+                    if (!uiState.isRecording) {
+                        viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                    }
                 },
             sheetState = sheetState,
             dragHandle = { BottomSheetDefaults.DragHandle() }
