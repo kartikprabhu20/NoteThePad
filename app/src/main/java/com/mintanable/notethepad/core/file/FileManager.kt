@@ -20,7 +20,7 @@ class FileManager @Inject constructor(
 
     private val folderName = "NoteAttachments"
 
-    private fun getMediaDir(): File {
+    fun getMediaDir(): File {
         val dir = File(context.getExternalFilesDir(null), folderName)
         if (!dir.exists()) dir.mkdirs()
         return dir
@@ -56,11 +56,7 @@ class FileManager @Inject constructor(
         return if (extension.isNullOrBlank()) "bin" else extension
     }
 
-    suspend fun deleteFileFromUris(list: List<Uri>){
-        deleteFilesFromPaths(list.map { it.toString() })
-    }
-
-    suspend fun deleteFilesFromPaths(list: List<String>) {
+    suspend fun deleteFiles(list: List<String>) {
         withContext(Dispatchers.IO){
             for(path in list){
                 try {

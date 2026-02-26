@@ -1,6 +1,8 @@
 package com.mintanable.notethepad.di
 
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
+import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.feature_firebase.data.repository.AuthRepositoryImpl
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_navigationdrawer.data.repository.NavigationDrawerItemRepositoryImpl
@@ -8,11 +10,14 @@ import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.Navi
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
 import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
+import com.mintanable.notethepad.feature_note.domain.model.AudioRecorderImpl
+import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -26,11 +31,11 @@ object AppModule {
     }
 
     @Provides
-    fun provideNoteUseCases(repository: NoteRepository): NoteUseCases {
+    fun provideNoteUseCases(repository: NoteRepository, fileManager: FileManager, @ApplicationContext context: Context): NoteUseCases {
         return NoteUseCases(
             getNotes = GetNotes(repository),
             deleteNote = DeleteNote(repository),
-            addNote = AddNote(repository),
+            saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
             getNote = GetNote(repository)
         )
     }
@@ -55,5 +60,21 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(auth: FirebaseAuth): AuthRepository {
         return AuthRepositoryImpl(auth)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAudioRecorder(@ApplicationContext context: Context): AudioRecorder {
+        return AudioRecorderImpl(context)
+    }
+
+    @Provides
+    fun provideFileIOUseCases(fileManager: FileManager): FileIOUseCases {
+        return FileIOUseCases(
+            createTempFile = CreateTempFile(fileManager),
+            createTempUri = CreateTempUri(fileManager),
+            deleteFiles = DeleteFiles(fileManager),
+            saveMediaToStorage = SaveMediaToStorage(fileManager)
+        )
     }
 }

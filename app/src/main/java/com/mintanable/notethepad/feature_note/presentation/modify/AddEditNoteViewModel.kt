@@ -1,8 +1,8 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
-import android.util.Log
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
@@ -10,15 +10,13 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.core.file.FileManager
-import com.mintanable.notethepad.feature_note.domain.model.AudioRecorderImpl
 import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
-import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
+import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
-import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,9 +34,9 @@ class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext val context: Context,
-    private val fileManager: FileManager,
     private val permissionUsecases: PermissionUsecases,
-    private val audioRecorder: AudioRecorderImpl
+    private val audioRecorder: AudioRecorder,
+    private val fileIOUseCases: FileIOUseCases
 ): ViewModel(){
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
@@ -146,28 +144,14 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.SaveNote ->{
                 viewModelScope.launch {
                     try{
-                        noteUseCases.addNote(
-                            Note(
-                                title = noteTitle.value.text,
-                                content = noteContent.value.text,
-                                timestamp = System.currentTimeMillis(),
-                                color = noteColor.value,
-                                id = currentNoteId,
-                                imageUris = attachedImageUris.value.mapNotNull { uri ->
-                                    if (uri.toString().contains(context.packageName)) {
-                                        uri.toString()
-                                    } else {
-                                        fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
-                                    }
-                                },
-                                audioUris = attachedAudioUris.value.mapNotNull { uri ->
-                                    if (uri.toString().contains(context.packageName)) {
-                                        uri.toString()
-                                    } else {
-                                        fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
-                                    }
-                                }
-                            )
+                        noteUseCases.saveNoteWithAttachments(
+                            id = currentNoteId,
+                            title = noteTitle.value.text,
+                            content = noteContent.value.text,
+                            timestamp = System.currentTimeMillis(),
+                            color = noteColor.value,
+                            imageUris = attachedImageUris.value,
+                            audioUris = attachedAudioUris.value
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
                     }catch(e: InvalidNoteException){
@@ -188,7 +172,7 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.RemoveImage -> {
                 _attachedImages.update { it - event.uri }
-                viewModelScope.launch { fileManager.deleteFileFromUris(listOf(event.uri)) }
+                viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
             }
 
             is AddEditNoteEvent.AttachVideo -> {
@@ -209,7 +193,7 @@ class AddEditNoteViewModel @Inject constructor(
                         }
                     } else {
                         // START
-                        val file = fileManager.createTempFile(".mp4")
+                        val file = fileIOUseCases.createTempFile(".mp4")
                         currentRecordingFile = file
                         file?.let {
                             audioRecorder.startRecording(it)
@@ -229,7 +213,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun generateTempUri(attachmentType: AttachmentType): Uri? {
-        return fileManager.createTempUri(attachmentType.extension)
+        return fileIOUseCases.createTempUri(attachmentType.extension)
     }
 
     sealed class UiEvent{

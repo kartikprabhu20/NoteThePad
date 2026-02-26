@@ -92,14 +92,14 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.SearchBarValueChange -> { _searchInputText.value = event.searchQuery }
             is NotesEvent.DeleteNote ->{
                 viewModelScope.launch {
-                    fileManager.deleteFilesFromPaths(event.note.imageUris)
+                    fileManager.deleteFiles(event.note.imageUris)
                     noteUseCases.deleteNote(event.note)
                     recentlyDeletedNote =  event.note
                 }
             }
             is NotesEvent.RestoreNote ->{
                 viewModelScope.launch {
-                    noteUseCases.addNote(recentlyDeletedNote?: return@launch)
+                    noteUseCases.saveNoteWithAttachments(recentlyDeletedNote?: return@launch)
                     recentlyDeletedNote = null
                 }
             }

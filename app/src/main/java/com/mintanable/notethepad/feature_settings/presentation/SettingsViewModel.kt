@@ -316,7 +316,7 @@ class SettingsViewModel @Inject constructor(
     fun createMassiveDummyData() {
         viewModelScope.launch(Dispatchers.IO) {
             for (i in 1..10000){
-                noteUseCases.addNote(Note(title = "Note #$i",
+                noteUseCases.saveNoteWithAttachments(Note(title = "Note #$i",
                     content = "Content for $i",
                     timestamp = System.currentTimeMillis(),
                     color = NoteColors.colors.random().toArgb()))
