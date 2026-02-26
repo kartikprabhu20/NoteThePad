@@ -159,7 +159,7 @@ class AddEditNoteViewModel @Inject constructor(
                     _uiState.update { it.copy(attachedAudios = it.attachedAudios + uri) }
                 }
             } else {
-                val file = fileIOUseCases.createTempFile(".mp4")
+                val file = fileIOUseCases.createFile(AttachmentType.AUDIO.extension, AttachmentType.AUDIO.name.lowercase())
                 currentRecordingFile = file
                 file?.let {
                     audioRecorder.startRecording(it)
@@ -192,7 +192,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun generateTempUri(attachmentType: AttachmentType): Uri? {
-        return fileIOUseCases.createTempUri(attachmentType.extension)
+        return fileIOUseCases.createUri(attachmentType.extension, attachmentType.name.lowercase())
     }
 
     fun checkMicrophonePermission(isGranted: Boolean, shouldShowRationale: Boolean) {

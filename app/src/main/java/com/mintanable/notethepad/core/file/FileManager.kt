@@ -71,9 +71,9 @@ class FileManager @Inject constructor(
         }
     }
 
-    fun createTempUri(extension: String): Uri? {
+    fun createUri(extension: String,prefix: String?): Uri? {
         return try {
-            val file = File.createTempFile("TEMP_", ".$extension", getMediaDir())
+            val file = File.createTempFile(if(prefix.isNullOrBlank()) "media_" else "$prefix"+"_", ".$extension", getMediaDir())
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         } catch (e: IOException) {
             Log.e("kptest", "Error while createTempUri: $e")
@@ -81,9 +81,9 @@ class FileManager @Inject constructor(
         }
     }
 
-    fun createTempFile(extension: String): File? {
+    fun createFile(extension: String,prefix: String?): File? {
         return try {
-            File.createTempFile("TEMP_", ".$extension", getMediaDir())
+            File.createTempFile(if(prefix.isNullOrBlank()) "media_" else "$prefix"+"_", ".$extension", getMediaDir())
         } catch (e: IOException) {
             Log.e("kptest", "Error while createTempUri: $e")
             null

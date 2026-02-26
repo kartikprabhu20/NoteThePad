@@ -71,8 +71,8 @@ object AppModule {
     @Provides
     fun provideFileIOUseCases(fileManager: FileManager): FileIOUseCases {
         return FileIOUseCases(
-            createTempFile = CreateTempFile(fileManager),
-            createTempUri = CreateTempUri(fileManager),
+            createFile = CreateFile(fileManager),
+            createUri = CreateUri(fileManager),
             deleteFiles = DeleteFiles(fileManager),
             saveMediaToStorage = SaveMediaToStorage(fileManager)
         )
