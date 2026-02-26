@@ -15,4 +15,5 @@ sealed class AddEditNoteEvent{
     data class AttachVideo(val uri: Uri): AddEditNoteEvent()
     data class AttachAudio(val uri: Uri): AddEditNoteEvent()
     data class RemoveAudio(val uri: Uri): AddEditNoteEvent()
+    object ToggleAudioRecording: AddEditNoteEvent()
 }

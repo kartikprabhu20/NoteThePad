@@ -8,5 +8,5 @@ data class Attachment(
 enum class AttachmentType(val extension: String) {
     IMAGE("jpg"),
     VIDEO("mp4"),
-    AUDIO(extension = "mp3")
+    AUDIO("mp4")
 }

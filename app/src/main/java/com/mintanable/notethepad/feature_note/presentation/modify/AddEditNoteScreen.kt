@@ -54,6 +54,8 @@ import com.mintanable.notethepad.feature_note.domain.util.MoreSettingsOptions
 import com.mintanable.notethepad.feature_note.domain.util.ReminderOptions
 import com.mintanable.notethepad.feature_note.domain.util.VideoSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
+import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioPlayerUI
+import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteActionButtons
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
@@ -153,7 +155,36 @@ fun AddEditNoteScreen(
         }
     }
 
+    val isRecording by viewModel.isRecording.collectAsStateWithLifecycle()
     val attachedAudioUris by viewModel.attachedAudioUris.collectAsStateWithLifecycle()
+    var nowPlayingAudioUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var showMicrophonePermissionRationaleDialog by rememberSaveable { mutableStateOf(false) }
+    val microphonePermissionState = rememberPermissionState(
+        android.Manifest.permission.RECORD_AUDIO
+    )
+    val checkAndRequestMicrophonePermission = {
+        scope.launch {
+            when {
+                microphonePermissionState.status.isGranted -> {
+                    val uri = viewModel.generateTempUri(AttachmentType.AUDIO)
+                    currentSheetType = BottomSheetType.AUDIO_RECORDER
+                }
+
+                microphonePermissionState.status.shouldShowRationale -> {
+                    showMicrophonePermissionRationaleDialog = true
+                }
+
+                else -> {
+                    if (viewModel.hasAskedForMicrophonePermissionBefore()) {
+                        showSettingsDialog = true
+                    } else {
+                        microphonePermissionState.launchPermissionRequest()
+                        viewModel.markMicrophonePermissionRequested()
+                    }
+                }
+            }
+        }
+    }
 
 
     LaunchedEffect(key1 = true){
@@ -345,21 +376,19 @@ fun AddEditNoteScreen(
                         }
 
                         if (attachedAudioUris.isNotEmpty()) {
-
                             item{
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Column {
-                                    attachedImageUris.forEach { uri ->
-                                        AttachedImageItem(
-                                            uri = uri,
+                                    attachedAudioUris.forEach { audioUri ->
+                                        AudioPlayerUI(
+                                            uri = audioUri,
+                                            nowPlaying = audioUri == nowPlayingAudioUri,
                                             onDelete = { deletedUri ->
-                                                viewModel.onEvent(AddEditNoteEvent.RemoveImage(deletedUri))
+                                                viewModel.onEvent(AddEditNoteEvent.RemoveAudio(deletedUri))
                                             },
-                                            onClick = { zoomedImageUri = it },
-                                            modifier = Modifier.sharedBounds(
-                                                sharedContentState = rememberSharedContentState(key = "image-${uri}"),
-                                                animatedVisibilityScope = animatedVisibilityScope
-                                            )
+                                            onPlayPause = { uri ->
+                                                nowPlayingAudioUri = uri
+                                            }
                                         )
                                     }
                                 }
@@ -400,6 +429,17 @@ fun AddEditNoteScreen(
                 )
             }
 
+            if (showMicrophonePermissionRationaleDialog) {
+                PermissionRationaleDialog(
+                    permissionRationaleType = PermissionRationaleType.MICROPHONE,
+                    onConfirmClicked = {
+                        showMicrophonePermissionRationaleDialog = false
+                        cameraPermissionState.launchPermissionRequest()
+                    },
+                    onDismissRequest = { showMicrophonePermissionRationaleDialog = false }
+                )
+            }
+
             if (showSettingsDialog) {
                 PermissionRationaleDialog(
                     permissionRationaleType = PermissionRationaleType.CAMERA_DENIED,
@@ -434,9 +474,17 @@ fun AddEditNoteScreen(
             sheetState = sheetState,
             dragHandle = { BottomSheetDefaults.DragHandle() }
         ) {
-
-
-            if (currentSheetType != BottomSheetType.NONE) {
+            if(currentSheetType == BottomSheetType.AUDIO_RECORDER){
+                AudioRecorderUI(
+                    isRecording = isRecording,
+                    onStartRecordingClicked = {
+                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
+                    },
+                    onStopRecordingClicked = {
+                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
+                    }
+                )
+            } else if (currentSheetType != BottomSheetType.NONE) {
                 BottomSheetContent(
                     items = sheetItems,
                     optionSelected = { additionalOption ->
@@ -478,7 +526,7 @@ fun AddEditNoteScreen(
 
                             AudioSourceOptions.AUDIO_RECORDER -> {
                                 currentSheetType = BottomSheetType.NONE
-
+                                checkAndRequestMicrophonePermission()
                             }
 
                             else -> {}

@@ -19,7 +19,8 @@ enum class BottomSheetType {
     MORE_SETTINGS,
     IMAGE_SOURCES,
     VIDEO_SOURCES,
-    AUDIO_SOURCES
+    AUDIO_SOURCES,
+    AUDIO_RECORDER
 }
 
 interface AdditionalOption {

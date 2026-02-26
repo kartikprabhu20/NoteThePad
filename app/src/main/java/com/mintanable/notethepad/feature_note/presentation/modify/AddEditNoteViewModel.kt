@@ -11,6 +11,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.core.file.FileManager
+import com.mintanable.notethepad.feature_note.domain.model.AudioRecorderImpl
 import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
@@ -18,8 +19,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
-import com.mintanable.notethepad.feature_settings.presentation.use_cases.GetCameraPermissionFlag
-import com.mintanable.notethepad.feature_settings.presentation.use_cases.MarkCameraPermissionFlag
+import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,8 +37,8 @@ class AddEditNoteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext val context: Context,
     private val fileManager: FileManager,
-    private val markCameraPermissionFlag: MarkCameraPermissionFlag,
-    private val getCameraPermissionFlag: GetCameraPermissionFlag,
+    private val permissionUsecases: PermissionUsecases,
+    private val audioRecorder: AudioRecorderImpl
 ): ViewModel(){
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
@@ -70,14 +71,28 @@ class AddEditNoteViewModel @Inject constructor(
     private var currentNoteId: Int? = null
 
     suspend fun hasAskedForCameraPermissionBefore(): Boolean {
-        return getCameraPermissionFlag()
+        return permissionUsecases.getCameraPermissionFlag()
     }
 
     fun markCameraPermissionRequested() {
         viewModelScope.launch {
-            markCameraPermissionFlag()
+            permissionUsecases.markCameraPermissionFlag()
         }
     }
+
+    suspend fun hasAskedForMicrophonePermissionBefore(): Boolean {
+        return permissionUsecases.getMicrophonePermissionFlag()
+    }
+
+    fun markMicrophonePermissionRequested() {
+        viewModelScope.launch {
+            permissionUsecases.markMicrophonePermissionFlag()
+        }
+    }
+
+    private var currentRecordingFile: File? = null
+    private val _isRecording = MutableStateFlow(false)
+    val isRecording = _isRecording.asStateFlow()
 
     init {
         if (isEditMode) {
@@ -92,10 +107,8 @@ class AddEditNoteViewModel @Inject constructor(
                 _noteTitle.value = _noteTitle.value.copy(text = note.title, isHintVisible = false)
                 _noteContent.value = _noteContent.value.copy(text = note.content, isHintVisible = false)
                 _noteColor.value = note.color
-                _attachedImages.value = note.imageUris.map {
-                    Log.d("kptest", "load: $it")
-                    it.toUri()
-                }
+                _attachedImages.value = note.imageUris.map { it.toUri() }
+                _attachedAudioUris.value = note.audioUris.map { it.toUri() }
             }
         }
     }
@@ -141,7 +154,13 @@ class AddEditNoteViewModel @Inject constructor(
                                 color = noteColor.value,
                                 id = currentNoteId,
                                 imageUris = attachedImageUris.value.mapNotNull { uri ->
-                                    val uri = uri
+                                    if (uri.toString().contains(context.packageName)) {
+                                        uri.toString()
+                                    } else {
+                                        fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+                                    }
+                                },
+                                audioUris = attachedAudioUris.value.mapNotNull { uri ->
                                     if (uri.toString().contains(context.packageName)) {
                                         uri.toString()
                                     } else {
@@ -178,6 +197,33 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
 
+            is AddEditNoteEvent.ToggleAudioRecording -> {
+                viewModelScope.launch {
+                    if (_isRecording.value) {
+                        // STOP
+                        audioRecorder.stopRecording()
+                        _isRecording.value = false
+                        currentRecordingFile?.let { file ->
+                            val uri = Uri.fromFile(file)
+                            _attachedAudioUris.update { it + uri }
+                        }
+                    } else {
+                        // START
+                        val file = fileManager.createTempFile(".mp4")
+                        currentRecordingFile = file
+                        file?.let {
+                            audioRecorder.startRecording(it)
+                            _isRecording.value = true
+                        }
+                    }
+                }
+            }
+
+            is AddEditNoteEvent.RemoveAudio -> {
+                Log.d("kptest", "RemoveAudio ${event.uri} ${_attachedAudioUris.value}")
+                _attachedAudioUris.update { it - event.uri }
+            }
+
             else -> {}
         }
     }
@@ -185,7 +231,6 @@ class AddEditNoteViewModel @Inject constructor(
     fun generateTempUri(attachmentType: AttachmentType): Uri? {
         return fileManager.createTempUri(attachmentType.extension)
     }
-
 
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()

@@ -84,4 +84,13 @@ class FileManager @Inject constructor(
             null
         }
     }
+
+    fun createTempFile(extension: String): File? {
+        return try {
+            File.createTempFile("TEMP_", ".$extension", getMediaDir())
+        } catch (e: IOException) {
+            Log.e("kptest", "Error while createTempUri: $e")
+            null
+        }
+    }
 }
