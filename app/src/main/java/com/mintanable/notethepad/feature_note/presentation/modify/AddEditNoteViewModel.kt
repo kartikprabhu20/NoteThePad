@@ -10,7 +10,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
@@ -217,8 +216,62 @@ class AddEditNoteViewModel @Inject constructor(
         return fileIOUseCases.createTempUri(attachmentType.extension)
     }
 
+    fun checkMicrophonePermission(
+        isGranted: Boolean,
+        shouldShowRationale: Boolean
+    ) {
+        viewModelScope.launch {
+            val hasAskedBefore = permissionUsecases.getMicrophonePermissionFlag()
+
+            when {
+                isGranted -> {
+                    _eventFlow.emit(UiEvent.LaunchAudioRecorder)
+                }
+                shouldShowRationale -> {
+                    _eventFlow.emit(UiEvent.ShowAudioRationale)
+                }
+                hasAskedBefore -> {
+                    _eventFlow.emit(UiEvent.OpenSettings)
+                }
+                else -> {
+                    permissionUsecases.markMicrophonePermissionFlag()
+                }
+            }
+        }
+    }
+
+    fun checkCameraPermission(
+        isGranted: Boolean,
+        shouldShowRationale: Boolean,
+        attachmentType: AttachmentType
+    ) {
+        viewModelScope.launch {
+            val hasAskedBefore = permissionUsecases.getCameraPermissionFlag()
+
+            when {
+                isGranted -> {
+                    _eventFlow.emit(UiEvent.LaunchCamera(attachmentType))
+                }
+                shouldShowRationale -> {
+                    _eventFlow.emit(UiEvent.ShowCameraRationale)
+                }
+                hasAskedBefore -> {
+                    _eventFlow.emit(UiEvent.OpenSettings)
+                }
+                else -> {
+                    permissionUsecases.markCameraPermissionFlag()
+                }
+            }
+        }
+    }
+
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
         object SaveNote: UiEvent()
+        object ShowAudioRationale : UiEvent()
+        object ShowCameraRationale : UiEvent()
+        object OpenSettings : UiEvent()
+        object LaunchAudioRecorder : UiEvent()
+        data class LaunchCamera(val type: AttachmentType) : UiEvent()
     }
 }

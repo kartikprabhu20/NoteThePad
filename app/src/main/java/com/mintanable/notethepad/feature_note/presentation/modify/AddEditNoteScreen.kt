@@ -128,11 +128,57 @@ fun AddEditNoteScreen(
         android.Manifest.permission.CAMERA
     )
     val checkAndRequestCameraPermission = { attachmentType: AttachmentType ->
-        scope.launch {
-            when {
-                cameraPermissionState.status.isGranted -> {
-                    val uri = viewModel.generateTempUri(attachmentType)
-                    if (attachmentType == AttachmentType.IMAGE) {
+        viewModel.checkCameraPermission(
+            isGranted = cameraPermissionState.status.isGranted,
+            shouldShowRationale = cameraPermissionState.status.shouldShowRationale,
+            attachmentType = attachmentType
+        )
+
+        if (!cameraPermissionState.status.isGranted &&
+            !cameraPermissionState.status.shouldShowRationale) {
+            cameraPermissionState.launchPermissionRequest()
+        }
+    }
+
+    val isRecording by viewModel.isRecording.collectAsStateWithLifecycle()
+    val attachedAudioUris by viewModel.attachedAudioUris.collectAsStateWithLifecycle()
+    var nowPlayingAudioUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    var showMicrophonePermissionRationaleDialog by rememberSaveable { mutableStateOf(false) }
+    val microphonePermissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+    val checkAndRequestMicrophonePermission = {
+        viewModel.checkMicrophonePermission(
+            isGranted = microphonePermissionState.status.isGranted,
+            shouldShowRationale = microphonePermissionState.status.shouldShowRationale
+        )
+        // Physical trigger for first-time system popup
+        if (!microphonePermissionState.status.isGranted &&
+            !microphonePermissionState.status.shouldShowRationale) {
+            microphonePermissionState.launchPermissionRequest()
+        }
+    }
+
+    LaunchedEffect(key1 = true){
+        viewModel.eventFlow.collectLatest { event->
+            when(event){
+                is AddEditNoteViewModel.UiEvent.ShowSnackbar->{
+                    snackBarHostState.showSnackbar( message = event.message)
+                }
+                is AddEditNoteViewModel.UiEvent.SaveNote->{
+                    navController.navigateUp()
+                }
+                is AddEditNoteViewModel.UiEvent.ShowAudioRationale -> {
+                    showMicrophonePermissionRationaleDialog = true
+                }
+                is AddEditNoteViewModel.UiEvent.OpenSettings -> {
+                    showSettingsDialog = true
+                }
+                is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
+                    currentSheetType = BottomSheetType.AUDIO_RECORDER
+                }
+                is AddEditNoteViewModel.UiEvent.LaunchCamera -> {
+                    val uri = viewModel.generateTempUri(event.type)
+                    if (event.type == AttachmentType.IMAGE) {
                         cameraImageUri = uri
                         cameraLauncher.launch(uri!!)
                     } else {
@@ -140,65 +186,11 @@ fun AddEditNoteScreen(
                         videoLauncher.launch(uri!!)
                     }
                 }
-
-                cameraPermissionState.status.shouldShowRationale -> {
+                is AddEditNoteViewModel.UiEvent.ShowCameraRationale -> {
                     showCameraPermissionRationaleDialog = true
                 }
-
-                else -> {
-                    if (viewModel.hasAskedForCameraPermissionBefore()) {
-                        showSettingsDialog = true
-                    } else {
-                        cameraPermissionState.launchPermissionRequest()
-                        viewModel.markCameraPermissionRequested()
-                    }
-                }
-            }
-        }
-    }
-
-    val isRecording by viewModel.isRecording.collectAsStateWithLifecycle()
-    val attachedAudioUris by viewModel.attachedAudioUris.collectAsStateWithLifecycle()
-    var nowPlayingAudioUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-    var showMicrophonePermissionRationaleDialog by rememberSaveable { mutableStateOf(false) }
-    val microphonePermissionState = rememberPermissionState(
-        android.Manifest.permission.RECORD_AUDIO
-    )
-    val checkAndRequestMicrophonePermission = {
-        scope.launch {
-            when {
-                microphonePermissionState.status.isGranted -> {
-                    val uri = viewModel.generateTempUri(AttachmentType.AUDIO)
-                    currentSheetType = BottomSheetType.AUDIO_RECORDER
-                }
-
-                microphonePermissionState.status.shouldShowRationale -> {
-                    showMicrophonePermissionRationaleDialog = true
-                }
-
-                else -> {
-                    if (viewModel.hasAskedForMicrophonePermissionBefore()) {
-                        showSettingsDialog = true
-                    } else {
-                        microphonePermissionState.launchPermissionRequest()
-                        viewModel.markMicrophonePermissionRequested()
-                    }
-                }
-            }
-        }
-    }
-
-
-    LaunchedEffect(key1 = true){
-        viewModel.eventFlow.collectLatest { event->
-            when(event){
-                is AddEditNoteViewModel.UiEvent.ShowSnackbar->{
-                    snackBarHostState.showSnackbar(
-                        message = event.message
-                    )
-                }
-                is AddEditNoteViewModel.UiEvent.SaveNote->{
-                    navController.navigateUp()
+                is AddEditNoteViewModel.UiEvent.OpenSettings -> {
+                    showSettingsDialog = true
                 }
             }
         }
@@ -436,7 +428,7 @@ fun AddEditNoteScreen(
                     permissionRationaleType = PermissionRationaleType.MICROPHONE,
                     onConfirmClicked = {
                         showMicrophonePermissionRationaleDialog = false
-                        cameraPermissionState.launchPermissionRequest()
+                        microphonePermissionState.launchPermissionRequest()
                     },
                     onDismissRequest = { showMicrophonePermissionRationaleDialog = false }
                 )
