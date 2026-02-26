@@ -20,7 +20,8 @@ data class Note(
     val content: String,
     val timestamp: Long,
     val color: Int,
-    val imageUris: List<String> = emptyList()
+    val imageUris: List<String> = emptyList(),
+    val audioUris: List<String> = emptyList()
 )
 
 class InvalidNoteException(message: String):Exception(message)

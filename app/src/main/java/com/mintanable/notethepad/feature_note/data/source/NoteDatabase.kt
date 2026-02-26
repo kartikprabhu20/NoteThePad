@@ -10,7 +10,7 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteConverters
 
 @Database(
     entities = [Note::class],
-    version=3
+    version = 4
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase:RoomDatabase() {
@@ -30,6 +30,12 @@ abstract class NoteDatabase:RoomDatabase() {
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE Note ADD COLUMN imageUris TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE Note ADD COLUMN audioUris TEXT NOT NULL DEFAULT ''")
             }
         }
     }
