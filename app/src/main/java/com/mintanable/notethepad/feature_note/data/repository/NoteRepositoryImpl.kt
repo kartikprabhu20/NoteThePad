@@ -32,4 +32,8 @@ class NoteRepositoryImpl(
     override suspend fun deleteNote(note: Note) {
         return dao.deleteNote(note)
     }
+
+    override suspend fun deleteNoteWithId(id: Long) {
+        return dao.deleteNoteWithId(id)
+    }
 }

@@ -12,6 +12,7 @@ sealed class AddEditNoteEvent{
     data class ChangeColor(val color:Int): AddEditNoteEvent()
     object SaveNote: AddEditNoteEvent()
     object MakeCopy: AddEditNoteEvent()
+    object DeleteNote: AddEditNoteEvent()
     data class AttachImage(val uri: Uri): AddEditNoteEvent()
     data class RemoveImage(val uri: Uri): AddEditNoteEvent()
     data class AttachVideo(val uri: Uri): AddEditNoteEvent()

@@ -10,4 +10,8 @@ class DeleteNote(
     suspend operator fun invoke(note: Note){
         repository.deleteNote(note)
     }
+
+    suspend operator fun invoke(id: Long){
+        repository.deleteNoteWithId(id)
+    }
 }

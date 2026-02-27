@@ -137,11 +137,12 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.SaveNote -> {
                 saveNote(currentNoteId)
             }
-
             is AddEditNoteEvent.MakeCopy -> {
                 saveNote(null)
             }
-
+            is AddEditNoteEvent.DeleteNote -> {
+                deleteNote()
+            }
             is AddEditNoteEvent.AttachImage -> {
                 _uiState.update { it.copy(
                     attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
@@ -192,6 +193,15 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(zoomedImageUri = null) }
             }
             else -> {}
+        }
+    }
+
+    private fun deleteNote() {
+        viewModelScope.launch {
+            fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
+            fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri.toString() })
+            currentNoteId?.let { noteUseCases.deleteNote(it) }
+            _eventFlow.emit(UiEvent.DeleteNote(currentNoteId))
         }
     }
 
@@ -276,6 +286,7 @@ class AddEditNoteViewModel @Inject constructor(
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
         object SaveNote: UiEvent()
+        data class DeleteNote(val id: Long?): UiEvent()
         data class MakeCopy(val newNoteId: Long): UiEvent()
         object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()

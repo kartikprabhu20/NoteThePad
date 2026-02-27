@@ -148,6 +148,16 @@ fun AddEditNoteScreen(
         }
     }
 
+    val hideSheetAndNavigate = { action: () -> Unit ->
+        scope.launch {
+            if (sheetState.isVisible) {
+                sheetState.hide()
+            }
+            viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+            action()
+        }
+    }
+
     LaunchedEffect(key1 = true){
         viewModel.eventFlow.collectLatest { event->
             when(event){
@@ -155,17 +165,29 @@ fun AddEditNoteScreen(
                     snackBarHostState.showSnackbar( message = event.message)
                 }
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
-                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
-                    viewModel.onEvent(AddEditNoteEvent.StopMedia)
-                    navController.navigateUp()
+                    scope.launch {
+                        sheetState.hide()
+                        viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                        navController.navigateUp()
+                    }
                 }
-                is AddEditNoteViewModel.UiEvent.MakeCopy->{
-                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
-                    viewModel.onEvent(AddEditNoteEvent.StopMedia)
-                    navController.navigate(
-                        Screen.AddEditNoteScreen.route + "?noteId=${event.newNoteId}&noteColor=${uiState.noteColor}"
-                    ) {
-                        popUpTo(Screen.AddEditNoteScreen.route + "?noteId={$noteId}&noteColor={$noteColor}") { inclusive = true }
+                is AddEditNoteViewModel.UiEvent.MakeCopy -> {
+                    hideSheetAndNavigate {
+                        viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                        navController.navigate(
+                            Screen.AddEditNoteScreen.route +
+                                    "?noteId=${event.newNoteId}&noteColor=${uiState.noteColor}"
+                        ) {
+                            popUpTo(Screen.AddEditNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+                is AddEditNoteViewModel.UiEvent.DeleteNote -> {
+                    hideSheetAndNavigate {
+                        viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                        navController.navigateUp()
                     }
                 }
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
@@ -532,7 +554,7 @@ fun AddEditNoteScreen(
                             }
 
                             MoreSettingsOptions.DELETE -> {
-
+                                viewModel.onEvent(AddEditNoteEvent.DeleteNote)
                             }
 
                             MoreSettingsOptions.SHARE -> {
