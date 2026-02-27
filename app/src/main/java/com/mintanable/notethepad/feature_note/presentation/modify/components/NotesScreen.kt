@@ -208,14 +208,6 @@ fun NotesScreen (
                             NoteItem(
                                 note = note,
                                 modifier = Modifier
-//                                    .animateItem(
-//                                        fadeInSpec = tween(300),
-//                                        fadeOutSpec = tween(300),
-//                                        placementSpec = spring(
-//                                            dampingRatio = Spring.DampingRatioLowBouncy,
-//                                            stiffness = Spring.StiffnessMedium
-//                                        )
-//                                    )
                                     .fillMaxWidth()
                                     .sharedBounds(
                                         sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-${note.id}"),
@@ -247,18 +239,5 @@ fun NotesScreen (
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun test(){
-    NoteThePadTheme {
-        Text(
-            "NoteThePad",
-            modifier = Modifier
-                .padding(16.dp),
-            style = MaterialTheme.typography.titleLarge
-        )
     }
 }
