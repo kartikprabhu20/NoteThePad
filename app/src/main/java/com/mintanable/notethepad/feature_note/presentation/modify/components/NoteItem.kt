@@ -1,26 +1,29 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
-import android.net.Uri
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Photo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -28,12 +31,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.RedOrange
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 
@@ -86,8 +90,9 @@ fun NoteItem(
             with(sharedTransitionScope) {
                 Text(
                     text = note.title,
-                    style = MaterialTheme.typography.h6,
-                    color = MaterialTheme.colors.onSurface,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -100,8 +105,8 @@ fun NoteItem(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = note.content,
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black,
                     maxLines = 10,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -120,14 +125,16 @@ fun NoteItem(
                         Icon(
                             imageVector = Icons.Default.Collections,
                             contentDescription = "Images attached",
-                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                            modifier = Modifier.alpha(alpha = 0.5f),
+                            tint = Color.Black
                         )
                     }
                     if(note.audioUris.size >0){
                         Icon(
                             imageVector = Icons.Default.Audiotrack,
                             contentDescription = "Images attached",
-                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                            modifier = Modifier.alpha(alpha = 0.5f),
+                            tint = Color.Black
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -139,7 +146,7 @@ fun NoteItem(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete note",
-                            tint = MaterialTheme.colors.onSurface,
+                            tint = Color.Black
                         )
                     }
                 }
@@ -152,25 +159,31 @@ fun NoteItem(
 @ThemePreviews
 @Composable
 fun NoteItemPreview() {
-    MaterialTheme {
+    NoteThePadTheme {
         SharedTransitionLayout {
             AnimatedContent(targetState = true, label = "preview") { isVisible ->
                 if (isVisible) {
-                    NoteItem(
-                        note = Note(
-                            title = "Meeting Notes",
-                            content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
-                            timestamp = System.currentTimeMillis(),
-                            color = RedOrange.toArgb(),
-                            id = 1,
-                            imageUris = listOf(""),
-                            audioUris = listOf("")
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                        onDeleteClick = {},
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        NoteItem(
+                            note = Note(
+                                title = "Meeting Notes",
+                                content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
+                                timestamp = System.currentTimeMillis(),
+                                color = RedOrange.toArgb(),
+                                id = 1,
+                                imageUris = listOf(""),
+                                audioUris = listOf("")
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            onDeleteClick = {},
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this@AnimatedContent
+                        )
+                    }
                 }
             }
         }

@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -312,7 +313,7 @@ fun AddEditNoteScreen(
                                 },
                                 isHintVisible = uiState.titleState.isHintVisible,
                                 isSingleLine = true,
-                                textStyle = MaterialTheme.typography.headlineLarge,
+                                textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                                 modifier = Modifier
                                     .sharedBounds(
                                         sharedContentState = sharedTransitionScope.rememberSharedContentState(
