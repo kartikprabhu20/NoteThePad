@@ -88,7 +88,6 @@ fun AddEditNoteScreen(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
 
-    var zoomedImageUri by remember { mutableStateOf<Uri?>(null) }
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
@@ -154,7 +153,7 @@ fun AddEditNoteScreen(
                     snackBarHostState.showSnackbar( message = event.message)
                 }
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
-                    viewModel.onEvent(AddEditNoteEvent.StopAudio)
+                    viewModel.onEvent(AddEditNoteEvent.StopMedia)
                     navController.navigateUp()
                 }
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
@@ -176,7 +175,7 @@ fun AddEditNoteScreen(
     }
 
     BackHandler {
-        viewModel.onEvent(AddEditNoteEvent.StopAudio)
+        viewModel.onEvent(AddEditNoteEvent.StopMedia)
         navController.navigateUp()
     }
 
@@ -284,7 +283,11 @@ fun AddEditNoteScreen(
                                                     AddEditNoteEvent.RemoveImage( deletedUri )
                                                 )
                                             },
-                                            onClick = { zoomedImageUri = it },
+                                            onClick = {
+                                                viewModel.onEvent(
+                                                    AddEditNoteEvent.ToggleZoom( it )
+                                                )
+                                            },
                                             modifier = Modifier.sharedBounds(
                                                 sharedContentState = rememberSharedContentState(key = "image-${uri}"),
                                                 animatedVisibilityScope = animatedVisibilityScope
@@ -358,7 +361,7 @@ fun AddEditNoteScreen(
                                     uiState.attachedAudios.forEach { audioUri ->
                                         AudioPlayerUI(
                                             attachment = audioUri,
-                                            playbackState = uiState.audioState,
+                                            playbackState = uiState.mediaState,
                                             onDelete = { deletedUri ->
                                                 viewModel.onEvent(AddEditNoteEvent.RemoveAudio(deletedUri))
                                             },
@@ -385,10 +388,11 @@ fun AddEditNoteScreen(
                     .padding(start = 16.dp, end = 100.dp)
             )
 
-            if (zoomedImageUri != null) {
+            if (uiState.zoomedImageUri != null) {
                 ZoomedImageOverlay(
-                    uri = zoomedImageUri!!,
-                    onClick = { zoomedImageUri = null },
+                    uri = uiState.zoomedImageUri!!,
+                    playerEngine = viewModel.videoPlayerEngine,
+                    onClick = { viewModel.onEvent(AddEditNoteEvent.StopMedia) },
                     transitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope
                 )

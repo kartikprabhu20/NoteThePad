@@ -23,15 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.feature_note.domain.util.AudioAttachment
-import com.mintanable.notethepad.feature_note.domain.util.AudioState
+import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 
 @Composable
 fun AudioPlayerUI(
-    attachment: AudioAttachment,
-    playbackState: AudioState?,
+    attachment: Attachment,
+    playbackState: MediaState?,
     onDelete: (Uri) -> Unit,
     onPlayPause: (Uri) -> Unit) {
 

@@ -2,11 +2,13 @@ package com.mintanable.notethepad.feature_note.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.mintanable.notethepad.feature_note.domain.repository.AudioPlayer
-import com.mintanable.notethepad.feature_note.domain.util.AudioState
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
+import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,30 +23,39 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class AndroidAudioPlayer@Inject constructor(
+class AndroidMediaPlayer@Inject constructor(
     @ApplicationContext private val context: Context
-) : AudioPlayer {
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+) : MediaPlayer {
 
-    private val player = ExoPlayer.Builder(context).build()
-    private val _audioState = MutableStateFlow(AudioState())
-    override val audioState = _audioState.asStateFlow()
+    val player = ExoPlayer.Builder(context)
+        .setAudioAttributes(
+            AudioAttributes.Builder()
+                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                .setUsage(C.USAGE_MEDIA)
+                .build(),
+            true
+        )
+        .build()
+    private val _mediaState = MutableStateFlow(MediaState())
+    override val mediaState = _mediaState.asStateFlow()
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var progressJob: Job? = null
 
     init {
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                _audioState.update { it.copy(isPlaying = isPlaying) }
+                _mediaState.update { it.copy(isPlaying = isPlaying) }
             }
 
             override fun onPlaybackStateChanged(state: Int) {
-                _audioState.update { it.copy(isBuffering = state == Player.STATE_BUFFERING)}
+                _mediaState.update { it.copy(isBuffering = state == Player.STATE_BUFFERING)}
 
                 if (state == Player.STATE_READY) {
-                    _audioState.update { it.copy(totalDurationMs = player.duration.coerceAtLeast(0L)) }
+                    _mediaState.update { it.copy(totalDurationMs = player.duration.coerceAtLeast(0L)) }
                 }
 
                 if (state == Player.STATE_ENDED) {
-                    _audioState.update { it.copy(progress = 0f, isPlaying = false) }
+                    _mediaState.update { it.copy(progress = 0f, isPlaying = false) }
                 }
             }
         })
@@ -53,7 +64,7 @@ class AndroidAudioPlayer@Inject constructor(
     override fun playPause(uri: Uri) {
         val currentUriString = uri.toString()
 
-        if (_audioState.value.currentUri == currentUriString) {
+        if (_mediaState.value.currentUri == currentUriString) {
             if (player.isPlaying) {
                 player.pause()
             } else {
@@ -71,11 +82,10 @@ class AndroidAudioPlayer@Inject constructor(
             play()
         }
 
-        _audioState.update { it.copy(currentUri = currentUriString) }
+        _mediaState.update { it.copy(currentUri = currentUriString) }
         startProgressUpdate()
     }
 
-    private var progressJob: Job? = null
     private fun startProgressUpdate() {
         progressJob?.cancel()
         progressJob = serviceScope.launch {
@@ -84,7 +94,7 @@ class AndroidAudioPlayer@Inject constructor(
                     val pos = player.currentPosition.coerceAtLeast(0L)
                     val dur = player.duration.coerceAtLeast(1L)
                     val progress = pos.toFloat() / dur.toFloat()
-                    _audioState.update { it.copy(progress = progress) }
+                    _mediaState.update { it.copy(progress = progress) }
                 }
                 delay(250)
             }
@@ -92,10 +102,10 @@ class AndroidAudioPlayer@Inject constructor(
     }
 
     override fun stop() {
-        progressJob?.cancel() // This kills the pulse loop
+        progressJob?.cancel()
         player.stop()
         player.clearMediaItems()
-        _audioState.update { AudioState() }
+        _mediaState.update { MediaState() }
     }
 
     // ONLY call this if the app is shutting down or you are destroying the Singleton

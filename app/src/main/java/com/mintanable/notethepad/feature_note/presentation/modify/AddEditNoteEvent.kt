@@ -20,5 +20,5 @@ sealed class AddEditNoteEvent{
     data class UpdateSheetType(val sheetType: BottomSheetType): AddEditNoteEvent()
     data class ToggleZoom(val uri: Uri): AddEditNoteEvent()
     data class UpdateNowPlaying(val uri: Uri): AddEditNoteEvent()
-    object StopAudio: AddEditNoteEvent()
+    object StopMedia: AddEditNoteEvent()
 }

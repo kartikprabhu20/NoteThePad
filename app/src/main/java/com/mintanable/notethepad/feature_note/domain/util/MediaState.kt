@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain.util
 
-data class AudioState(
+data class MediaState(
     val currentUri: String? = null,
     val isPlaying: Boolean = false,
     val progress: Float = 0f,

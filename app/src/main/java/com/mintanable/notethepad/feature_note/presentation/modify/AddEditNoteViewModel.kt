@@ -7,15 +7,17 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.exoplayer.ExoPlayer
+import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
-import com.mintanable.notethepad.feature_note.domain.repository.AudioPlayer
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
-import com.mintanable.notethepad.feature_note.domain.util.AudioAttachment
+import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +42,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val permissionUsecases: PermissionUsecases,
     private val audioRecorder: AudioRecorder,
     private val fileIOUseCases: FileIOUseCases,
-    private val audioPlayer: AudioPlayer,
+    private val mediaPlayer: MediaPlayer,
     private val audioMetadataProvider: AudioMetadataProvider
 ): ViewModel(){
 
@@ -56,13 +58,12 @@ class AddEditNoteViewModel @Inject constructor(
             } else NoteColors.colors.random().toArgb()
         )
     )
-
     val uiState: StateFlow<AddEditNoteUiState> = combine(
         _uiState,
-        audioPlayer.audioState
-    ) { state, audioState ->
-//        Log.d("kptest", "state: $state audioState: $audioState")
-        state.copy(audioState = audioState)
+        mediaPlayer.mediaState
+    ) { state, mediaState ->
+//        Log.d("kptest", "state: $state mediaState: $mediaState")
+        state.copy(mediaState = mediaState)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -71,6 +72,8 @@ class AddEditNoteViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    val videoPlayerEngine: ExoPlayer? = (mediaPlayer as? AndroidMediaPlayer)?.player
 
     init {
         if (isEditMode) {
@@ -82,9 +85,9 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             noteUseCases.getNote(id)?.also { note ->
                 currentNoteId = note.id
-                val audioAttachments = note.audioUris.map { uriString ->
+                val attachments = note.audioUris.map { uriString ->
                     val uri = uriString.toUri()
-                    AudioAttachment(uri, audioMetadataProvider.getDuration(uri))
+                    Attachment(uri, audioMetadataProvider.getDuration(uri))
                 }
 
                 _uiState.update {
@@ -93,7 +96,7 @@ class AddEditNoteViewModel @Inject constructor(
                         contentState = it.contentState.copy(text = note.content, isHintVisible = false),
                         noteColor = note.color,
                         attachedImages = note.imageUris.map { it.toUri() },
-                        attachedAudios = audioAttachments
+                        attachedAudios = attachments
                     )
                 }
             }
@@ -155,8 +158,8 @@ class AddEditNoteViewModel @Inject constructor(
                     )
                 }
                 // If the removed audio was playing, stop the player
-                if (uiState.value.audioState?.currentUri == event.uri.toString()) {
-                    audioPlayer.stop()
+                if (uiState.value.mediaState?.currentUri == event.uri.toString()) {
+                    mediaPlayer.stop()
                 }
             }
             is AddEditNoteEvent.ToggleAudioRecording -> {
@@ -173,13 +176,15 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(currentSheetType = event.sheetType) }
             }
             is AddEditNoteEvent.ToggleZoom -> {
+                mediaPlayer.playPause(event.uri)
                 _uiState.update { it.copy(zoomedImageUri = event.uri) }
             }
             is AddEditNoteEvent.UpdateNowPlaying -> {
-                audioPlayer.playPause(event.uri)
+                mediaPlayer.playPause(event.uri)
             }
-            is AddEditNoteEvent.StopAudio -> {
-                audioPlayer.stop()
+            is AddEditNoteEvent.StopMedia -> {
+                mediaPlayer.stop()
+                _uiState.update { it.copy(zoomedImageUri = null) }
             }
             else -> {}
         }
@@ -194,7 +199,7 @@ class AddEditNoteViewModel @Inject constructor(
                     val uri = Uri.fromFile(file)
                     val duration = audioMetadataProvider.getDuration(uri)
                     _uiState.update { it.copy(
-                        attachedAudios = it.attachedAudios + AudioAttachment(uri, duration)
+                        attachedAudios = it.attachedAudios + Attachment(uri, duration)
                     )}
                 }
             } else {
@@ -260,7 +265,7 @@ class AddEditNoteViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        audioPlayer.stop()
+        mediaPlayer.stop()
     }
 
     sealed class UiEvent{

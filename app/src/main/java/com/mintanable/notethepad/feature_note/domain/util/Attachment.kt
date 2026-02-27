@@ -8,7 +8,7 @@ enum class AttachmentType(val extension: String) {
     AUDIO("mp4")
 }
 
-data class AudioAttachment(
+data class Attachment(
     val uri: Uri,
     val duration: Long = 0L
 )

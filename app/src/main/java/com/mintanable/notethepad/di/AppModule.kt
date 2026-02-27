@@ -8,11 +8,11 @@ import com.mintanable.notethepad.feature_firebase.domain.repository.AuthReposito
 import com.mintanable.notethepad.feature_navigationdrawer.data.repository.NavigationDrawerItemRepositoryImpl
 import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
-import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioPlayer
+import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
-import com.mintanable.notethepad.feature_note.domain.repository.AudioPlayer
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.*
@@ -82,7 +82,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAudioPlayer(@ApplicationContext context: Context): AudioPlayer{
-        return AndroidAudioPlayer(context)
+    fun provideMediaPlayer(@ApplicationContext context: Context): MediaPlayer{
+        return AndroidMediaPlayer(context)
     }
 }

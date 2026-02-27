@@ -20,18 +20,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.media3.exoplayer.ExoPlayer
 import coil3.compose.AsyncImage
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 
 @Composable
 fun ZoomedImageOverlay(
+//    attachment: Attachment,
     uri: Uri,
+    playerEngine: ExoPlayer?,
     onClick: () -> Unit,
     transitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val context = LocalContext.current
+//    val uri = attachment.uri
     val attachmentType = rememberSaveable(uri) { AttachmentHelper.getAttachmentType(context, uri) }
 
     with(transitionScope){
@@ -55,7 +59,7 @@ fun ZoomedImageOverlay(
             ) {
 
                 if (attachmentType == AttachmentType.VIDEO) {
-                    VideoPlayer(uri = uri)
+                    VideoPlayerUI(playerEngine)
                 } else {
                     AsyncImage(
                         model = uri,
