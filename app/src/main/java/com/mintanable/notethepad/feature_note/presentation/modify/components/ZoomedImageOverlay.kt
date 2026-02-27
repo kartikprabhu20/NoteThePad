@@ -27,7 +27,6 @@ import com.mintanable.notethepad.feature_note.presentation.notes.util.Attachment
 
 @Composable
 fun ZoomedImageOverlay(
-//    attachment: Attachment,
     uri: Uri,
     playerEngine: ExoPlayer?,
     onClick: () -> Unit,
@@ -35,7 +34,6 @@ fun ZoomedImageOverlay(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val context = LocalContext.current
-//    val uri = attachment.uri
     val attachmentType = rememberSaveable(uri) { AttachmentHelper.getAttachmentType(context, uri) }
 
     with(transitionScope){
