@@ -23,20 +23,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.feature_note.domain.util.AudioAttachment
 import com.mintanable.notethepad.feature_note.domain.util.AudioState
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 
 @Composable
 fun AudioPlayerUI(
-    uri: Uri,
+    attachment: AudioAttachment,
     playbackState: AudioState?,
     onDelete: (Uri) -> Unit,
     onPlayPause: (Uri) -> Unit) {
 
-
+    val uri = attachment.uri
     val isPlaying = playbackState?.currentUri == uri.toString() && playbackState.isPlaying
-    val totalDuration = if (playbackState?.currentUri == uri.toString()) playbackState.totalDurationMs else 0L
+    val totalDuration = attachment.duration
     val progress = if (playbackState?.currentUri == uri.toString()) playbackState.progress else 0f
 
     AudioPlayer(

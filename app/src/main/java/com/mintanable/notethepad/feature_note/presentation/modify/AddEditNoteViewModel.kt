@@ -1,13 +1,13 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.content.Context
-import android.util.Log
 import android.net.Uri
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.repository.AudioPlayer
@@ -15,6 +15,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
+import com.mintanable.notethepad.feature_note.domain.util.AudioAttachment
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +40,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val permissionUsecases: PermissionUsecases,
     private val audioRecorder: AudioRecorder,
     private val fileIOUseCases: FileIOUseCases,
-    private val audioPlayer: AudioPlayer
+    private val audioPlayer: AudioPlayer,
+    private val audioMetadataProvider: AudioMetadataProvider
 ): ViewModel(){
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
@@ -80,13 +82,18 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             noteUseCases.getNote(id)?.also { note ->
                 currentNoteId = note.id
+                val audioAttachments = note.audioUris.map { uriString ->
+                    val uri = uriString.toUri()
+                    AudioAttachment(uri, audioMetadataProvider.getDuration(uri))
+                }
+
                 _uiState.update {
                     it.copy(
                         titleState = it.titleState.copy(text = note.title, isHintVisible = false),
                         contentState = it.contentState.copy(text = note.content, isHintVisible = false),
                         noteColor = note.color,
                         attachedImages = note.imageUris.map { it.toUri() },
-                        attachedAudios = note.audioUris.map { it.toUri() }
+                        attachedAudios = audioAttachments
                     )
                 }
             }
@@ -142,7 +149,15 @@ class AddEditNoteViewModel @Inject constructor(
                 )}
             }
             is AddEditNoteEvent.RemoveAudio -> {
-                _uiState.update { it.copy(attachedAudios = it.attachedAudios - event.uri) }
+                _uiState.update { state ->
+                    state.copy(
+                        attachedAudios = state.attachedAudios.filterNot { it.uri == event.uri }
+                    )
+                }
+                // If the removed audio was playing, stop the player
+                if (uiState.value.audioState?.currentUri == event.uri.toString()) {
+                    audioPlayer.stop()
+                }
             }
             is AddEditNoteEvent.ToggleAudioRecording -> {
                 handleRecording()
@@ -174,7 +189,10 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(isRecording = false) }
                 currentRecordingFile?.let { file ->
                     val uri = Uri.fromFile(file)
-                    _uiState.update { it.copy(attachedAudios = it.attachedAudios + uri) }
+                    val duration = audioMetadataProvider.getDuration(uri)
+                    _uiState.update { it.copy(
+                        attachedAudios = it.attachedAudios + AudioAttachment(uri, duration)
+                    )}
                 }
             } else {
                 val file = fileIOUseCases.createFile(AttachmentType.AUDIO.extension, AttachmentType.AUDIO.name.lowercase())
@@ -199,7 +217,7 @@ class AddEditNoteViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis(),
                 color = state.noteColor,
                 imageUris = state.attachedImages,
-                audioUris = state.attachedAudios
+                audioUris = state.attachedAudios.map { it.uri }
             ).onSuccess {
                 _eventFlow.emit(UiEvent.SaveNote)
             }.onFailure { e ->
