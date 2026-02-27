@@ -21,11 +21,11 @@ class NoteRepositoryImpl(
         )
     }
 
-    override suspend fun getNoteById(id: Int): Note? {
+    override suspend fun getNoteById(id: Long): Note? {
         return dao.getNoteById(id)
     }
 
-    override suspend fun insertNote(note: Note) {
+    override suspend fun insertNote(note: Note) : Long {
         return dao.inserNote(note)
     }
 

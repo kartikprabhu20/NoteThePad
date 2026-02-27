@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -46,9 +47,9 @@ class AddEditNoteViewModel @Inject constructor(
     private val audioMetadataProvider: AudioMetadataProvider
 ): ViewModel(){
 
-    private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
-    private val isEditMode = passedNoteId != -1
-    private var currentNoteId: Int? = null
+    private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
+    private val isEditMode = passedNoteId != -1L
+    private var currentNoteId: Long? = null
     private var currentRecordingFile: File? = null
 
     private val _uiState = MutableStateFlow(
@@ -81,7 +82,7 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private fun loadNote(id: Int) {
+    private fun loadNote(id: Long) {
         viewModelScope.launch {
             noteUseCases.getNote(id)?.also { note ->
                 currentNoteId = note.id
@@ -134,7 +135,11 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(noteColor = event.color) }
             }
             is AddEditNoteEvent.SaveNote -> {
-                saveNote()
+                saveNote(currentNoteId)
+            }
+
+            is AddEditNoteEvent.MakeCopy -> {
+                saveNote(null)
             }
 
             is AddEditNoteEvent.AttachImage -> {
@@ -213,21 +218,21 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private fun saveNote() {
+    private fun saveNote(id:Long?) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             val state = uiState.value
 
             noteUseCases.saveNoteWithAttachments(
-                id = currentNoteId,
+                id = id,
                 title = state.titleState.text,
                 content = state.contentState.text,
                 timestamp = System.currentTimeMillis(),
                 color = state.noteColor,
                 imageUris = state.attachedImages,
                 audioUris = state.attachedAudios.map { it.uri }
-            ).onSuccess {
-                _eventFlow.emit(UiEvent.SaveNote)
+            ).onSuccess { newNoteId ->
+                _eventFlow.emit(if(id!=newNoteId) UiEvent.MakeCopy(newNoteId) else UiEvent.SaveNote)
             }.onFailure { e ->
                 _uiState.update { it.copy(isSaving = false) }
                 _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
@@ -271,6 +276,7 @@ class AddEditNoteViewModel @Inject constructor(
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
         object SaveNote: UiEvent()
+        data class MakeCopy(val newNoteId: Long): UiEvent()
         object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()
     }

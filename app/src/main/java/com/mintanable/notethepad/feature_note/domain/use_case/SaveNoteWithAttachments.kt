@@ -17,20 +17,20 @@ class SaveNoteWithAttachments(
 ) {
 
     @Throws(InvalidNoteException::class)
-    suspend operator fun invoke(note: Note){
+    suspend operator fun invoke(note: Note) : Long{
         if(note.title.isBlank()){
             throw InvalidNoteException("The title of the note cant be empty")
         }
-        repository.insertNote(note)
+        return repository.insertNote(note)
     }
 
-    suspend operator fun invoke( id: Int?,
+    suspend operator fun invoke( id: Long?,
                                  title: String,
                                  content: String,
                                  timestamp: Long,
                                  color: Int,
                                  imageUris: List<Uri> = emptyList(),
-                                 audioUris: List<Uri> = emptyList()) : Result<Unit> {
+                                 audioUris: List<Uri> = emptyList()) : Result<Long> {
 
        try{
             if(title.isBlank()){
@@ -53,7 +53,7 @@ class SaveNoteWithAttachments(
                 }
             }
 
-            repository.insertNote(
+            val newNoteId = repository.insertNote(
                 Note(
                     id = id,
                     title = title,
@@ -64,7 +64,7 @@ class SaveNoteWithAttachments(
                     audioUris = audioUriList
                 )
             )
-            return Result.success(Unit)
+            return Result.success(newNoteId)
         } catch (e: Exception) {
             return Result.failure(e)
         }

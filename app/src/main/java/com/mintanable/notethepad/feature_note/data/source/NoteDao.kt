@@ -20,10 +20,10 @@ interface NoteDao {
     fun getNotes(order: String, ascending: Int): Flow<List<Note>>
 
     @Query("SELECT * FROM note WHERE id =:id")
-    suspend fun getNoteById(id:Int):Note?
+    suspend fun getNoteById(id:Long):Note?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserNote(note: Note)
+    suspend fun inserNote(note: Note): Long
 
     @Delete
     suspend fun deleteNote(note:Note)

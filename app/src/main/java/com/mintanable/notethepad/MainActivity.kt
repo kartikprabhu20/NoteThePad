@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity() {
                             navArgument(
                                 name = "noteId"
                             ) {
-                                type = NavType.IntType
-                                defaultValue = -1
+                                type = NavType.LongType
+                                defaultValue = -1L
                             },
                             navArgument(
                                 name = "noteColor"
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         val color = it.arguments?.getInt("noteColor") ?: -1
                         AddEditNoteScreen(
-                            noteId = it.arguments?.getInt("noteId"),
+                            noteId = it.arguments?.getLong("noteId"),
                             navController = navController,
                             noteColor = color,
                             sharedTransitionScope = this@SharedTransitionLayout,

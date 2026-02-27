@@ -66,6 +66,7 @@ import com.mintanable.notethepad.feature_settings.presentation.components.Permis
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
+import com.mintanable.notethepad.ui.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -73,7 +74,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddEditNoteScreen(
     navController: NavController,
-    noteId: Int?,
+    noteId: Long?,
     noteColor: Int,
     viewModel: AddEditNoteViewModel = hiltViewModel(),
     sharedTransitionScope: SharedTransitionScope,
@@ -154,8 +155,18 @@ fun AddEditNoteScreen(
                     snackBarHostState.showSnackbar( message = event.message)
                 }
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
+                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                     viewModel.onEvent(AddEditNoteEvent.StopMedia)
                     navController.navigateUp()
+                }
+                is AddEditNoteViewModel.UiEvent.MakeCopy->{
+                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                    viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                    navController.navigate(
+                        Screen.AddEditNoteScreen.route + "?noteId=${event.newNoteId}&noteColor=${uiState.noteColor}"
+                    ) {
+                        popUpTo(Screen.AddEditNoteScreen.route + "?noteId={$noteId}&noteColor={$noteColor}") { inclusive = true }
+                    }
                 }
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
                     viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.AUDIO_RECORDER))
@@ -177,7 +188,9 @@ fun AddEditNoteScreen(
 
     BackHandler {
         viewModel.onEvent(AddEditNoteEvent.StopMedia)
-        navController.navigateUp()
+        if(uiState.zoomedImageUri == null){
+            navController.navigateUp()
+        }
     }
 
     with(sharedTransitionScope) {
@@ -205,7 +218,7 @@ fun AddEditNoteScreen(
                         .background(noteBackgroundAnimatable.value)
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(
-                                key = if (noteId == -1) "notescreens_fab" else "note-$noteId"
+                                key = if (noteId == -1L) "notescreens_fab" else "note-$noteId"
                             ),
                             animatedVisibilityScope = animatedVisibilityScope,
                             enter = fadeIn(tween(200)),
@@ -468,7 +481,7 @@ fun AddEditNoteScreen(
                         viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
                     }
                 )
-            } else if (uiState.currentSheetType != BottomSheetType.NONE) {
+            } else {
                 BottomSheetContent(
                     items = sheetItems,
                     optionSelected = { additionalOption ->
@@ -512,6 +525,18 @@ fun AddEditNoteScreen(
                             AudioSourceOptions.AUDIO_RECORDER -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                                 checkAndRequestMicrophonePermission()
+                            }
+
+                            MoreSettingsOptions.COPY -> {
+                                viewModel.onEvent(AddEditNoteEvent.MakeCopy)
+                            }
+
+                            MoreSettingsOptions.DELETE -> {
+
+                            }
+
+                            MoreSettingsOptions.SHARE -> {
+
                             }
 
                             else -> {}

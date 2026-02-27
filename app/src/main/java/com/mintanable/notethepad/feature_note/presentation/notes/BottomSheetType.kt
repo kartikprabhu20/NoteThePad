@@ -52,5 +52,5 @@ enum class MoreSettingsOptions(
     DELETE("Delete", Icons.Default.Delete),
     COPY("Make a copy", Icons.Default.ContentCopy),
     SHARE("Send", Icons.Default.Share),
-    LABEL("Label", Icons.AutoMirrored.Filled.Label)
+//    LABEL("Label", Icons.AutoMirrored.Filled.Label)
 }
