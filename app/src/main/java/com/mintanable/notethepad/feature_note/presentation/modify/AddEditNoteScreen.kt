@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -154,6 +154,7 @@ fun AddEditNoteScreen(
                     snackBarHostState.showSnackbar( message = event.message)
                 }
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
+                    viewModel.onEvent(AddEditNoteEvent.StopAudio)
                     navController.navigateUp()
                 }
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
@@ -172,6 +173,11 @@ fun AddEditNoteScreen(
                 else -> {}
             }
         }
+    }
+
+    BackHandler {
+        viewModel.onEvent(AddEditNoteEvent.StopAudio)
+        navController.navigateUp()
     }
 
     with(sharedTransitionScope) {

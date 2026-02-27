@@ -14,11 +14,11 @@ sealed class AddEditNoteEvent{
     data class AttachImage(val uri: Uri): AddEditNoteEvent()
     data class RemoveImage(val uri: Uri): AddEditNoteEvent()
     data class AttachVideo(val uri: Uri): AddEditNoteEvent()
-    data class AttachAudio(val uri: Uri): AddEditNoteEvent()
     data class RemoveAudio(val uri: Uri): AddEditNoteEvent()
     object ToggleAudioRecording: AddEditNoteEvent()
     object DismissDialogs: AddEditNoteEvent()
     data class UpdateSheetType(val sheetType: BottomSheetType): AddEditNoteEvent()
     data class ToggleZoom(val uri: Uri): AddEditNoteEvent()
     data class UpdateNowPlaying(val uri: Uri): AddEditNoteEvent()
+    object StopAudio: AddEditNoteEvent()
 }

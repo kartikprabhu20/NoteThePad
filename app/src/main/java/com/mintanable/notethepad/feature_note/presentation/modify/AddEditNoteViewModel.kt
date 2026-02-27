@@ -178,6 +178,9 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.UpdateNowPlaying -> {
                 audioPlayer.playPause(event.uri)
             }
+            is AddEditNoteEvent.StopAudio -> {
+                audioPlayer.stop()
+            }
             else -> {}
         }
     }
