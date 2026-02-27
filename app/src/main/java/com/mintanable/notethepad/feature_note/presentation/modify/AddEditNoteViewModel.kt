@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.content.Context
+import android.util.Log
 import android.net.Uri
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.net.toUri
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.domain.repository.AudioPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
@@ -19,8 +21,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -33,7 +38,8 @@ class AddEditNoteViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     private val permissionUsecases: PermissionUsecases,
     private val audioRecorder: AudioRecorder,
-    private val fileIOUseCases: FileIOUseCases
+    private val fileIOUseCases: FileIOUseCases,
+    private val audioPlayer: AudioPlayer
 ): ViewModel(){
 
     private val passedNoteId: Int = savedStateHandle.get<Int>("noteId") ?: -1
@@ -48,7 +54,18 @@ class AddEditNoteViewModel @Inject constructor(
             } else NoteColors.colors.random().toArgb()
         )
     )
-    val uiState = _uiState.asStateFlow()
+
+    val uiState: StateFlow<AddEditNoteUiState> = combine(
+        _uiState,
+        audioPlayer.audioState
+    ) { state, audioState ->
+//        Log.d("kptest", "state: $state audioState: $audioState")
+        state.copy(audioState = audioState)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = AddEditNoteUiState()
+    )
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -77,6 +94,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun onEvent(event:AddEditNoteEvent){
+//        Log.d("kptest", "event: $event")
         when(event){
             is AddEditNoteEvent.EnteredTitle -> {
                 _uiState.update { it.copy(
@@ -143,7 +161,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(zoomedImageUri = event.uri) }
             }
             is AddEditNoteEvent.UpdateNowPlaying -> {
-                _uiState.update { it.copy(nowPlayingAudioUri = event.uri) }
+                audioPlayer.playPause(event.uri)
             }
             else -> {}
         }
@@ -219,13 +237,14 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
+    }
+
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
         object SaveNote: UiEvent()
-        object ShowAudioRationale : UiEvent()
-        object ShowCameraRationale : UiEvent()
-        object OpenCameraSettings : UiEvent()
-        object OpenMicrophoneSettings : UiEvent()
         object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()
     }

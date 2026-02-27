@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_note.domain
 import android.net.Uri
 import androidx.compose.ui.graphics.toArgb
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.domain.util.AudioState
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.NoteTextFieldState
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
@@ -22,5 +23,5 @@ data class AddEditNoteUiState(
     val showCameraRationale: Boolean = false,
     val showMicrophoneRationale: Boolean = false,
     val zoomedImageUri: Uri? = null,
-    val nowPlayingAudioUri: Uri? = null
+    val audioState: AudioState? = null
 )

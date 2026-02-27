@@ -352,7 +352,7 @@ fun AddEditNoteScreen(
                                     uiState.attachedAudios.forEach { audioUri ->
                                         AudioPlayerUI(
                                             uri = audioUri,
-                                            nowPlaying = audioUri == uiState.nowPlayingAudioUri,
+                                            playbackState = uiState.audioState,
                                             onDelete = { deletedUri ->
                                                 viewModel.onEvent(AddEditNoteEvent.RemoveAudio(deletedUri))
                                             },

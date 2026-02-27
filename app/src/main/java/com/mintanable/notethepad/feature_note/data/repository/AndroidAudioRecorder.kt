@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.domain.model
+package com.mintanable.notethepad.feature_note.data.repository
 
 import android.content.Context
 import android.media.MediaRecorder
@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
-class AudioRecorderImpl @Inject constructor(
+class AndroidAudioRecorder @Inject constructor(
     @ApplicationContext private val context: Context
 ): AudioRecorder {
     private var recorder: MediaRecorder? = null

@@ -6,91 +6,44 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
+import com.mintanable.notethepad.feature_note.domain.util.AudioState
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
-import kotlinx.coroutines.delay
+import com.mintanable.notethepad.ui.theme.ThemePreviews
 
 @Composable
 fun AudioPlayerUI(
     uri: Uri,
-    nowPlaying: Boolean,
+    playbackState: AudioState?,
     onDelete: (Uri) -> Unit,
     onPlayPause: (Uri) -> Unit) {
 
-    val context = LocalContext.current
-    val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(uri))
-            prepare()
-        }
-    }
-    var isPlaying by remember { mutableStateOf(false) }
-    var currentPosition by remember { mutableLongStateOf(0L) }
-    var totalDuration by remember { mutableLongStateOf(0L) }
 
-    // Update isPlaying state based on player events
-    DisposableEffect(exoPlayer) {
-        val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(playing: Boolean) {
-                isPlaying = playing
-            }
+    val isPlaying = playbackState?.currentUri == uri.toString() && playbackState.isPlaying
+    val totalDuration = if (playbackState?.currentUri == uri.toString()) playbackState.totalDurationMs else 0L
+    val progress = if (playbackState?.currentUri == uri.toString()) playbackState.progress else 0f
 
-            override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_READY) {
-                    totalDuration = exoPlayer.duration.coerceAtLeast(0L)
-                }
-            }
-        }
-        exoPlayer.addListener(listener)
-        onDispose {
-            exoPlayer.removeListener(listener)
-            exoPlayer.release()
-        }
-    }
-
-    LaunchedEffect(isPlaying) {
-        if (isPlaying) {
-            while (true) {
-                currentPosition = exoPlayer.currentPosition
-                delay(500)
-            }
-        }
-    }
-
-    LaunchedEffect(nowPlaying) {
-        if (nowPlaying) exoPlayer.play() else exoPlayer.pause()
-    }
-
-
-    val progress = if (totalDuration > 0) currentPosition.toFloat() / totalDuration.toFloat() else 0f
     AudioPlayer(
         isPlaying = isPlaying,
         progress = progress,
         totalDuration = totalDuration,
         onPlayPause = {
-            if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
             onPlayPause(uri)
         },
         onDelete = {
@@ -125,15 +78,25 @@ fun AudioPlayer(
                 )
             }
 
-            LinearProgressIndicator( progress = { progress},
-                modifier = Modifier.padding(end = 4.dp))
+            LinearProgressIndicator(
+                progress = { progress},
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .weight(1f),
+                strokeCap = StrokeCap.Round
+            )
 
-            Text(formatMillisToTime(totalDuration))
+            Text(
+                text = formatMillisToTime(totalDuration),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.widthIn(min = 45.dp)
+            )
+
 
             IconButton(onClick = onDelete) {
                 Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Remove audio"
                 )
             }
         }
@@ -141,11 +104,7 @@ fun AudioPlayer(
 
 }
 
-@Preview(name = "Light Mode", showBackground = true)
-@Preview(
-    name = "Dark Mode",
-    showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@ThemePreviews
 @Composable
 fun PreviewAudioPlayer(){
     NoteThePadTheme {
