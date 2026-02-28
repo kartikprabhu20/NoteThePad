@@ -99,27 +99,19 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                     composable(
-                        route = Screen.AddEditNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}",
+                        route = Screen.AddEditNoteScreen.route + "?noteId={noteId}",
                         arguments = listOf(
                             navArgument(
                                 name = "noteId"
                             ) {
                                 type = NavType.LongType
                                 defaultValue = -1L
-                            },
-                            navArgument(
-                                name = "noteColor"
-                            ) {
-                                type = NavType.IntType
-                                defaultValue = -1
                             }
                         )
                     ) {
-                        val color = it.arguments?.getInt("noteColor") ?: -1
                         AddEditNoteScreen(
                             noteId = it.arguments?.getLong("noteId"),
                             navController = navController,
-                            noteColor = color,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@composable
                         )

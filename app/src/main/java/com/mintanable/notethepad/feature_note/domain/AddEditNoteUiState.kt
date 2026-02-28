@@ -12,7 +12,7 @@ import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 data class AddEditNoteUiState(
     val titleState: NoteTextFieldState = NoteTextFieldState(hint = "Enter title..."),
     val contentState: NoteTextFieldState = NoteTextFieldState(hint = "Enter some content..."),
-    val noteColor: Int = NoteColors.colors.random().toArgb(),
+    val noteColor: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),
 

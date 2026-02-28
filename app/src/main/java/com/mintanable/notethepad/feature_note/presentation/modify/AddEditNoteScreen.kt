@@ -75,7 +75,6 @@ import kotlinx.coroutines.launch
 fun AddEditNoteScreen(
     navController: NavController,
     noteId: Long?,
-    noteColor: Int,
     viewModel: AddEditNoteViewModel = hiltViewModel(),
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
@@ -85,7 +84,6 @@ fun AddEditNoteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
-    val noteBackgroundAnimatable = remember{ Animatable(Color(if(noteColor!=-1) noteColor else uiState.noteColor)) }
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
@@ -145,6 +143,20 @@ fun AddEditNoteScreen(
         if (!microphonePermissionState.status.isGranted &&
             !microphonePermissionState.status.shouldShowRationale) {
             microphonePermissionState.launchPermissionRequest()
+        }
+    }
+
+    val noteBackgroundAnimatable = remember {
+        Animatable(if (uiState.noteColor == -1) Color.White else Color(uiState.noteColor))
+    }
+    LaunchedEffect(uiState.noteColor) {
+        if (uiState.noteColor != -1) {
+            scope.launch {
+                noteBackgroundAnimatable.animateTo(
+                    targetValue = Color(uiState.noteColor),
+                    animationSpec = tween(500)
+                )
+            }
         }
     }
 
@@ -284,14 +296,6 @@ fun AddEditNoteScreen(
                                                 shape = CircleShape
                                             )
                                             .clickable {
-                                                scope.launch {
-                                                    noteBackgroundAnimatable.animateTo(
-                                                        targetValue = Color(colorInt),
-                                                        animationSpec = tween(
-                                                            durationMillis = 500
-                                                        )
-                                                    )
-                                                }
                                                 viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
                                             }
                                     )

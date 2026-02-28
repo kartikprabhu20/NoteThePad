@@ -54,9 +54,8 @@ class AddEditNoteViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         AddEditNoteUiState(
-            noteColor = if (isEditMode) {
-                savedStateHandle.get<Int>("noteColor") ?: NoteColors.colors.random().toArgb()
-            } else NoteColors.colors.random().toArgb()
+            noteColor =
+                if (isEditMode) -1 else NoteColors.colors.random().toArgb()
         )
     )
     val uiState: StateFlow<AddEditNoteUiState> = combine(
@@ -77,9 +76,7 @@ class AddEditNoteViewModel @Inject constructor(
     val videoPlayerEngine: ExoPlayer? = (mediaPlayer as? AndroidMediaPlayer)?.player
 
     init {
-        if (isEditMode) {
-            loadNote(passedNoteId)
-        }
+        loadNote(passedNoteId)
     }
 
     private fun loadNote(id: Long) {
