@@ -11,7 +11,8 @@ import java.lang.Exception
     indices = [
         Index(value = ["title"]),
         Index(value = ["timestamp"]),
-        Index(value = ["color"])
+        Index(value = ["color"]),
+        Index(value = ["reminderTime"])
     ]
 )
 data class Note(
@@ -21,7 +22,8 @@ data class Note(
     val timestamp: Long,
     val color: Int,
     val imageUris: List<String> = emptyList(),
-    val audioUris: List<String> = emptyList()
+    val audioUris: List<String> = emptyList(),
+    val reminderTime: Long = -1
 )
 
 class InvalidNoteException(message: String):Exception(message)

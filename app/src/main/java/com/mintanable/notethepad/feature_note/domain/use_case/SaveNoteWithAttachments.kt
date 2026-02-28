@@ -30,7 +30,8 @@ class SaveNoteWithAttachments(
                                  timestamp: Long,
                                  color: Int,
                                  imageUris: List<Uri> = emptyList(),
-                                 audioUris: List<Uri> = emptyList()) : Result<Long> {
+                                 audioUris: List<Uri> = emptyList(),
+                                 reminderTime: Long) : Result<Long> {
 
        try{
             if(title.isBlank()){
@@ -61,7 +62,8 @@ class SaveNoteWithAttachments(
                     timestamp = timestamp,
                     color = color,
                     imageUris = imageUriList,
-                    audioUris = audioUriList
+                    audioUris = audioUriList,
+                    reminderTime = reminderTime
                 )
             )
             return Result.success(newNoteId)

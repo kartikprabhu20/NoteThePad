@@ -36,4 +36,8 @@ class NoteRepositoryImpl(
     override suspend fun deleteNoteWithId(id: Long) {
         return dao.deleteNoteWithId(id)
     }
+
+    override suspend fun getNotesWithFutureReminders(currentTime: Long) : List<Note> {
+        return dao.getNotesWithFutureReminders(currentTime)
+    }
 }

@@ -154,6 +154,7 @@ dependencies {
     //Exo player
     implementation("androidx.media3:media3-exoplayer:1.9.2")
     implementation("androidx.media3:media3-ui:1.9.2")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.x")
 
     //Google drive
     implementation("com.google.api-client:google-api-client-android:2.0.0")

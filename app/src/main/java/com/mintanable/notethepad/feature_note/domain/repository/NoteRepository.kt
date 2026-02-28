@@ -16,4 +16,6 @@ interface NoteRepository {
 
     suspend fun deleteNoteWithId(id:Long)
 
+    suspend fun getNotesWithFutureReminders(currentTime: Long): List<Note>
+
 }

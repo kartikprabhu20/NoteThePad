@@ -31,4 +31,7 @@ interface NoteDao {
 
     @Query("DELETE FROM note WHERE id = :id")
     suspend fun deleteNoteWithId(id:Long)
+
+    @Query("SELECT * FROM note WHERE reminderTime > :currentTime")
+    suspend fun getNotesWithFutureReminders(currentTime: Long): List<Note>
 }
