@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -60,6 +62,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Aud
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteActionButtons
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
+import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
@@ -254,20 +257,27 @@ fun AddEditNoteScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 contentWindowInsets = WindowInsets.systemBars,
-                floatingActionButton = {
-                    NoteActionButtons(
-                        modifier = Modifier,
-                        onActionClick = { sheetType ->
-                            viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
-                        },
-                        onSaveClick = {
-                            viewModel.onEvent(AddEditNoteEvent.SaveNote)
-                        }
-                    )
+                containerColor = Color.Transparent,
+                bottomBar = {
+                    CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
+                        NoteBottomAppBar(
+                            modifier = Modifier
+                                .zIndex(1f)
+                                .renderInSharedTransitionScopeOverlay(
+                                    zIndexInOverlay = 2f
+                                ),
+                            onActionClick = { sheetType ->
+                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
+                            },
+                            onSaveClick = {
+                                viewModel.onEvent(AddEditNoteEvent.SaveNote)
+                            }
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(noteBackgroundAnimatable.value)
+//                    .background(noteBackgroundAnimatable.value)
             ) { paddingValue ->
                 Box(
                     modifier = Modifier
@@ -292,8 +302,8 @@ fun AddEditNoteScreen(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValue)
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = 16.dp),
+                        contentPadding = paddingValue
                     ) {
 
                         item{
