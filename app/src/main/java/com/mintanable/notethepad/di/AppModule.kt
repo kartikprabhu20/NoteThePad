@@ -12,9 +12,11 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
+import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
+import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.*
 import dagger.Module
 import dagger.Provides
@@ -84,5 +86,11 @@ object AppModule {
     @Singleton
     fun provideMediaPlayer(@ApplicationContext context: Context): MediaPlayer{
         return AndroidMediaPlayer(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReminderScheduler(@ApplicationContext context: Context): ReminderScheduler{
+        return ReminderSchedulerImpl(context)
     }
 }
