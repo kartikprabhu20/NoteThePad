@@ -23,4 +23,6 @@ sealed class AddEditNoteEvent{
     data class ToggleZoom(val uri: Uri): AddEditNoteEvent()
     data class UpdateNowPlaying(val uri: Uri): AddEditNoteEvent()
     object StopMedia: AddEditNoteEvent()
+    data class SetReminder(val timestamp: Long) : AddEditNoteEvent()
+    object CancelReminder : AddEditNoteEvent()
 }

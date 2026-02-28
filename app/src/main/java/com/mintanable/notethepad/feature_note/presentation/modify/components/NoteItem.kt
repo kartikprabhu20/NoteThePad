@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -137,6 +139,17 @@ fun NoteItem(
                             tint = Color.Black
                         )
                     }
+                    if(note.reminderTime > -1){
+                        Icon(
+                            imageVector = if(note.reminderTime> System.currentTimeMillis())
+                                Icons.Default.Notifications
+                            else
+                                Icons.Default.NotificationsOff,
+                            contentDescription = "Images attached",
+                            modifier = Modifier.alpha(alpha = 0.5f),
+                            tint = Color.Black
+                        )
+                    }
                     Spacer(modifier = Modifier.weight(1f))
 
                     IconButton(
@@ -176,7 +189,8 @@ fun NoteItemPreview() {
                                 color = RedOrange.toArgb(),
                                 id = 1,
                                 imageUris = listOf(""),
-                                audioUris = listOf("")
+                                audioUris = listOf(""),
+                                reminderTime = 1
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},

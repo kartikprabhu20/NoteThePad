@@ -15,6 +15,7 @@ import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
+import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
@@ -44,7 +45,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val audioRecorder: AudioRecorder,
     private val fileIOUseCases: FileIOUseCases,
     private val mediaPlayer: MediaPlayer,
-    private val audioMetadataProvider: AudioMetadataProvider
+    private val audioMetadataProvider: AudioMetadataProvider,
+    private val reminderScheduler: ReminderScheduler
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
@@ -94,7 +96,8 @@ class AddEditNoteViewModel @Inject constructor(
                         contentState = it.contentState.copy(text = note.content, isHintVisible = false),
                         noteColor = note.color,
                         attachedImages = note.imageUris.map { it.toUri() },
-                        attachedAudios = attachments
+                        attachedAudios = attachments,
+                        reminderTime = note.reminderTime
                     )
                 }
             }
@@ -189,6 +192,13 @@ class AddEditNoteViewModel @Inject constructor(
                 mediaPlayer.stop()
                 _uiState.update { it.copy(zoomedImageUri = null) }
             }
+            is AddEditNoteEvent.SetReminder -> {
+                _uiState.update { it.copy(reminderTime = event.timestamp, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
+            }
+            is AddEditNoteEvent.CancelReminder -> {
+                _uiState.update { it.copy(reminderTime = -1, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
+                currentNoteId?.let { reminderScheduler.cancel(it) }
+            }
             else -> {}
         }
     }
@@ -237,8 +247,11 @@ class AddEditNoteViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis(),
                 color = state.noteColor,
                 imageUris = state.attachedImages,
-                audioUris = state.attachedAudios.map { it.uri }
+                audioUris = state.attachedAudios.map { it.uri },
+                reminderTime = state.reminderTime
             ).onSuccess { newNoteId ->
+                reminderScheduler.cancel(id = newNoteId)
+                reminderScheduler.schedule(id = newNoteId, title = state.titleState.text, content = state.contentState.text, reminderTime = state.reminderTime)
                 _eventFlow.emit(if(id!=newNoteId) UiEvent.MakeCopy(newNoteId) else UiEvent.SaveNote)
             }.onFailure { e ->
                 _uiState.update { it.copy(isSaving = false) }
@@ -271,6 +284,19 @@ class AddEditNoteViewModel @Inject constructor(
                 shouldShowRationale -> _uiState.update { it.copy(showCameraRationale = true) }
                 hasAskedBefore -> _uiState.update { it.copy(settingsDeniedType = DeniedType.CAMERA) }
                 else -> permissionUsecases.markCameraPermissionFlag()
+            }
+        }
+    }
+
+    fun checkExactAlarmPermission() {
+        viewModelScope.launch {
+            if(!reminderScheduler.canScheduleExactAlarms()){
+                _uiState.update { it.copy(showAlarmPermissionRationale = true) }
+            } else{
+                _uiState.update { it.copy(
+                    showAlarmPermissionRationale = false,
+                    showDataAndTimePicker = true
+                ) }
             }
         }
     }

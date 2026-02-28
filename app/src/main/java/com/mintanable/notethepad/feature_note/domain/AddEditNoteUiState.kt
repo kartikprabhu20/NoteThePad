@@ -1,8 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain
 
 import android.net.Uri
-import androidx.compose.ui.graphics.toArgb
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
@@ -15,6 +13,7 @@ data class AddEditNoteUiState(
     val noteColor: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),
+    val reminderTime: Long = -1L,
 
     val isRecording: Boolean = false,
     val isSaving: Boolean = false,
@@ -23,6 +22,8 @@ data class AddEditNoteUiState(
     val settingsDeniedType: DeniedType? = null,
     val showCameraRationale: Boolean = false,
     val showMicrophoneRationale: Boolean = false,
+    val showAlarmPermissionRationale: Boolean = false,
     val zoomedImageUri: Uri? = null,
-    val mediaState: MediaState? = null
+    val mediaState: MediaState? = null,
+    val showDataAndTimePicker: Boolean = false
 )

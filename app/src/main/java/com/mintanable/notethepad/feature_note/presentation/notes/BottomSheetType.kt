@@ -1,9 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Label
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
@@ -41,8 +39,7 @@ enum class ReminderOptions(
     override val title: String,
     override val icon: ImageVector
 ) : AdditionalOption {
-    TIMER("Timer", Icons.Default.Alarm),
-    CALENDAR("Date", Icons.Default.CalendarToday)
+    DATE_AND_TIME("Choose a data & time", Icons.Default.AccessTime),
 }
 
 enum class MoreSettingsOptions(

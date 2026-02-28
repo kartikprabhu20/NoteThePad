@@ -1,6 +1,9 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -17,6 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -60,11 +64,14 @@ import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOpti
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioPlayerUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
-import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteActionButtons
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
+import com.mintanable.notethepad.feature_note.presentation.modify.components.ReminderDialog
+import com.mintanable.notethepad.feature_note.presentation.modify.components.TagUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
+import com.mintanable.notethepad.feature_note.presentation.notes.TagType
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
+import com.mintanable.notethepad.feature_note.presentation.notes.util.TimeFormatter
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
@@ -72,6 +79,7 @@ import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRa
 import com.mintanable.notethepad.ui.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Spacer as Spacer1
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -338,7 +346,7 @@ fun AddEditNoteScreen(
 
                         if (uiState.attachedImages.isNotEmpty()) {
                             item{
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer1(modifier = Modifier.height(16.dp))
                                 LazyRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -373,7 +381,7 @@ fun AddEditNoteScreen(
                         }
 
                         item{
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer1(modifier = Modifier.height(16.dp))
                             TransparentHintTextField(
                                 text = uiState.titleState.text,
                                 hint = uiState.titleState.hint,
@@ -399,7 +407,7 @@ fun AddEditNoteScreen(
                                     ),
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer1(modifier = Modifier.height(16.dp))
                             TransparentHintTextField(
                                 text = uiState.contentState.text,
                                 hint = uiState.contentState.hint,
@@ -445,8 +453,19 @@ fun AddEditNoteScreen(
                                     }
                                 }
                             }
+                        }
 
-
+                        if(uiState.reminderTime != -1L){
+                            item {
+                                Spacer1(modifier = Modifier.height(16.dp))
+                                TagUI(
+                                    imageVector = TagType.REMINDER_TAG.imageVector,
+                                    description = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) TimeFormatter.formatMillis(uiState.reminderTime) else "Reminder",
+                                    onDelete = {
+                                        viewModel.onEvent(AddEditNoteEvent.CancelReminder)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -468,6 +487,24 @@ fun AddEditNoteScreen(
                     onClick = { viewModel.onEvent(AddEditNoteEvent.StopMedia) },
                     transitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
+
+            if(uiState.showAlarmPermissionRationale){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    }
+                    context.startActivity(intent)
+                }
+            }
+
+            if(uiState.showDataAndTimePicker){
+                ReminderDialog(
+                    onDismiss = { viewModel.onEvent(AddEditNoteEvent.CancelReminder) },
+                    onConfirm = { selectedTimestamp ->
+                        viewModel.onEvent(AddEditNoteEvent.SetReminder(selectedTimestamp))
+                    }
                 )
             }
 
@@ -598,6 +635,10 @@ fun AddEditNoteScreen(
 
                             }
 
+                            ReminderOptions.DATE_AND_TIME -> {
+                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                                viewModel.checkExactAlarmPermission()
+                            }
                             else -> {}
                         }
                     }
@@ -616,7 +657,7 @@ fun AddEditNoteScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = Color.White)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer1(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Saving Note...",
                     color = Color.White,
