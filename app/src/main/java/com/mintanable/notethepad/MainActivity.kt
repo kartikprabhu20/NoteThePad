@@ -30,6 +30,7 @@ import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper
 import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
+import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.ui.util.Screen
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NotesScreen
@@ -59,6 +60,13 @@ class MainActivity : AppCompatActivity() {
             NoteThePadTheme(darkTheme = isDarkTheme) {
                 MainScreen(settingsViewModel, settings)
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(isFinishing){
+            AndroidMediaPlayer(this).release()
         }
     }
 

@@ -2,6 +2,9 @@ package com.mintanable.notethepad.feature_note.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -25,40 +28,56 @@ import javax.inject.Inject
 
 class AndroidMediaPlayer@Inject constructor(
     @ApplicationContext private val context: Context
-) : MediaPlayer {
+) : MediaPlayer, DefaultLifecycleObserver {
 
-    val player = ExoPlayer.Builder(context)
-        .setAudioAttributes(
-            AudioAttributes.Builder()
-                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                .setUsage(C.USAGE_MEDIA)
-                .build(),
-            true
-        )
-        .build()
     private val _mediaState = MutableStateFlow(MediaState())
     override val mediaState = _mediaState.asStateFlow()
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var progressJob: Job? = null
 
+    private var _player: ExoPlayer? = null
+    val player: ExoPlayer
+        get() = _player ?: createPlayer().also { _player = it }
+
+    private fun createPlayer(): ExoPlayer {
+        return ExoPlayer.Builder(context)
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .setUsage(C.USAGE_MEDIA)
+                    .build(),
+                true
+            )
+            .build().apply {
+                addListener(playerListener)
+            }
+    }
+
+    private val playerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            _mediaState.update { it.copy(isPlaying = isPlaying) }
+        }
+        override fun onPlaybackStateChanged(state: Int) {
+            _mediaState.update { it.copy(isBuffering = state == Player.STATE_BUFFERING)}
+
+            if (state == Player.STATE_READY) {
+                _mediaState.update { it.copy(totalDurationMs = player.duration.coerceAtLeast(0L)) }
+            }
+
+            if (state == Player.STATE_ENDED) {
+                _mediaState.update { it.copy(progress = 0f, isPlaying = false) }
+            }
+        }
+    }
+
     init {
-        player.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                _mediaState.update { it.copy(isPlaying = isPlaying) }
-            }
+        //attaches the singleton to the Global App Lifecycle
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        player.addListener(playerListener)
+    }
 
-            override fun onPlaybackStateChanged(state: Int) {
-                _mediaState.update { it.copy(isBuffering = state == Player.STATE_BUFFERING)}
-
-                if (state == Player.STATE_READY) {
-                    _mediaState.update { it.copy(totalDurationMs = player.duration.coerceAtLeast(0L)) }
-                }
-
-                if (state == Player.STATE_ENDED) {
-                    _mediaState.update { it.copy(progress = 0f, isPlaying = false) }
-                }
-            }
-        })
+    override fun onStop(owner: LifecycleOwner) {
+        stop()
     }
 
     override fun playPause(uri: Uri) {
@@ -110,8 +129,11 @@ class AndroidMediaPlayer@Inject constructor(
 
     // ONLY call this if the app is shutting down or you are destroying the Singleton
     override fun release() {
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         progressJob?.cancel()
         serviceScope.cancel()
-        player.release()
+        _player?.removeListener(playerListener)
+        _player?.release()
+        _player = null
     }
 }
