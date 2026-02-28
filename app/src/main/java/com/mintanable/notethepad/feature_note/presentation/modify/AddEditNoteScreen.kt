@@ -86,7 +86,15 @@ fun AddEditNoteScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        confirmValueChange = { sheetValue ->
+            if (uiState.isRecording) {
+                sheetValue != SheetValue.Hidden
+            } else {
+                true
+            }
+        }
+    )
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -224,6 +232,21 @@ fun AddEditNoteScreen(
         viewModel.onEvent(AddEditNoteEvent.StopMedia)
         if(uiState.zoomedImageUri == null){
             navController.navigateUp()
+        }
+        when {
+            uiState.zoomedImageUri != null -> {
+                viewModel.onEvent(AddEditNoteEvent.StopMedia)
+            }
+            uiState.currentSheetType != BottomSheetType.NONE && uiState.isRecording -> {
+                viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
+            }
+            uiState.currentSheetType != BottomSheetType.NONE -> {
+                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+            }
+            else -> {
+                viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                navController.navigateUp()
+            }
         }
     }
 
@@ -490,13 +513,13 @@ fun AddEditNoteScreen(
         ModalBottomSheet(
             onDismissRequest =
                 {
-                    if (!uiState.isRecording) {
-                        viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                    if (uiState.isRecording) {
+                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
                     }
+                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                 },
             sheetState = sheetState,
-            dragHandle = { BottomSheetDefaults.DragHandle() }
-        ) {
+            dragHandle = if (uiState.isRecording) null else { { BottomSheetDefaults.DragHandle() } }        ) {
             if(uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER){
                 AudioRecorderUI(
                     isRecording = uiState.isRecording,
