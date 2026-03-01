@@ -66,7 +66,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Aud
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
-import com.mintanable.notethepad.feature_note.presentation.modify.components.ReminderDialog
+import com.mintanable.notethepad.feature_note.presentation.modify.components.DateAndTimePicker
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TagUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.notes.TagType
@@ -460,7 +460,7 @@ fun AddEditNoteScreen(
                                 Spacer1(modifier = Modifier.height(16.dp))
                                 TagUI(
                                     imageVector = TagType.REMINDER_TAG.imageVector,
-                                    description = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) TimeFormatter.formatMillis(uiState.reminderTime) else "Reminder",
+                                    description = TimeFormatter.formatMillis(uiState.reminderTime),
                                     onDelete = {
                                         viewModel.onEvent(AddEditNoteEvent.CancelReminder)
                                     }
@@ -500,7 +500,7 @@ fun AddEditNoteScreen(
             }
 
             if(uiState.showDataAndTimePicker){
-                ReminderDialog(
+                DateAndTimePicker(
                     onDismiss = { viewModel.onEvent(AddEditNoteEvent.CancelReminder) },
                     onConfirm = { selectedTimestamp ->
                         viewModel.onEvent(AddEditNoteEvent.SetReminder(selectedTimestamp))

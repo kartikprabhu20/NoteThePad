@@ -9,18 +9,24 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    initialHour: Int,
-    initialMinute: Int,
+    initialHour: Int? = null,
+    initialMinute: Int? = null,
     onDismiss: () -> Unit,
     onConfirm: (Int, Int) -> Unit
 ) {
+
+    val now = LocalDateTime.now()
+    val hour = now.hour
+    val minute = now.minute
+
     val timePickerState = rememberTimePickerState(
-        initialHour = initialHour,
-        initialMinute = initialMinute,
+        initialHour = initialHour?: hour,
+        initialMinute = initialMinute?: minute,
         is24Hour = true
     )
 

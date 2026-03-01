@@ -11,12 +11,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import java.util.Calendar
+import com.mintanable.notethepad.feature_settings.presentation.components.TimePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderDialog(
+fun DateAndTimePicker(
     onDismiss: () -> Unit,
-    onConfirm: (Long) -> Unit // Returns the final combined timestamp
+    onConfirm: (Long) -> Unit
 ) {
     val dateState = rememberDatePickerState()
     val timeState = rememberTimePickerState()
@@ -32,22 +33,19 @@ fun ReminderDialog(
             DatePicker(state = dateState)
         }
     } else {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                TextButton(onClick = {
-                    val calendar = Calendar.getInstance().apply {
-                        timeInMillis = dateState.selectedDateMillis ?: System.currentTimeMillis()
-                        set(Calendar.HOUR_OF_DAY, timeState.hour)
-                        set(Calendar.MINUTE, timeState.minute)
-                    }
-                    onConfirm(calendar.timeInMillis)
-                }) { Text("Save") }
+        TimePickerDialog(
+            onDismiss = {
+                showTimePicker = false
             },
-            dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) { Text("Back") }
-            },
-            text = { TimePicker(state = timeState) }
+            onConfirm = { hour, minute ->
+                val calendar = Calendar.getInstance().apply {
+                    timeInMillis = dateState.selectedDateMillis ?: System.currentTimeMillis()
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, minute)
+                }
+                onConfirm(calendar.timeInMillis)
+
+            }
         )
     }
 }
