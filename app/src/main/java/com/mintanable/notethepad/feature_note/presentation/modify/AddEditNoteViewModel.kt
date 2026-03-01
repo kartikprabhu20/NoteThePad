@@ -254,7 +254,7 @@ class AddEditNoteViewModel @Inject constructor(
                 reminderTime = state.reminderTime
             ).onSuccess { newNoteId ->
                 reminderScheduler.cancel(id = newNoteId)
-                if(state.reminderTime > -1) {
+                if(state.reminderTime > System.currentTimeMillis()) {
                     reminderScheduler.schedule(
                         id = newNoteId,
                         title = state.titleState.text,
