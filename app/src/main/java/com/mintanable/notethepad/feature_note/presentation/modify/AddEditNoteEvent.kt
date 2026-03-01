@@ -25,4 +25,5 @@ sealed class AddEditNoteEvent{
     object StopMedia: AddEditNoteEvent()
     data class SetReminder(val timestamp: Long) : AddEditNoteEvent()
     object CancelReminder : AddEditNoteEvent()
+    object DismissReminder: AddEditNoteEvent()
 }

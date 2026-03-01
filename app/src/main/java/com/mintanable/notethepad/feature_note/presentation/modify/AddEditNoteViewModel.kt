@@ -199,6 +199,9 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(reminderTime = -1, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
                 currentNoteId?.let { reminderScheduler.cancel(it) }
             }
+            is AddEditNoteEvent.DismissReminder -> {
+                _uiState.update { it.copy(showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
+            }
             else -> {}
         }
     }
