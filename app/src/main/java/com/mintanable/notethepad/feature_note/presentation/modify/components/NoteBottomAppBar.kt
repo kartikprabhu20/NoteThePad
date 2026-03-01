@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
@@ -80,28 +81,29 @@ fun NoteBottomAppBar(
         containerColor = Color.Black.copy(alpha = 0.75f),
         tonalElevation = 0.dp,
         actions = {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                val utilityButtons = listOf(
-                    Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
-                    Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
-                    Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
-                )
 
-                utilityButtons.forEachIndexed { index, (icon, type, label) ->
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = fadeIn(tween(300)) + expandHorizontally(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            expandFrom = Alignment.End
-                        ),
-                        exit = fadeOut()
-                    ) {
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(tween(300)) + expandHorizontally(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ),
+                    expandFrom = Alignment.End
+                ),
+                exit = fadeOut()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    val utilityButtons = listOf(
+                        Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
+                        Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
+                        Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
+                    )
+
+                    utilityButtons.forEachIndexed { index, (icon, type, label) ->
                         SmallFloatingActionButton(
                             onClick = { onActionClick(type) },
                             shape = RoundedCornerShape(32.dp),
@@ -117,6 +119,9 @@ fun NoteBottomAppBar(
         },
         floatingActionButton = {
             FloatingActionButton(
+                modifier = Modifier.graphicsLayer {
+                    rotationZ = wiggleAnim.value
+                },
                 onClick = onSaveClick,
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor
             ) {

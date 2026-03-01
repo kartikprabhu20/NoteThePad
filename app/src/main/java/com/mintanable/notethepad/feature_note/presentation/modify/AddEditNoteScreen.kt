@@ -10,8 +10,10 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -39,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -267,13 +271,29 @@ fun AddEditNoteScreen(
                 contentWindowInsets = WindowInsets.systemBars,
                 containerColor = Color.Transparent,
                 bottomBar = {
+                    val transition = animatedVisibilityScope.transition
+                    val barAlpha by transition.animateFloat(
+                        label = "BarAlpha",
+                        transitionSpec = {
+                            if (targetState == EnterExitState.Visible) {
+                                tween(300) // Smooth fade in
+                            } else {
+                                tween(50)  // INSTANT fade out on exit (fixes lingering)
+                            }
+                        }
+                    ) { state ->
+                        if (state == EnterExitState.Visible) 1f else 0f
+                    }
+
                     CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
                         NoteBottomAppBar(
                             modifier = Modifier
-                                .zIndex(1f)
                                 .renderInSharedTransitionScopeOverlay(
-                                    zIndexInOverlay = 2f
-                                ),
+                                    zIndexInOverlay = 5f
+                                ).graphicsLayer {
+                                    alpha = barAlpha
+                                    compositingStrategy = CompositingStrategy.Offscreen
+                                },
                             onActionClick = { sheetType ->
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
                             },
@@ -282,14 +302,14 @@ fun AddEditNoteScreen(
                             }
                         )
                     }
+
                 },
-                modifier = Modifier
-                    .fillMaxSize()
-//                    .background(noteBackgroundAnimatable.value)
+                modifier = Modifier.fillMaxSize()
             ) { paddingValue ->
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .zIndex(0f)
                         .background(noteBackgroundAnimatable.value)
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(
@@ -457,14 +477,19 @@ fun AddEditNoteScreen(
 
                         if(uiState.reminderTime != -1L){
                             item {
-                                Spacer1(modifier = Modifier.height(16.dp))
-                                TagUI(
-                                    imageVector = TagType.REMINDER_TAG.imageVector,
-                                    description = TimeFormatter.formatMillis(uiState.reminderTime),
-                                    onDelete = {
-                                        viewModel.onEvent(AddEditNoteEvent.CancelReminder)
-                                    }
-                                )
+                                Box(modifier = Modifier.padding(8.dp)
+                                ){
+                                    TagUI(
+                                        imageVector = TagType.REMINDER_TAG.imageVector,
+                                        description = TimeFormatter.formatMillis(uiState.reminderTime),
+                                        onDelete = {
+                                            viewModel.onEvent(AddEditNoteEvent.CancelReminder)
+                                        },
+                                        onClick = {
+                                            viewModel.checkExactAlarmPermission()
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -501,7 +526,7 @@ fun AddEditNoteScreen(
 
             if(uiState.showDataAndTimePicker){
                 DateAndTimePicker(
-                    onDismiss = { viewModel.onEvent(AddEditNoteEvent.CancelReminder) },
+                    onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissReminder) },
                     onConfirm = { selectedTimestamp ->
                         viewModel.onEvent(AddEditNoteEvent.SetReminder(selectedTimestamp))
                     }

@@ -2,16 +2,15 @@ package com.mintanable.notethepad.feature_note.presentation.modify.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +27,8 @@ import com.mintanable.notethepad.ui.theme.ThemePreviews
 fun TagUI(
     imageVector: ImageVector,
     description: String,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onClick: () -> Unit
 ){
 
     Surface(
@@ -37,25 +37,27 @@ fun TagUI(
         border = BorderStroke(0.5.dp, Color.Black)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
             Icon(
+                modifier = Modifier.clickable(
+                    onClick = onClick
+                ),
                 imageVector = imageVector,
                 contentDescription = "icon"
             )
-            Text(description)
-
-            IconButton(
-                onClick = onDelete,
-                Modifier.padding(0.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "icon"
-                )
-            }
-            
+            Text(modifier = Modifier.clickable(
+                onClick = onClick
+            ),
+                text = description)
+            Icon(
+                modifier = Modifier.clickable(
+                    onClick = onDelete
+                ),
+                imageVector = Icons.Default.Close,
+                contentDescription = "icon"
+            )
         }
     }
 }
@@ -66,11 +68,12 @@ fun PreviewReminderTag(){
     NoteThePadTheme {
         Box(modifier = Modifier
             .background(NoteColors.colors.get(0))
-            .padding(8.dp))
+            .padding(8.dp)
+        )
         {
             TagUI(Icons.Default.Notifications,
                 "Reminder",
-                {})
+                {}, {})
         }
     }
 }
