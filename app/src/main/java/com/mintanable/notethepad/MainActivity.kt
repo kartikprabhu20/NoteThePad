@@ -1,6 +1,7 @@
 package com.mintanable.notethepad
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +36,7 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.ui.util.Screen
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NotesScreen
+import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
@@ -46,10 +49,12 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var credentialHelper: GoogleClientHelper
+    private var intentState = mutableStateOf<Intent?>(null)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        intentState.value = intent
 
         credentialHelper = GoogleClientHelper(this)
         setContent {
@@ -58,9 +63,15 @@ class MainActivity : AppCompatActivity() {
             val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
             val isDarkTheme = if(settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else settings.themeMode == ThemeMode.DARK
             NoteThePadTheme(darkTheme = isDarkTheme) {
-                MainScreen(settingsViewModel, settings)
+                MainScreen(settingsViewModel, settings, intentState.value ?: intent)
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intentState.value = intent
     }
 
     override fun onDestroy() {
@@ -72,7 +83,18 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Composable
-    fun MainScreen(settingsViewModel: SettingsViewModel, settings: Settings) {
+    fun MainScreen(settingsViewModel: SettingsViewModel, settings: Settings, intent: Intent) {
+
+        val navController = rememberNavController()
+        LaunchedEffect(intent) {
+            val noteId = intent.getLongExtra(TARGET_NOTE_ID, -1L)
+            if (noteId != -1L) {
+                navController.navigate(Screen.AddEditNoteScreen.route + "?noteId=$noteId") {
+                    launchSingleTop = true
+                }
+                intent.removeExtra("target_note_id")
+            }
+        }
 
         val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartIntentSenderForResult()
@@ -87,7 +109,6 @@ class MainActivity : AppCompatActivity() {
         Surface(
             color = MaterialTheme.colorScheme.background
         ) {
-            val navController = rememberNavController()
             SharedTransitionLayout {
 
                 NavHost(
