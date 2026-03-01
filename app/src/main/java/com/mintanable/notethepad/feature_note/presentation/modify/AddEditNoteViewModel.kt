@@ -251,7 +251,14 @@ class AddEditNoteViewModel @Inject constructor(
                 reminderTime = state.reminderTime
             ).onSuccess { newNoteId ->
                 reminderScheduler.cancel(id = newNoteId)
-                reminderScheduler.schedule(id = newNoteId, title = state.titleState.text, content = state.contentState.text, reminderTime = state.reminderTime)
+                if(state.reminderTime > -1) {
+                    reminderScheduler.schedule(
+                        id = newNoteId,
+                        title = state.titleState.text,
+                        content = state.contentState.text,
+                        reminderTime = state.reminderTime
+                    )
+                }
                 _eventFlow.emit(if(id!=newNoteId) UiEvent.MakeCopy(newNoteId) else UiEvent.SaveNote)
             }.onFailure { e ->
                 _uiState.update { it.copy(isSaving = false) }
