@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter
 
 object TimeFormatter {
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun formatMillis(millis: Long): String {
         if (millis == -1L) return "No Reminder"
 

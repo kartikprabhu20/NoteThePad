@@ -27,17 +27,15 @@ class NoteThePadApp : Application(), Configuration.Provider {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Backup Service"
-            val descriptionText = "Shows progress of Google Drive backups"
-            val importance = NotificationManager.IMPORTANCE_LOW
+        val name = "Backup Service"
+        val descriptionText = "Shows progress of Google Drive backups"
+        val importance = NotificationManager.IMPORTANCE_LOW
 
-            val channel = NotificationChannel("backup_channel", name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel("backup_channel", name, importance).apply {
+            description = descriptionText
         }
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 }

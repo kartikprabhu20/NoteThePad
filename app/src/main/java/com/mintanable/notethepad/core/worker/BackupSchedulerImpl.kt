@@ -31,7 +31,6 @@ class BackupSchedulerImpl @Inject constructor(
         const val KEY_BACKUP_NOW = "backupNow"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun scheduleBackup(backupSettings: BackupSettings, backupNow: Boolean) {
         val frequency = backupSettings.backupFrequency
         val hour = backupSettings.backupTimeHour
@@ -80,7 +79,6 @@ class BackupSchedulerImpl @Inject constructor(
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleMonthly(hour: Int, minute: Int, workdata: Data) {
 
         val delay = ScheduleHelper.calculateNextMonthlyDelay(hour, minute)
@@ -99,7 +97,6 @@ class BackupSchedulerImpl @Inject constructor(
             )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun schedulePeriodic(interval: Pair<Long, TimeUnit>, frequency: BackupFrequency, hour: Int, minute: Int, workdata: Data){
         val delay = ScheduleHelper.calculateInitialDelay(hour, minute, frequency)
 
@@ -123,7 +120,6 @@ class BackupSchedulerImpl @Inject constructor(
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onWorkCompleted(inputData: Data) {
         val frequency = inputData.getString(KEY_FREQUENCY)
             ?.let { BackupFrequency.valueOf(it) }

@@ -8,7 +8,6 @@ import java.time.ZonedDateTime
 
 object ScheduleHelper{
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun calculateInitialDelay(
         hour: Int,
         minute: Int,
@@ -33,7 +32,6 @@ object ScheduleHelper{
         return Duration.between(now, nextRun).toMillis()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun calculateNextMonthlyDelay(
         hour: Int,
         minute: Int
