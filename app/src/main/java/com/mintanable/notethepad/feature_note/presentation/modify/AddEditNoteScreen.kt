@@ -276,9 +276,9 @@ fun AddEditNoteScreen(
                         label = "BarAlpha",
                         transitionSpec = {
                             if (targetState == EnterExitState.Visible) {
-                                tween(300) // Smooth fade in
+                                tween(300)
                             } else {
-                                tween(50)  // INSTANT fade out on exit (fixes lingering)
+                                tween(50)
                             }
                         }
                     ) { state ->

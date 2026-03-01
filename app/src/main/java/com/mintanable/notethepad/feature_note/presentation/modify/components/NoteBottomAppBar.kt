@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Save
@@ -98,6 +99,7 @@ fun NoteBottomAppBar(
                 ) {
                     val utilityButtons = listOf(
                         Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
+                        Triple(Icons.Default.CheckBox, BottomSheetType.CHECKBOX, "CheckBox") ,
                         Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
                         Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
                     )

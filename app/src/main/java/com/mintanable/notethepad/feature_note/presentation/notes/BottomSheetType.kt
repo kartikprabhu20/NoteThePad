@@ -18,7 +18,8 @@ enum class BottomSheetType {
     IMAGE_SOURCES,
     VIDEO_SOURCES,
     AUDIO_SOURCES,
-    AUDIO_RECORDER
+    AUDIO_RECORDER,
+    CHECKBOX
 }
 
 interface AdditionalOption {
