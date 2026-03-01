@@ -288,9 +288,8 @@ fun AddEditNoteScreen(
                     CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
                         NoteBottomAppBar(
                             modifier = Modifier
-                                .renderInSharedTransitionScopeOverlay(
-                                    zIndexInOverlay = 5f
-                                ).graphicsLayer {
+                                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
+                                .graphicsLayer {
                                     alpha = barAlpha
                                     compositingStrategy = CompositingStrategy.Offscreen
                                 },

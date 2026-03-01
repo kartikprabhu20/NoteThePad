@@ -162,7 +162,7 @@ fun NotesScreen (
                                                   },
                                 resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
                                 )
-//                            .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 1f)
+                            .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 2f)
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
                     }
