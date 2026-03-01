@@ -20,6 +20,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -90,6 +91,9 @@ class AddEditNoteViewModel @Inject constructor(
                     Attachment(uri, audioMetadataProvider.getDuration(uri))
                 }
 
+                val isCheckboxListAvailable = CheckboxConvertors.isContentCheckboxList(note.content)
+                val checkList = if(isCheckboxListAvailable) CheckboxConvertors.stringToCheckboxes(content = note.content) else emptyList()
+
                 _uiState.update {
                     it.copy(
                         titleState = it.titleState.copy(text = note.title, isHintVisible = false),
@@ -97,7 +101,9 @@ class AddEditNoteViewModel @Inject constructor(
                         noteColor = note.color,
                         attachedImages = note.imageUris.map { it.toUri() },
                         attachedAudios = attachments,
-                        reminderTime = note.reminderTime
+                        reminderTime = note.reminderTime,
+                        checkListItems = checkList,
+                        isCheckboxListAvailable = isCheckboxListAvailable
                     )
                 }
             }
@@ -202,7 +208,36 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.DismissReminder -> {
                 _uiState.update { it.copy(showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
             }
-            else -> {}
+            is AddEditNoteEvent.ToggleCheckbox -> {
+                if(uiState.value.isCheckboxListAvailable) {
+                    _uiState.update {
+                        it.copy(
+                            isCheckboxListAvailable = false,
+                            checkListItems = emptyList(),
+                            contentState = it.contentState.copy(
+                                text = CheckboxConvertors.checkboxesToContentString(
+                                    uiState.value.checkListItems
+                                ), isHintVisible = false
+                            )
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isCheckboxListAvailable = true,
+                            checkListItems = CheckboxConvertors.stringToCheckboxes(it.contentState.text),
+                            contentState = it.contentState.copy(
+                                text = "", isHintVisible = false
+                            )
+                        )
+                    }
+                }
+            }
+
+            is AddEditNoteEvent.UpdateCheckList -> {
+                _uiState.update { it.copy(checkListItems = event.list) }
+            }
+                else -> {}
         }
     }
 
@@ -243,7 +278,7 @@ class AddEditNoteViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true) }
             val state = uiState.value
 
-            noteUseCases.saveNoteWithAttachments(
+            noteUseCases.saveNoteWithAttachments.invoke(
                 id = id,
                 title = state.titleState.text,
                 content = state.contentState.text,
@@ -251,7 +286,8 @@ class AddEditNoteViewModel @Inject constructor(
                 color = state.noteColor,
                 imageUris = state.attachedImages,
                 audioUris = state.attachedAudios.map { it.uri },
-                reminderTime = state.reminderTime
+                reminderTime = state.reminderTime,
+                checkboxItems = state.checkListItems
             ).onSuccess { newNoteId ->
                 reminderScheduler.cancel(id = newNoteId)
                 if(state.reminderTime > System.currentTimeMillis()) {

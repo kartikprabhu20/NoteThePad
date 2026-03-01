@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.domain
 
 import android.net.Uri
+import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
@@ -14,9 +15,11 @@ data class AddEditNoteUiState(
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),
     val reminderTime: Long = -1L,
+    val checkListItems: List<CheckboxItem> = emptyList(),
 
     val isRecording: Boolean = false,
     val isSaving: Boolean = false,
+    val isCheckboxListAvailable: Boolean = false,
 
     val currentSheetType: BottomSheetType = BottomSheetType.NONE,
     val settingsDeniedType: DeniedType? = null,

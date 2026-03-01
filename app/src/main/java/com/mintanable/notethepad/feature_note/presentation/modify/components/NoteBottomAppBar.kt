@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
@@ -52,8 +53,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun NoteBottomAppBar(
+    utilityButtons: List<Triple<ImageVector, BottomSheetType, String>>,
     modifier: Modifier = Modifier,
-    onActionClick:  (BottomSheetType) -> Unit,
+    onActionClick: (BottomSheetType) -> Unit,
     onSaveClick: () -> Unit
 ) {
     var isVisible by remember { mutableStateOf(false) }
@@ -97,12 +99,7 @@ fun NoteBottomAppBar(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    val utilityButtons = listOf(
-                        Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
-                        Triple(Icons.Default.CheckBox, BottomSheetType.CHECKBOX, "CheckBox") ,
-                        Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
-                        Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
-                    )
+
 
                     utilityButtons.forEachIndexed { index, (icon, type, label) ->
                         SmallFloatingActionButton(
@@ -143,6 +140,12 @@ fun PreviewBottomAppBar(){
                 containerColor = Color.Transparent,
                 bottomBar = {
                     NoteBottomAppBar(
+                        utilityButtons = listOf(
+                            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
+                            Triple(Icons.Default.CheckBox, BottomSheetType.CHECKBOX, "CheckBox") ,
+                            Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
+                            Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
+                        ),
                         onActionClick = { },
                         onSaveClick = { }
                     )

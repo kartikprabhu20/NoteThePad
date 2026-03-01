@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Audiotrack
+import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.RedOrange
 import com.mintanable.notethepad.ui.theme.ThemePreviews
@@ -145,6 +147,18 @@ fun NoteItem(
                                 Icons.Default.Notifications
                             else
                                 Icons.Default.NotificationsOff,
+                            contentDescription = "Images attached",
+                            modifier = Modifier.alpha(alpha = 0.5f),
+                            tint = Color.Black
+                        )
+                    }
+
+                    if(CheckboxConvertors.isContentCheckboxList(note.content)){
+                        Icon(
+                            imageVector = if(note.reminderTime> System.currentTimeMillis())
+                                Icons.Default.Notifications
+                            else
+                                Icons.Default.CheckBox,
                             contentDescription = "Images attached",
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black

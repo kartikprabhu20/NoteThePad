@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -27,6 +28,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -73,6 +80,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Not
 import com.mintanable.notethepad.feature_note.presentation.modify.components.DateAndTimePicker
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TagUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
+import com.mintanable.notethepad.feature_note.presentation.modify.components.checkboxListSection
 import com.mintanable.notethepad.feature_note.presentation.notes.TagType
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 import com.mintanable.notethepad.feature_note.presentation.notes.util.TimeFormatter
@@ -83,7 +91,6 @@ import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRa
 import com.mintanable.notethepad.ui.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.Spacer as Spacer1
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -142,7 +149,7 @@ fun AddEditNoteScreen(
         }
     )
 
-   val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+   val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val checkAndRequestCameraPermission = { attachmentType: AttachmentType ->
         viewModel.checkCameraPermission(
             isGranted = cameraPermissionState.status.isGranted,
@@ -156,7 +163,7 @@ fun AddEditNoteScreen(
         }
     }
 
-    val microphonePermissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+    val microphonePermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val checkAndRequestMicrophonePermission = {
         viewModel.checkMicrophonePermission(
             isGranted = microphonePermissionState.status.isGranted,
@@ -265,6 +272,9 @@ fun AddEditNoteScreen(
         }
     }
 
+    var activeDragUnCheckIndex by remember { mutableStateOf<String?>(null) }
+    var activeDragCheckIndex by remember { mutableStateOf<String?>(null) }
+
     with(sharedTransitionScope) {
         Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
@@ -287,6 +297,12 @@ fun AddEditNoteScreen(
 
                     CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
                         NoteBottomAppBar(
+                            utilityButtons = listOf(
+                                Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
+                                Triple(if (uiState.isCheckboxListAvailable) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank, BottomSheetType.CHECKBOX, "CheckBox") ,
+                                Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
+                                Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
+                            ),
                             modifier = Modifier
                                 .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
                                 .graphicsLayer {
@@ -294,7 +310,12 @@ fun AddEditNoteScreen(
                                     compositingStrategy = CompositingStrategy.Offscreen
                                 },
                             onActionClick = { sheetType ->
-                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
+
+                                if(sheetType == BottomSheetType.CHECKBOX){
+                                    viewModel.onEvent(AddEditNoteEvent.ToggleCheckbox)
+                                } else {
+                                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
+                                }
                             },
                             onSaveClick = {
                                 viewModel.onEvent(AddEditNoteEvent.SaveNote)
@@ -365,7 +386,7 @@ fun AddEditNoteScreen(
 
                         if (uiState.attachedImages.isNotEmpty()) {
                             item{
-                                Spacer1(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
                                 LazyRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -399,8 +420,8 @@ fun AddEditNoteScreen(
 
                         }
 
-                        item{
-                            Spacer1(modifier = Modifier.height(16.dp))
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
                             TransparentHintTextField(
                                 text = uiState.titleState.text,
                                 hint = uiState.titleState.hint,
@@ -426,31 +447,61 @@ fun AddEditNoteScreen(
                                     ),
                             )
 
-                            Spacer1(modifier = Modifier.height(16.dp))
-                            TransparentHintTextField(
-                                text = uiState.contentState.text,
-                                hint = uiState.contentState.hint,
-                                onValueChange = {
-                                    viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
-                                },
-                                onFocusChange = {
-                                    viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
-                                },
-                                isHintVisible = uiState.contentState.isHintVisible,
-                                isSingleLine = false,
-                                textStyle = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .sharedBounds(
-                                        sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                            key = "note-content-${noteId}"
-                                        ),
-                                        animatedVisibilityScope = animatedVisibilityScope,
-                                        boundsTransform = { _, _ ->
-                                            tween()
-                                        },
-                                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            if(!uiState.isCheckboxListAvailable) {
+                                TransparentHintTextField(
+                                    text = uiState.contentState.text,
+                                    hint = uiState.contentState.hint,
+                                    onValueChange = {
+                                        viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
+                                    },
+                                    onFocusChange = {
+                                        viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
+                                    },
+                                    isHintVisible = uiState.contentState.isHintVisible,
+                                    isSingleLine = false,
+                                    textStyle = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .sharedBounds(
+                                            sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                                key = "note-content-${noteId}"
+                                            ),
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                            boundsTransform = { _, _ ->
+                                                tween()
+                                            },
+                                            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                        )
+                                )
+                            }
+                        }
+
+                        if(uiState.isCheckboxListAvailable) {
+                            checkboxListSection(
+                                activeDragCheckIndex = activeDragCheckIndex,
+                                activeDragUnCheckIndex = activeDragUnCheckIndex,
+                                items = uiState.checkListItems,
+                                onEnterPressed = {},
+                                onItemChanged = { updatedItem ->
+                                    viewModel.onEvent(
+                                        AddEditNoteEvent.UpdateCheckList(
+                                            uiState.checkListItems.map {
+                                                if (it.id == updatedItem.id) updatedItem else it
+                                            }
+                                        )
                                     )
+                                },
+                                onListOrderUpdated = { newList ->
+                                    viewModel.onEvent(AddEditNoteEvent.UpdateCheckList(newList))
+                                },
+                                onDragStateChangedChecked = {
+                                    activeDragCheckIndex = it
+                                },
+                                onDragStateChangedUnChecked = {
+                                    activeDragUnCheckIndex = it
+                                }
                             )
                         }
 
@@ -681,7 +732,7 @@ fun AddEditNoteScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = Color.White)
-                Spacer1(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Saving Note...",
                     color = Color.White,

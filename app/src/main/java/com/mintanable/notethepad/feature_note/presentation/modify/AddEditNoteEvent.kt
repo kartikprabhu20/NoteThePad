@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.net.Uri
 import androidx.compose.ui.focus.FocusState
+import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 
 sealed class AddEditNoteEvent{
@@ -26,4 +27,6 @@ sealed class AddEditNoteEvent{
     data class SetReminder(val timestamp: Long) : AddEditNoteEvent()
     object CancelReminder : AddEditNoteEvent()
     object DismissReminder: AddEditNoteEvent()
+    object ToggleCheckbox: AddEditNoteEvent()
+    data class UpdateCheckList(val list: List<CheckboxItem>) : AddEditNoteEvent()
 }
