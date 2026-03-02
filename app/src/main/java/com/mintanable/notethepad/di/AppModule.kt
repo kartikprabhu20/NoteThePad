@@ -40,7 +40,8 @@ object AppModule {
             getNotes = GetNotes(repository),
             deleteNote = DeleteNote(repository),
             saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
-            getNote = GetNote(repository)
+            getNote = GetNote(repository),
+            getTopNotes = GetTopNotes(repository)
         )
     }
 

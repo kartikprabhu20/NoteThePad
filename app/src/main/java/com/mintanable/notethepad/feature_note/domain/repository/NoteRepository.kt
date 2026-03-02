@@ -18,4 +18,6 @@ interface NoteRepository {
 
     suspend fun getNotesWithFutureReminders(currentTime: Long): List<Note>
 
+    fun getTopNotes(limit: Int): Flow<List<Note>>
+
 }

@@ -40,4 +40,8 @@ class NoteRepositoryImpl(
     override suspend fun getNotesWithFutureReminders(currentTime: Long) : List<Note> {
         return dao.getNotesWithFutureReminders(currentTime)
     }
+
+    override fun getTopNotes(limit: Int): Flow<List<Note>> {
+        return dao.getTopNotes(limit)
+    }
 }

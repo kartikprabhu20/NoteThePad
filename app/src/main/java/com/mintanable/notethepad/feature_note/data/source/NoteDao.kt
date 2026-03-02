@@ -34,4 +34,7 @@ interface NoteDao {
 
     @Query("SELECT * FROM note WHERE reminderTime > :currentTime")
     suspend fun getNotesWithFutureReminders(currentTime: Long): List<Note>
+
+    @Query("SELECT * FROM note ORDER BY timestamp DESC LIMIT :limit")
+    fun getTopNotes(limit: Int):  Flow<List<Note>>
 }

@@ -155,10 +155,7 @@ fun NoteItem(
 
                     if(CheckboxConvertors.isContentCheckboxList(note.content)){
                         Icon(
-                            imageVector = if(note.reminderTime> System.currentTimeMillis())
-                                Icons.Default.Notifications
-                            else
-                                Icons.Default.CheckBox,
+                            imageVector = Icons.Default.CheckBox,
                             contentDescription = "Images attached",
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
