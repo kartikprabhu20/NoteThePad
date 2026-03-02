@@ -1,9 +1,10 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
+import android.content.Context
 import android.util.Log
+import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
@@ -11,10 +12,12 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
+import com.mintanable.notethepad.feature_widgets.presentation.NoteListWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -109,5 +112,10 @@ class NotesViewModel @Inject constructor(
 
     fun toggleGridView(enabled: Boolean) {
         viewModelScope.launch { toggleLayoutSettings(enabled) }
+    }
+
+    suspend fun updateNoteWidget(context: Context) {
+        delay(300)
+        NoteListWidget().updateAll(context)
     }
 }

@@ -37,6 +37,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.ui.platform.LocalContext
 import com.mintanable.notethepad.feature_note.domain.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +67,11 @@ fun NotesScreen (
 
     LaunchedEffect(user) {
         navigationDrawerViewModel.onLoggedIn(user != null)
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(state.notes, context){
+        notesViewModel.updateNoteWidget(context)
     }
 
     ModalNavigationDrawer(
