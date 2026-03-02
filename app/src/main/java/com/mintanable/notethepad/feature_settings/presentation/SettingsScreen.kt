@@ -167,14 +167,14 @@ fun SettingsScreen(
                     )
                 }
 
-                item {
-                    Button(
-                        modifier = Modifier.padding(8.dp).clip(RectangleShape).fillMaxWidth(),
-                        onClick = { onDummyDataCreate() }
-                    ) {
-                        Text("Create dummy data")
-                    }
-                }
+//                item {
+//                    Button(
+//                        modifier = Modifier.padding(8.dp).clip(RectangleShape).fillMaxWidth(),
+//                        onClick = { onDummyDataCreate() }
+//                    ) {
+//                        Text("Create dummy data")
+//                    }
+//                }
 
             }
 
