@@ -162,4 +162,8 @@ dependencies {
     implementation("com.google.http-client:google-http-client-gson:1.42.3")
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
-}
+
+    //Widgets
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance-material3:1.1.1")
+    debugImplementation("androidx.glance:glance-appwidget-preview:1.1.0")}
