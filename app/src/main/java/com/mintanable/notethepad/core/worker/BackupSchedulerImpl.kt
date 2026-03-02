@@ -127,6 +127,7 @@ class BackupSchedulerImpl @Inject constructor(
 
         val backupNow = inputData.getBoolean(KEY_BACKUP_NOW, false)
 
+        // DAILY/WEEKLY use PeriodicWorkRequest and self-reschedule — no action needed here
         if(backupNow || frequency == BackupFrequency.MONTHLY){
             val hour = inputData.getInt(KEY_HOUR, 2)
             val minute = inputData.getInt(KEY_MINUTE, 0)

@@ -26,10 +26,24 @@ class AndroidNetworkMonitor @Inject constructor(
     override val isUnmetered: Flow<Boolean> = callbackFlow {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-                trySend(capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED))
+                val isNotMetered = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+                val isWifi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                val isEthernet = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+
+                trySend(isNotMetered || isWifi || isEthernet)
             }
         }
         connectivityManager?.registerNetworkCallback(request, callback)
+
+        val activeNetwork = connectivityManager?.activeNetwork
+        val caps = connectivityManager?.getNetworkCapabilities(activeNetwork)
+        val initialSafe = caps?.let {
+            it.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED) ||
+                    it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    it.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+        } ?: false
+        trySend(initialSafe)
+
         awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
     }.distinctUntilChanged()
 
@@ -40,7 +54,9 @@ class AndroidNetworkMonitor @Inject constructor(
             }
 
             override fun onLost(network: Network) {
-                trySend(false)
+                val activeNetwork = connectivityManager?.activeNetwork
+                val caps = connectivityManager?.getNetworkCapabilities(activeNetwork)
+                trySend(caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true)
             }
 
             override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {

@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
@@ -12,6 +11,12 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class NoteThePadApp : Application(), Configuration.Provider {
+
+    companion object{
+        const val BACKUP_NOTIFICATION_ID = 1001
+        const val DOWNLOAD_NOTIFICATION_ID = 1002
+        const val BACKUP_NOTIFICATION_CHANNEL_ID = "backup_channel"
+    }
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -31,7 +36,7 @@ class NoteThePadApp : Application(), Configuration.Provider {
         val descriptionText = "Shows progress of Google Drive backups"
         val importance = NotificationManager.IMPORTANCE_LOW
 
-        val channel = NotificationChannel("backup_channel", name, importance).apply {
+        val channel = NotificationChannel(BACKUP_NOTIFICATION_CHANNEL_ID, name, importance).apply {
             description = descriptionText
         }
 
