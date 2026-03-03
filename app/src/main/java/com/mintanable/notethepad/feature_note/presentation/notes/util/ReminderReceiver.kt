@@ -19,6 +19,7 @@ class ReminderReceiver : BroadcastReceiver() {
         const val NOTE_CONTENT = "NOTE_CONTENT"
         const val CHANNEL_ID = "note_reminders"
         const val TARGET_NOTE_ID = "TARGET_NOTE_ID"
+        const val LAUNCH_EDIT_SCREEN = "LAUNCH_EDIT_SCREEN"
     }
     @SuppressLint("ServiceCast")
     override fun onReceive(context: Context, intent: Intent) {

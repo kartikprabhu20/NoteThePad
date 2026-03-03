@@ -36,6 +36,7 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.ui.util.Screen
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NotesScreen
+import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
@@ -92,7 +93,12 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(Screen.AddEditNoteScreen.route + "?noteId=$noteId") {
                     launchSingleTop = true
                 }
-                intent.removeExtra("target_note_id")
+                intent.removeExtra(TARGET_NOTE_ID)
+            }
+            val launchEditScreen = intent.getBooleanExtra(LAUNCH_EDIT_SCREEN, false)
+            if(launchEditScreen){
+                navController.navigate(Screen.AddEditNoteScreen.route)
+                intent.removeExtra(LAUNCH_EDIT_SCREEN)
             }
         }
 
