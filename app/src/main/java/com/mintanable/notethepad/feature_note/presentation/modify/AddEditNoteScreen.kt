@@ -5,38 +5,27 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.CheckBox
-import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.NotificationAdd
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,17 +34,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -63,34 +44,29 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
-import com.mintanable.notethepad.feature_note.presentation.notes.AttachmentOptions
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
+import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
+import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
+import com.mintanable.notethepad.feature_note.presentation.modify.components.DateAndTimePicker
+import com.mintanable.notethepad.feature_note.presentation.modify.components.SavingOverlay
+import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
+import com.mintanable.notethepad.feature_note.presentation.modify.components.sections.NoteEditorContent
+import com.mintanable.notethepad.feature_note.presentation.notes.AttachmentOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.AudioSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.ImageSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.MoreSettingsOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.ReminderOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOptions
-import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
-import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioPlayerUI
-import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
-import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
-import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
-import com.mintanable.notethepad.feature_note.presentation.modify.components.DateAndTimePicker
-import com.mintanable.notethepad.feature_note.presentation.modify.components.TagUI
-import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
-import com.mintanable.notethepad.feature_note.presentation.modify.components.checkboxListSection
-import com.mintanable.notethepad.feature_note.presentation.notes.TagType
-import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
-import com.mintanable.notethepad.feature_note.presentation.notes.util.TimeFormatter
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import com.mintanable.notethepad.ui.util.Screen
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -149,7 +125,7 @@ fun AddEditNoteScreen(
         }
     )
 
-   val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val checkAndRequestCameraPermission = { attachmentType: AttachmentType ->
         viewModel.checkCameraPermission(
             isGranted = cameraPermissionState.status.isGranted,
@@ -176,20 +152,6 @@ fun AddEditNoteScreen(
         }
     }
 
-    val noteBackgroundAnimatable = remember {
-        Animatable(if (uiState.noteColor == -1) Color.White else Color(uiState.noteColor))
-    }
-    LaunchedEffect(uiState.noteColor) {
-        if (uiState.noteColor != -1) {
-            scope.launch {
-                noteBackgroundAnimatable.animateTo(
-                    targetValue = Color(uiState.noteColor),
-                    animationSpec = tween(500)
-                )
-            }
-        }
-    }
-
     val hideSheetAndNavigate = { action: () -> Unit ->
         scope.launch {
             if (sheetState.isVisible) {
@@ -200,18 +162,24 @@ fun AddEditNoteScreen(
         }
     }
 
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = true){
-        viewModel.eventFlow.collectLatest { event->
+        viewModel.eventFlow.collect { event ->
             when(event){
                 is AddEditNoteViewModel.UiEvent.ShowSnackbar->{
                     snackBarHostState.showSnackbar( message = event.message)
                 }
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
-                    scope.launch {
-                        sheetState.hide()
-                        viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                    focusManager.clearFocus()
+                    withContext(NonCancellable) {
+                        delay(260)
+                        if (sheetState.isVisible) {
+                            sheetState.hide()
+                        }
+                        Log.d("RecomposeTest", "navigateUp")
                         navController.navigateUp()
                     }
+
                 }
                 is AddEditNoteViewModel.UiEvent.MakeCopy -> {
                     hideSheetAndNavigate {
@@ -227,9 +195,11 @@ fun AddEditNoteScreen(
                     }
                 }
                 is AddEditNoteViewModel.UiEvent.DeleteNote -> {
-                    hideSheetAndNavigate {
-                        viewModel.onEvent(AddEditNoteEvent.StopMedia)
-                        navController.navigateUp()
+                    withContext(NonCancellable) {
+                        hideSheetAndNavigate {
+                            viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                            navController.navigateUp()
+                        }
                     }
                 }
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
@@ -245,7 +215,6 @@ fun AddEditNoteScreen(
                         videoLauncher.launch(uri!!)
                     }
                 }
-                else -> {}
             }
         }
     }
@@ -272,350 +241,95 @@ fun AddEditNoteScreen(
         }
     }
 
-    var activeDragUnCheckIndex by remember { mutableStateOf<String?>(null) }
-    var activeDragCheckIndex by remember { mutableStateOf<String?>(null) }
+    val onEvent = remember { { event: AddEditNoteEvent -> viewModel.onEvent(event) } }
 
-    with(sharedTransitionScope) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                contentWindowInsets = WindowInsets.systemBars,
-                containerColor = Color.Transparent,
-                bottomBar = {
-                    val transition = animatedVisibilityScope.transition
-                    val barAlpha by transition.animateFloat(
-                        label = "BarAlpha",
-                        transitionSpec = {
-                            if (targetState == EnterExitState.Visible) {
-                                tween(300)
-                            } else {
-                                tween(50)
-                            }
-                        }
-                    ) { state ->
-                        if (state == EnterExitState.Visible) 1f else 0f
-                    }
-
-                    CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
-                        NoteBottomAppBar(
-                            utilityButtons = listOf(
-                                Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
-                                Triple(if (uiState.isCheckboxListAvailable) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank, BottomSheetType.CHECKBOX, "CheckBox") ,
-                                Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
-                                Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
-                            ),
-                            modifier = Modifier
-                                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
-                                .graphicsLayer {
-                                    alpha = barAlpha
-                                    compositingStrategy = CompositingStrategy.Offscreen
-                                },
-                            onActionClick = { sheetType ->
-
-                                if(sheetType == BottomSheetType.CHECKBOX){
-                                    viewModel.onEvent(AddEditNoteEvent.ToggleCheckbox)
-                                } else {
-                                    viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
-                                }
-                            },
-                            onSaveClick = {
-                                viewModel.onEvent(AddEditNoteEvent.SaveNote)
-                            }
-                        )
-                    }
-
-                },
-                modifier = Modifier.fillMaxSize()
-            ) { paddingValue ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(0f)
-                        .background(noteBackgroundAnimatable.value)
-                        .sharedBounds(
-                            sharedContentState = rememberSharedContentState(
-                                key = if (noteId == -1L) "notescreens_fab" else "note-$noteId"
-                            ),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            enter = fadeIn(tween(200)),
-                            exit = fadeOut(tween(300)),
-                            boundsTransform = { _, _ ->
-                                spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
-                            },
-                            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                        )
-//                    .renderInSharedTransitionScopeOverlay(
-//                        zIndexInOverlay = if (animatedVisibilityScope.transition.isRunning) 2f else 0f
-//                    )
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        contentPadding = paddingValue
-                    ) {
-
-                        item{
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                NoteColors.colors.forEach { color ->
-                                    val colorInt = color.toArgb()
-                                    Box(
-                                        modifier = Modifier
-                                            .size(50.dp)
-                                            .shadow(15.dp, CircleShape)
-                                            .clip(CircleShape)
-                                            .background(color)
-                                            .border(
-                                                width = 3.dp,
-                                                color = if (uiState.noteColor == colorInt) {
-                                                    Color.Black
-                                                } else Color.Transparent,
-                                                shape = CircleShape
-                                            )
-                                            .clickable {
-                                                viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
-                                            }
-                                    )
-                                }
-                            }
-                        }
-
-                        if (uiState.attachedImages.isNotEmpty()) {
-                            item{
-                                Spacer(modifier = Modifier.height(16.dp))
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    contentPadding = PaddingValues(horizontal = 16.dp),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-
-                                    items(
-                                        items = uiState.attachedImages,
-                                        key = { uri -> uri.toString() },
-                                    ) { uri ->
-                                        AttachedImageItem(
-                                            uri = uri,
-                                            onDelete = { deletedUri ->
-                                                viewModel.onEvent(
-                                                    AddEditNoteEvent.RemoveImage( deletedUri )
-                                                )
-                                            },
-                                            onClick = {
-                                                viewModel.onEvent(
-                                                    AddEditNoteEvent.ToggleZoom( it )
-                                                )
-                                            },
-                                            modifier = Modifier.sharedBounds(
-                                                sharedContentState = rememberSharedContentState(key = "image-${uri}"),
-                                                animatedVisibilityScope = animatedVisibilityScope
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-
-                        }
-
-                        item {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            TransparentHintTextField(
-                                text = uiState.titleState.text,
-                                hint = uiState.titleState.hint,
-                                onValueChange = {
-                                    viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
-                                },
-                                onFocusChange = {
-                                    viewModel.onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
-                                },
-                                isHintVisible = uiState.titleState.isHintVisible,
-                                isSingleLine = true,
-                                textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                modifier = Modifier
-                                    .sharedBounds(
-                                        sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                            key = "note-title-${noteId}"
-                                        ),
-                                        animatedVisibilityScope = animatedVisibilityScope,
-                                        boundsTransform = { _, _ ->
-                                            tween()
-                                        },
-                                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                                    ),
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            if(!uiState.isCheckboxListAvailable) {
-                                TransparentHintTextField(
-                                    text = uiState.contentState.text,
-                                    hint = uiState.contentState.hint,
-                                    onValueChange = {
-                                        viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
-                                    },
-                                    onFocusChange = {
-                                        viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
-                                    },
-                                    isHintVisible = uiState.contentState.isHintVisible,
-                                    isSingleLine = false,
-                                    textStyle = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .sharedBounds(
-                                            sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                                key = "note-content-${noteId}"
-                                            ),
-                                            animatedVisibilityScope = animatedVisibilityScope,
-                                            boundsTransform = { _, _ ->
-                                                tween()
-                                            },
-                                            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                                        )
-                                )
-                            }
-                        }
-
-                        if(uiState.isCheckboxListAvailable) {
-                            checkboxListSection(
-                                activeDragCheckIndex = activeDragCheckIndex,
-                                activeDragUnCheckIndex = activeDragUnCheckIndex,
-                                items = uiState.checkListItems,
-                                onEnterPressed = {},
-                                onItemChanged = { updatedItem ->
-                                    viewModel.onEvent(
-                                        AddEditNoteEvent.UpdateCheckList(
-                                            uiState.checkListItems.map {
-                                                if (it.id == updatedItem.id) updatedItem else it
-                                            }
-                                        )
-                                    )
-                                },
-                                onListOrderUpdated = { newList ->
-                                    viewModel.onEvent(AddEditNoteEvent.UpdateCheckList(newList))
-                                },
-                                onDragStateChangedChecked = {
-                                    activeDragCheckIndex = it
-                                },
-                                onDragStateChangedUnChecked = {
-                                    activeDragUnCheckIndex = it
-                                }
-                            )
-                        }
-
-                        if (uiState.attachedAudios.isNotEmpty()) {
-                            item{
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Column {
-                                    uiState.attachedAudios.forEach { audioUri ->
-                                        AudioPlayerUI(
-                                            attachment = audioUri,
-                                            playbackState = uiState.mediaState,
-                                            onDelete = { deletedUri ->
-                                                viewModel.onEvent(AddEditNoteEvent.RemoveAudio(deletedUri))
-                                            },
-                                            onPlayPause = { uri ->
-                                                viewModel.onEvent(AddEditNoteEvent.UpdateNowPlaying(uri))
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        if(uiState.reminderTime != -1L){
-                            item {
-                                Box(modifier = Modifier.padding(8.dp)
-                                ){
-                                    TagUI(
-                                        imageVector = TagType.REMINDER_TAG.imageVector,
-                                        description = TimeFormatter.formatMillis(uiState.reminderTime),
-                                        onDelete = {
-                                            viewModel.onEvent(AddEditNoteEvent.CancelReminder)
-                                        },
-                                        onClick = {
-                                            viewModel.checkExactAlarmPermission()
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-            SnackbarHost(
-                hostState = snackBarHostState,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = navigationBarHeight + 8.dp)
-                    .padding(start = 16.dp, end = 100.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+            NoteEditorContent(
+                noteId = noteId,
+                noteColor = uiState.noteColor,
+                attachedImages = uiState.attachedImages,
+                titleState = uiState.titleState,
+                contentState = uiState.contentState,
+                isCheckboxListAvailable = uiState.isCheckboxListAvailable,
+                checkListItems = uiState.checkListItems,
+                attachedAudios = uiState.attachedAudios,
+                mediaState = uiState.mediaState,
+                reminderTime = uiState.reminderTime,
+                onEvent = onEvent,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
             )
 
-            if (uiState.zoomedImageUri != null) {
-                ZoomedImageOverlay(
-                    uri = uiState.zoomedImageUri!!,
-                    playerEngine = viewModel.videoPlayerEngine,
-                    onClick = { viewModel.onEvent(AddEditNoteEvent.StopMedia) },
-                    transitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
-            }
+        val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        SnackbarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = navigationBarHeight + 8.dp)
+                .padding(start = 16.dp, end = 100.dp)
+        )
 
-            if(uiState.showAlarmPermissionRationale){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                        data = Uri.fromParts("package", context.packageName, null)
-                    }
-                    context.startActivity(intent)
+        if (uiState.zoomedImageUri != null) {
+            ZoomedImageOverlay(
+                uri = uiState.zoomedImageUri!!,
+                playerEngine = viewModel.videoPlayerEngine,
+                onClick = { viewModel.onEvent(AddEditNoteEvent.StopMedia) },
+                transitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+
+        if(uiState.showAlarmPermissionRationale){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
                 }
+                context.startActivity(intent)
             }
+        }
 
-            if(uiState.showDataAndTimePicker){
-                DateAndTimePicker(
-                    onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissReminder) },
-                    onConfirm = { selectedTimestamp ->
-                        viewModel.onEvent(AddEditNoteEvent.SetReminder(selectedTimestamp))
-                    }
-                )
-            }
+        if(uiState.showDataAndTimePicker){
+            DateAndTimePicker(
+                onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissReminder) },
+                onConfirm = { selectedTimestamp ->
+                    viewModel.onEvent(AddEditNoteEvent.SetReminder(selectedTimestamp))
+                }
+            )
+        }
 
-            if (uiState.showCameraRationale) {
-                PermissionRationaleDialog(
-                    permissionRationaleType = PermissionRationaleType.CAMERA,
-                    onConfirmClicked = {
-                        viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
-                        cameraPermissionState.launchPermissionRequest()
-                    },
-                    onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
-                )
-            }
+        if (uiState.showCameraRationale) {
+            PermissionRationaleDialog(
+                permissionRationaleType = PermissionRationaleType.CAMERA,
+                onConfirmClicked = {
+                    viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
+                    cameraPermissionState.launchPermissionRequest()
+                },
+                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
+            )
+        }
 
-            if (uiState.showMicrophoneRationale) {
-                PermissionRationaleDialog(
-                    permissionRationaleType = PermissionRationaleType.MICROPHONE,
-                    onConfirmClicked = {
-                        viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
-                        microphonePermissionState.launchPermissionRequest()
-                    },
-                    onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
-                )
-            }
+        if (uiState.showMicrophoneRationale) {
+            PermissionRationaleDialog(
+                permissionRationaleType = PermissionRationaleType.MICROPHONE,
+                onConfirmClicked = {
+                    viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
+                    microphonePermissionState.launchPermissionRequest()
+                },
+                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
+            )
+        }
 
-            uiState.settingsDeniedType?.let { type ->
-                PermissionRationaleDialog(
-                    permissionRationaleType = if (type == DeniedType.CAMERA)
-                        PermissionRationaleType.CAMERA_DENIED else PermissionRationaleType.MICROPHONE_DENIED,
-                    onConfirmClicked = {
-                        viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
-                        NavigatationHelper.openAppSettings(context)
-                    },
-                    onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
-                )
-            }
+        uiState.settingsDeniedType?.let { type ->
+            PermissionRationaleDialog(
+                permissionRationaleType = if (type == DeniedType.CAMERA)
+                    PermissionRationaleType.CAMERA_DENIED else PermissionRationaleType.MICROPHONE_DENIED,
+                onConfirmClicked = {
+                    viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
+                    NavigatationHelper.openAppSettings(context)
+                },
+                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
+            )
+
         }
     }
 
@@ -663,7 +377,6 @@ fun AddEditNoteScreen(
 
                             AttachmentOptions.VIDEO -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.VIDEO_SOURCES))
-
                             }
 
                             AttachmentOptions.AUDIO -> {
@@ -722,23 +435,5 @@ fun AddEditNoteScreen(
         }
     }
 
-    if (uiState.isSaving) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f))
-                .pointerInput(Unit) {}, // Blocks touch events
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator(color = Color.White)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Saving Note...",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
+    SavingOverlay(uiState.isSaving)
 }

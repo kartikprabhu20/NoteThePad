@@ -26,6 +26,7 @@ sealed class AddEditNoteEvent{
     object StopMedia: AddEditNoteEvent()
     data class SetReminder(val timestamp: Long) : AddEditNoteEvent()
     object CancelReminder : AddEditNoteEvent()
+    object CheckAlarmPermission : AddEditNoteEvent()
     object DismissReminder: AddEditNoteEvent()
     object ToggleCheckbox: AddEditNoteEvent()
     data class UpdateCheckList(val list: List<CheckboxItem>) : AddEditNoteEvent()

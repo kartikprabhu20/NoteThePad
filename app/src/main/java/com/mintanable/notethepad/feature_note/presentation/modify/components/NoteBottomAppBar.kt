@@ -1,8 +1,15 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -42,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -56,77 +64,111 @@ fun NoteBottomAppBar(
     utilityButtons: List<Triple<ImageVector, BottomSheetType, String>>,
     modifier: Modifier = Modifier,
     onActionClick: (BottomSheetType) -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    var isVisible by remember { mutableStateOf(false) }
-    val wiggleAnim = remember { Animatable(0f) }
+    Log.d("kptest", "Recompose NoteBottomAppBar")
+    with(sharedTransitionScope) {
+        var isVisible by remember { mutableStateOf(false) }
+        val wiggleAnim = remember { Animatable(0f) }
 
-    LaunchedEffect(Unit) {
-        isVisible = true
-        delay(400)
-        wiggleAnim.animateTo(
-            targetValue = 1f,
-            animationSpec = keyframes {
-                durationMillis = 500
-                0f at 0
-                -20f at 100 // Rotate left
-                20f at 200  // Rotate right
-                -10f at 300  // Rotate left (smaller)
-                10f at 400   // Rotate right (smaller)
-                0f at 500   // Back to center
+        val transition = animatedVisibilityScope.transition
+        val barAlpha by transition.animateFloat(
+            label = "BarAlpha",
+            transitionSpec = {
+                if (targetState == EnterExitState.Visible) {
+                    tween(300)
+                } else {
+                    tween(50)
+                }
             }
-        )
-    }
+        ) { state ->
+            if (state == EnterExitState.Visible) 1f else 0f
+        }
 
-    BottomAppBar(
-        modifier = modifier,
-        containerColor = Color.Black.copy(alpha = 0.75f),
-        tonalElevation = 0.dp,
-        actions = {
+        LaunchedEffect(Unit) {
+            isVisible = true
+            delay(400)
+            wiggleAnim.animateTo(
+                targetValue = 1f,
+                animationSpec = keyframes {
+                    durationMillis = 500
+                    0f at 0
+                    -20f at 100 // Rotate left
+                    20f at 200  // Rotate right
+                    -10f at 300  // Rotate left (smaller)
+                    10f at 400   // Rotate right (smaller)
+                    0f at 500   // Back to center
+                }
+            )
+        }
 
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(tween(300)) + expandHorizontally(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
+        BottomAppBar(
+//            modifier = modifier
+//                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
+//                .graphicsLayer {
+//                    alpha = barAlpha
+//                    compositingStrategy = CompositingStrategy.Offscreen
+//                },
+            modifier = modifier
+                .let {
+                    if (transition.isRunning) {
+                        it.renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
+                    } else it
+                }
+                .graphicsLayer {
+                    alpha = barAlpha
+                    compositingStrategy = CompositingStrategy.Offscreen
+                },
+            containerColor = Color.Black.copy(alpha = 0.75f),
+            tonalElevation = 0.dp,
+            actions = {
+
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = fadeIn(tween(300)) + expandHorizontally(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ),
+                        expandFrom = Alignment.End
                     ),
-                    expandFrom = Alignment.End
-                ),
-                exit = fadeOut()
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.Bottom
+                    exit = fadeOut()
                 ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
 
 
-                    utilityButtons.forEachIndexed { index, (icon, type, label) ->
-                        SmallFloatingActionButton(
-                            onClick = { onActionClick(type) },
-                            shape = RoundedCornerShape(32.dp),
-                            modifier = Modifier.graphicsLayer {
-                                rotationZ = wiggleAnim.value
+                        utilityButtons.forEachIndexed { _, (icon, type, label) ->
+                            SmallFloatingActionButton(
+                                onClick = { onActionClick(type) },
+                                shape = RoundedCornerShape(32.dp),
+                                modifier = Modifier.graphicsLayer {
+                                    rotationZ = wiggleAnim.value
+                                }
+                            ) {
+                                Icon(icon, contentDescription = label)
                             }
-                        ) {
-                            Icon(icon, contentDescription = label)
                         }
                     }
                 }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    modifier = Modifier.graphicsLayer {
+                        rotationZ = wiggleAnim.value
+                    },
+                    onClick = onSaveClick,
+                    containerColor = BottomAppBarDefaults.bottomAppBarFabColor
+                ) {
+                    Icon(imageVector = Icons.Default.Save, contentDescription = "Save Note")
+                }
             }
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.graphicsLayer {
-                    rotationZ = wiggleAnim.value
-                },
-                onClick = onSaveClick,
-                containerColor = BottomAppBarDefaults.bottomAppBarFabColor
-            ) {
-                Icon(imageVector = Icons.Default.Save, contentDescription = "Save Note")
-            }
-        }
-    )
+        )
+    }
 }
 
 
@@ -134,44 +176,68 @@ fun NoteBottomAppBar(
 @Composable
 fun PreviewBottomAppBar(){
     NoteThePadTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                contentWindowInsets = WindowInsets.systemBars,
-                containerColor = Color.Transparent,
-                bottomBar = {
-                    NoteBottomAppBar(
-                        utilityButtons = listOf(
-                            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
-                            Triple(Icons.Default.CheckBox, BottomSheetType.CHECKBOX, "CheckBox") ,
-                            Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
-                            Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
-                        ),
-                        onActionClick = { },
-                        onSaveClick = { }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(NoteColors.colors.get(0))
-            ) { paddingValue ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(NoteColors.colors.get(0))
-                ){
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-                        contentPadding = paddingValue,
-                    ) {
-                        items(20) { index ->
-                            Text(
-                                "Note Content $index",
-                                Modifier.padding(16.dp).fillMaxWidth()
-                            )
+
+        SharedTransitionLayout {
+            AnimatedContent(targetState = true, label = "preview") { isVisible ->
+                if (isVisible) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Scaffold(
+                            contentWindowInsets = WindowInsets.systemBars,
+                            containerColor = Color.Transparent,
+                            bottomBar = {
+                                NoteBottomAppBar(
+                                    utilityButtons = listOf(
+                                        Triple(
+                                            Icons.Default.AttachFile,
+                                            BottomSheetType.ATTACH,
+                                            "Attach"
+                                        ),
+                                        Triple(
+                                            Icons.Default.CheckBox,
+                                            BottomSheetType.CHECKBOX,
+                                            "CheckBox"
+                                        ),
+                                        Triple(
+                                            Icons.Default.NotificationAdd,
+                                            BottomSheetType.REMINDER,
+                                            "Reminders"
+                                        ),
+                                        Triple(
+                                            Icons.Default.MoreHoriz,
+                                            BottomSheetType.MORE_SETTINGS,
+                                            "Settings"
+                                        )
+                                    ),
+                                    onActionClick = { },
+                                    onSaveClick = { },
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@AnimatedContent
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(NoteColors.colors[0])
+                        ) { paddingValue ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(NoteColors.colors[0])
+                            ) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                                    contentPadding = paddingValue,
+                                ) {
+                                    items(20) { index ->
+                                        Text(
+                                            "Note Content $index",
+                                            Modifier.padding(16.dp).fillMaxWidth()
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-
             }
         }
     }

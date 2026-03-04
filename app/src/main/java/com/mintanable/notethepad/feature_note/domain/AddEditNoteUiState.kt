@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.domain
 
 import android.net.Uri
+import androidx.compose.runtime.Stable
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
@@ -8,6 +9,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.NoteTextFieldState
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 
+@Stable
 data class AddEditNoteUiState(
     val titleState: NoteTextFieldState = NoteTextFieldState(hint = "Enter title..."),
     val contentState: NoteTextFieldState = NoteTextFieldState(hint = "Enter some content..."),

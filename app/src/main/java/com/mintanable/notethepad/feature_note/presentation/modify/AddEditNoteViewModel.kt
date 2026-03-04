@@ -205,6 +205,9 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(reminderTime = -1, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
                 currentNoteId?.let { reminderScheduler.cancel(it) }
             }
+            is AddEditNoteEvent.CheckAlarmPermission -> {
+                checkExactAlarmPermission()
+            }
             is AddEditNoteEvent.DismissReminder -> {
                 _uiState.update { it.copy(showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
             }
@@ -274,6 +277,8 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private fun saveNote(id:Long?) {
+        Log.d("RecomposeTest", "saving note")
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             val state = uiState.value
@@ -289,7 +294,11 @@ class AddEditNoteViewModel @Inject constructor(
                 reminderTime = state.reminderTime,
                 checkboxItems = state.checkListItems
             ).onSuccess { newNoteId ->
+                mediaPlayer.stop()
                 reminderScheduler.cancel(id = newNoteId)
+
+                _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
+
                 if(state.reminderTime > System.currentTimeMillis()) {
                     reminderScheduler.schedule(
                         id = newNoteId,
