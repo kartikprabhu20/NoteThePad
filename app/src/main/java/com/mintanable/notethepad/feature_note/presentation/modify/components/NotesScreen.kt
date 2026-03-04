@@ -200,48 +200,25 @@ fun NotesScreen (
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    LazyVerticalStaggeredGrid(
-                        columns = StaggeredGridCells.Fixed(if (isGridView) 2 else 1),                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 16.dp),
-                        verticalItemSpacing = 8.dp,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ){
-                        items(
-                            state.notes,
-                            key = { note -> note.id ?: -1 },
-                            contentType = { "note_item" }
-                        ){ note->
-                            NoteItem(
-                                note = note,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .sharedBounds(
-                                        sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "note-${note.id}"),
-                                        animatedVisibilityScope = animatedVisibilityScope,
-                                        boundsTransform = { _, _ ->
-                                            spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow )
-                                        },
-                                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                                    )
-//                                    .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 0f)
-                                    .clickable { onNoteClick(note) },
-                                onDeleteClick = {
-                                    notesViewModel.onEvent(NotesEvent.DeleteNote(note))
-                                    scope.launch {
-                                        val result = snackBarHostState.showSnackbar(
-                                            message = "Note deleted",
-                                            actionLabel = "Undo"
-                                        )
-                                        if(result == SnackbarResult.ActionPerformed){
-                                            notesViewModel.onEvent(NotesEvent.RestoreNote)
-                                        }
-                                    }
-                                },
-                                sharedTransitionScope = sharedTransitionScope,
-                                animatedVisibilityScope = animatedVisibilityScope
-                            )
+                    StaggeredNotesList(
+                        notes = state.notes,
+                        isGridView = isGridView,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        onNoteClicked = onNoteClick,
+                        onDeleteClicked = { note ->
+                            notesViewModel.onEvent(NotesEvent.DeleteNote(note))
+                            scope.launch {
+                                val result = snackBarHostState.showSnackbar(
+                                    message = "Note deleted",
+                                    actionLabel = "Undo"
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    notesViewModel.onEvent(NotesEvent.RestoreNote)
+                                }
+                            }
                         }
-                    }
+                    )
                 }
             }
         }

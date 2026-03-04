@@ -1,0 +1,70 @@
+package com.mintanable.notethepad.feature_note.presentation.modify.components
+
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.feature_note.domain.model.Note
+
+@Composable
+fun StaggeredNotesList(
+    notes: List<Note>,
+    isGridView: Boolean,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedContentScope,
+    onNoteClicked: (Note) -> Unit,
+    onDeleteClicked: (Note) -> Unit,
+    enableDeletion: Boolean = true
+) {
+
+    with(sharedTransitionScope) {
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(if (isGridView) 2 else 1),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 16.dp),
+            verticalItemSpacing = 8.dp,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(
+                notes,
+                key = { note -> note.id ?: -1 },
+                contentType = { "note_item" }
+            ) { note ->
+                NoteItem(
+                    note = note,
+                    enableDeleteIcon = enableDeletion,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .sharedBounds(
+                            sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                key = "note-${note.id}"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
+                            },
+                            resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                        )
+//                                    .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 0f)
+                        .clickable { onNoteClicked(note) },
+                    onDeleteClick = {
+                        onDeleteClicked(note)
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
+        }
+    }
+}

@@ -45,6 +45,7 @@ import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
+import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.components.RoundedScrollingLazyVerticalGrid
 import com.mintanable.notethepad.feature_widgets.presentation.components.WidgetTitleBar
 import com.mintanable.notethepad.feature_widgets.presentation.utils.GridBreakpointPreviews
@@ -264,36 +265,6 @@ fun NoteItemRow(note: Note) {
             )
         }
     }
-}
-
-@Composable
-private fun IconsRow(note: Note) {
-    Row(modifier = GlanceModifier.fillMaxWidth()) {
-        if (note.imageUris.isNotEmpty()) {
-            WidgetIcon(R.drawable.baseline_collections_24)
-        }
-        if (note.audioUris.isNotEmpty()) {
-            WidgetIcon(R.drawable.baseline_audiotrack_24)
-        }
-        if (note.reminderTime > -1) {
-            WidgetIcon( if(note.reminderTime> System.currentTimeMillis())
-                R.drawable.baseline_notifications_24
-            else R.drawable.baseline_notifications_off_24)
-        }
-        if(CheckboxConvertors.isContentCheckboxList(note.content)){
-            WidgetIcon(R.drawable.baseline_check_box_24)
-        }
-    }
-}
-
-@Composable
-private fun WidgetIcon(resId: Int) {
-    Image(
-        provider = ImageProvider(resId),
-        contentDescription = null,
-        modifier = GlanceModifier.size(24.dp).padding(end = 4.dp),
-        colorFilter = ColorFilter.tint(ColorProvider(Color.Black.copy(alpha = 0.5f)))
-    )
 }
 
 @Composable

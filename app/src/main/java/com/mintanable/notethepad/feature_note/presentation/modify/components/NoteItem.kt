@@ -51,6 +51,7 @@ fun NoteItem(
     modifier:Modifier=Modifier,
     cornerRadius: Dp = 10.dp,
     cutCornerSize : Dp = 30.dp,
+    enableDeleteIcon: Boolean = true,
     onDeleteClick: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
@@ -163,15 +164,17 @@ fun NoteItem(
                     }
                     Spacer(modifier = Modifier.weight(1f))
 
-                    IconButton(
-                        onClick = onDeleteClick,
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete note",
-                            tint = Color.Black
-                        )
+                    if(enableDeleteIcon) {
+                        IconButton(
+                            onClick = onDeleteClick,
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete note",
+                                tint = Color.Black
+                            )
+                        }
                     }
                 }
             }
