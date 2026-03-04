@@ -144,7 +144,7 @@ class AddEditNoteViewModel @Inject constructor(
                 saveNote(currentNoteId)
             }
             is AddEditNoteEvent.MakeCopy -> {
-                saveNote(null)
+                saveNote(null, true)
             }
             is AddEditNoteEvent.DeleteNote -> {
                 deleteNote()
@@ -276,7 +276,7 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private fun saveNote(id:Long?) {
+    private fun saveNote(id:Long?, makeCopy: Boolean = false) {
         Log.d("RecomposeTest", "saving note")
 
         viewModelScope.launch {
@@ -294,11 +294,7 @@ class AddEditNoteViewModel @Inject constructor(
                 reminderTime = state.reminderTime,
                 checkboxItems = state.checkListItems
             ).onSuccess { newNoteId ->
-                mediaPlayer.stop()
                 reminderScheduler.cancel(id = newNoteId)
-
-                _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
-
                 if(state.reminderTime > System.currentTimeMillis()) {
                     reminderScheduler.schedule(
                         id = newNoteId,
@@ -307,7 +303,8 @@ class AddEditNoteViewModel @Inject constructor(
                         reminderTime = state.reminderTime
                     )
                 }
-                _eventFlow.emit(if(id!=newNoteId) UiEvent.MakeCopy(newNoteId) else UiEvent.SaveNote)
+                _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
+                _eventFlow.emit(if(makeCopy) UiEvent.MakeCopy(newNoteId) else UiEvent.SaveNote)
             }.onFailure { e ->
                 _uiState.update { it.copy(isSaving = false) }
                 _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))

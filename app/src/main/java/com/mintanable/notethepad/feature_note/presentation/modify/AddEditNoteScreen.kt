@@ -176,11 +176,11 @@ fun AddEditNoteScreen(
                         if (sheetState.isVisible) {
                             sheetState.hide()
                         }
-                        Log.d("RecomposeTest", "navigateUp")
                         navController.navigateUp()
+                        viewModel.onEvent(AddEditNoteEvent.StopMedia)
                     }
-
                 }
+
                 is AddEditNoteViewModel.UiEvent.MakeCopy -> {
                     hideSheetAndNavigate {
                         viewModel.onEvent(AddEditNoteEvent.StopMedia)
