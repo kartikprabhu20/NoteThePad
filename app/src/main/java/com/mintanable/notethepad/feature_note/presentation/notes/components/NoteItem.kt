@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.notes.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
@@ -17,12 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ fun NoteItem(
     cutCornerSize : Dp = 30.dp,
     enableDeleteIcon: Boolean = true,
     onDeleteClick: () -> Unit,
+    onPinClick: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
 ) {
@@ -126,7 +128,7 @@ fun NoteItem(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    if(note.imageUris.size >0){
+                    if(note.imageUris.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Collections,
                             contentDescription = "Images attached",
@@ -134,9 +136,9 @@ fun NoteItem(
                             tint = Color.Black
                         )
                     }
-                    if(note.audioUris.size >0){
+                    if(note.audioUris.isNotEmpty()){
                         Icon(
-                            imageVector = Icons.Default.Audiotrack,
+                            imageVector = Icons.Default.Mic,
                             contentDescription = "Images attached",
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
@@ -165,6 +167,17 @@ fun NoteItem(
                     Spacer(modifier = Modifier.weight(1f))
 
                     if(enableDeleteIcon) {
+                        IconButton(
+                            onClick = onPinClick,
+                            modifier = Modifier.size(24.dp).padding(2.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PushPin,
+                                contentDescription = "Pin note as widget",
+                                tint = Color.Black
+                            )
+                        }
+
                         IconButton(
                             onClick = onDeleteClick,
                             modifier = Modifier.size(24.dp)
@@ -208,6 +221,7 @@ fun NoteItemPreview() {
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},
+                            onPinClick = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent
                         )

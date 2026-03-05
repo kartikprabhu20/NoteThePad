@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures

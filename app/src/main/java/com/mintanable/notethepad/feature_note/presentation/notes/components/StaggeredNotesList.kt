@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.notes.components
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
@@ -25,6 +25,7 @@ fun StaggeredNotesList(
     animatedVisibilityScope: AnimatedContentScope,
     onNoteClicked: (Note) -> Unit,
     onDeleteClicked: (Note) -> Unit,
+    onPinClicked: (Note) -> Unit,
     enableDeletion: Boolean = true
 ) {
 
@@ -56,10 +57,12 @@ fun StaggeredNotesList(
                             },
                             resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                         )
-//                                    .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 0f)
                         .clickable { onNoteClicked(note) },
                     onDeleteClick = {
                         onDeleteClicked(note)
+                    },
+                    onPinClick = {
+                        onPinClicked(note)
                     },
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope

@@ -47,7 +47,6 @@ import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
-import com.mintanable.notethepad.feature_note.presentation.modify.components.checkboxListSection
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField

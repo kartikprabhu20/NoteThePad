@@ -22,14 +22,11 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.components.Scaffold
-import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
@@ -150,75 +147,6 @@ private fun Grid(items: List<Note>) {
 }
 
 @Composable
-fun NoteListContent(notes: List<Note>) {
-
-    Scaffold(
-        titleBar = {
-            WidgetTitleBar(
-                title = "Recent Notes",
-                titleIconRes = R.mipmap.notethepad_launcher_round,
-                titleBarActionIconRes = R.drawable.baseline_refresh_24,
-                titleBarActionIconContentDescription = "refresh widgets",
-            ) {
-                actionRunCallback<RefreshNoteWidgetCallback>()
-            }
-        },
-        backgroundColor = GlanceTheme.colors.widgetBackground,
-        horizontalPadding = 12.dp,
-        modifier = GlanceModifier.padding(bottom = 12.dp)
-    ) {
-
-        Box(modifier = GlanceModifier.fillMaxSize()) {
-            Column(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .background(GlanceTheme.colors.background)
-                    .padding(8.dp)
-            ) {
-
-                Spacer(GlanceModifier.height(8.dp))
-
-                LazyColumn {
-                    items(notes) { note ->
-                        NoteItemRow(note)
-                    }
-                }
-            }
-
-            //The Floating Action Button
-            Box(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.BottomEnd // Positions it at the bottom right
-            ) {
-                val context = LocalContext.current
-                val intent = Intent(context, MainActivity::class.java).apply {
-                    putExtra(LAUNCH_EDIT_SCREEN, true)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                }
-                Box(
-                    modifier = GlanceModifier
-                        .size(56.dp)
-                        .background(
-                            imageProvider = ImageProvider(R.drawable.widget_fab_background),
-                            colorFilter = ColorFilter.tint(GlanceTheme.colors.primary))
-                        .clickable(actionStartActivity(intent)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        provider = ImageProvider(R.drawable.baseline_add_24),
-                        contentDescription = "Add Note",
-                        modifier = GlanceModifier.size(24.dp),
-//                    colorFilter = ColorFilter.tint(ColorProvider(Color.White))
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun NoteItemRow(note: Note) {
     val context = LocalContext.current
     val intent = Intent(context, MainActivity::class.java).apply {
@@ -304,41 +232,41 @@ private fun NoteListContentPreview() {
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
-                color = NoteColors.colors.get(1).toArgb(),
+                color = NoteColors.colors[1].toArgb(),
                 reminderTime = 1234556
             ),
             Note(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
-                color = NoteColors.colors.get(2).toArgb()
+                color = NoteColors.colors[2].toArgb()
             ),
 
             Note(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
-                color = NoteColors.colors.get(4).toArgb(),
+                color = NoteColors.colors[4].toArgb(),
                 reminderTime = 1234556
             ),
             Note(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
-                color = NoteColors.colors.get(2).toArgb()
+                color = NoteColors.colors[2].toArgb()
             ),
 
             Note(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
-                color = NoteColors.colors.get(1).toArgb()
+                color = NoteColors.colors[1].toArgb()
             ),
             Note(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
-                color = NoteColors.colors.get(3).toArgb(),
+                color = NoteColors.colors[3].toArgb(),
                 reminderTime = 1234556
             )
         )

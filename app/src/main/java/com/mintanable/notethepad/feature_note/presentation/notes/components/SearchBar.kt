@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.notes.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
