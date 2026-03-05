@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,6 +48,7 @@ enum class MoreSettingsOptions(
     override val title: String,
     override val icon: ImageVector
 ) : AdditionalOption {
+    PIN("Pin as widget", Icons.Default.PushPin),
     DELETE("Delete", Icons.Default.Delete),
     COPY("Make a copy", Icons.Default.ContentCopy),
     SHARE("Send", Icons.Default.Share),

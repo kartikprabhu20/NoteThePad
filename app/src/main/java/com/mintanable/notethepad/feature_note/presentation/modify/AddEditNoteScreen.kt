@@ -1,11 +1,16 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.Manifest
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -62,9 +67,11 @@ import com.mintanable.notethepad.feature_settings.presentation.components.Permis
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
+import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
+import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver.Companion.PINNING_ACTION
+import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver.Companion.PINNING_NOTE_ID
 import com.mintanable.notethepad.ui.util.Screen
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -172,7 +179,6 @@ fun AddEditNoteScreen(
                 is AddEditNoteViewModel.UiEvent.SaveNote->{
                     focusManager.clearFocus()
                     withContext(NonCancellable) {
-                        delay(260)
                         if (sheetState.isVisible) {
                             sheetState.hide()
                         }
@@ -214,6 +220,10 @@ fun AddEditNoteScreen(
                         cameraVideoUri = uri
                         videoLauncher.launch(uri!!)
                     }
+                }
+
+                is AddEditNoteViewModel.UiEvent.RequestWidgetPin -> {
+                    event.noteId?.let { pinSingleNoteWidget(context, it) }
                 }
             }
         }
@@ -419,6 +429,10 @@ fun AddEditNoteScreen(
                                 viewModel.onEvent(AddEditNoteEvent.DeleteNote)
                             }
 
+                            MoreSettingsOptions.PIN -> {
+                                viewModel.onEvent(AddEditNoteEvent.PinNote)
+                            }
+
                             MoreSettingsOptions.SHARE -> {
 
                             }
@@ -436,4 +450,27 @@ fun AddEditNoteScreen(
     }
 
     SavingOverlay(uiState.isSaving)
+}
+
+private fun pinSingleNoteWidget(context: Context, noteId: Long) {
+    val appWidgetManager = AppWidgetManager.getInstance(context)
+    val myProvider = ComponentName(context, SingleNoteWidgetReceiver::class.java)
+
+    if (appWidgetManager.isRequestPinAppWidgetSupported) {
+        val successCallback = Intent(context, SingleNoteWidgetReceiver::class.java).apply {
+            putExtra(PINNING_NOTE_ID, noteId)
+            action = PINNING_ACTION
+        }
+
+        val successPendingIntent = PendingIntent.getBroadcast(
+            context,
+            noteId.toInt(),
+            successCallback,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        appWidgetManager.requestPinAppWidget(myProvider, null, successPendingIntent)
+    } else {
+        Toast.makeText(context, "Pinned widgets are not supported on this launcher", Toast.LENGTH_SHORT).show()
+    }
 }

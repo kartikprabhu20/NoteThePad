@@ -86,14 +86,20 @@
             android:exported="false">
         </receiver>
 
-        <receiver android:name=".feature_widgets.presentation.utils.NoteListWidgetProvider" android:exported="true">
+        <receiver
+            android:name=".feature_widgets.presentation.utils.NoteListWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_title_note_collection">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/note_list_widget_info" />
         </receiver>
 
-        <receiver android:name=".feature_widgets.presentation.utils.SingleNoteWidgetReceiver" android:exported="true">
+        <receiver
+            android:name=".feature_widgets.presentation.utils.SingleNoteWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_title_single_note">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

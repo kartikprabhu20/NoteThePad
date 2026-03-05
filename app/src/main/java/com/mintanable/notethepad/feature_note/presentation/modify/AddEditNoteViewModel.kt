@@ -12,6 +12,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
+import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
@@ -21,6 +22,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
+import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel.UiEvent
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -141,13 +143,51 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(noteColor = event.color) }
             }
             is AddEditNoteEvent.SaveNote -> {
-                saveNote(currentNoteId)
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isSaving = true) }
+                    saveNote(currentNoteId)
+                        .onSuccess {
+                            currentNoteId?.let { it1 -> rescheduleReminder(it1) }
+                            _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
+                            _eventFlow.emit(UiEvent.SaveNote)
+                        }
+                        .onFailure { e ->
+                            _uiState.update { it.copy(isSaving = false) }
+                            _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
+                        }
+                }
+
             }
             is AddEditNoteEvent.MakeCopy -> {
-                saveNote(null, true)
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isSaving = true) }
+                    saveNote(null, true)
+                        .onSuccess { id ->
+                            _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
+                            _eventFlow.emit(UiEvent.MakeCopy(id))
+                        }
+                        .onFailure { e ->
+                            _uiState.update { it.copy(isSaving = false) }
+                            _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
+                        }
+                }
             }
             is AddEditNoteEvent.DeleteNote -> {
                 deleteNote()
+            }
+            is AddEditNoteEvent.PinNote -> {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isSaving = true) }
+                    saveNote(currentNoteId)
+                        .onSuccess { id ->
+                            _uiState.update { it.copy(isSaving = false) }
+                            _eventFlow.emit(UiEvent.RequestWidgetPin(id))
+                        }
+                        .onFailure {
+                            _uiState.update { it.copy(isSaving = false) }
+                            _eventFlow.emit(UiEvent.ShowSnackbar("Save Failed, can't pin to homescreen"))
+                        }
+                }
             }
             is AddEditNoteEvent.AttachImage -> {
                 _uiState.update { it.copy(
@@ -240,7 +280,7 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.UpdateCheckList -> {
                 _uiState.update { it.copy(checkListItems = event.list) }
             }
-                else -> {}
+            else -> {}
         }
     }
 
@@ -276,14 +316,9 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private fun saveNote(id:Long?, makeCopy: Boolean = false) {
-        Log.d("RecomposeTest", "saving note")
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) }
+    private suspend fun saveNote(id:Long?, makeCopy: Boolean = false): Result<Long> {
             val state = uiState.value
-
-            noteUseCases.saveNoteWithAttachments.invoke(
+            return noteUseCases.saveNoteWithAttachments.invoke(
                 id = id,
                 title = state.titleState.text,
                 content = state.contentState.text,
@@ -293,22 +328,19 @@ class AddEditNoteViewModel @Inject constructor(
                 audioUris = state.attachedAudios.map { it.uri },
                 reminderTime = state.reminderTime,
                 checkboxItems = state.checkListItems
-            ).onSuccess { newNoteId ->
-                reminderScheduler.cancel(id = newNoteId)
-                if(state.reminderTime > System.currentTimeMillis()) {
-                    reminderScheduler.schedule(
-                        id = newNoteId,
-                        title = state.titleState.text,
-                        content = state.contentState.text,
-                        reminderTime = state.reminderTime
-                    )
-                }
-                _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
-                _eventFlow.emit(if(makeCopy) UiEvent.MakeCopy(newNoteId) else UiEvent.SaveNote)
-            }.onFailure { e ->
-                _uiState.update { it.copy(isSaving = false) }
-                _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
-            }
+            )
+    }
+
+    fun rescheduleReminder(id: Long){
+        val state = uiState.value
+        reminderScheduler.cancel(id = id)
+        if(state.reminderTime > System.currentTimeMillis()) {
+            reminderScheduler.schedule(
+                id = id,
+                title = state.titleState.text,
+                content = state.contentState.text,
+                reminderTime = state.reminderTime
+            )
         }
     }
 
@@ -365,5 +397,6 @@ class AddEditNoteViewModel @Inject constructor(
         data class MakeCopy(val newNoteId: Long): UiEvent()
         object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()
+        data class RequestWidgetPin(val noteId: Long):UiEvent()
     }
 }

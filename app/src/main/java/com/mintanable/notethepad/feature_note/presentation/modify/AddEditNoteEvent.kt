@@ -30,4 +30,5 @@ sealed class AddEditNoteEvent{
     object DismissReminder: AddEditNoteEvent()
     object ToggleCheckbox: AddEditNoteEvent()
     data class UpdateCheckList(val list: List<CheckboxItem>) : AddEditNoteEvent()
+    object PinNote : AddEditNoteEvent()
 }

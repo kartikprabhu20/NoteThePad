@@ -68,8 +68,6 @@ fun NoteEditorContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    Log.d("RecomposeTest", "Scaffold Content Recomposed! noteColor $noteColor")
-
     var activeDragUnCheckIndex by remember { mutableStateOf<String?>(null) }
     var activeDragCheckIndex by remember { mutableStateOf<String?>(null) }
 

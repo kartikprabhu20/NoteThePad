@@ -5,9 +5,12 @@
     android:minHeight="110dp"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/glance_default_loading_layout"
+    android:previewImage="@drawable/widget_single_note_preview"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
+    android:label="@string/widget_title_single_note"
+    android:description="@string/widget_description_single_note"
     android:configure="com.mintanable.notethepad.NoteWidgetConfigActivity"
+    android:widgetFeatures="reconfigurable"
     />
-    <!--    android:widgetFeatures="reconfigurable"-->
 

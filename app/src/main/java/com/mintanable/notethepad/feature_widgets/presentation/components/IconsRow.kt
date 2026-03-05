@@ -17,8 +17,11 @@ import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 
 @Composable
-fun IconsRow(note: Note) {
-    Row(modifier = GlanceModifier.fillMaxWidth()) {
+fun IconsRow(
+    note: Note,
+    modifier: GlanceModifier = GlanceModifier
+) {
+    Row(modifier = modifier.fillMaxWidth()) {
         if (note.imageUris.isNotEmpty()) {
             WidgetIcon(R.drawable.baseline_collections_24)
         }

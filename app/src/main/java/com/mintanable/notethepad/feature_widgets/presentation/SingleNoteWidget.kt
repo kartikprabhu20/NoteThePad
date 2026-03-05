@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_widgets.presentation
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -11,7 +12,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
+import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -55,10 +56,19 @@ class SingleNoteWidget : GlanceAppWidget() {
             entryPoint.noteUseCases().getNote(noteId)
         } else null
 
+
         provideContent {
-            GlanceTheme {
+            val intent = Intent(context, MainActivity::class.java).apply {
                 if (note != null) {
-                    NoteItem(note)
+                    putExtra(TARGET_NOTE_ID, note.id)
+                }
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+
+            GlanceTheme {
+                Box(modifier = GlanceModifier.fillMaxSize()) {
+                if (note != null) {
+                    NoteItem(note, actionStartActivity(intent))
                 } else {
                     NoteItem(
                         Note(
@@ -67,8 +77,10 @@ class SingleNoteWidget : GlanceAppWidget() {
                             content = "Please go to the app and add some notes",
                             timestamp = System.currentTimeMillis(),
                             color = NoteColors.colors[0].toArgb()
-                        )
+                        ),
+                        null
                     )
+                }
                 }
             }
         }
@@ -78,22 +90,16 @@ class SingleNoteWidget : GlanceAppWidget() {
 @Composable
 fun NoteItem(
     note: Note,
+    action: Action?
 ) {
-    val context = LocalContext.current
-    val intent = Intent(context, MainActivity::class.java).apply {
-        putExtra(TARGET_NOTE_ID, note.id)
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-    }
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .clickable(actionStartActivity(intent))
-
     ){
         LazyColumn(
             modifier = GlanceModifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .background(
                     imageProvider = ImageProvider(R.drawable.widget_background),
                     colorFilter = ColorFilter.tint(ColorProvider(Color(note.color)))
@@ -107,12 +113,16 @@ fun NoteItem(
                     maxLines = 2,
                     modifier = GlanceModifier
                         .padding(end = 32.dp)
+                        .maybeClickable(action)
                 )
                 Spacer(modifier = GlanceModifier.height(8.dp))
             }
 
             item{
-                IconsRow(note)
+                IconsRow(
+                    note,
+                    modifier = GlanceModifier.maybeClickable(action)
+                )
                 Spacer(modifier = GlanceModifier.height(8.dp))
             }
 
@@ -120,13 +130,22 @@ fun NoteItem(
                 Text(
                     text = note.content,
                     style = NoteListLayoutTextStyles.contentText,
+                    modifier = GlanceModifier
+                        .maybeClickable(action)
                 )
             }
-
         }
     }
 }
 
+private fun GlanceModifier.maybeClickable(action: Action?): GlanceModifier {
+    return if (action != null) {
+        Log.d("kptest", "maybeClickable")
+        this.clickable(action)
+    } else {
+        this
+    }
+}
 
 @GridBreakpointPreviews
 @SmallWidgetPreview
@@ -141,6 +160,7 @@ private fun NoteListContentPreview() {
         timestamp = 123,
         color = NoteColors.colors.get(1).toArgb(),
         reminderTime = 1234556
-        )
+        ),
+        null
     )
 }

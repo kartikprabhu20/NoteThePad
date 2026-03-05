@@ -13,4 +13,10 @@
     <string name="facebook_application_id" translatable="false">972780702114726</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb972780702114726</string>
 
+    <string name="widget_title_single_note">Single Note</string>
+    <string name="widget_description_single_note">Pin a specific note to your home screen</string>
+
+    <string name="widget_title_note_collection">Note collection</string>
+    <string name="widget_description_note_collection">View the most recent notes</string>
+
 </resources>
