@@ -18,9 +18,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -82,6 +84,9 @@ class NotesViewModel @Inject constructor(
             initialValue = NotesState()
         )
 
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     val isGridViewEnabled: StateFlow<Boolean> = getLayoutSettings()
         .stateIn(
             scope = viewModelScope,
@@ -99,12 +104,25 @@ class NotesViewModel @Inject constructor(
                     fileIOUseCases.deleteFiles(event.note.imageUris)
                     noteUseCases.deleteNote(event.note)
                     recentlyDeletedNote =  event.note
+
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            message = "Note deleted",
+                            actionLabel = "Undo",
+                            onAction = { onEvent(NotesEvent.RestoreNote) }
+                        )
+                    )
                 }
             }
             is NotesEvent.RestoreNote ->{
                 viewModelScope.launch {
                     noteUseCases.saveNoteWithAttachments(recentlyDeletedNote?: return@launch)
                     recentlyDeletedNote = null
+                }
+            }
+            is NotesEvent.PinNote -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(UiEvent.RequestWidgetPin(event.note))
                 }
             }
         }
@@ -117,5 +135,13 @@ class NotesViewModel @Inject constructor(
     suspend fun updateNoteWidget(context: Context) {
         delay(300)
         NoteListWidget().updateAll(context)
+    }
+
+    sealed class UiEvent{
+        data class ShowSnackbar(
+            val message: String,
+            val actionLabel: String? = null,
+            val onAction: (() -> Unit)? = null) : UiEvent()
+        data class RequestWidgetPin(val note:Note):UiEvent()
     }
 }

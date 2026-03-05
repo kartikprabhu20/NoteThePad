@@ -1,7 +1,6 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.notes
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -17,28 +16,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mintanable.notethepad.feature_note.presentation.notes.components.TopSearchBar
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.ui.util.Screen
-import com.mintanable.notethepad.feature_note.presentation.notes.NotesEvent
-import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
-import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.launch
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.ui.platform.LocalContext
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
+import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
+import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +55,6 @@ fun NotesScreen (
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
     val currentOrder by notesViewModel.noteOrder.collectAsState()
 
-    val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -73,6 +68,8 @@ fun NotesScreen (
     LaunchedEffect(state.notes, context){
         notesViewModel.updateNoteWidget(context)
     }
+    val snackBarHostState = remember { SnackbarHostState() }
+    EvenHandler(snackBarHostState = snackBarHostState)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -193,9 +190,7 @@ fun NotesScreen (
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             noteOrder = currentOrder,
-                            onOrderChange = {
-                                notesViewModel.onEvent(NotesEvent.Order(it))
-                            }
+                            onOrderChange = { notesViewModel.onEvent(NotesEvent.Order(it)) }
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -206,19 +201,8 @@ fun NotesScreen (
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
                         onNoteClicked = onNoteClick,
-                        onDeleteClicked = { note ->
-                            notesViewModel.onEvent(NotesEvent.DeleteNote(note))
-                            scope.launch {
-                                val result = snackBarHostState.showSnackbar(
-                                    message = "Note deleted",
-                                    actionLabel = "Undo",
-                                    duration = SnackbarDuration.Short
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    notesViewModel.onEvent(NotesEvent.RestoreNote)
-                                }
-                            }
-                        }
+                        onDeleteClicked = { note -> notesViewModel.onEvent(NotesEvent.DeleteNote(note)) },
+                        onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) }
                     )
                 }
             }

@@ -9,4 +9,5 @@ sealed class NotesEvent{
     object RestoreNote: NotesEvent()
     object ToggleOrderSection: NotesEvent()
     data class SearchBarValueChange(val searchQuery:String) : NotesEvent()
+    data class PinNote(val note:Note): NotesEvent()
 }

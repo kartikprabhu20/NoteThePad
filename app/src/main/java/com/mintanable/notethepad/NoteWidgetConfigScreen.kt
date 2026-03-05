@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.presentation.modify.components.StaggeredNotesList
+import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 
 @Composable
@@ -41,10 +41,12 @@ fun NoteWidgetConfigScreen(
                         StaggeredNotesList(
                             notes = state.notes,
                             isGridView = isGridView,
+                            enableDeletion = false,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
                             onNoteClicked = onNoteClicked,
-                            onDeleteClicked = { }
+                            onDeleteClicked = { },
+                            onPinClicked = { }
                         )
                     }
                 }
