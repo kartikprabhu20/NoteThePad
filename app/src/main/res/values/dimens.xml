@@ -127,8 +127,8 @@
     2x2 as minimum resize size and 4x4 as maximum resize size) -->
     <integer name="sample_image_grid_target_cell_width">5</integer>
     <integer name="sample_image_grid_target_cell_height">5</integer>
-    <dimen name="sample_image_grid_widget_min_width">256dp</dimen>
-    <dimen name="sample_image_grid_widget_min_height">185dp</dimen>
+    <dimen name="sample_image_grid_widget_min_width">180dp</dimen>
+    <dimen name="sample_image_grid_widget_min_height">110dp</dimen>
     <dimen name="sample_image_grid_widget_min_resize_width">120dp</dimen>
     <dimen name="sample_image_grid_widget_min_resize_height">115dp</dimen>
     <dimen name="sample_image_grid_widget_max_resize_width">624dp</dimen>

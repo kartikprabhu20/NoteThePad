@@ -93,7 +93,7 @@ fun WidgetContent(
             }
         },
         backgroundColor = GlanceTheme.colors.widgetBackground,
-        horizontalPadding = 12.dp,
+        horizontalPadding = 4.dp,
         modifier = GlanceModifier.padding(bottom = 12.dp)
     ) {
         Grid(items)
@@ -112,7 +112,7 @@ private fun Grid(items: List<Note>) {
             itemContentProvider = { item ->
                 NoteItemRow(item)
             },
-            cellSpacing = 4.dp
+            cellSpacing = 2.dp
         )
 
         //The Floating Action Button
