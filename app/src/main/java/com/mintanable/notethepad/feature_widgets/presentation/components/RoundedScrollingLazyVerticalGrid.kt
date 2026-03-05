@@ -67,14 +67,9 @@ fun <T> RoundedScrollingLazyVerticalGrid(
   itemContentProvider: @Composable (item: T) -> Unit,
   modifier: GlanceModifier = GlanceModifier,
   horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-  cellSpacing: Dp = 12.dp,
+  cellSpacing: Dp = 4.dp,
 ) {
   val numRows = ceil(items.size.toDouble() / gridCells).toInt()
-
-  // Cell spacing is achieved by allocating equal amount of padding to each cell. Cells on edge
-  // apply it completely to inner sides, while cells not on edge apply it evenly on sides.
-  val perCellHorizontalPadding = (cellSpacing * (gridCells - 1)) / gridCells
-  val perCellVerticalPadding = (cellSpacing * (numRows - 1)) / numRows
 
   RoundedScrollingLazyVerticalGrid(
     gridCells = GridCells.Fixed(gridCells),
@@ -86,38 +81,14 @@ fun <T> RoundedScrollingLazyVerticalGrid(
       val row = index / gridCells
       val column = index % gridCells
 
-      val cellTopPadding = when (row) {
-        0 -> 0.dp
-        numRows - 1 -> perCellVerticalPadding
-        else -> perCellVerticalPadding / 2
-      }
-
-      val cellBottomPadding = when (row) {
-        0 -> perCellVerticalPadding
-        numRows - 1 -> 0.dp
-        else -> perCellVerticalPadding / 2
-      }
-
-      val cellStartPadding = when (column) {
-        0 -> 0.dp
-        gridCells - 1 -> perCellHorizontalPadding
-        else -> perCellHorizontalPadding / 2
-      }
-
-      val cellEndPadding = when (column) {
-        0 -> perCellHorizontalPadding
-        gridCells - 1 -> 0.dp
-        else -> perCellHorizontalPadding / 2
-      }
-
       Box(
         modifier = modifier
           .fillMaxSize()
           .padding(
-            start = cellStartPadding,
-            end = cellEndPadding,
-            top = cellTopPadding,
-            bottom = cellBottomPadding
+            start = cellSpacing,
+            end = if (column == gridCells - 1) cellSpacing else 0.dp,
+            top = cellSpacing,
+            bottom = if (row == numRows - 1) cellSpacing else 0.dp
           )
       ) {
         itemContentProvider(item)
