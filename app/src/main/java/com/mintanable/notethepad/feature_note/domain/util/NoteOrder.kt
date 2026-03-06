@@ -1,15 +1,16 @@
 package com.mintanable.notethepad.feature_note.domain.util
 
-sealed class NoteOrder(val orderType: OrderType){
-    class Title(orderType: OrderType): NoteOrder(orderType)
-    class Color(orderType: OrderType): NoteOrder(orderType)
-    class Date(orderType: OrderType): NoteOrder(orderType)
+sealed class NoteOrder(open val orderType: OrderType) {
 
-    fun copy(orderType: OrderType): NoteOrder{
-        return when(this){
-            is Title -> Title(orderType)
-            is Date -> Date(orderType)
-            is Color -> Color(orderType)
+    data class Title(override val orderType: OrderType): NoteOrder(orderType)
+    data class Color(override val orderType: OrderType): NoteOrder(orderType)
+    data class Date(override val orderType: OrderType): NoteOrder(orderType)
+
+    fun copyOrder(newOrderType: OrderType): NoteOrder {
+        return when (this) {
+            is Title -> this.copy(orderType = newOrderType)
+            is Color -> this.copy(orderType = newOrderType)
+            is Date -> this.copy(orderType = newOrderType)
         }
     }
 }
