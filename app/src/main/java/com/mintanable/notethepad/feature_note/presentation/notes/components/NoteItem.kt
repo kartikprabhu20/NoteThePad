@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
@@ -111,18 +112,23 @@ fun NoteItem(
                         )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = note.content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black,
-                    maxLines = 10,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .sharedElement(
-                            sharedContentState = rememberSharedContentState(key = "note-content-${note.id}"),
-                            animatedVisibilityScope = animatedVisibilityScope
-                        )
-                )
+
+                if(!note.isCheckboxListAvailable){
+                    Text(
+                        text = note.content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Black,
+                        maxLines = 10,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .sharedElement(
+                                sharedContentState = rememberSharedContentState(key = "note-content-${note.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                    )
+                } else {
+                    SimpleCheckboxList( checklist = note.checkListItems )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
@@ -159,7 +165,7 @@ fun NoteItem(
 
                     if(CheckboxConvertors.isContentCheckboxList(note.content)){
                         Icon(
-                            imageVector = Icons.Default.CheckBox,
+                            imageVector = Icons.Default.Checklist,
                             contentDescription = "Images attached",
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black

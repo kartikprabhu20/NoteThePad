@@ -26,7 +26,7 @@ fun IconsRow(
             WidgetIcon(R.drawable.baseline_collections_24)
         }
         if (note.audioAttachments.isNotEmpty()) {
-            WidgetIcon(R.drawable.baseline_audiotrack_24)
+            WidgetIcon(R.drawable.baseline_mic_24)
         }
         if (note.reminderTime > -1) {
             WidgetIcon( if(note.reminderTime> System.currentTimeMillis())
@@ -34,7 +34,7 @@ fun IconsRow(
             else R.drawable.baseline_notifications_off_24)
         }
         if(CheckboxConvertors.isContentCheckboxList(note.content)){
-            WidgetIcon(R.drawable.baseline_check_box_24)
+            WidgetIcon(R.drawable.baseline_checklist_24)
         }
     }
 }
