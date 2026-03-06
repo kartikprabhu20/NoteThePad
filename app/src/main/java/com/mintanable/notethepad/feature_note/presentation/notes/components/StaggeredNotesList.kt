@@ -15,17 +15,17 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 
 @Composable
 fun StaggeredNotesList(
-    notes: List<Note>,
+    notes: List<DetailedNote>,
     isGridView: Boolean,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
-    onNoteClicked: (Note) -> Unit,
-    onDeleteClicked: (Note) -> Unit,
-    onPinClicked: (Note) -> Unit,
+    onNoteClicked: (DetailedNote) -> Unit,
+    onDeleteClicked: (DetailedNote) -> Unit,
+    onPinClicked: (DetailedNote) -> Unit,
     enableDeletion: Boolean = true
 ) {
 

@@ -14,14 +14,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 
 @Composable
 fun NoteWidgetConfigScreen(
     notesViewModel: NotesViewModel = hiltViewModel(),
-    onNoteClicked: (Note) -> Unit
+    onNoteClicked: (DetailedNote) -> Unit
 ) {
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()

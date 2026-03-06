@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -48,7 +49,7 @@ import com.mintanable.notethepad.ui.theme.ThemePreviews
 
 @Composable
 fun NoteItem(
-    note: Note,
+    note: DetailedNote,
     modifier:Modifier=Modifier,
     cornerRadius: Dp = 10.dp,
     cutCornerSize : Dp = 30.dp,
@@ -136,7 +137,7 @@ fun NoteItem(
                             tint = Color.Black
                         )
                     }
-                    if(note.audioUris.isNotEmpty()){
+                    if(note.audioAttachments.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Mic,
                             contentDescription = "Images attached",
@@ -209,14 +210,14 @@ fun NoteItemPreview() {
                             .padding(8.dp)
                     ) {
                         NoteItem(
-                            note = Note(
+                            note = DetailedNote(
                                 title = "Meeting Notes",
                                 content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
                                 timestamp = System.currentTimeMillis(),
                                 color = RedOrange.toArgb(),
                                 id = 1,
-                                imageUris = listOf(""),
-                                audioUris = listOf(""),
+                                imageUris = listOf(),
+                                audioAttachments = listOf(),
                                 reminderTime = 1
                             ),
                             modifier = Modifier.fillMaxWidth(),

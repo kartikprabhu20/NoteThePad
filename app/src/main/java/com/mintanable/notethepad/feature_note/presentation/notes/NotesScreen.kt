@@ -31,7 +31,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.platform.LocalContext
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
 import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
@@ -102,7 +102,7 @@ fun NotesScreen (
 
         with(sharedTransitionScope){
             val onNoteClick = remember(navController) {
-                { note: Note ->
+                { note: DetailedNote ->
                     navController.navigate(
                         Screen.AddEditNoteScreen.route + "?noteId=${note.id}&noteColor=${note.color}"
                     )

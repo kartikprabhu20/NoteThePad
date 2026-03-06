@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
@@ -42,7 +42,7 @@ class NotesViewModel @Inject constructor(
     private val fileIOUseCases: FileIOUseCases
 ) :ViewModel() {
 
-    private var recentlyDeletedNote: Note? = null
+    private var recentlyDeletedNote: DetailedNote? = null
 
     private val _noteOrder = MutableStateFlow<NoteOrder>(NoteOrder.Date(OrderType.Descending))
     val noteOrder = _noteOrder.asStateFlow()
@@ -57,9 +57,7 @@ class NotesViewModel @Inject constructor(
     val state: StateFlow<NotesState> = combine(
         _noteOrder,
         _searchInputText.debounce(300L).distinctUntilChanged(),
-        _noteOrder.flatMapLatest { order ->
-            noteUseCases.getNotes(order)
-        }
+        _noteOrder.flatMapLatest { order -> noteUseCases.getDetailedNotes(order) }
     ) { order, query, notes ->
         Log.d("kptest", "order: $order, query: $query")
         val filtered =
@@ -101,9 +99,9 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.SearchBarValueChange -> { _searchInputText.value = event.searchQuery }
             is NotesEvent.DeleteNote ->{
                 viewModelScope.launch {
-                    fileIOUseCases.deleteFiles(event.note.imageUris)
-                    noteUseCases.deleteNote(event.note)
-                    recentlyDeletedNote =  event.note
+                    fileIOUseCases.deleteFiles(event.detailedNote.imageUris.map { it.toString() })
+                    noteUseCases.deleteNote(event.detailedNote.toNote())
+                    recentlyDeletedNote =  event.detailedNote
 
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
@@ -116,13 +114,13 @@ class NotesViewModel @Inject constructor(
             }
             is NotesEvent.RestoreNote ->{
                 viewModelScope.launch {
-                    noteUseCases.saveNoteWithAttachments(recentlyDeletedNote?: return@launch)
+                    noteUseCases.saveNoteWithAttachments(recentlyDeletedNote?.toNote() ?: return@launch)
                     recentlyDeletedNote = null
                 }
             }
             is NotesEvent.PinNote -> {
                 viewModelScope.launch {
-                    _eventFlow.emit(UiEvent.RequestWidgetPin(event.note))
+                    _eventFlow.emit(UiEvent.RequestWidgetPin(event.detailedNote))
                 }
             }
         }
@@ -142,6 +140,6 @@ class NotesViewModel @Inject constructor(
             val message: String,
             val actionLabel: String? = null,
             val onAction: (() -> Unit)? = null) : UiEvent()
-        data class RequestWidgetPin(val note:Note):UiEvent()
+        data class RequestWidgetPin(val note:DetailedNote):UiEvent()
     }
 }

@@ -13,19 +13,19 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 
 @Composable
 fun IconsRow(
-    note: Note,
+    note: DetailedNote,
     modifier: GlanceModifier = GlanceModifier
 ) {
     Row(modifier = modifier.fillMaxWidth()) {
         if (note.imageUris.isNotEmpty()) {
             WidgetIcon(R.drawable.baseline_collections_24)
         }
-        if (note.audioUris.isNotEmpty()) {
+        if (note.audioAttachments.isNotEmpty()) {
             WidgetIcon(R.drawable.baseline_audiotrack_24)
         }
         if (note.reminderTime > -1) {

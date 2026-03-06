@@ -37,7 +37,7 @@ import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.MainActivity
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
@@ -79,7 +79,7 @@ class NoteListWidget : GlanceAppWidget() {
 
 @Composable
 fun WidgetContent(
-    items: List<Note>,
+    items: List<DetailedNote>,
 ) {
     Scaffold(
         titleBar = {
@@ -101,7 +101,7 @@ fun WidgetContent(
 }
 
 @Composable
-private fun Grid(items: List<Note>) {
+private fun Grid(items: List<DetailedNote>) {
 
     Box(modifier = GlanceModifier.fillMaxSize()) {
 
@@ -147,7 +147,7 @@ private fun Grid(items: List<Note>) {
 }
 
 @Composable
-fun NoteItemRow(note: Note) {
+fun NoteItemRow(note: DetailedNote) {
     val context = LocalContext.current
     val intent = Intent(context, MainActivity::class.java).apply {
         putExtra(TARGET_NOTE_ID, note.id)
@@ -196,7 +196,7 @@ fun NoteItemRow(note: Note) {
 }
 
 @Composable
-fun rememberNoteHeight(note: Note): Dp {
+fun rememberNoteHeight(note: DetailedNote): Dp {
     val titleHeight = 20.dp
     val paddingTotal = 12.dp + 12.dp + 4.dp + 4.dp  // top + bottom padding + spacers
 
@@ -209,7 +209,7 @@ fun rememberNoteHeight(note: Note): Dp {
     }
 
     val hasIcons = note.imageUris.isNotEmpty() ||
-            note.audioUris.isNotEmpty() ||
+            note.audioAttachments.isNotEmpty() ||
             note.reminderTime > -1 ||
             CheckboxConvertors.isContentCheckboxList(note.content)
     val iconsHeight = if (hasIcons) 28.dp else 0.dp
@@ -224,45 +224,43 @@ fun rememberNoteHeight(note: Note): Dp {
 @LargeWidgetPreview
 @Composable
 private fun NoteListContentPreview() {
-    val context = LocalContext.current
-
     WidgetContent(
         listOf(
-            Note(
+            DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
                 color = NoteColors.colors[1].toArgb(),
                 reminderTime = 1234556
             ),
-            Note(
+            DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
                 color = NoteColors.colors[2].toArgb()
             ),
 
-            Note(
+            DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
                 color = NoteColors.colors[4].toArgb(),
                 reminderTime = 1234556
             ),
-            Note(
+            DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
                 color = NoteColors.colors[2].toArgb()
             ),
 
-            Note(
+            DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,
                 color = NoteColors.colors[1].toArgb()
             ),
-            Note(
+            DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
                 timestamp = 123,

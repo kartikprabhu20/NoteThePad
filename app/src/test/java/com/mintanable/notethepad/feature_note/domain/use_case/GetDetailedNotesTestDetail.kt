@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
@@ -13,13 +14,14 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
-class GetNotesTest {
-    private lateinit var getNotes: GetNotes
+class GetDetailedNotesTestDetail {
+    private lateinit var getDetailedNotes: GetDetailedNotes
     private val fakeRepository = mockk<NoteRepository>()
+    private val audioMetadataProvider = mockk<AudioMetadataProvider>()
 
     @Before
     fun setUp() {
-        getNotes = GetNotes(fakeRepository)
+        getDetailedNotes = GetDetailedNotes(fakeRepository, audioMetadataProvider)
     }
 
     @Test
@@ -35,7 +37,7 @@ class GetNotesTest {
             mockNotes
         )
 
-        val result = getNotes(NoteOrder.Title(OrderType.Ascending)).first()
+        val result = getDetailedNotes(NoteOrder.Title(OrderType.Ascending)).first()
 
         assertThat(result[0].title).isEqualTo("Apple")
         assertThat(result[1].title).isEqualTo("Banana")

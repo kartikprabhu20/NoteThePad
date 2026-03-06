@@ -28,7 +28,7 @@ fun EvenHandler(
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             if (event is NotesViewModel.UiEvent.RequestWidgetPin) {
-                pinSingleNoteWidget(context, event.note)
+                pinSingleNoteWidget(context, event.note.toNote())
             }
             if(event is NotesViewModel.UiEvent.ShowSnackbar){
                 val result = snackBarHostState.showSnackbar(

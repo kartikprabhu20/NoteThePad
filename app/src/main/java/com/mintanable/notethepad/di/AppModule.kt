@@ -12,6 +12,7 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
+import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
@@ -35,13 +36,17 @@ object AppModule {
     }
 
     @Provides
-    fun provideNoteUseCases(repository: NoteRepository, fileManager: FileManager, @ApplicationContext context: Context): NoteUseCases {
+    fun provideNoteUseCases(
+        repository: NoteRepository,
+        fileManager: FileManager,
+        audioMetadataProvider: AudioMetadataProvider,
+        @ApplicationContext context: Context): NoteUseCases {
         return NoteUseCases(
-            getNotes = GetNotes(repository),
+            getDetailedNotes = GetDetailedNotes(repository, audioMetadataProvider),
             deleteNote = DeleteNote(repository),
             saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
-            getNote = GetNote(repository),
-            getTopNotes = GetTopNotes(repository)
+            getDetailedNote = GetDetailedNote(repository, audioMetadataProvider),
+            getTopNotes = GetTopNotes(repository, audioMetadataProvider)
         )
     }
 

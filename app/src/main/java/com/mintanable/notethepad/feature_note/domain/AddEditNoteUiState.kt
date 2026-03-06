@@ -18,11 +18,10 @@ data class AddEditNoteUiState(
     val attachedAudios: List<Attachment> = emptyList(),
     val reminderTime: Long = -1L,
     val checkListItems: List<CheckboxItem> = emptyList(),
+    val isCheckboxListAvailable: Boolean = false,
 
     val isRecording: Boolean = false,
     val isSaving: Boolean = false,
-    val isCheckboxListAvailable: Boolean = false,
-
     val currentSheetType: BottomSheetType = BottomSheetType.NONE,
     val settingsDeniedType: DeniedType? = null,
     val showCameraRationale: Boolean = false,

@@ -35,7 +35,7 @@ object CheckboxConvertors {
 
     fun checkboxesToContentString(items: List<CheckboxItem>): String {
         return items.joinToString("\n") { item ->
-            "${item.text}"
+            item.text
         }
     }
 

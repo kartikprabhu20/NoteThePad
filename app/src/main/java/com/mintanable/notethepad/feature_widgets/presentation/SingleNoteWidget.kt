@@ -23,13 +23,13 @@ import androidx.glance.background
 import androidx.glance.layout.Box
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.MainActivity
 import com.mintanable.notethepad.R
+import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
@@ -53,7 +53,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 context,
                 WidgetEntryPoint::class.java
             )
-            entryPoint.noteUseCases().getNote(noteId)
+            entryPoint.noteUseCases().getDetailedNote(noteId)
         } else null
 
 
@@ -71,7 +71,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                     NoteItem(note, actionStartActivity(intent))
                 } else {
                     NoteItem(
-                        Note(
+                        DetailedNote(
                             id = null,
                             title = "No note found",
                             content = "Please go to the app and add some notes",
@@ -89,7 +89,7 @@ class SingleNoteWidget : GlanceAppWidget() {
 
 @Composable
 fun NoteItem(
-    note: Note,
+    note: DetailedNote,
     action: Action?
 ) {
 
@@ -154,7 +154,7 @@ private fun GlanceModifier.maybeClickable(action: Action?): GlanceModifier {
 @Composable
 private fun NoteListContentPreview() {
     NoteItem(
-        Note(
+        DetailedNote(
         title = "Remember to call landlord",
         content = "Repairing basin and pipes",
         timestamp = 123,

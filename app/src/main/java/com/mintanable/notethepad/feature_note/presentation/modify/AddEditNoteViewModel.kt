@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +21,6 @@ import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
-import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel.UiEvent
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -86,26 +84,19 @@ class AddEditNoteViewModel @Inject constructor(
 
     private fun loadNote(id: Long) {
         viewModelScope.launch {
-            noteUseCases.getNote(id)?.also { note ->
-                currentNoteId = note.id
-                val attachments = note.audioUris.map { uriString ->
-                    val uri = uriString.toUri()
-                    Attachment(uri, audioMetadataProvider.getDuration(uri))
-                }
-
-                val isCheckboxListAvailable = CheckboxConvertors.isContentCheckboxList(note.content)
-                val checkList = if(isCheckboxListAvailable) CheckboxConvertors.stringToCheckboxes(content = note.content) else emptyList()
+            noteUseCases.getDetailedNote(id)?.also { detailedNote ->
+                currentNoteId = detailedNote.id
 
                 _uiState.update {
                     it.copy(
-                        titleState = it.titleState.copy(text = note.title, isHintVisible = false),
-                        contentState = it.contentState.copy(text = note.content, isHintVisible = false),
-                        noteColor = note.color,
-                        attachedImages = note.imageUris.map { it.toUri() },
-                        attachedAudios = attachments,
-                        reminderTime = note.reminderTime,
-                        checkListItems = checkList,
-                        isCheckboxListAvailable = isCheckboxListAvailable
+                        titleState = it.titleState.copy(text = detailedNote.title, isHintVisible = false),
+                        contentState = it.contentState.copy(text = detailedNote.content, isHintVisible = false),
+                        noteColor = detailedNote.color,
+                        attachedImages = detailedNote.imageUris,
+                        attachedAudios = detailedNote.audioAttachments,
+                        reminderTime = detailedNote.reminderTime,
+                        checkListItems = detailedNote.checkListItems,
+                        isCheckboxListAvailable = detailedNote.isCheckboxListAvailable
                     )
                 }
             }
@@ -161,7 +152,7 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.MakeCopy -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
-                    saveNote(null, true)
+                    saveNote(null)
                         .onSuccess { id ->
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                             _eventFlow.emit(UiEvent.MakeCopy(id))
@@ -296,7 +287,6 @@ class AddEditNoteViewModel @Inject constructor(
 
                     currentState.copy(checkListItems = newList)                }
             }
-            else -> {}
         }
     }
 
@@ -332,7 +322,7 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveNote(id:Long?, makeCopy: Boolean = false): Result<Long> {
+    private suspend fun saveNote(id:Long?): Result<Long> {
             val state = uiState.value
             return noteUseCases.saveNoteWithAttachments.invoke(
                 id = id,
@@ -347,7 +337,7 @@ class AddEditNoteViewModel @Inject constructor(
             )
     }
 
-    fun rescheduleReminder(id: Long){
+    private fun rescheduleReminder(id: Long){
         val state = uiState.value
         reminderScheduler.cancel(id = id)
         if(state.reminderTime > System.currentTimeMillis()) {
@@ -408,10 +398,10 @@ class AddEditNoteViewModel @Inject constructor(
 
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
-        object SaveNote: UiEvent()
+        data object SaveNote: UiEvent()
         data class DeleteNote(val id: Long?): UiEvent()
         data class MakeCopy(val newNoteId: Long): UiEvent()
-        object LaunchAudioRecorder : UiEvent()
+        data object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()
         data class RequestWidgetPin(val noteId: Long):UiEvent()
     }
