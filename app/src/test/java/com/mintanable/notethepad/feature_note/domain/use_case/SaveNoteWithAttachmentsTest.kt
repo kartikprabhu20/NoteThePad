@@ -50,12 +50,15 @@ class SaveNoteWithAttachmentsTest{
         val pkg = context.packageName
         val internalUri = Uri.parse("content://$pkg/files/my_image.jpg")
         val externalUri = Uri.parse("content://com.android.providers/other_image.jpg")
-        val audioUri = Uri.parse("content://com.android.providers/test.mp4")
+        val audioUri = Uri.parse("content://$pkg/test.mp4")
+        val externalaudioUri = Uri.parse("content://com.android.providers/test2.mp4")
 
-        val newSavedPath = "internal/storage/saved_image.jpg"
+        val newSavedPath1 = "internal/storage/saved_image.jpg"
+        val newSavedPath2 = "internal/storage/test2.mp4"
 
         // Mock FileManager only for the external one
-        coEvery { fileManager.saveMediaToStorage(externalUri, any()) } returns newSavedPath
+        coEvery { fileManager.saveMediaToStorage(externalUri, any()) } returns newSavedPath1
+        coEvery { fileManager.saveMediaToStorage(externalaudioUri, any()) } returns newSavedPath2
 
         val result = saveNote(
             id = null,
@@ -64,7 +67,7 @@ class SaveNoteWithAttachmentsTest{
             timestamp = 1L,
             color = 1,
             imageUris = listOf(internalUri, externalUri),
-            audioUris = listOf(audioUri),
+            audioUris = listOf(audioUri, externalaudioUri),
             reminderTime = 0L,
             checkboxItems = emptyList()
         )
@@ -75,12 +78,14 @@ class SaveNoteWithAttachmentsTest{
             repository.insertNote(match { note ->
                 // Check if internal stayed the same and external was updated to saved path
                 note.imageUris.contains(internalUri.toString()) &&
-                        note.imageUris.contains(newSavedPath)
+                        note.imageUris.contains(newSavedPath1) &&
+                        note.audioUris.contains(audioUri.toString()) &&
+                        note.audioUris.contains(newSavedPath2)
             })
         }
 
         // Verify fileManager was called EXACTLY once (only for the external one)
-        coVerify(exactly = 1) { fileManager.saveMediaToStorage(any(), any()) }
+        coVerify(exactly = 2) { fileManager.saveMediaToStorage(any(), any()) }
     }
 
     @Test
