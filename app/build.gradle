@@ -63,6 +63,12 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
             excludes += "META-INF/DEPENDENCIES"
             excludes += "META-INF/LICENSE"
+
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/junit-jupiter-api.kotlin_module"
         }
     }
 
@@ -71,6 +77,11 @@ android {
         arg("dagger.fastInit", "enabled")
         arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
         arg("dagger.hilt.disableModulesHaveInstallInCheck", "true")
+    }
+
+    configurations {
+        canaryImplementation.extendsFrom(testImplementation)
+        canaryImplementation.extendsFrom(androidTestImplementation)
     }
 }
 
@@ -173,6 +184,6 @@ dependencies {
     //Widgets
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.glance:glance-material3:1.1.1")
-    canaryImplementation("androidx.glance:glance-appwidget-preview:1.1.1")
-    implementation("androidx.glance:glance-preview:1.1.1")
+    testImplementation("androidx.glance:glance-appwidget-preview:1.1.1")
+    testImplementation("androidx.glance:glance-preview:1.1.1")
 }

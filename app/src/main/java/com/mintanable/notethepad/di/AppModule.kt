@@ -19,6 +19,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.*
+import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,14 +40,14 @@ object AppModule {
     fun provideNoteUseCases(
         repository: NoteRepository,
         fileManager: FileManager,
-        audioMetadataProvider: AudioMetadataProvider,
+        detailedNoteMapper: DetailedNoteMapper,
         @ApplicationContext context: Context): NoteUseCases {
         return NoteUseCases(
-            getDetailedNotes = GetDetailedNotes(repository, audioMetadataProvider),
+            getDetailedNotes = GetDetailedNotes(repository, detailedNoteMapper),
             deleteNote = DeleteNote(repository),
             saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
-            getDetailedNote = GetDetailedNote(repository, audioMetadataProvider),
-            getTopNotes = GetTopNotes(repository, audioMetadataProvider)
+            getDetailedNote = GetDetailedNote(repository, detailedNoteMapper),
+            getTopNotes = GetTopNotes(repository, detailedNoteMapper)
         )
     }
 
