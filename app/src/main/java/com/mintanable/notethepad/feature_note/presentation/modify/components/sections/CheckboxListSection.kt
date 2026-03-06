@@ -11,24 +11,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragIndicator
-import androidx.compose.material3.*
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -42,7 +47,8 @@ fun LazyListScope.checkboxListSection(
     activeDragCheckIndex: String?,
     activeDragUnCheckIndex: String?,
     items: List<CheckboxItem>,
-    onEnterPressed: () -> Unit,
+    focusRequesters: MutableMap<String, FocusRequester>,
+    onEnterPressed: (CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
     onListOrderUpdated: (List<CheckboxItem>) -> Unit,
     onDragStateChangedChecked: (String?) -> Unit,
@@ -55,6 +61,7 @@ fun LazyListScope.checkboxListSection(
     checkboxGroup(
         activeDragIndex = activeDragCheckIndex,
         items = uncheckedList,
+        focusRequesters = focusRequesters,
         isDoneGroup = false,
         onMove = { from, to ->
             val newUncheckedList = uncheckedList.toMutableList().apply { add(to, removeAt(from)) }
@@ -78,6 +85,7 @@ fun LazyListScope.checkboxListSection(
     checkboxGroup(
         activeDragIndex = activeDragUnCheckIndex,
         items = checkedList,
+        focusRequesters = focusRequesters,
         isDoneGroup = true,
         onMove = { from, to ->
             val newCheckedList = checkedList.toMutableList().apply { add(to, removeAt(from)) }
@@ -88,7 +96,7 @@ fun LazyListScope.checkboxListSection(
             val newCheckedList = checkedList.toMutableList().apply { removeAt(index) }
             onListOrderUpdated(uncheckedList + newCheckedList)
         },
-        onEnterPressed = {},
+        onEnterPressed = onEnterPressed,
         onDragStateChanged = onDragStateChangedUnChecked
     )
 }
@@ -97,14 +105,21 @@ fun LazyListScope.checkboxListSection(
 fun CheckboxRow(
     item: CheckboxItem,
     isHeld: Boolean,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(),
     isSingleLine: Boolean = false,
-    onEnterPressed:() -> Unit,
+    onEnterPressed:(CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
     onDeletePressed: (String) -> Unit
 ) {
+    LaunchedEffect(item.id) {
+        if (item.text.isEmpty()) {
+            focusRequester.requestFocus()
+        }
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -136,14 +151,13 @@ fun CheckboxRow(
                 .padding(top = 14.dp, bottom = 8.dp)
                 .padding(horizontal = 4.dp)
                 .weight(1F)
-                .onKeyEvent { keyEvent ->
-                    if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown) {
-                        onEnterPressed()
-                        true
-                    } else {
-                        false
-                    }
-                }
+                .focusRequester(focusRequester),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { onEnterPressed(item) }
+            ),
         )
 
         IconButton(
@@ -162,19 +176,21 @@ fun CheckboxRow(
 fun LazyListScope.checkboxGroup(
     activeDragIndex: String?,
     items: List<CheckboxItem>,
+    focusRequesters: MutableMap<String, FocusRequester>,
     isDoneGroup: Boolean,
     onMove: (Int, Int) -> Unit,
-    onEnterPressed: () -> Unit,
+    onEnterPressed: (CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
     onDeletePressed: (Int) -> Unit,
     onDragStateChanged: (String?) -> Unit
 ) {
     itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-        
+        val requester = focusRequesters.getOrPut(item.id) { FocusRequester() }
         val isHeld = item.id == activeDragIndex
         CheckboxRow(
             item = item,
             isHeld = isHeld,
+            focusRequester = requester,
             textStyle = TextStyle(
                 textDecoration = if (isDoneGroup) TextDecoration.LineThrough else TextDecoration.None,
                 color = if (isDoneGroup) Color.Gray else Color.Unspecified
@@ -249,6 +265,8 @@ fun PreviewCheckboxListSection(){
         Box(modifier = Modifier.background(NoteColors.colors.get(0))) {
 
             val id = UUID.randomUUID().toString()
+            val focusRequesters = remember { mutableMapOf<String, FocusRequester>() }
+
             LazyColumn {
                 checkboxListSection(
                     items = listOf(
@@ -275,6 +293,7 @@ fun PreviewCheckboxListSection(){
                         CheckboxItem(text = "test4", isChecked = true)
 
                     ),
+                    focusRequesters = focusRequesters,
                     onEnterPressed = {},
                     onItemChanged = {},
                     onListOrderUpdated = {},

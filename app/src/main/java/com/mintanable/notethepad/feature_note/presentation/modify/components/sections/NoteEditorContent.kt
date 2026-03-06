@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -151,6 +152,9 @@ fun NoteEditorContent(
 //                        zIndexInOverlay = if (animatedVisibilityScope.transition.isRunning) 2f else 0f
 //                    )
             ) {
+
+                val focusRequesters = remember { mutableMapOf<String, FocusRequester>() }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -232,7 +236,8 @@ fun NoteEditorContent(
                             activeDragCheckIndex = activeDragCheckIndex,
                             activeDragUnCheckIndex = activeDragUnCheckIndex,
                             items = checkListItems,
-                            onEnterPressed = {},
+                            focusRequesters = focusRequesters,
+                            onEnterPressed = { previousCheckItem -> onEvent(AddEditNoteEvent.AddChecklistItem(previousCheckItem)) },
                             onItemChanged = { updatedItem ->
                                 onEvent(AddEditNoteEvent.UpdateCheckList(checkListItems.map { if (it.id == updatedItem.id) updatedItem else it }))
                             },

@@ -12,15 +12,15 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
-import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel.UiEvent
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
@@ -113,7 +113,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun onEvent(event:AddEditNoteEvent){
-//        Log.d("kptest", "event: $event")
+        Log.d("kptest", "event: $event")
         when(event){
             is AddEditNoteEvent.EnteredTitle -> {
                 _uiState.update { it.copy(
@@ -279,6 +279,22 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.UpdateCheckList -> {
                 _uiState.update { it.copy(checkListItems = event.list) }
+            }
+
+            is AddEditNoteEvent.AddChecklistItem -> {
+                _uiState.update { currentState ->
+                    val currentItems = currentState.checkListItems
+                    val targetIndex = currentItems.indexOfFirst { it.id == event.previousCheckItem.id }
+
+                    val newList = if (targetIndex != -1) {
+                        currentItems.toMutableList().apply {
+                            add(targetIndex + 1,CheckboxItem(text = "", isChecked = event.previousCheckItem.isChecked))
+                        }
+                    } else {
+                        currentItems + CheckboxItem(text = "", isChecked = event.previousCheckItem.isChecked)
+                    }
+
+                    currentState.copy(checkListItems = newList)                }
             }
             else -> {}
         }
