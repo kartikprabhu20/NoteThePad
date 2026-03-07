@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -195,14 +196,16 @@ class AddEditNoteViewModel @Inject constructor(
                 )}
             }
             is AddEditNoteEvent.RemoveAudio -> {
-                _uiState.update { state ->
-                    state.copy(
-                        attachedAudios = state.attachedAudios.filterNot { it.uri == event.uri }
-                    )
-                }
-                // If the removed audio was playing, stop the player
-                if (uiState.value.mediaState?.currentUri == event.uri.toString()) {
-                    mediaPlayer.stop()
+                viewModelScope.launch {
+                    _uiState.update { state ->
+                        state.copy(
+                            attachedAudios = state.attachedAudios.filterNot { it.uri == event.uri }
+                        )
+                    }
+                    // If the removed audio was playing, stop the player
+                    if (mediaPlayer.mediaState.first().currentUri == event.uri.toString()) {
+                        mediaPlayer.stop()
+                    }
                 }
             }
             is AddEditNoteEvent.ToggleAudioRecording -> {
@@ -287,6 +290,7 @@ class AddEditNoteViewModel @Inject constructor(
 
                     currentState.copy(checkListItems = newList)                }
             }
+
         }
     }
 
