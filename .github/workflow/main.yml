@@ -5,6 +5,7 @@ on: # Run whenever push to main or pr to main
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:  #for manual trigger
 
 jobs:
   test_job:
