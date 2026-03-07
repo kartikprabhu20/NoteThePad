@@ -12,12 +12,16 @@ android {
     namespace 'com.mintanable.notethepad'
     compileSdk 35
 
+    def gitTag = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
+    def rawBuildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "1"
+    def buildNumber = rawBuildNumber.toInteger()
+
     defaultConfig {
         applicationId "com.mintanable.notethepad"
         minSdk 26
         targetSdk 35
-        versionCode 1
-        versionName "1.0"
+        versionCode 100 + buildNumber
+        versionName gitTag.startsWith("v") ? gitTag.substring(1) : gitTag
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -33,7 +37,6 @@ android {
         buildConfigField("String", "DRIVE_CLIENT_ID", "\"${localProperties.getProperty("DRIVE_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "DRIVE_CLIENT_SECRET", "\"${localProperties.getProperty("DRIVE_CLIENT_SECRET") ?: ""}\"")
     }
-
     signingConfigs {
         create("release") {
             storeFile = file("release.jks")
@@ -95,6 +98,16 @@ android {
     }
 }
 
+tasks.register("printVersionInfo") {
+    doLast {
+        println("🚀 CI/CD Version Info:")
+        println("   - Version Name: ${android.defaultConfig.versionName}")
+        println("   - Version Code: ${android.defaultConfig.versionCode}")
+        println("   - Git Tag: ${System.getenv("GITHUB_REF_NAME")}")
+        println("   - Build Number: ${System.getenv("GITHUB_RUN_NUMBER")}")
+    }
+}
+
 dependencies {
     implementation 'androidx.test:core-ktx:1.7.0'
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
@@ -106,7 +119,7 @@ dependencies {
     def composeBom = platform('androidx.compose:compose-bom:2024.02.01')
     implementation composeBom
     androidTestImplementation composeBom
-    canaryImplementation 'androidx.compose.ui:ui-tooling:1.10.3'
+    implementation 'androidx.compose.ui:ui-tooling:1.10.3'
 
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -194,6 +207,6 @@ dependencies {
     //Widgets
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.glance:glance-material3:1.1.1")
-    testImplementation("androidx.glance:glance-appwidget-preview:1.1.1")
-    testImplementation("androidx.glance:glance-preview:1.1.1")
+    implementation("androidx.glance:glance-appwidget-preview:1.1.1")
+    implementation("androidx.glance:glance-preview:1.1.1")
 }

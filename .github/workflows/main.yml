@@ -37,7 +37,10 @@ jobs:
 
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/release.jks
-            
+
+      - name: Verify Versioning
+        run: ./gradlew printVersionInfo
+
       - name: Build Release Bundle
         run: ./gradlew bundleRelease
         env:
