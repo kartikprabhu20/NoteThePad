@@ -389,6 +389,7 @@ class AddEditNoteViewModelTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `RemoveAudio stops player if the removed audio was playing`() = runTest {
         val uriString = "content://audio/1"
@@ -426,6 +427,7 @@ class AddEditNoteViewModelTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `CancelReminder updates state and cancels scheduled alarm`() = runTest {
         val noteId = 1L
