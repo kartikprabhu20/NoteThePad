@@ -41,10 +41,13 @@ jobs:
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/release.jks
 
+      - name: Verify Versioning
+        run: ./gradlew :app:printVersionInfo
+
       - name: Extract Version Name
         id: get_version
         run: |
-          VERSION_NAME=$(./gradlew -q printVersionName)
+          VERSION_NAME=$(./gradlew -q :app:printVersionName)
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
 
       - name: Build Release Bundle & APK

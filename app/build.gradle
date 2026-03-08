@@ -132,6 +132,12 @@ tasks.register("printVersionInfo") {
     }
 }
 
+tasks.register("printVersionName") {
+    doLast {
+        println android.defaultConfig.versionName
+    }
+}
+
 dependencies {
     implementation 'androidx.test:core-ktx:1.7.0'
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
