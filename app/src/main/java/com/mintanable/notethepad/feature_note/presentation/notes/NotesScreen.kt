@@ -30,11 +30,18 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
 import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
+import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +50,7 @@ fun NotesScreen (
     notesViewModel: NotesViewModel = hiltViewModel(),
     navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     onLogOut: suspend () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope
@@ -53,7 +61,8 @@ fun NotesScreen (
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
-    val currentOrder by notesViewModel.noteOrder.collectAsState()
+    val currentOrder by notesViewModel.noteOrder.collectAsStateWithLifecycle()
+    val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
 
@@ -195,15 +204,46 @@ fun NotesScreen (
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    StaggeredNotesList(
-                        notes = state.notes,
-                        isGridView = isGridView,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        onNoteClicked = onNoteClick,
-                        onDeleteClicked = { note -> notesViewModel.onEvent(NotesEvent.DeleteNote(note)) },
-                        onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) }
-                    )
+                    if(state.notes.isNotEmpty()) {
+                        StaggeredNotesList(
+                            notes = state.notes,
+                            isGridView = isGridView,
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            onNoteClicked = onNoteClick,
+                            onDeleteClicked = { note ->
+                                notesViewModel.onEvent(
+                                    NotesEvent.DeleteNote(
+                                        note
+                                    )
+                                )
+                            },
+                            onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) }
+                        )
+                    }else{
+                        val isDark = settings.themeMode == ThemeMode.DARK
+                        val resource =
+                            if(isDark){
+                                if(searchQuery.isNotEmpty())
+                                    R.drawable.search_female_dark
+                                else
+                                    R.drawable.empty_male_dark
+                            } else {
+                                if(searchQuery.isNotEmpty())
+                                    R.drawable.search_female_pastel
+                                else
+                                    R.drawable.empty_male_pastel
+                            }
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(resource),
+                                contentDescription = "empty list"
+                            )
+                        }
+                    }
                 }
             }
         }
