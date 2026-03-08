@@ -7,8 +7,8 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 sealed class NotesEvent{
     data class Order(val noteOrder: NoteOrder): NotesEvent()
     data class DeleteNote(val detailedNote: DetailedNote): NotesEvent()
-    object RestoreNote: NotesEvent()
-    object ToggleOrderSection: NotesEvent()
+    data object RestoreNote: NotesEvent()
+    data object ToggleOrderSection: NotesEvent()
     data class SearchBarValueChange(val searchQuery:String) : NotesEvent()
     data class PinNote(val detailedNote: DetailedNote): NotesEvent()
 }

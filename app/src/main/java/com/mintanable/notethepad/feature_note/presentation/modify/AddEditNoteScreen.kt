@@ -433,9 +433,9 @@ fun AddEditNoteScreen(
                                 viewModel.onEvent(AddEditNoteEvent.PinNote)
                             }
 
-                            MoreSettingsOptions.SHARE -> {
-
-                            }
+//                            MoreSettingsOptions.SHARE -> {
+//
+//                            }
 
                             ReminderOptions.DATE_AND_TIME -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
