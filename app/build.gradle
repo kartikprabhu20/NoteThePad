@@ -12,14 +12,15 @@ android {
     namespace 'com.mintanable.notethepad'
     compileSdk 35
 
-    def gitTag = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
-    def rawBuildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "1"
-    def buildNumber = rawBuildNumber.toInteger()
-
     defaultConfig {
         applicationId "com.mintanable.notethepad"
         minSdk 26
         targetSdk 35
+
+
+        def gitTag = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
+        def rawBuildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "1"
+        def buildNumber = rawBuildNumber.toInteger()
         versionCode 100 + buildNumber
         versionName gitTag.startsWith("v") ? gitTag.substring(1) : gitTag
 
@@ -95,6 +96,17 @@ android {
     configurations {
         canaryImplementation.extendsFrom(testImplementation)
         canaryImplementation.extendsFrom(androidTestImplementation)
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def name = "NoteThePad"
+            def verName = variant.versionName
+            def verCode = variant.versionCode
+            def type = variant.buildType.name
+
+            outputFileName = "${name}-v${verName}-b${verCode}-${type}.apk"
+        }
     }
 }
 

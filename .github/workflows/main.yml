@@ -41,15 +41,36 @@ jobs:
       - name: Verify Versioning
         run: ./gradlew printVersionInfo
 
-      - name: Build Release Bundle
-        run: ./gradlew bundleRelease
+      - name: Build Release Bundle & APK
+        run: ./gradlew bundleRelease assembleRelease
         env:
-            KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-            KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-            KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          DRIVE_CLIENT_ID: ${{ secrets.DRIVE_CLIENT_ID }}
+          DRIVE_CLIENT_SECRET: ${{ secrets.DRIVE_CLIENT_SECRET }}
 
-      - name: Build App
+      - name: Build Debug APK
         run: ./gradlew assembleDebug
         env:
           DRIVE_CLIENT_ID: ${{ secrets.DRIVE_CLIENT_ID }}
           DRIVE_CLIENT_SECRET: ${{ secrets.DRIVE_CLIENT_SECRET }}
+
+
+      - name: Upload Release Bundle (AAB)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mintanable-Release-Bundle
+          path: app/build/outputs/bundle/release/*.aab
+
+      - name: Upload Release APK (Signed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mintanable-Release-APK
+          path: app/build/outputs/apk/release/NoteThePad-*.apk
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mintanable-Debug-APK
+          path: app/build/outputs/apk/debug/NoteThePad-*.apk
