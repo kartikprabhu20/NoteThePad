@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigati
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +37,10 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.google.firebase.auth.GoogleAuthProvider
+import com.mintanable.notethepad.BuildConfig
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
+import com.mintanable.notethepad.ui.theme.ThemePreviews
+import com.mintanable.notethepad.ui.util.Screen
 
 @Composable
 fun AppDrawer(
@@ -42,33 +51,53 @@ fun AppDrawer(
     onItemSelected: (Int, NavigationDrawerItem) -> Unit
 ) {
     ModalDrawerSheet(modifier = modifier) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = 16.dp)
-        ) {
-            item {
-                DrawerHeader(user = user, modifier = Modifier.fillMaxWidth())
-                Spacer(modifier = Modifier.height(8.dp))
+
+        Column(modifier = Modifier.fillMaxHeight()) {
+            DrawerHeader(user = user, modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                itemsIndexed(
+                    items = items,
+                    key = { _, item -> item.route }
+                ) { index, item ->
+                    NavigationDrawerItem(
+                        label = { Text(text = item.title) },
+                        selected = index == selectedItemIndex,
+                        onClick = {
+                            onItemSelected(index, item)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = item.title
+                            )
+                        },
+                        modifier = Modifier
+                            .padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
             }
 
-            itemsIndexed(
-                items = items,
-                key = { _, item -> item.route }
-            ) { index, item ->
-                NavigationDrawerItem(
-                    label = { Text(text = item.title) },
-                    selected = index == selectedItemIndex,
-                    onClick = {
-                        onItemSelected(index, item)
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.title
-                        )
-                    },
-                    modifier = Modifier
-                        .padding(NavigationDrawerItemDefaults.ItemPadding)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                Text(
+                    text = "Version ${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Build ${BuildConfig.VERSION_CODE}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -122,13 +151,9 @@ fun DrawerHeader(
     }
 }
 
-@Preview(name = "Light Mode", showBackground = true)
-@Preview(
-    name = "Dark Mode",
-    showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@ThemePreviews
 @Composable
-fun previewDrawHeader(){
+fun PreviewDrawHeader(){
     NoteThePadTheme {
         DrawerHeader("NoteThePad",
             User(
@@ -138,5 +163,40 @@ fun previewDrawHeader(){
                 "testuri",
                 false),
             Modifier)
+    }
+}
+
+@ThemePreviews
+@Composable
+fun PreviewAppDrawer() {
+    NoteThePadTheme {
+        AppDrawer(
+            user = null,
+            items = listOf(
+                NavigationDrawerItem(
+                    title = "Home",
+                    icon = Icons.Filled.Home,
+                    route = Screen.NotesScreen.route
+                ),
+                NavigationDrawerItem(
+                    title = "Settings",
+                    icon = Icons.Filled.Settings,
+                    route = Screen.SettingsScreen.route
+                ),
+                NavigationDrawerItem(
+                    title = "Login",
+                    icon = Icons.AutoMirrored.Filled.Login,
+                    route = Screen.FirebaseLoginScreen.route
+                ),
+                NavigationDrawerItem(
+                    title = "Logout",
+                    icon = Icons.AutoMirrored.Filled.Logout,
+                    route = Screen.LogOut.route
+                ),
+
+            ),
+            selectedItemIndex = 1,
+            onItemSelected = {_,_ -> },
+        )
     }
 }

@@ -21,6 +21,7 @@ android {
         def gitTag = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
         def rawBuildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "1"
         def buildNumber = rawBuildNumber.toInteger()
+
         versionCode 100 + buildNumber
         versionName gitTag.startsWith("v") ? gitTag.substring(1) : gitTag
 
@@ -61,7 +62,6 @@ android {
         }
     }
     compileOptions {
-        // Updated to Java 17, required for modern Android/Gradle versions
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -72,40 +72,52 @@ android {
         compose true
         buildConfig true
     }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-            excludes += "META-INF/DEPENDENCIES"
-            excludes += "META-INF/LICENSE"
 
-            excludes += "META-INF/LICENSE.md"
-            excludes += "META-INF/LICENSE-notice.md"
-            excludes += "META-INF/NOTICE"
-            excludes += "META-INF/NOTICE.txt"
-            excludes += "META-INF/junit-jupiter-api.kotlin_module"
-        }
-    }
-
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
-        arg("dagger.fastInit", "enabled")
-        arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
-        arg("dagger.hilt.disableModulesHaveInstallInCheck", "true")
-    }
-
-    configurations {
-        canaryImplementation.extendsFrom(testImplementation)
-        canaryImplementation.extendsFrom(androidTestImplementation)
-    }
-
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
             def name = "NoteThePad"
             def verName = variant.versionName
             def verCode = variant.versionCode
             def type = variant.buildType.name
 
             outputFileName = "${name}-v${verName}-b${verCode}-${type}.apk"
+        }
+    }
+
+    // Modern AAB Naming Logic (Using layout.buildDirectory)
+    tasks.configureEach { task ->
+        if (task.name.startsWith("bundle") && !task.name.contains("Classes")) {
+            def renameTaskName = "rename${task.name.capitalize()}Output"
+
+            tasks.register(renameTaskName) {
+                doLast {
+                    def name = "NoteThePad"
+                    def verName = defaultConfig.versionName
+                    def verCode = defaultConfig.versionCode
+                    def type = task.name.toLowerCase().contains("release") ? "release" : "debug"
+
+                    def buildDirectory = layout.buildDirectory.get().asFile
+                    def bundleDir = new File(buildDirectory, "outputs/bundle/${type}")
+                    def oldFile = new File(bundleDir, "app-${type}.aab")
+                    def newFile = new File(bundleDir, "${name}-v${verName}-b${verCode}-${type}.aab")
+
+                    if (oldFile.exists()) {
+                        oldFile.renameTo(newFile)
+                        println "🚀 Renamed Bundle to: ${newFile.name}"
+                    }
+                }
+            }
+            task.finalizedBy(renameTaskName)
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE*"
+            excludes += "META-INF/NOTICE*"
+            excludes += "META-INF/*.kotlin_module"
         }
     }
 }

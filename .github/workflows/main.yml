@@ -1,15 +1,18 @@
-name: Android Unit Tests
+name: Android CI and Release
 
 on: # Run whenever push to main or pr to main
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:  #for manual trigger
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   test_job:
     runs-on: ubuntu-latest
+    # Required to create Releases and upload Assets
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Code
@@ -38,8 +41,11 @@ jobs:
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/release.jks
 
-      - name: Verify Versioning
-        run: ./gradlew printVersionInfo
+      - name: Extract Version Name
+        id: get_version
+        run: |
+          VERSION_NAME=$(./gradlew -q printVersionName)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
 
       - name: Build Release Bundle & APK
         run: ./gradlew bundleRelease assembleRelease
@@ -56,35 +62,26 @@ jobs:
           DRIVE_CLIENT_ID: ${{ secrets.DRIVE_CLIENT_ID }}
           DRIVE_CLIENT_SECRET: ${{ secrets.DRIVE_CLIENT_SECRET }}
 
-
-      - name: Upload Release Bundle (AAB)
+      - name: Upload Artifacts to Actions Tab
         uses: actions/upload-artifact@v4
         with:
-          name: Mintanable-Release-Bundle
-          path: app/build/outputs/bundle/release/*.aab
-
-      - name: Upload Release APK (Signed)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mintanable-Release-APK
-          path: app/build/outputs/apk/release/NoteThePad-*.apk
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mintanable-Debug-APK
-          path: app/build/outputs/apk/debug/NoteThePad-*.apk
-
+          name: Mintanable-Builds-v${{ steps.get_version.outputs.VERSION_NAME }}
+          path: |
+            app/build/outputs/apk/release/NoteThePad-*.apk
+            app/build/outputs/apk/debug/NoteThePad-*.apk
+            app/build/outputs/bundle/release/NoteThePad-*.aab
 
       - name: Create GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.get_version.outputs.VERSION_NAME }}
+          name: Release v${{ steps.get_version.outputs.VERSION_NAME }}
           files: |
-            app/build/outputs/apk/release/NoteThePad-release.apk
-            app/build/outputs/bundle/release/app-release.aab
-            tag_name: v${{ github.run_number }}
-            name: Release v${{ github.run_number }}
-            draft: false
-            prerelease: false
+            app/build/outputs/apk/release/NoteThePad-*.apk
+            app/build/outputs/bundle/release/NoteThePad-*.aab
+          draft: false
+          prerelease: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
