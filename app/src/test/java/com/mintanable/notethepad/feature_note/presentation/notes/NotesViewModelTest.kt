@@ -94,7 +94,7 @@ class NotesViewModelTest {
             awaitItem() // Initial state
             viewModel.onEvent(NotesEvent.Order(newOrder))
             runCurrent()
-            verify(exactly = 1) { noteUseCases.getDetailedNotes(newOrder) }
+            verify(exactly = 2) { noteUseCases.getDetailedNotes(newOrder) }
         }
     }
 
