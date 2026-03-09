@@ -70,9 +70,8 @@ jobs:
         with:
           name: Mintanable-Builds-v${{ steps.get_version.outputs.VERSION_NAME }}
           path: |
-            app/build/outputs/apk/release/NoteThePad-*.apk
-            app/build/outputs/apk/debug/NoteThePad-*.apk
-            app/build/outputs/bundle/release/NoteThePad-*.aab
+            app/build/outputs/apk/*/NoteThePad-*.apk
+            app/build/outputs/bundle/*/NoteThePad-*.aab
 
       - name: Create GitHub Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

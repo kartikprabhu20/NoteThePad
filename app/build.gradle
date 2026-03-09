@@ -18,9 +18,11 @@ android {
         targetSdk 35
 
 
-        def gitTag = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
+        def refName = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
         def rawBuildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "1"
         def buildNumber = rawBuildNumber.toInteger()
+        def gitTag = (refName == "main" || refName == "master") ? "1.0.${buildNumber}" : refName
+
 
         versionCode 100 + buildNumber
         versionName gitTag.startsWith("v") ? gitTag.substring(1) : gitTag
@@ -88,28 +90,41 @@ afterEvaluate {
     android.applicationVariants.configureEach { variant ->
         def type = variant.buildType.name
         def variantName = variant.name.capitalize()
+
+        // 1. Rename AAB (Bundles)
         def bundleTaskName = "bundle${variantName}"
-
-        def renameTask = tasks.register("rename${variantName}Bundle") {
-            doLast {
-                def buildDir = layout.buildDirectory.get().asFile
-                def bundleDir = new File(buildDir, "outputs/bundle/${type}")
-                def oldFile = new File(bundleDir, "app-${type}.aab")
-                def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
-
-                if (oldFile.exists()) {
-                    if (oldFile.renameTo(newFile)) {
-                        println "🚀 Renamed Bundle to: ${newFile.name}"
-                    }
-                } else {
-                    println "⚠️ Bundle not found at ${oldFile.absolutePath}"
+        tasks.matching { it.name == bundleTaskName }.configureEach { bundleTask ->
+            def renameBundleTask = tasks.register("rename${variantName}Bundle") {
+                doLast {
+                    def buildDir = layout.buildDirectory.get().asFile
+                    def bundleDir = new File(buildDir, "outputs/bundle/${type}")
+                    def oldFile = new File(bundleDir, "app-${type}.aab")
+                    def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
+                    if (oldFile.exists()) oldFile.renameTo(newFile)
                 }
             }
+            bundleTask.finalizedBy(renameBundleTask)
         }
 
-        // Link the tasks
-        tasks.matching { it.name == bundleTaskName }.configureEach { bundleTask ->
-            bundleTask.finalizedBy(renameTask)
+        // 2. Rename APKs (Assemble)
+        def assembleTaskName = "assemble${variantName}"
+        tasks.matching { it.name == assembleTaskName }.configureEach { assembleTask ->
+            def renameApkTask = tasks.register("rename${variantName}Apk") {
+                doLast {
+                    def buildDir = layout.buildDirectory.get().asFile
+                    def apkDir = new File(buildDir, "outputs/apk/${type}")
+                    // Note: Release APKs are usually in a subfolder named after the build type
+                    def searchDir = type == "release" ? new File(apkDir, "") : apkDir
+
+                    def oldFile = new File(apkDir, "app-${type}.apk")
+                    // If you have a different default name, adjust here
+                    if (!oldFile.exists()) oldFile = new File(apkDir, "app-${type}-unsigned.apk")
+
+                    def newFile = new File(apkDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.apk")
+                    if (oldFile.exists()) oldFile.renameTo(newFile)
+                }
+            }
+            assembleTask.finalizedBy(renameApkTask)
         }
     }
 }
