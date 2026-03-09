@@ -84,37 +84,33 @@ android {
     }
 }
 
-android.applicationVariants.all { variant ->
-    def variantName = variant.name.capitalize()
-    def bundleTaskName = "bundle$variantName"
+afterEvaluate {
+    android.applicationVariants.configureEach { variant ->
+        def type = variant.buildType.name
+        def variantName = variant.name.capitalize()
+        def bundleTaskName = "bundle${variantName}"
 
-    // Check if the bundle task exists for this variant
-    tasks.matching { it.name == bundleTaskName }.configureEach { bundleTask ->
-        def renameTaskName = "rename${variantName}Bundle"
+        def renameTask = tasks.register("rename${variantName}Bundle") {
+            doLast {
+                def buildDir = layout.buildDirectory.get().asFile
+                def bundleDir = new File(buildDir, "outputs/bundle/${type}")
+                def oldFile = new File(bundleDir, "app-${type}.aab")
+                def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
 
-        def renameTask = tasks.maybeCreate(renameTaskName)
-        renameTask.doLast {
-            def name = "NoteThePad"
-            def verName = variant.versionName
-            def verCode = variant.versionCode
-            def type = variant.buildType.name
-
-            // Access the build directory safely
-            def buildDir = layout.buildDirectory.get().asFile
-            def bundleDir = File(buildDir, "outputs/bundle/$type")
-            def oldFile = File(bundleDir, "app-$type.aab")
-            def newFile = File(bundleDir, "${name}-v${verName}-b${verCode}-${type}.aab")
-
-            if (oldFile.exists()) {
-                if (oldFile.renameTo(newFile)) {
-                    println "🚀 Renamed Bundle to: ${newFile.name}"
+                if (oldFile.exists()) {
+                    if (oldFile.renameTo(newFile)) {
+                        println "🚀 Renamed Bundle to: ${newFile.name}"
+                    }
+                } else {
+                    println "⚠️ Bundle not found at ${oldFile.absolutePath}"
                 }
-            } else {
-                println "⚠️ Bundle not found at ${oldFile.absolutePath}"
             }
         }
 
-        bundleTask.finalizedBy(renameTask)
+        // Link the tasks
+        tasks.matching { it.name == bundleTaskName }.configureEach { bundleTask ->
+            bundleTask.finalizedBy(renameTask)
+        }
     }
 }
 
