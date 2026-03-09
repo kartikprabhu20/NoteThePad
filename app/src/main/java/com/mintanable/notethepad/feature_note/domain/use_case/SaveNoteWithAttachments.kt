@@ -6,6 +6,7 @@ import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
@@ -19,7 +20,7 @@ class SaveNoteWithAttachments(
 ) {
 
     @Throws(InvalidNoteException::class)
-    suspend operator fun invoke(note: Note, tags: List<String> = emptyList()) : Long{
+    suspend operator fun invoke(note: Note, tags: List<Tag> = emptyList()) : Long{
         if(note.title.isBlank()){
             throw InvalidNoteException("The title of the note cant be empty")
         }
@@ -36,7 +37,7 @@ class SaveNoteWithAttachments(
         audioUris: List<Uri> = emptyList(),
         reminderTime: Long,
         checkboxItems: List<CheckboxItem>,
-        tags: List<String> = emptyList()
+        tags: List<Tag> = emptyList()
     ) : Result<Long> {
 
        try{

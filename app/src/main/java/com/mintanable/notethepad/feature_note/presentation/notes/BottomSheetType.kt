@@ -51,7 +51,7 @@ enum class MoreSettingsOptions(
     override val icon: ImageVector
 ) : AdditionalOption {
     PIN("Pin as widget", Icons.Default.PushPin),
-    LABEL("Label", Icons.AutoMirrored.Filled.Label),
+    LABEL("Add label", Icons.AutoMirrored.Filled.Label),
     DELETE("Delete", Icons.Default.Delete),
     COPY("Make a copy", Icons.Default.ContentCopy),
 //    SHARE("Send", Icons.Default.Share)

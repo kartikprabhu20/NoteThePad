@@ -16,7 +16,7 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteConverters
         Tag::class,
         NoteTagCrossRef::class
     ],
-    version = 6
+    version = 7
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase:RoomDatabase() {
@@ -99,6 +99,42 @@ abstract class NoteDatabase:RoomDatabase() {
         """.trimIndent())
 
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_tagName` ON `note_tag_cross_ref` (`tagName`)")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                //Create the new tag table
+                db.execSQL("CREATE TABLE IF NOT EXISTS `tag_table_new` (`tagId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tagName` TEXT NOT NULL)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_tag_table_tagName` ON `tag_table_new` (`tagName`)")
+
+                //Transfer
+                db.execSQL("INSERT INTO `tag_table_new` (`tagName`) SELECT `tagName` FROM `tag_table`")
+
+                // New CrossRef table
+                db.execSQL("""CREATE TABLE IF NOT EXISTS `note_tag_cross_ref_new` (
+                `noteId` INTEGER NOT NULL, 
+                `tagId` INTEGER NOT NULL, 
+                PRIMARY KEY(`noteId`, `tagId`), 
+                FOREIGN KEY(`noteId`) REFERENCES `Note`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE, 
+                FOREIGN KEY(`tagId`) REFERENCES `tag_table`(`tagId`) ON UPDATE NO ACTION ON DELETE CASCADE)""")
+
+                // Transfer CrossRef data by joining the old names to the new IDs
+                db.execSQL("""INSERT INTO `note_tag_cross_ref_new` (`noteId`, `tagId`)
+                SELECT ref.noteId, newTag.tagId
+                FROM note_tag_cross_ref AS ref
+                JOIN tag_table_new AS newTag ON ref.tagName = newTag.tagName""")
+
+                //Cleanup
+                db.execSQL("DROP TABLE `tag_table`")
+                db.execSQL("DROP TABLE `note_tag_cross_ref`")
+
+                //Rename to final names
+                db.execSQL("ALTER TABLE `tag_table_new` RENAME TO `tag_table`")
+                db.execSQL("ALTER TABLE `note_tag_cross_ref_new` RENAME TO `note_tag_cross_ref`")
+
+                //Re-create the index on the final table name
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_tagId` ON `note_tag_cross_ref` (`tagId`)")
             }
         }
     }

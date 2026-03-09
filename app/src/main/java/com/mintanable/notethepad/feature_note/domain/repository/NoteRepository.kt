@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_note.domain.repository
 
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import kotlinx.coroutines.flow.Flow
 
@@ -11,7 +12,7 @@ interface NoteRepository {
 
     suspend fun getNoteById(id:Long):NoteWithTags?
 
-    suspend fun insertNote(note:Note, tags: List<String>): Long
+    suspend fun insertNote(note:Note, tags: List<Tag>): Long
 
     suspend fun deleteNote(note:Note)
 
@@ -21,4 +22,7 @@ interface NoteRepository {
 
     fun getTopNotes(limit: Int): Flow<List<NoteWithTags>>
 
+    fun getAllTags() : Flow<List<Tag>>
+
+    suspend fun insertTag(tag: Tag)
 }

@@ -45,9 +45,8 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.net.toUri
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
-import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.RedOrange
 import com.mintanable.notethepad.ui.theme.ThemePreviews
@@ -241,7 +240,7 @@ fun NoteItemPreviewCheckboxes() {
                                 reminderTime = 1,
                                 checkListItems = listOf(CheckboxItem(text = "abc")),
                                 isCheckboxListAvailable = true,
-                                tags = listOf("abc")
+                                tags = listOf(Tag("abc"))
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},
@@ -279,7 +278,7 @@ fun NoteItemPreview() {
                                 imageUris = listOf("image".toUri()),
                                 audioAttachments = listOf(Attachment("x".toUri(),123)),
                                 reminderTime = 1,
-                                tags = listOf("abc")
+                                tags = listOf(Tag("abc"))
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},

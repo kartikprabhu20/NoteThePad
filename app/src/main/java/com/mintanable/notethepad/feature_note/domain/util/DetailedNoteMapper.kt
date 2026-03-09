@@ -5,6 +5,7 @@ import androidx.core.net.toUri
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -16,7 +17,7 @@ class DetailedNoteMapper @Inject constructor(
 
     private val durationCache = LruCache<String, Long>(100)
 
-    suspend fun toDetailedNote(note: Note, tags: List<String> = emptyList()): DetailedNote = coroutineScope {
+    suspend fun toDetailedNote(note: Note, tags: List<Tag> = emptyList()): DetailedNote = coroutineScope {
 
         val audioAttachments = if (note.audioUris.isEmpty()) {
             emptyList()

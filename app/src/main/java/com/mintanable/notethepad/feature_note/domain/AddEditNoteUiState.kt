@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_note.domain
 import android.net.Uri
 import androidx.compose.runtime.Stable
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
@@ -19,7 +20,7 @@ data class AddEditNoteUiState(
     val reminderTime: Long = -1L,
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
-    val tags: List<String> = emptyList(),
+    val tags: List<Tag> = emptyList(),
 
     val isRecording: Boolean = false,
     val isSaving: Boolean = false,

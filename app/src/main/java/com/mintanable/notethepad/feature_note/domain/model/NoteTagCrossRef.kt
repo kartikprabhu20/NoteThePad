@@ -7,7 +7,7 @@ import androidx.room.Index
 
 @Entity(
     tableName = "note_tag_cross_ref",
-    primaryKeys = ["noteId", "tagName"],
+    primaryKeys = ["noteId", "tagId"],
     foreignKeys = [
         ForeignKey(
             entity = Note::class,
@@ -17,14 +17,14 @@ import androidx.room.Index
         ),
         ForeignKey(
             entity = Tag::class,
-            parentColumns = ["tagName"],
-            childColumns = ["tagName"],
+            parentColumns = ["tagId"],
+            childColumns = ["tagId"],
             onDelete = ForeignKey.CASCADE // If tag is deleted, the link is deleted
         )
     ],
-    indices = [Index("tagName")]
+    indices = [Index("tagId")]
 )
 data class NoteTagCrossRef(
     val noteId: Long,
-    val tagName: String
+    val tagId: Long
 )

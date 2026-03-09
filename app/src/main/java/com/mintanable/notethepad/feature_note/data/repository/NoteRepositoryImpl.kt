@@ -36,14 +36,14 @@ class NoteRepositoryImpl(
         return noteDao.getNoteById(id)
     }
 
-    override suspend fun insertNote(note: Note, tags: List<String>) : Long {
+    override suspend fun insertNote(note: Note, tags: List<Tag>) : Long {
         return withContext(Dispatchers.IO) {
             db.withTransaction {
                 val noteId = noteDao.inserNote(note)
                 noteDao.deleteLinksForNote(noteId)
-                tags.forEach { tagName ->
-                    tagDao.insertTag(Tag(tagName))
-                    noteDao.insertNoteTagCrossRef(NoteTagCrossRef(noteId, tagName))
+                tags.forEach { tag ->
+                    val tagId = tagDao.insertTag(tag)
+                    noteDao.insertNoteTagCrossRef(NoteTagCrossRef(noteId, tagId))
                 }
                 noteId
             }
@@ -64,5 +64,13 @@ class NoteRepositoryImpl(
 
     override fun getTopNotes(limit: Int): Flow<List<NoteWithTags>> {
         return noteDao.getTopNotes(limit)
+    }
+
+    override fun getAllTags(): Flow<List<Tag>> {
+        return tagDao.getAllTags()
+    }
+
+    override suspend fun insertTag(tag: Tag) {
+        tagDao.insertTag(tag)
     }
 }

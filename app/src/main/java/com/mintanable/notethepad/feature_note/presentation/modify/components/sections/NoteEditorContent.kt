@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent
@@ -65,7 +66,7 @@ fun NoteEditorContent(
     attachedAudios: List<Attachment>,
     mediaState: MediaState?,
     reminderTime: Long,
-    tags: List<String> = emptyList(),
+    tags: List<Tag> = emptyList(),
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -273,7 +274,7 @@ fun NoteEditorContent(
 
                     tagsSection(
                         tags = tags,
-                        onDelete = { tag -> onEvent(AddEditNoteEvent.DeleteLabel(tag)) },
+                        onDelete = { tagName -> onEvent(AddEditNoteEvent.DeleteLabel(tagName)) },
                     )
                 }
             }

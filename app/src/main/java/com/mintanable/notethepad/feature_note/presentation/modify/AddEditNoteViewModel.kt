@@ -13,6 +13,7 @@ import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvi
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
@@ -300,17 +301,17 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.InsertLabel -> {
                 _uiState.update { currentState ->
-                    val newTags = if (currentState.tags.contains(event.tag)) {
+                    val newTags = if (currentState.tags.map { it.tagName }.contains(event.tagName)) {
                         currentState.tags
                     } else {
-                        currentState.tags + event.tag
+                        currentState.tags + Tag(event.tagName)
                     }
                     currentState.copy(tags = newTags, showAddNewTagDialog = false)
                 }
             }
             is AddEditNoteEvent.DeleteLabel -> {
                 _uiState.update { currentState ->
-                    val newList = currentState.tags.filterNot { it == event.tag }
+                    val newList = currentState.tags.filterNot { it.tagName == event.tagName }
                     currentState.copy(tags = newList, showAddNewTagDialog = false)
                 }
             }

@@ -33,6 +33,6 @@ sealed class AddEditNoteEvent{
     data class AddChecklistItem(val previousCheckItem: CheckboxItem): AddEditNoteEvent()
     data object PinNote : AddEditNoteEvent()
     data object ShowLabelDialog : AddEditNoteEvent()
-    data class InsertLabel(val tag: String) : AddEditNoteEvent()
-    data class DeleteLabel(val tag: String) : AddEditNoteEvent()
+    data class InsertLabel(val tagName: String) : AddEditNoteEvent()
+    data class DeleteLabel(val tagName: String) : AddEditNoteEvent()
 }

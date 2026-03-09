@@ -35,11 +35,11 @@ data class NoteWithTags(
     @Embedded val note: Note,
     @Relation(
         parentColumn = "id",
-        entityColumn = "tagName",
+        entityColumn = "tagId",
         associateBy = Junction(
             value = NoteTagCrossRef::class,
             parentColumn = "noteId",
-            entityColumn = "tagName"
+            entityColumn = "tagId"
         )
     )
     val tags: List<Tag> = emptyList()

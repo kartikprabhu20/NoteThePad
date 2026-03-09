@@ -13,6 +13,7 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
+import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.CreateFile
 import com.mintanable.notethepad.feature_note.domain.use_case.CreateUri
@@ -33,8 +34,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGetNavigationDrawerItemsUseCase(repository: NavigationDrawerItemRepository): GetNavigationDrawerItems {
-        return GetNavigationDrawerItems(repository)
+    fun provideGetNavigationDrawerItemsUseCase(repository: NavigationDrawerItemRepository, noteRepository: NoteRepository): GetNavigationDrawerItems {
+        return GetNavigationDrawerItems(repository, noteRepository)
     }
 
     @Provides

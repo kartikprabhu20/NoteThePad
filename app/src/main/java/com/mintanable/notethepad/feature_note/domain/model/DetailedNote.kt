@@ -14,7 +14,7 @@ data class DetailedNote (
     val reminderTime: Long = -1,
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
-    val tags: List<String> = emptyList()
+    val tags: List<Tag> = emptyList()
 ){
     fun toNote(): Note{
         return Note(

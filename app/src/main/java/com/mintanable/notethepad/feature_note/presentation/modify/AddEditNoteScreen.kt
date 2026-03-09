@@ -333,7 +333,7 @@ fun AddEditNoteScreen(
         if (uiState.showAddNewTagDialog){
             EditTextDialog(
                 onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs)} ,
-                onConfirm = {tag -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tag))}
+                onConfirm = {tagName -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tagName))}
             )
         }
 

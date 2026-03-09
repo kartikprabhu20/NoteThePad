@@ -20,7 +20,7 @@ class GetDetailedNotes(
         return repository.getNotes(order).map { notesList ->
             coroutineScope {
                 notesList.map { noteWithTags ->
-                    async { detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags.map { it.tagName }) }
+                    async { detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags) }
                 }.awaitAll()
             }
         }.flowOn(Dispatchers.Default)

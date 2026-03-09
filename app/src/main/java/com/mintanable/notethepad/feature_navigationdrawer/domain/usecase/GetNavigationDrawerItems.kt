@@ -39,9 +39,9 @@ class GetNavigationDrawerItems(
                         tags.forEach { tag ->
                             resultList.add(
                                 DrawerItem.LabelDrawerItem(
-                                    title = tag.tagName,
+                                    tag = tag,
                                     icon = Icons.AutoMirrored.Outlined.Label,
-                                    route = Screen.LabelsScreen.route + "?label=${tag.tagName}"
+                                    route = Screen.LabelsScreen.route + "?label=${tag.tagId}"
                                 )
                             )
                         }

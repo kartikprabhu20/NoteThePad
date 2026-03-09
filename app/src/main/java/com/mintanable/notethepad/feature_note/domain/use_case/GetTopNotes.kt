@@ -19,7 +19,7 @@ class GetTopNotes(
         return repository.getTopNotes(limit).map { notesList ->
             coroutineScope {
                 notesList.map { noteWithTags ->
-                    async { detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags.map { it.tagName }) }
+                    async { detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags) }
                 }.awaitAll()
             }
         }.flowOn(Dispatchers.Default)

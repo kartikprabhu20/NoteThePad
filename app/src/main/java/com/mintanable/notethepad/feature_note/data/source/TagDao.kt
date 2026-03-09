@@ -5,13 +5,14 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.mintanable.notethepad.feature_note.domain.model.Tag
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TagDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTag(tag: Tag): Long
 
     @Query("SELECT * FROM tag_table")
@@ -19,4 +20,7 @@ interface TagDao {
 
     @Delete
     suspend fun deleteTag(tag: Tag)
+
+    @Update
+    suspend fun updateTag(tag: Tag)
 }

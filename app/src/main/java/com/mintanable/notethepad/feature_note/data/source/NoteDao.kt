@@ -36,11 +36,13 @@ interface NoteDao {
 
     @Transaction
     @Query("""
-        SELECT * FROM Note 
-        INNER JOIN note_tag_cross_ref ON Note.id = note_tag_cross_ref.noteId 
-        WHERE note_tag_cross_ref.tagName = :tag
+    SELECT * FROM note
+    WHERE id IN (
+        SELECT noteId FROM note_tag_cross_ref 
+        WHERE tagId = :tagId
+    )
     """)
-    fun getNotesByTag(tag: String): Flow<List<NoteWithTags>>
+    fun getNotesByTag(tagId: Long): Flow<List<NoteWithTags>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserNote(note: Note): Long
