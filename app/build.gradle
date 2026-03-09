@@ -93,38 +93,38 @@ afterEvaluate {
 
         // 1. Rename AAB (Bundles)
         def bundleTaskName = "bundle${variantName}"
-        tasks.matching { it.name == bundleTaskName }.configureEach { bundleTask ->
-            def renameBundleTask = tasks.register("rename${variantName}Bundle") {
-                doLast {
-                    def buildDir = layout.buildDirectory.get().asFile
-                    def bundleDir = new File(buildDir, "outputs/bundle/${type}")
-                    def oldFile = new File(bundleDir, "app-${type}.aab")
-                    def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
-                    if (oldFile.exists()) oldFile.renameTo(newFile)
+        tasks.matching { it.name == bundleTaskName }.all { bundleTask ->
+            bundleTask.doLast {
+                def buildDir = layout.buildDirectory.get().asFile
+                def bundleDir = new File(buildDir, "outputs/bundle/${type}")
+                def oldFile = new File(bundleDir, "app-${type}.aab")
+                def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
+
+                if (oldFile.exists()) {
+                    oldFile.renameTo(newFile)
+                    println "🚀 Renamed Bundle to: ${newFile.name}"
                 }
             }
-            bundleTask.finalizedBy(renameBundleTask)
         }
 
-        // 2. Rename APKs (Assemble)
+        // 2. Logic for APK (Assemble)
         def assembleTaskName = "assemble${variantName}"
-        tasks.matching { it.name == assembleTaskName }.configureEach { assembleTask ->
-            def renameApkTask = tasks.register("rename${variantName}Apk") {
-                doLast {
-                    def buildDir = layout.buildDirectory.get().asFile
-                    def apkDir = new File(buildDir, "outputs/apk/${type}")
-                    // Note: Release APKs are usually in a subfolder named after the build type
-                    def searchDir = type == "release" ? new File(apkDir, "") : apkDir
+        tasks.matching { it.name == assembleTaskName }.all { assembleTask ->
+            assembleTask.doLast {
+                def buildDir = layout.buildDirectory.get().asFile
+                def apkDir = new File(buildDir, "outputs/apk/${type}")
+                def oldFile = new File(apkDir, "app-${type}.apk")
 
-                    def oldFile = new File(apkDir, "app-${type}.apk")
-                    // If you have a different default name, adjust here
-                    if (!oldFile.exists()) oldFile = new File(apkDir, "app-${type}-unsigned.apk")
+                // If standard name isn't found, try the unsigned version
+                if (!oldFile.exists()) oldFile = new File(apkDir, "app-${type}-unsigned.apk")
 
-                    def newFile = new File(apkDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.apk")
-                    if (oldFile.exists()) oldFile.renameTo(newFile)
+                def newFile = new File(apkDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.apk")
+
+                if (oldFile.exists()) {
+                    oldFile.renameTo(newFile)
+                    println "🚀 Renamed APK to: ${newFile.name}"
                 }
             }
-            assembleTask.finalizedBy(renameApkTask)
         }
     }
 }
