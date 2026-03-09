@@ -47,6 +47,9 @@ class NotesViewModel @Inject constructor(
     private val _noteOrder = MutableStateFlow<NoteOrder>(NoteOrder.Date(OrderType.Descending))
     val noteOrder = _noteOrder.asStateFlow()
 
+    private val _showLabelDialog = MutableStateFlow(false)
+    val showLabelDialog = _showLabelDialog
+
     private val _isOrderSectionVisible = MutableStateFlow(false)
     val isOrderSectionVisible = _isOrderSectionVisible.asStateFlow()
 
@@ -124,6 +127,12 @@ class NotesViewModel @Inject constructor(
                 viewModelScope.launch {
                     _eventFlow.emit(UiEvent.RequestWidgetPin(event.detailedNote))
                 }
+            }
+            is NotesEvent.ShowLabelDialog -> {
+                _showLabelDialog.value = true
+            }
+            is NotesEvent.DismissLabelDialog -> {
+                _showLabelDialog.value = false
             }
         }
     }

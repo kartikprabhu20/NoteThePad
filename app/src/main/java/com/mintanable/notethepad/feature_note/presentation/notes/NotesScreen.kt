@@ -32,16 +32,17 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.mintanable.notethepad.R
+import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
 import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
+import com.mintanable.notethepad.feature_settings.presentation.components.EditTextDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +64,7 @@ fun NotesScreen (
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
     val currentOrder by notesViewModel.noteOrder.collectAsStateWithLifecycle()
     val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
+    val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
 
@@ -80,6 +82,13 @@ fun NotesScreen (
     val snackBarHostState = remember { SnackbarHostState() }
     EvenHandler(snackBarHostState = snackBarHostState)
 
+    if(showLabelDialog){
+        EditTextDialog(
+            onDismiss = { notesViewModel.onEvent(NotesEvent.DismissLabelDialog)},
+            onConfirm = { }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -87,22 +96,30 @@ fun NotesScreen (
                 user = user,
                 items = navigationDrawerState.items,
                 selectedItemIndex =  selectedItemIndex,
-                onItemSelected = { index, navigationItem ->
-                    selectedItemIndex = index
-                    scope.launch {
-                        drawerState.close()
-                    }
+                onItemSelected = { index, item ->
+                    scope.launch { drawerState.close() }
 
-                    if(navigationItem.route == "logout"){
-                        scope.launch {
-                            authViewModel.signOut()
-                            onLogOut()
+                    when (item) {
+                        is DrawerItem.NavigationDrawerItem -> {
+                            selectedItemIndex = index
+                            if (item.route == Screen.LogOut.route) {
+                                scope.launch {
+                                    authViewModel.signOut()
+                                    onLogOut()
+                                }
+                            } else {
+                                navController.navigate(item.route) {
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
                         }
-                    } else {
-                        navController.navigate(navigationItem.route) {
-                            launchSingleTop = true
-                            restoreState = true
+
+                        is DrawerItem.AddLabelDrawerItem -> {
+                            notesViewModel.onEvent(NotesEvent.ShowLabelDialog)
                         }
+
+                        else -> Unit // Do nothing for Dividers or Headers
                     }
                 }
             )

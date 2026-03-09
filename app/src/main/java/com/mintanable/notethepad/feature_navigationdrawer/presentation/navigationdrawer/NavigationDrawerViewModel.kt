@@ -2,7 +2,6 @@ package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigati
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.feature_navigationdrawer.domain.model.NavigationDrawerItem
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import android.util.Log
+import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 
 @HiltViewModel
 class NavigationDrawerViewModel @Inject constructor(
@@ -40,5 +40,5 @@ class NavigationDrawerViewModel @Inject constructor(
 }
 
 data class NavigationDrawerState(
-    val items: List<NavigationDrawerItem> = emptyList()
+    val items: List<DrawerItem> = emptyList()
 )
