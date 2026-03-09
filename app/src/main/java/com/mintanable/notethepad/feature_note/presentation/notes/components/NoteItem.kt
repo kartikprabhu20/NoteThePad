@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
@@ -41,8 +42,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import androidx.core.net.toUri
+import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.RedOrange
@@ -163,14 +167,24 @@ fun NoteItem(
                         )
                     }
 
-                    if(CheckboxConvertors.isContentCheckboxList(note.content)){
+                    if(note.checkListItems.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Checklist,
-                            contentDescription = "Images attached",
+                            contentDescription = "checkboxes available",
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
                         )
                     }
+
+                    if(note.tags.isNotEmpty()){
+                        Icon(
+                            imageVector = Icons.Default.Label,
+                            contentDescription = "Tags available",
+                            modifier = Modifier.alpha(alpha = 0.5f),
+                            tint = Color.Black
+                        )
+                    }
+
                     Spacer(modifier = Modifier.weight(1f))
 
                     if(enableDeleteIcon) {
@@ -205,6 +219,46 @@ fun NoteItem(
 
 @ThemePreviews
 @Composable
+fun NoteItemPreviewCheckboxes() {
+    NoteThePadTheme {
+        SharedTransitionLayout {
+            AnimatedContent(targetState = true, label = "preview") { isVisible ->
+                if (isVisible) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        NoteItem(
+                            note = DetailedNote(
+                                title = "Meeting Notes",
+                                content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
+                                timestamp = System.currentTimeMillis(),
+                                color = RedOrange.toArgb(),
+                                id = 1,
+                                imageUris = listOf("image".toUri()),
+                                audioAttachments = listOf(Attachment("x".toUri(),123)),
+                                reminderTime = 1,
+                                checkListItems = listOf(CheckboxItem(text = "abc")),
+                                isCheckboxListAvailable = true,
+                                tags = listOf("abc")
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            onDeleteClick = {},
+                            onPinClick = {},
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this@AnimatedContent
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@ThemePreviews
+@Composable
 fun NoteItemPreview() {
     NoteThePadTheme {
         SharedTransitionLayout {
@@ -222,9 +276,10 @@ fun NoteItemPreview() {
                                 timestamp = System.currentTimeMillis(),
                                 color = RedOrange.toArgb(),
                                 id = 1,
-                                imageUris = listOf(),
-                                audioAttachments = listOf(),
-                                reminderTime = 1
+                                imageUris = listOf("image".toUri()),
+                                audioAttachments = listOf(Attachment("x".toUri(),123)),
+                                reminderTime = 1,
+                                tags = listOf("abc")
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},

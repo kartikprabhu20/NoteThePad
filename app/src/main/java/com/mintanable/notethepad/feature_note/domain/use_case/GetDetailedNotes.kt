@@ -19,8 +19,8 @@ class GetDetailedNotes(
     operator fun invoke(order: NoteOrder): Flow<List<DetailedNote>> {
         return repository.getNotes(order).map { notesList ->
             coroutineScope {
-                notesList.map { note ->
-                    async { detailedNoteMapper.toDetailedNote(note) }
+                notesList.map { noteWithTags ->
+                    async { detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags.map { it.tagName }) }
                 }.awaitAll()
             }
         }.flowOn(Dispatchers.Default)

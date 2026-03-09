@@ -8,18 +8,17 @@ import com.mintanable.notethepad.feature_firebase.domain.repository.AuthReposito
 import com.mintanable.notethepad.feature_navigationdrawer.data.repository.NavigationDrawerItemRepositoryImpl
 import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
-import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
-import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
-import com.mintanable.notethepad.feature_note.data.source.NoteDao
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
-import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
+import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl
-import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
-import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
-import com.mintanable.notethepad.feature_note.domain.use_case.*
-import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
+import com.mintanable.notethepad.feature_note.domain.use_case.CreateFile
+import com.mintanable.notethepad.feature_note.domain.use_case.CreateUri
+import com.mintanable.notethepad.feature_note.domain.use_case.DeleteFiles
+import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.SaveMediaToStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,25 +30,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    @Provides
-    fun provideNoteRepository(dao: NoteDao): NoteRepository {
-        return NoteRepositoryImpl(dao)
-    }
-
-    @Provides
-    fun provideNoteUseCases(
-        repository: NoteRepository,
-        fileManager: FileManager,
-        detailedNoteMapper: DetailedNoteMapper,
-        @ApplicationContext context: Context): NoteUseCases {
-        return NoteUseCases(
-            getDetailedNotes = GetDetailedNotes(repository, detailedNoteMapper),
-            deleteNote = DeleteNote(repository),
-            saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
-            getDetailedNote = GetDetailedNote(repository, detailedNoteMapper),
-            getTopNotes = GetTopNotes(repository, detailedNoteMapper)
-        )
-    }
 
     @Provides
     @Singleton

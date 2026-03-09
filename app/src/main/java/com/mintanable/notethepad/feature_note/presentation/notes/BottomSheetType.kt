@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
@@ -20,7 +21,8 @@ enum class BottomSheetType {
     VIDEO_SOURCES,
     AUDIO_SOURCES,
     AUDIO_RECORDER,
-    CHECKBOX
+    CHECKBOX,
+    LABEL
 }
 
 interface AdditionalOption {
@@ -49,8 +51,8 @@ enum class MoreSettingsOptions(
     override val icon: ImageVector
 ) : AdditionalOption {
     PIN("Pin as widget", Icons.Default.PushPin),
+    LABEL("Label", Icons.AutoMirrored.Filled.Label),
     DELETE("Delete", Icons.Default.Delete),
     COPY("Make a copy", Icons.Default.ContentCopy),
-//    SHARE("Send", Icons.Default.Share),
-//    LABEL("Label", Icons.AutoMirrored.Filled.Label)
+//    SHARE("Send", Icons.Default.Share)
 }

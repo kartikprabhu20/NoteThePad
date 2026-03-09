@@ -90,10 +90,10 @@ class NotesViewModelTest {
     fun `Changing note order triggers new database fetch`() = runTest {
         val newOrder = NoteOrder.Title(OrderType.Ascending)
         every { noteUseCases.getDetailedNotes(any()) } returns flowOf(emptyList())
-        viewModel.onEvent(NotesEvent.Order(newOrder))
-        runCurrent()
         viewModel.state.test {
             awaitItem() // Initial state
+            viewModel.onEvent(NotesEvent.Order(newOrder))
+            runCurrent()
             verify(exactly = 1) { noteUseCases.getDetailedNotes(newOrder) }
         }
     }

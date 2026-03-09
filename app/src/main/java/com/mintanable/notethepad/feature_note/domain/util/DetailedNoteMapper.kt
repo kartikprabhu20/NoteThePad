@@ -16,7 +16,7 @@ class DetailedNoteMapper @Inject constructor(
 
     private val durationCache = LruCache<String, Long>(100)
 
-    suspend fun toDetailedNote(note: Note): DetailedNote = coroutineScope {
+    suspend fun toDetailedNote(note: Note, tags: List<String> = emptyList()): DetailedNote = coroutineScope {
 
         val audioAttachments = if (note.audioUris.isEmpty()) {
             emptyList()
@@ -46,7 +46,8 @@ class DetailedNoteMapper @Inject constructor(
             audioAttachments = audioAttachments,
             reminderTime = note.reminderTime,
             checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(note.content) else emptyList(),
-            isCheckboxListAvailable = isCheckbox
+            isCheckboxListAvailable = isCheckbox,
+            tags = tags
         )
     }
 }

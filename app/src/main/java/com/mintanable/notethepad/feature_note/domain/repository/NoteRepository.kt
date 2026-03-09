@@ -1,23 +1,24 @@
 package com.mintanable.notethepad.feature_note.domain.repository
 
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
 
-    fun getNotes(noteOrder: NoteOrder): Flow<List<Note>>
+    fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>>
 
-    suspend fun getNoteById(id:Long):Note?
+    suspend fun getNoteById(id:Long):NoteWithTags?
 
-    suspend fun insertNote(note:Note): Long
+    suspend fun insertNote(note:Note, tags: List<String>): Long
 
     suspend fun deleteNote(note:Note)
 
     suspend fun deleteNoteWithId(id:Long)
 
-    suspend fun getNotesWithFutureReminders(currentTime: Long): List<Note>
+    suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags>
 
-    fun getTopNotes(limit: Int): Flow<List<Note>>
+    fun getTopNotes(limit: Int): Flow<List<NoteWithTags>>
 
 }

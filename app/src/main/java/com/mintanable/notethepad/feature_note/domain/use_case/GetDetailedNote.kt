@@ -12,7 +12,7 @@ class GetDetailedNote(
 ) {
 
     suspend operator fun invoke(id:Long): DetailedNote? = withContext(Dispatchers.IO){
-        val note = repository.getNoteById(id) ?: return@withContext null
-        return@withContext detailedNoteMapper.toDetailedNote(note)
+        val noteWithTags = repository.getNoteById(id) ?: return@withContext null
+        return@withContext detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags.map { it.tagName })
     }
 }

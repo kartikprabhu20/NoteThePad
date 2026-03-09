@@ -18,8 +18,8 @@ class GetTopNotes(
      operator fun invoke(limit: Int): Flow<List<DetailedNote>> {
         return repository.getTopNotes(limit).map { notesList ->
             coroutineScope {
-                notesList.map { note ->
-                    async { detailedNoteMapper.toDetailedNote(note) }
+                notesList.map { noteWithTags ->
+                    async { detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags.map { it.tagName }) }
                 }.awaitAll()
             }
         }.flowOn(Dispatchers.Default)

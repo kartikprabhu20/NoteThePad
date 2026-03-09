@@ -6,15 +6,22 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteTagCrossRef
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.NoteConverters
 
 @Database(
-    entities = [Note::class],
-    version = 5
+    entities = [
+        Note::class,
+        Tag::class,
+        NoteTagCrossRef::class
+    ],
+    version = 6
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase:RoomDatabase() {
     abstract  val noteDao:NoteDao
+    abstract val tagDao: TagDao
 
     companion object{
         const val DATABASE_NAME = "notes_db"
@@ -74,6 +81,24 @@ abstract class NoteDatabase:RoomDatabase() {
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_timestamp` ON `Note` (`timestamp`)")
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_color` ON `Note` (`color`)")
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_reminderTime` ON `Note` (`reminderTime`)")
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `tag_table` (`tagName` TEXT NOT NULL, PRIMARY KEY(`tagName`))")
+
+                db.execSQL("""
+            CREATE TABLE IF NOT EXISTS `note_tag_cross_ref` (
+                `noteId` INTEGER NOT NULL, 
+                `tagName` TEXT NOT NULL, 
+                PRIMARY KEY(`noteId`, `tagName`), 
+                FOREIGN KEY(`noteId`) REFERENCES `Note`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE, 
+                FOREIGN KEY(`tagName`) REFERENCES `tag_table`(`tagName`) ON UPDATE NO ACTION ON DELETE CASCADE 
+            )
+        """.trimIndent())
+
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_tagName` ON `note_tag_cross_ref` (`tagName`)")
             }
         }
     }

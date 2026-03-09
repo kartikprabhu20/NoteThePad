@@ -19,6 +19,7 @@ data class AddEditNoteUiState(
     val reminderTime: Long = -1L,
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
+    val tags: List<String> = emptyList(),
 
     val isRecording: Boolean = false,
     val isSaving: Boolean = false,
@@ -29,5 +30,6 @@ data class AddEditNoteUiState(
     val showAlarmPermissionRationale: Boolean = false,
     val zoomedImageUri: Uri? = null,
     val mediaState: MediaState? = null,
-    val showDataAndTimePicker: Boolean = false
+    val showDataAndTimePicker: Boolean = false,
+    val showAddNewTagDialog: Boolean = false
 )

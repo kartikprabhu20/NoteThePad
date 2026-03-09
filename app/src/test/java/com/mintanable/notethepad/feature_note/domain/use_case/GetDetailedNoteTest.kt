@@ -4,6 +4,8 @@ import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
 import io.mockk.coEvery
@@ -44,7 +46,7 @@ class GetDetailedNoteTest {
             color = 0xFFFFFF,
         )
 
-        coEvery { repository.getNoteById(noteId) } returns fakeNote
+        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNote, tags = listOf( Tag("tag")))
         coEvery { audioMetadataProvider.getDuration(any()) } returns 3500L
 
         val result = getDetailedNote(noteId)
@@ -53,6 +55,7 @@ class GetDetailedNoteTest {
         assertThat(result?.title).isEqualTo("Test Note")
         assertThat(result?.isCheckboxListAvailable).isTrue()
         assertThat(result?.audioAttachments?.first()?.duration).isEqualTo(3500L)
+        assertThat(result?.tags?.get(0)).isEqualTo("tag")
     }
 
     @Test
@@ -80,7 +83,7 @@ class GetDetailedNoteTest {
             color = 0
         )
 
-        coEvery { repository.getNoteById(noteId) } returns fakeNote
+        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNote)
         coEvery { audioMetadataProvider.getDuration(any()) } returns 1000L
 
         getDetailedNote(noteId)

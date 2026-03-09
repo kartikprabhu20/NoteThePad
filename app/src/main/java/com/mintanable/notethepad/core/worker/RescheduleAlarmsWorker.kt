@@ -20,7 +20,8 @@ class RescheduleAlarmsWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         val currentTime = System.currentTimeMillis()
         val notesToRemind = repository.getNotesWithFutureReminders(currentTime)
-        notesToRemind.forEach { note ->
+        notesToRemind.forEach { noteWithTags ->
+            val note = noteWithTags.note
             note.id?.let { scheduler.schedule(id = it, note.title, note.content, note.reminderTime) }
         }
 

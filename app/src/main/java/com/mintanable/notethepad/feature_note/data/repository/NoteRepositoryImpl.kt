@@ -1,17 +1,28 @@
 package com.mintanable.notethepad.feature_note.data.repository
 
+import androidx.room.withTransaction
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
+import com.mintanable.notethepad.feature_note.data.source.NoteDatabase
+import com.mintanable.notethepad.feature_note.data.source.TagDao
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteTagCrossRef
+import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class NoteRepositoryImpl(
-    private val dao: NoteDao
+    private val noteDao: NoteDao,
+    private val tagDao: TagDao,
+    private val db: NoteDatabase
 ) : NoteRepository {
-    override fun getNotes(noteOrder: NoteOrder): Flow<List<Note>> {
-        return dao.getNotes(
+
+    override fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>> {
+        return noteDao.getNotes(
             order = when(noteOrder) {
                 is NoteOrder.Title -> "title"
                 is NoteOrder.Date -> "date"
@@ -21,27 +32,37 @@ class NoteRepositoryImpl(
         )
     }
 
-    override suspend fun getNoteById(id: Long): Note? {
-        return dao.getNoteById(id)
+    override suspend fun getNoteById(id: Long): NoteWithTags? {
+        return noteDao.getNoteById(id)
     }
 
-    override suspend fun insertNote(note: Note) : Long {
-        return dao.inserNote(note)
+    override suspend fun insertNote(note: Note, tags: List<String>) : Long {
+        return withContext(Dispatchers.IO) {
+            db.withTransaction {
+                val noteId = noteDao.inserNote(note)
+                noteDao.deleteLinksForNote(noteId)
+                tags.forEach { tagName ->
+                    tagDao.insertTag(Tag(tagName))
+                    noteDao.insertNoteTagCrossRef(NoteTagCrossRef(noteId, tagName))
+                }
+                noteId
+            }
+        }
     }
 
     override suspend fun deleteNote(note: Note) {
-        return dao.deleteNote(note)
+        return noteDao.deleteNote(note)
     }
 
     override suspend fun deleteNoteWithId(id: Long) {
-        return dao.deleteNoteWithId(id)
+        return noteDao.deleteNoteWithId(id)
     }
 
-    override suspend fun getNotesWithFutureReminders(currentTime: Long) : List<Note> {
-        return dao.getNotesWithFutureReminders(currentTime)
+    override suspend fun getNotesWithFutureReminders(currentTime: Long) : List<NoteWithTags> {
+        return noteDao.getNotesWithFutureReminders(currentTime)
     }
 
-    override fun getTopNotes(limit: Int): Flow<List<Note>> {
-        return dao.getTopNotes(limit)
+    override fun getTopNotes(limit: Int): Flow<List<NoteWithTags>> {
+        return noteDao.getTopNotes(limit)
     }
 }

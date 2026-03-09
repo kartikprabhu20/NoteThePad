@@ -25,7 +25,7 @@ import com.mintanable.notethepad.ui.theme.ThemePreviews
 
 @Composable
 fun TagUI(
-    imageVector: ImageVector,
+    imageVector: ImageVector? = null,
     description: String,
     onDelete: () -> Unit,
     onClick: () -> Unit
@@ -40,13 +40,15 @@ fun TagUI(
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
-            Icon(
-                modifier = Modifier.clickable(
-                    onClick = onClick
-                ),
-                imageVector = imageVector,
-                contentDescription = "icon"
-            )
+            if(imageVector != null) {
+                Icon(
+                    modifier = Modifier.clickable(
+                        onClick = onClick
+                    ),
+                    imageVector = imageVector,
+                    contentDescription = "icon"
+                )
+            }
             Text(modifier = Modifier.clickable(
                 onClick = onClick
             ),

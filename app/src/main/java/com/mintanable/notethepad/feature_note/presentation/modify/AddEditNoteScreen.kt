@@ -9,7 +9,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -63,6 +62,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.ImageSourceOpti
 import com.mintanable.notethepad.feature_note.presentation.notes.MoreSettingsOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.ReminderOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOptions
+import com.mintanable.notethepad.feature_settings.presentation.components.EditTextDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
@@ -265,6 +265,7 @@ fun AddEditNoteScreen(
                 attachedAudios = uiState.attachedAudios,
                 mediaState = uiState.mediaState,
                 reminderTime = uiState.reminderTime,
+                tags = uiState.tags,
                 onEvent = onEvent,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope
@@ -326,6 +327,13 @@ fun AddEditNoteScreen(
                     microphonePermissionState.launchPermissionRequest()
                 },
                 onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
+            )
+        }
+
+        if (uiState.showAddNewTagDialog){
+            EditTextDialog(
+                onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs)} ,
+                onConfirm = {tag -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tag))}
             )
         }
 
@@ -431,6 +439,11 @@ fun AddEditNoteScreen(
 
                             MoreSettingsOptions.PIN -> {
                                 viewModel.onEvent(AddEditNoteEvent.PinNote)
+                            }
+
+                            MoreSettingsOptions.LABEL -> {
+                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                                viewModel.onEvent(AddEditNoteEvent.ShowLabelDialog)
                             }
 
 //                            MoreSettingsOptions.SHARE -> {

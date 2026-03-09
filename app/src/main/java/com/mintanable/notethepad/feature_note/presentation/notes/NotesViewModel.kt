@@ -114,7 +114,9 @@ class NotesViewModel @Inject constructor(
             }
             is NotesEvent.RestoreNote ->{
                 viewModelScope.launch {
-                    noteUseCases.saveNoteWithAttachments(recentlyDeletedNote?.toNote() ?: return@launch)
+                    val note = recentlyDeletedNote?.toNote()?: return@launch
+                    val tags = recentlyDeletedNote?.tags ?: return@launch
+                    noteUseCases.saveNoteWithAttachments(note, tags)
                     recentlyDeletedNote = null
                 }
             }

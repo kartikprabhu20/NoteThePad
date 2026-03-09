@@ -65,6 +65,7 @@ fun NoteEditorContent(
     attachedAudios: List<Attachment>,
     mediaState: MediaState?,
     reminderTime: Long,
+    tags: List<String> = emptyList(),
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -268,6 +269,11 @@ fun NoteEditorContent(
                         reminderTime = reminderTime,
                         onDelete = { onEvent(AddEditNoteEvent.CancelReminder) },
                         onClick = { onEvent(AddEditNoteEvent.CheckAlarmPermission) }
+                    )
+
+                    tagsSection(
+                        tags = tags,
+                        onDelete = { tag -> onEvent(AddEditNoteEvent.DeleteLabel(tag)) },
                     )
                 }
             }

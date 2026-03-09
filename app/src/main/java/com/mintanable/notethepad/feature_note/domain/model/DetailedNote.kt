@@ -13,7 +13,8 @@ data class DetailedNote (
     val audioAttachments: List<Attachment> = emptyList(),
     val reminderTime: Long = -1,
     val checkListItems: List<CheckboxItem> = emptyList(),
-    val isCheckboxListAvailable: Boolean = false
+    val isCheckboxListAvailable: Boolean = false,
+    val tags: List<String> = emptyList()
 ){
     fun toNote(): Note{
         return Note(

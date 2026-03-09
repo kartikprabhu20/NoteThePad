@@ -28,7 +28,7 @@ class SaveNoteWithAttachmentsTest{
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
         saveNote = SaveNoteWithAttachments(repository, fileManager, context)
-        coEvery { repository.insertNote(any()) } returns 1L
+        coEvery { repository.insertNote(any(), any()) } returns 1L
     }
 
     @Test
@@ -41,7 +41,7 @@ class SaveNoteWithAttachmentsTest{
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(InvalidNoteException::class.java)
 
-        coVerify(exactly = 0) { repository.insertNote(any()) }
+        coVerify(exactly = 0) { repository.insertNote(any(), any()) }
     }
 
     @Test
@@ -81,6 +81,8 @@ class SaveNoteWithAttachmentsTest{
                         note.imageUris.contains(newSavedPath1) &&
                         note.audioUris.contains(audioUri.toString()) &&
                         note.audioUris.contains(newSavedPath2)
+            }, match { tags ->
+                tags.isEmpty()
             })
         }
 
@@ -99,13 +101,16 @@ class SaveNoteWithAttachmentsTest{
             timestamp = 1L,
             color = 1,
             reminderTime = 0L,
-            checkboxItems = checkboxes
+            checkboxItems = checkboxes,
+            tags = listOf("tag1", "tag2")
         )
 
         coVerify {
             repository.insertNote(match { note ->
                 // Note content should now be the converted checkbox string, not "Old Text Content"
                 note.content != "Old Text Content"
+            }, match { tags->
+                tags.isNotEmpty() && tags.size == 2 && tags[0] == "tag1" && tags[1] == "tag2"
             })
         }
     }

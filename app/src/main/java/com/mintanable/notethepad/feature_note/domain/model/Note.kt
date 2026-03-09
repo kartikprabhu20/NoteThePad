@@ -1,9 +1,12 @@
 package com.mintanable.notethepad.feature_note.domain.model
 
 import androidx.compose.runtime.Immutable
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.Junction
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import java.lang.Exception
 
 @Immutable
@@ -27,3 +30,17 @@ data class Note(
 )
 
 class InvalidNoteException(message: String):Exception(message)
+
+data class NoteWithTags(
+    @Embedded val note: Note,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "tagName",
+        associateBy = Junction(
+            value = NoteTagCrossRef::class,
+            parentColumn = "noteId",
+            entityColumn = "tagName"
+        )
+    )
+    val tags: List<Tag> = emptyList()
+)

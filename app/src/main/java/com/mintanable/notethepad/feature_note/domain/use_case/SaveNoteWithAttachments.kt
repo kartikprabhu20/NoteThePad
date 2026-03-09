@@ -19,11 +19,11 @@ class SaveNoteWithAttachments(
 ) {
 
     @Throws(InvalidNoteException::class)
-    suspend operator fun invoke(note: Note) : Long{
+    suspend operator fun invoke(note: Note, tags: List<String> = emptyList()) : Long{
         if(note.title.isBlank()){
             throw InvalidNoteException("The title of the note cant be empty")
         }
-        return repository.insertNote(note)
+        return repository.insertNote(note, tags)
     }
 
     suspend operator fun invoke(
@@ -35,7 +35,8 @@ class SaveNoteWithAttachments(
         imageUris: List<Uri> = emptyList(),
         audioUris: List<Uri> = emptyList(),
         reminderTime: Long,
-        checkboxItems: List<CheckboxItem>
+        checkboxItems: List<CheckboxItem>,
+        tags: List<String> = emptyList()
     ) : Result<Long> {
 
        try{
@@ -71,7 +72,8 @@ class SaveNoteWithAttachments(
                     imageUris = imageUriList,
                     audioUris = audioUriList,
                     reminderTime = reminderTime
-                )
+                ),
+                tags
             )
             return Result.success(newNoteId)
         } catch (e: Exception) {

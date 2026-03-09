@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
 import io.mockk.every
@@ -34,7 +36,7 @@ class GetTopNotesTest {
     fun `When invoked, returns mapped detailed notes from repository`() = runTest {
         val limit = 2
         val mockNotes = listOf(
-            Note(
+            NoteWithTags(Note(
                 id = 1,
                 title = "Top 1",
                 content = "...",
@@ -42,23 +44,25 @@ class GetTopNotesTest {
                 timestamp = 0,
                 color = 0
             ),
-            Note(
+                tags = listOf(Tag("test"))
+            ),
+            NoteWithTags(Note(
                 id = 2,
                 title = "Top 2",
                 content = "...",
                 audioUris = emptyList(),
                 timestamp = 0,
                 color = 0
-            )
+            ))
         )
 
         every { repository.getTopNotes(limit) } returns flowOf(mockNotes)
 
-        // Act & Assert (using Turbine)
         getTopNotes(limit).test {
             val result = awaitItem()
             assertThat(result).hasSize(2)
             assertThat(result[0].title).isEqualTo("Top 1")
+            assertThat(result[0].tags.size).isEqualTo(1)
             awaitComplete()
         }
     }

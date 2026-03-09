@@ -97,7 +97,8 @@ class AddEditNoteViewModel @Inject constructor(
                         attachedAudios = detailedNote.audioAttachments,
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,
-                        isCheckboxListAvailable = detailedNote.isCheckboxListAvailable
+                        isCheckboxListAvailable = detailedNote.isCheckboxListAvailable,
+                        tags = detailedNote.tags
                     )
                 }
             }
@@ -215,7 +216,8 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(
                     showCameraRationale = false,
                     showMicrophoneRationale = false,
-                    settingsDeniedType = null
+                    settingsDeniedType = null,
+                    showAddNewTagDialog = false
                 )}
             }
             is AddEditNoteEvent.UpdateSheetType -> {
@@ -288,9 +290,30 @@ class AddEditNoteViewModel @Inject constructor(
                         currentItems + CheckboxItem(text = "", isChecked = event.previousCheckItem.isChecked)
                     }
 
-                    currentState.copy(checkListItems = newList)                }
+                    currentState.copy(checkListItems = newList)
+                }
             }
 
+            is AddEditNoteEvent.ShowLabelDialog -> {
+                _uiState.update { it.copy(showAddNewTagDialog = true) }
+            }
+
+            is AddEditNoteEvent.InsertLabel -> {
+                _uiState.update { currentState ->
+                    val newTags = if (currentState.tags.contains(event.tag)) {
+                        currentState.tags
+                    } else {
+                        currentState.tags + event.tag
+                    }
+                    currentState.copy(tags = newTags, showAddNewTagDialog = false)
+                }
+            }
+            is AddEditNoteEvent.DeleteLabel -> {
+                _uiState.update { currentState ->
+                    val newList = currentState.tags.filterNot { it == event.tag }
+                    currentState.copy(tags = newList, showAddNewTagDialog = false)
+                }
+            }
         }
     }
 
@@ -337,7 +360,8 @@ class AddEditNoteViewModel @Inject constructor(
                 imageUris = state.attachedImages,
                 audioUris = state.attachedAudios.map { it.uri },
                 reminderTime = state.reminderTime,
-                checkboxItems = state.checkListItems
+                checkboxItems = state.checkListItems,
+                tags = state.tags
             )
     }
 
