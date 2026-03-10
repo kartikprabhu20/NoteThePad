@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -60,26 +61,25 @@ class NotesViewModel @Inject constructor(
         MutableStateFlow("")
     val searchInputText = _searchInputText
 
-    val state: StateFlow<NotesState> = combine(
-        _noteOrder,
-        _searchInputText.debounce(300L).distinctUntilChanged(),
-        _noteOrder.flatMapLatest { order -> noteUseCases.getDetailedNotes(order) }
-    ) { order, query, notes ->
-        Log.d("kptest", "order: $order, query: $query")
-        val filtered =
-            if (query.isBlank()) {
+    private val _triggers = combine(_noteOrder, _searchInputText.debounce(300L).distinctUntilChanged()) { order, query ->
+        order to query
+    }
+
+    val state: StateFlow<NotesState> = _triggers.flatMapLatest { (order, query) ->
+        noteUseCases.getDetailedNotes(order).map { notes ->
+            val filtered = if (query.isBlank()) {
                 notes
-            }
-            else {
+            } else {
                 notes.filter {
                     it.title.contains(query, ignoreCase = true) ||
                             it.content.contains(query, ignoreCase = true)
                 }
             }
 
-        NotesState(
-            notes = filtered
-        )
+            NotesState(
+                notes = filtered,
+            )
+        }
     }
         .flowOn(Dispatchers.Default)
         .stateIn(

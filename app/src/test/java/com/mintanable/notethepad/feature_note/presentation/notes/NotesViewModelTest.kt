@@ -88,16 +88,32 @@ class NotesViewModelTest {
         }
     }
 
-
     @Test
     fun `Changing note order triggers new database fetch`() = runTest {
         val newOrder = NoteOrder.Title(OrderType.Ascending)
-        every { noteUseCases.getDetailedNotes(any()) } returns flowOf(emptyList())
+        val mockNotes = listOf(DetailedNote(
+            id = 1,
+            title = "Testing Title",
+            content = "Testing Content",
+            audioAttachments = emptyList(),
+            imageUris = emptyList(),
+            color = 0,
+            timestamp = 0L,
+            isCheckboxListAvailable = false,
+            checkListItems = emptyList(),
+            reminderTime = -1L
+        ))
+        every { noteUseCases.getDetailedNotes(any()) } returns flowOf(emptyList()) // Initial
+        every { noteUseCases.getDetailedNotes(newOrder) } returns flowOf(mockNotes) // After change
+
         viewModel.state.test {
-            awaitItem() // Initial state
+            awaitItem()
             viewModel.onEvent(NotesEvent.Order(newOrder))
+            testScheduler.advanceTimeBy(301L)
             runCurrent()
-            verify(atLeast = 1) { noteUseCases.getDetailedNotes(newOrder) }
+            val finalState = awaitItem()
+            assertThat(finalState.notes).isEqualTo(mockNotes)
+            verify { noteUseCases.getDetailedNotes(newOrder) }
         }
     }
 

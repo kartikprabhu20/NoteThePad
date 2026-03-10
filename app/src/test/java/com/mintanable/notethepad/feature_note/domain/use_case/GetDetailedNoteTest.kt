@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 
 import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
@@ -26,10 +27,11 @@ class GetDetailedNoteTest {
     // Mocks
     private val repository = mockk<NoteRepository>()
     private val audioMetadataProvider = mockk<AudioMetadataProvider>()
+    private val testDispatcherProvider = TestDispatcherProvider()
 
     @Before
     fun setUp() {
-        detailedNoteMapper = DetailedNoteMapper(audioMetadataProvider)
+        detailedNoteMapper = DetailedNoteMapper(audioMetadataProvider, testDispatcherProvider)
         getDetailedNote = GetDetailedNote(repository, detailedNoteMapper)
     }
 

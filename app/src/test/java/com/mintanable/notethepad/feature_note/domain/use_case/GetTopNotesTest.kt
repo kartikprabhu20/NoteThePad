@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
@@ -25,10 +26,11 @@ class GetTopNotesTest {
 
     private val repository = mockk<NoteRepository>()
     private val audioProvider = mockk<AudioMetadataProvider>()
+    private val testDispatcherProvider = TestDispatcherProvider()
 
     @Before
     fun setUp() {
-        mapper = DetailedNoteMapper(audioProvider)
+        mapper = DetailedNoteMapper(audioProvider, testDispatcherProvider)
         getTopNotes = GetTopNotes(repository, mapper)
     }
 

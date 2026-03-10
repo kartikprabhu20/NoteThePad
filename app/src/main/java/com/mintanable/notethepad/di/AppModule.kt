@@ -20,6 +20,8 @@ import com.mintanable.notethepad.feature_note.domain.use_case.CreateUri
 import com.mintanable.notethepad.feature_note.domain.use_case.DeleteFiles
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.SaveMediaToStorage
+import com.mintanable.notethepad.feature_note.domain.util.DefaultDispatcherProvider
+import com.mintanable.notethepad.feature_note.domain.util.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -81,4 +83,9 @@ object AppModule {
     fun provideReminderScheduler(@ApplicationContext context: Context): ReminderScheduler{
         return ReminderSchedulerImpl(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
+
 }
