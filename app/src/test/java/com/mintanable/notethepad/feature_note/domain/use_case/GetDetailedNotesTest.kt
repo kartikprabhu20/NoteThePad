@@ -55,7 +55,7 @@ class GetDetailedNotesTest {
 
         assertThat(result).hasSize(2)
         assertThat(result[0].title).isEqualTo("Apple")
-        assertThat(result[0].tags[0]).isEqualTo("fruits")
+        assertThat(result[0].tags[0]).isEqualTo(Tag("fruits"))
 
         assertThat(result[0].isCheckboxListAvailable).isTrue()
         assertThat(result[0].checkListItems.first().text).isEqualTo("Buy Apple")

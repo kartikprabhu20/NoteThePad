@@ -7,6 +7,7 @@ import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
@@ -40,6 +41,8 @@ class NotesViewModelTest {
     private val getLayoutSettings = mockk<GetLayoutSettings>(relaxed = true)
     private val toggleLayoutSettings = mockk<ToggleLayoutSettings>(relaxed = true)
     private val fileIOUseCases = mockk<FileIOUseCases>(relaxed = true)
+    private val tagUseCases = mockk<TagUseCases>(relaxed = true)
+
 
     private lateinit var viewModel: NotesViewModel
 
@@ -48,7 +51,7 @@ class NotesViewModelTest {
         Dispatchers.setMain(testDispatcher)
         every { getLayoutSettings() } returns flowOf(true)
         viewModel = NotesViewModel(
-            noteUseCases, getLayoutSettings, toggleLayoutSettings, fileIOUseCases
+            noteUseCases,tagUseCases, getLayoutSettings, toggleLayoutSettings, fileIOUseCases
         )
     }
 

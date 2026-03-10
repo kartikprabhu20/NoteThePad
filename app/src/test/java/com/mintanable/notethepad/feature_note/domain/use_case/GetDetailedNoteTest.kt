@@ -55,7 +55,7 @@ class GetDetailedNoteTest {
         assertThat(result?.title).isEqualTo("Test Note")
         assertThat(result?.isCheckboxListAvailable).isTrue()
         assertThat(result?.audioAttachments?.first()?.duration).isEqualTo(3500L)
-        assertThat(result?.tags?.get(0)).isEqualTo("tag")
+        assertThat(result?.tags?.get(0)).isEqualTo(Tag("tag"))
     }
 
     @Test
