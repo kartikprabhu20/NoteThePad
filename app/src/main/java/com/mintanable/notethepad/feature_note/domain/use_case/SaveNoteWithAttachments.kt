@@ -28,7 +28,7 @@ class SaveNoteWithAttachments(
     }
 
     suspend operator fun invoke(
-        id: Long?,
+        id: Long,
         title: String,
         content: String,
         timestamp: Long,

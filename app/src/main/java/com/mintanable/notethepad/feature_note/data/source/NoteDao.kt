@@ -44,8 +44,11 @@ interface NoteDao {
     """)
     fun getNotesByTag(tagId: Long): Flow<List<NoteWithTags>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun inserNote(note: Note): Long
+
+    @Update
+    suspend fun updateNote(note: Note)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef)

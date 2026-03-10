@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,7 +35,7 @@ class SaveNoteWithAttachmentsTest{
     @Test
     fun `Title is blank, returns Result failure`() = runTest {
         val result = saveNote(
-            id = null, title = "   ", content = "", timestamp = 0L,
+            id = 0L, title = "   ", content = "", timestamp = 0L,
             color = 0, reminderTime = 0L, checkboxItems = emptyList()
         )
 
@@ -61,7 +62,7 @@ class SaveNoteWithAttachmentsTest{
         coEvery { fileManager.saveMediaToStorage(externalaudioUri, any()) } returns newSavedPath2
 
         val result = saveNote(
-            id = null,
+            id = 0L,
             title = "Valid Title",
             content = "Content",
             timestamp = 1L,
@@ -95,14 +96,14 @@ class SaveNoteWithAttachmentsTest{
         val checkboxes = listOf(CheckboxItem(text = "Buy Milk", isChecked = true))
 
         saveNote(
-            id = null,
+            id = 0L,
             title = "Grocery List",
             content = "Old Text Content",
             timestamp = 1L,
             color = 1,
             reminderTime = 0L,
             checkboxItems = checkboxes,
-            tags = listOf("tag1", "tag2")
+            tags = listOf(Tag("tag1"), Tag("tag2"))
         )
 
         coVerify {
@@ -110,7 +111,7 @@ class SaveNoteWithAttachmentsTest{
                 // Note content should now be the converted checkbox string, not "Old Text Content"
                 note.content != "Old Text Content"
             }, match { tags->
-                tags.isNotEmpty() && tags.size == 2 && tags[0] == "tag1" && tags[1] == "tag2"
+                tags.isNotEmpty() && tags.size == 2 && tags[0].tagName == "tag1" && tags[1].tagName == "tag2"
             })
         }
     }

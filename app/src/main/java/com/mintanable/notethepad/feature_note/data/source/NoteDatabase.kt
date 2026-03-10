@@ -16,7 +16,7 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteConverters
         Tag::class,
         NoteTagCrossRef::class
     ],
-    version = 7
+    version = 8
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase:RoomDatabase() {
@@ -135,6 +135,35 @@ abstract class NoteDatabase:RoomDatabase() {
 
                 //Re-create the index on the final table name
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_tagId` ON `note_tag_cross_ref` (`tagId`)")
+            }
+        }
+
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""CREATE TABLE IF NOT EXISTS `Note_new` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                `title` TEXT NOT NULL, 
+                `content` TEXT NOT NULL, 
+                `timestamp` INTEGER NOT NULL, 
+                `color` INTEGER NOT NULL,
+                `reminderTime` INTEGER NOT NULL,
+                `imageUris` TEXT NOT NULL,
+                `audioUris` TEXT NOT NULL)""")
+
+                db.execSQL("""INSERT INTO `Note_new` (`id`, `title`, `content`, `timestamp`, `color`, `reminderTime`, `imageUris`, `audioUris`)
+                SELECT `id`, `title`, `content`, `timestamp`, `color`, 
+                   COALESCE(`reminderTime`, 0), 
+                   COALESCE(`imageUris`, ''), 
+                   COALESCE(`audioUris`, '') 
+                FROM `Note`""")
+
+                db.execSQL("DROP TABLE `note`")
+                db.execSQL("ALTER TABLE `note_new` RENAME TO `note`")
+
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_timestamp` ON `Note` (`timestamp`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_color` ON `Note` (`color`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_reminderTime` ON `Note` (`reminderTime`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_title` ON `Note` (`title`)")
             }
         }
     }

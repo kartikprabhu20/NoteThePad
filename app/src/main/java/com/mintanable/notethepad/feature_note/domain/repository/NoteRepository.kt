@@ -24,5 +24,12 @@ interface NoteRepository {
 
     fun getAllTags() : Flow<List<Tag>>
 
-    suspend fun insertTag(tag: Tag)
+    suspend fun insertTag(tag: Tag): Long
+
+    suspend fun updateTag(tag: Tag)
+
+    suspend fun deleteTag(tag: Tag)
+
+    suspend fun getTagByName(tagName: String): Tag?
+
 }

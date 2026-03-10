@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun NoteEditorContent(
-    noteId: Long?,
+    noteId: Long,
     noteColor: Int,
     attachedImages: List<Uri>,
     titleState: NoteTextFieldState,
@@ -140,7 +140,7 @@ fun NoteEditorContent(
                     .background(noteBackgroundAnimatable.value)
                     .sharedBounds(
                         sharedContentState = rememberSharedContentState(
-                            key = if (noteId == -1L) "notescreens_fab" else "note-$noteId"
+                            key = if (noteId <= 0L) "notescreens_fab" else "note-$noteId"
                         ),
                         animatedVisibilityScope = animatedVisibilityScope,
                         enter = fadeIn(tween(200)),
