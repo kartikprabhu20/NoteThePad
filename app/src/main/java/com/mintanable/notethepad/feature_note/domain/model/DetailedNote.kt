@@ -4,7 +4,7 @@ import android.net.Uri
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 
 data class DetailedNote (
-    val id: Long? = null,
+    val id: Long = 0L,
     val title: String,
     val content: String,
     val timestamp: Long,

@@ -72,7 +72,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 } else {
                     NoteItem(
                         DetailedNote(
-                            id = null,
+                            id = 0L,
                             title = "No note found",
                             content = "Please go to the app and add some notes",
                             timestamp = System.currentTimeMillis(),
