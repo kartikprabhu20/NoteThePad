@@ -13,6 +13,8 @@ import com.mintanable.notethepad.feature_note.domain.use_case.DeleteTag
 import com.mintanable.notethepad.feature_note.domain.use_case.GetAllTags
 import com.mintanable.notethepad.feature_note.domain.use_case.GetDetailedNote
 import com.mintanable.notethepad.feature_note.domain.use_case.GetDetailedNotes
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNotesWithReminders
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNotesWithTag
 import com.mintanable.notethepad.feature_note.domain.use_case.GetTopNotes
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.SaveNoteWithAttachments
@@ -38,6 +40,8 @@ object DatabaseModule {
         @ApplicationContext context: Context): NoteUseCases {
         return NoteUseCases(
             getDetailedNotes = GetDetailedNotes(repository, detailedNoteMapper),
+            getNotesWithReminders = GetNotesWithReminders(repository, detailedNoteMapper),
+            getNotesWithTags =  GetNotesWithTag(repository, detailedNoteMapper),
             deleteNote = DeleteNote(repository),
             saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
             getDetailedNote = GetDetailedNote(repository, detailedNoteMapper),
