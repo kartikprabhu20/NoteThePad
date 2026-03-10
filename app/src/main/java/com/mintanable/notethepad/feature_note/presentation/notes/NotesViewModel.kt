@@ -6,8 +6,10 @@ import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
@@ -37,6 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NotesViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
+    private val tagUseCases: TagUseCases,
     getLayoutSettings: GetLayoutSettings,
     private val toggleLayoutSettings: ToggleLayoutSettings,
     private val fileIOUseCases: FileIOUseCases
@@ -134,6 +137,23 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.DismissLabelDialog -> {
                 _showLabelDialog.value = false
             }
+            is NotesEvent.EditLabel -> {
+                viewModelScope.launch {
+                    tagUseCases.saveTag(event.tag)
+                }
+            }
+            is NotesEvent.DeleteLabel -> {
+                viewModelScope.launch {
+                    tagUseCases.deleteTag(event.tag)
+                }
+            }
+            is NotesEvent.AddLabel -> {
+                viewModelScope.launch {
+                    tagUseCases.saveTag(Tag(event.tagName))
+                    _showLabelDialog.value = false
+                }
+            }
+
         }
     }
 

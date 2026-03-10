@@ -85,7 +85,7 @@ fun NotesScreen (
     if(showLabelDialog){
         EditTextDialog(
             onDismiss = { notesViewModel.onEvent(NotesEvent.DismissLabelDialog)},
-            onConfirm = { }
+            onConfirm = { notesViewModel.onEvent(NotesEvent.AddLabel(it))}
         )
     }
 
@@ -95,7 +95,7 @@ fun NotesScreen (
             AppDrawer(
                 user = user,
                 items = navigationDrawerState.items,
-                selectedItemIndex =  selectedItemIndex,
+                selectedItemIndex = selectedItemIndex,
                 onItemSelected = { index, item ->
                     scope.launch { drawerState.close() }
 
@@ -121,7 +121,9 @@ fun NotesScreen (
 
                         else -> Unit // Do nothing for Dividers or Headers
                     }
-                }
+                },
+                onTagDeleted = {tag -> notesViewModel.onEvent(NotesEvent.DeleteLabel(tag)) },
+                onTagEdited = {tag-> notesViewModel.onEvent(NotesEvent.EditLabel(tag)) },
             )
         }
     ){

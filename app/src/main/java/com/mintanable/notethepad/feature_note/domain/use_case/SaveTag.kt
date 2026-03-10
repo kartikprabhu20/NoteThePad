@@ -9,8 +9,12 @@ class SaveTag(
     private val repository: NoteRepository
 ) {
     suspend operator fun invoke(tag: Tag): Long = withContext(Dispatchers.IO){
-        val existingTagId = repository.getTagByName(tag.tagName)?.tagId
+        var tagId = repository.insertTag(tag)
 
-        return@withContext existingTagId ?: repository.insertTag(tag)
+        if (tagId == -1L) {
+            repository.updateTag(tag)
+            tagId = repository.getTagByName(tag.tagName)?.tagId ?: tagId
+        }
+        return@withContext tagId
     }
 }

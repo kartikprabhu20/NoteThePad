@@ -18,8 +18,11 @@ import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
@@ -30,10 +33,17 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -54,8 +64,13 @@ fun AppDrawer(
     items: List<DrawerItem>,
     selectedItemIndex: Int,
     modifier: Modifier = Modifier,
-    onItemSelected: (Int, DrawerItem) -> Unit
+    onItemSelected: (Int, DrawerItem) -> Unit,
+    onTagDeleted: (Tag) -> Unit,
+    onTagEdited: (Tag) -> Unit
 ) {
+    var isLabelEditing by rememberSaveable { mutableStateOf(false) }
+    var pendingEdits by rememberSaveable { mutableStateOf(mapOf<Long, String>()) }
+
     ModalDrawerSheet(modifier = modifier) {
 
         Column(modifier = Modifier.fillMaxHeight()) {
@@ -95,33 +110,29 @@ fun AppDrawer(
                                 modifier = Modifier
                                     .padding(NavigationDrawerItemDefaults.ItemPadding)
                             )
+
                         }
 
                         is DrawerItem.LabelDrawerItem -> {
-                            NavigationDrawerItem(
-                                label = { Text(text = item.tag.tagName) },
-                                selected = index == selectedItemIndex,
-                                onClick = {
-                                    onItemSelected(index, item)
-                                },
-                                icon = {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.tag.tagName
-                                    )
-                                },
-                                modifier = Modifier
-                                    .padding(start = 16.dp)
-                                    .padding(NavigationDrawerItemDefaults.ItemPadding)
-                            )
+                            val currentText = pendingEdits[item.tag.tagId] ?: item.tag.tagName
 
+                            LabelEditRow(
+                                item = item,
+                                isLabelEditing = isLabelEditing,
+                                currentText = currentText,
+                                onTextChanged = { newText ->
+                                    pendingEdits = pendingEdits + (item.tag.tagId to newText)
+                                },
+                                onTagDeleted = { onTagDeleted(it) }
+                            )
                         }
 
                         is DrawerItem.TextDrawerItem -> {
                             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
 
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(NavigationDrawerItemDefaults.ItemPadding),
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -133,15 +144,23 @@ fun AppDrawer(
                                         .padding(vertical = 8.dp)
                                 )
                                 IconButton(
-                                    onClick = {}
+                                    onClick = {
+                                        if (isLabelEditing) {
+                                            pendingEdits.forEach { (tagId, newName) ->
+                                                if(newName.isNotEmpty())  onTagEdited(Tag(tagName = newName, tagId = tagId))
+                                            }
+                                            pendingEdits = emptyMap()
+                                        }
+                                        isLabelEditing = !isLabelEditing
+                                    }
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = "edit labels"
+                                        imageVector = if(!isLabelEditing)Icons.Default.Edit else Icons.Default.Check,
+                                        contentDescription = "edit labels",
+                                        tint = if (isLabelEditing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
-
                         }
 
                         is DrawerItem.AddLabelDrawerItem -> {
@@ -239,6 +258,59 @@ fun DrawerHeader(
     }
 }
 
+@Composable
+fun LabelEditRow(
+    item: DrawerItem.LabelDrawerItem,
+    isLabelEditing: Boolean,
+    currentText: String,
+    onTextChanged: (String) -> Unit,
+    onTagDeleted: (Tag) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 32.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(imageVector = item.icon, contentDescription = null)
+
+        if (!isLabelEditing) {
+            Text(text = item.tag.tagName, modifier = Modifier.weight(1f).padding(16.dp))
+        } else {
+            TextField(
+                value = currentText,
+                onValueChange = onTextChanged,
+                modifier = Modifier.weight(1f).padding(start = 8.dp),
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                )
+            )
+            IconButton(onClick = { onTagDeleted(item.tag) }) {
+                Icon(Icons.Default.Delete, contentDescription = null)
+            }
+        }
+    }
+}
+
+
+@ThemePreviews
+@Composable
+fun PreviewLabelEditRow() {
+    NoteThePadTheme {
+        LabelEditRow(
+            item = DrawerItem.LabelDrawerItem(
+                Tag("test"),
+                icon = Icons.Default.Label,
+                route = "route"
+            ),
+            isLabelEditing = false,
+            currentText = "Test",
+            onTextChanged = {},
+            onTagDeleted = {}
+        )
+    }
+}
+
 @ThemePreviews
 @Composable
 fun PreviewDrawHeader(){
@@ -330,7 +402,9 @@ fun PreviewAppDrawer() {
             user = null,
             items = resultList,
             selectedItemIndex = 1,
-            onItemSelected = {_,_ -> },
+            onItemSelected = { _, _ -> },
+            onTagDeleted = { _ -> },
+            onTagEdited = { _ -> },
         )
     }
 }
