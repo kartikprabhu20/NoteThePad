@@ -79,7 +79,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AddEditNoteScreen(
     navController: NavController,
-    noteId: Long?,
+    noteId: Long,
     viewModel: AddEditNoteViewModel = hiltViewModel(),
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope

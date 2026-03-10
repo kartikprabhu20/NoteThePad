@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
                         )
                     ) {
                         AddEditNoteScreen(
-                            noteId = it.arguments?.getLong("noteId"),
+                            noteId = it.arguments?.getLong("noteId") ?: 0L,
                             navController = navController,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@composable

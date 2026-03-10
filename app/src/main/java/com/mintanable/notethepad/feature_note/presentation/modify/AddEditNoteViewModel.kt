@@ -54,7 +54,7 @@ class AddEditNoteViewModel @Inject constructor(
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
     private val isEditMode = passedNoteId != -1L
-    private var currentNoteId: Long? = null
+    private var currentNoteId: Long = 0L
     private var currentRecordingFile: File? = null
 
     private val _uiState = MutableStateFlow(
@@ -141,7 +141,7 @@ class AddEditNoteViewModel @Inject constructor(
                     _uiState.update { it.copy(isSaving = true) }
                     saveNote(currentNoteId)
                         .onSuccess {
-                            currentNoteId?.let { it1 -> rescheduleReminder(it1) }
+                            if(currentNoteId != 0L) { rescheduleReminder(currentNoteId) }
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                             _eventFlow.emit(UiEvent.SaveNote)
                         }
@@ -155,7 +155,7 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.MakeCopy -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
-                    saveNote(null)
+                    saveNote(0L)
                         .onSuccess { id ->
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                             _eventFlow.emit(UiEvent.MakeCopy(id))
@@ -240,7 +240,7 @@ class AddEditNoteViewModel @Inject constructor(
             }
             is AddEditNoteEvent.CancelReminder -> {
                 _uiState.update { it.copy(reminderTime = -1, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
-                currentNoteId?.let { reminderScheduler.cancel(it) }
+                if(currentNoteId != 0L) { reminderScheduler.cancel(currentNoteId) }
             }
             is AddEditNoteEvent.CheckAlarmPermission -> {
                 checkExactAlarmPermission()
@@ -322,7 +322,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
             fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri.toString() })
-            currentNoteId?.let { noteUseCases.deleteNote(it) }
+            if(currentNoteId != 0L) { noteUseCases.deleteNote(currentNoteId) }
             _eventFlow.emit(UiEvent.DeleteNote(currentNoteId))
         }
     }
@@ -350,7 +350,7 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveNote(id:Long?): Result<Long> {
+    private suspend fun saveNote(id:Long): Result<Long> {
             val state = uiState.value
             return noteUseCases.saveNoteWithAttachments.invoke(
                 id = id,
@@ -428,7 +428,7 @@ class AddEditNoteViewModel @Inject constructor(
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
         data object SaveNote: UiEvent()
-        data class DeleteNote(val id: Long?): UiEvent()
+        data class DeleteNote(val id: Long): UiEvent()
         data class MakeCopy(val newNoteId: Long): UiEvent()
         data object LaunchAudioRecorder : UiEvent()
         data class LaunchCamera(val type: AttachmentType) : UiEvent()
