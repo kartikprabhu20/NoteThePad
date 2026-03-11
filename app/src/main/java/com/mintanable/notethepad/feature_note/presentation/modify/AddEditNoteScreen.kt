@@ -191,10 +191,9 @@ fun AddEditNoteScreen(
                     hideSheetAndNavigate {
                         viewModel.onEvent(AddEditNoteEvent.StopMedia)
                         navController.navigate(
-                            Screen.AddEditNoteScreen.route +
-                                    "?noteId=${event.newNoteId}&noteColor=${uiState.noteColor}"
+                            Screen.AddEditNoteScreen.passArgs(noteId=event.newNoteId)
                         ) {
-                            popUpTo(Screen.AddEditNoteScreen.route + "?noteId={noteId}&noteColor={noteColor}") {
+                            popUpTo(Screen.AddEditNoteScreen.route + "?noteId={noteId}") {
                                 inclusive = true
                             }
                         }

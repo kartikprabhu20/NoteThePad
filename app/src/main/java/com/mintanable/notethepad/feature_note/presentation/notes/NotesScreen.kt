@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -43,6 +45,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.components.Stag
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.components.EditTextDialog
+import com.mintanable.notethepad.ui.util.NotesFilterType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +78,14 @@ fun NotesScreen (
         navigationDrawerViewModel.onLoggedIn(user != null)
     }
 
+    val filterType by notesViewModel.filterType.collectAsStateWithLifecycle()
+    val isFiltered = filterType != NotesFilterType.ALL.filter
+    BackHandler(enabled = isFiltered) {
+        navController.navigate(Screen.NotesScreen.passArgs(filterType = NotesFilterType.ALL.filter)) {
+            popUpTo(Screen.NotesScreen.route) { inclusive = true }
+        }
+    }
+
     val context = LocalContext.current
     LaunchedEffect(state.notes, context){
         notesViewModel.updateNoteWidget(context)
@@ -97,20 +108,27 @@ fun NotesScreen (
                 items = navigationDrawerState.items,
                 selectedItemIndex = selectedItemIndex,
                 onItemSelected = { index, item ->
+                    selectedItemIndex = index
                     scope.launch { drawerState.close() }
-
                     when (item) {
+                        is DrawerItem.LabelDrawerItem -> {
+                            navController.navigate(item.route)
+                        }
                         is DrawerItem.NavigationDrawerItem -> {
-                            selectedItemIndex = index
-                            if (item.route == Screen.LogOut.route) {
-                                scope.launch {
-                                    authViewModel.signOut()
-                                    onLogOut()
+
+                            when (item.title) {
+                                "Notes", "Reminders" -> {
+                                    navController.navigate(item.route)
                                 }
-                            } else {
-                                navController.navigate(item.route) {
-                                    launchSingleTop = true
-                                    restoreState = true
+                                else -> {
+                                    if (item.route == Screen.LogOut.route) {
+                                        scope.launch {
+                                            authViewModel.signOut()
+                                            onLogOut()
+                                        }
+                                    } else {
+                                        navController.navigate(item.route)
+                                    }
                                 }
                             }
                         }
@@ -132,7 +150,7 @@ fun NotesScreen (
             val onNoteClick = remember(navController) {
                 { note: DetailedNote ->
                     navController.navigate(
-                        Screen.AddEditNoteScreen.route + "?noteId=${note.id}&noteColor=${note.color}"
+                        Screen.AddEditNoteScreen.passArgs(noteId=note.id)
                     )
                 }
             }

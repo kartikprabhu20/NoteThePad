@@ -2,6 +2,7 @@ package com.mintanable.notethepad.di
 
 import android.content.Context
 import com.mintanable.notethepad.core.file.FileManager
+import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.data.repository.NoteRepositoryImpl
 import com.mintanable.notethepad.feature_note.data.source.DatabaseManager
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
@@ -21,6 +22,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.SaveNoteWithAttach
 import com.mintanable.notethepad.feature_note.domain.use_case.SaveTag
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
+import com.mintanable.notethepad.feature_note.domain.util.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -86,5 +88,11 @@ object DatabaseModule {
     @Singleton
     fun provideNoteRepository(noteDao: NoteDao, tagDao: TagDao, noteDatabase: NoteDatabase): NoteRepository {
         return NoteRepositoryImpl(noteDao, tagDao, noteDatabase)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDetailedNoteMapper(audioMetadataProvider: AudioMetadataProvider,dispatchers: DispatcherProvider): DetailedNoteMapper {
+        return DetailedNoteMapper(audioMetadataProvider, dispatchers)
     }
 }

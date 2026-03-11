@@ -22,7 +22,7 @@ import androidx.room.Index
             onDelete = ForeignKey.CASCADE // If tag is deleted, the link is deleted
         )
     ],
-    indices = [Index("tagId")]
+    indices = [Index("tagId"),Index("noteId")]
 )
 data class NoteTagCrossRef(
     val noteId: Long,

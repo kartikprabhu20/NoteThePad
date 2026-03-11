@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Add
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
+import com.mintanable.notethepad.ui.util.NotesFilterType
 import com.mintanable.notethepad.ui.util.Screen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -41,7 +42,11 @@ class GetNavigationDrawerItems(
                                 DrawerItem.LabelDrawerItem(
                                     tag = tag,
                                     icon = Icons.AutoMirrored.Outlined.Label,
-                                    route = Screen.LabelsScreen.route + "?label=${tag.tagId}"
+                                    route = Screen.NotesScreen.passArgs(
+                                        tagId = tag.tagId,
+                                        tagName = tag.tagName,
+                                        filterType = NotesFilterType.TAGS.filter
+                                    )
                                 )
                             )
                         }

@@ -56,6 +56,7 @@ import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerIte
 import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
+import com.mintanable.notethepad.ui.util.NotesFilterType
 import com.mintanable.notethepad.ui.util.Screen
 
 @Composable
@@ -118,12 +119,15 @@ fun AppDrawer(
 
                             LabelEditRow(
                                 item = item,
+                                index = index,
+                                selected = index==selectedItemIndex,
                                 isLabelEditing = isLabelEditing,
                                 currentText = currentText,
                                 onTextChanged = { newText ->
                                     pendingEdits = pendingEdits + (item.tag.tagId to newText)
                                 },
-                                onTagDeleted = { onTagDeleted(it) }
+                                onTagDeleted = { onTagDeleted(it) },
+                                onItemSelected = onItemSelected
                             )
                         }
 
@@ -177,7 +181,7 @@ fun AppDrawer(
                                     )
                                 },
                                 modifier = Modifier
-                                    .padding(start = 16.dp)
+                                    .padding(start = 12.dp)
                                     .padding(NavigationDrawerItemDefaults.ItemPadding)
                             )
 
@@ -261,35 +265,45 @@ fun DrawerHeader(
 @Composable
 fun LabelEditRow(
     item: DrawerItem.LabelDrawerItem,
+    index: Int,
+    selected: Boolean, // 👈 New parameter
     isLabelEditing: Boolean,
     currentText: String,
     onTextChanged: (String) -> Unit,
-    onTagDeleted: (Tag) -> Unit
+    onTagDeleted: (Tag) -> Unit,
+    onItemSelected: (Int, DrawerItem) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 32.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(imageVector = item.icon, contentDescription = null)
-
-        if (!isLabelEditing) {
-            Text(text = item.tag.tagName, modifier = Modifier.weight(1f).padding(16.dp))
-        } else {
-            TextField(
-                value = currentText,
-                onValueChange = onTextChanged,
-                modifier = Modifier.weight(1f).padding(start = 8.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
+    NavigationDrawerItem(
+        label = {
+            if (!isLabelEditing) {
+                Text(text = item.tag.tagName)
+            } else {
+                TextField(
+                    value = currentText,
+                    onValueChange = onTextChanged,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
+                    )
                 )
-            )
-            IconButton(onClick = { onTagDeleted(item.tag) }) {
-                Icon(Icons.Default.Delete, contentDescription = null)
             }
-        }
-    }
+        },
+        selected = selected,
+        onClick = { if (!isLabelEditing) onItemSelected(index, item) },
+        icon = { Icon(imageVector = item.icon, contentDescription = null) },
+        badge = {
+            if (isLabelEditing) {
+                IconButton(onClick = { onTagDeleted(item.tag) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete Label")
+                }
+            }
+        },
+        modifier = Modifier
+            .padding(NavigationDrawerItemDefaults.ItemPadding)
+            .padding(start = 12.dp)
+    )
 }
 
 
@@ -303,10 +317,13 @@ fun PreviewLabelEditRow() {
                 icon = Icons.Default.Label,
                 route = "route"
             ),
+            index = 0,
+            selected = false,
             isLabelEditing = false,
             currentText = "Test",
             onTextChanged = {},
-            onTagDeleted = {}
+            onTagDeleted = {},
+            onItemSelected = {_,_ ->}
         )
     }
 }
@@ -340,7 +357,7 @@ fun PreviewAppDrawer() {
         DrawerItem.NavigationDrawerItem(
             title = "Reminders",
             icon = Icons.Filled.Notifications,
-            route = Screen.RemindersScreen.route
+            route = Screen.NotesScreen.route
         ),
         DrawerItem.TextDrawerItem(
             title = "Labels"
@@ -382,7 +399,11 @@ fun PreviewAppDrawer() {
                         DrawerItem.LabelDrawerItem(
                             tag = tag,
                             icon = Icons.AutoMirrored.Outlined.Label,
-                            route = Screen.LabelsScreen.route + "?label=${tag.tagName}"
+                            route = Screen.NotesScreen.passArgs(
+                                tagId = tag.tagId,
+                                tagName = tag.tagName,
+                                filterType = NotesFilterType.TAGS.filter
+                            )
                         )
                     )
                 }

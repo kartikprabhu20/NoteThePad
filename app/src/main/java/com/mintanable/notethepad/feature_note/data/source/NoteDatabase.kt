@@ -16,7 +16,7 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteConverters
         Tag::class,
         NoteTagCrossRef::class
     ],
-    version = 8
+    version = 9
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase:RoomDatabase() {
@@ -164,6 +164,12 @@ abstract class NoteDatabase:RoomDatabase() {
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_color` ON `Note` (`color`)")
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_reminderTime` ON `Note` (`reminderTime`)")
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_Note_title` ON `Note` (`title`)")
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_noteId` ON `note_tag_cross_ref` (`noteId`)")
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.NavigationDrawerItemRepository
+import com.mintanable.notethepad.ui.util.NotesFilterType
 import com.mintanable.notethepad.ui.util.Screen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -24,7 +25,7 @@ class NavigationDrawerItemRepositoryImpl: NavigationDrawerItemRepository {
             DrawerItem.NavigationDrawerItem(
                 title = "Reminders",
                 icon = Icons.Filled.Notifications,
-                route = Screen.RemindersScreen.route
+                route = Screen.NotesScreen.passArgs(filterType = NotesFilterType.REMINDERS.filter)
             ),
             DrawerItem.TextDrawerItem(
                 title = "Labels"

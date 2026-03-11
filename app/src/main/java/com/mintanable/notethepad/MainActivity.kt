@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         LaunchedEffect(intent) {
             val noteId = intent.getLongExtra(TARGET_NOTE_ID, -1L)
             if (noteId != -1L) {
-                navController.navigate(Screen.AddEditNoteScreen.route + "?noteId=$noteId") {
+                navController.navigate(Screen.AddEditNoteScreen.passArgs(noteId=noteId)) {
                     launchSingleTop = true
                 }
                 intent.removeExtra(TARGET_NOTE_ID)
@@ -121,27 +121,28 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     startDestination = Screen.NotesScreen.route
                 ) {
-                    composable(route = Screen.NotesScreen.route) {
+                    composable(
+                        route = Screen.NotesScreen.route,
+                        arguments = listOf(
+                            navArgument("tagId") { type = NavType.LongType; defaultValue = -1L },
+                            navArgument("tagName") { type = NavType.StringType; defaultValue = "" },
+                            navArgument("filterType") { type = NavType.StringType; defaultValue = "all" }
+                        )
+                    ) { entry ->
                         NotesScreen(
                             navController = navController,
-                            onLogOut =
-                                {
-                                    credentialHelper.clearCredentials()
-                                    settingsViewModel.signOut()
-                                },
+                            onLogOut = {
+                                credentialHelper.clearCredentials()
+                                settingsViewModel.signOut()
+                            },
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@composable
                         )
                     }
                     composable(
-                        route = Screen.AddEditNoteScreen.route + "?noteId={noteId}",
+                        route = Screen.AddEditNoteScreen.route,
                         arguments = listOf(
-                            navArgument(
-                                name = "noteId"
-                            ) {
-                                type = NavType.LongType
-                                defaultValue = -1L
-                            }
+                            navArgument(name = "noteId") { type = NavType.LongType; defaultValue = -1L }
                         )
                     ) {
                         AddEditNoteScreen(
