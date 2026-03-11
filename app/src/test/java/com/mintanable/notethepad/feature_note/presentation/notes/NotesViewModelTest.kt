@@ -1,10 +1,13 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
 import androidx.core.net.toUri
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
@@ -12,6 +15,7 @@ import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
+import com.mintanable.notethepad.ui.util.NotesFilterType
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -19,6 +23,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -43,6 +48,8 @@ class NotesViewModelTest {
     private val fileIOUseCases = mockk<FileIOUseCases>(relaxed = true)
     private val tagUseCases = mockk<TagUseCases>(relaxed = true)
 
+    private val savedStateHandle = SavedStateHandle()
+    private val dispatcherProvider = TestDispatcherProvider()
 
     private lateinit var viewModel: NotesViewModel
 
@@ -51,7 +58,8 @@ class NotesViewModelTest {
         Dispatchers.setMain(testDispatcher)
         every { getLayoutSettings() } returns flowOf(true)
         viewModel = NotesViewModel(
-            noteUseCases,tagUseCases, getLayoutSettings, toggleLayoutSettings, fileIOUseCases
+            savedStateHandle, noteUseCases,tagUseCases,
+            getLayoutSettings, toggleLayoutSettings, fileIOUseCases, dispatcherProvider
         )
     }
 
@@ -81,10 +89,43 @@ class NotesViewModelTest {
 
             viewModel.onEvent(NotesEvent.SearchBarValueChange("Test"))
             advanceTimeBy(301)
-            runCurrent()
 
             val state = awaitItem()
             assertThat(state.notes).hasSize(1)
+            assertThat(state.notes[0].title).isEqualTo("Testing Title")
+        }
+    }
+
+    @Test
+    fun `Changing filter via updateFilter triggers new database fetch`() = runTest {
+        val tag = Tag(tagId = 10L, tagName = "Work")
+        val tagNotes = listOf(DetailedNote(
+            id = 1,
+            title = "Testing Title",
+            content = "Testing Content",
+            audioAttachments = emptyList(),
+            imageUris = emptyList(),
+            color = 0,
+            timestamp = 0L,
+            isCheckboxListAvailable = false,
+            checkListItems = emptyList(),
+            reminderTime = -1L
+        ))
+
+        every { noteUseCases.getNotesWithTags(any(), any()) } returns flowOf(tagNotes)
+
+        viewModel.state.test {
+            awaitItem() // Skip initial fetch
+
+            viewModel.updateFilter(
+                filter = NotesFilterType.TAGS.filter,
+                tagId = tag.tagId,
+                tagName = tag.tagName
+            )
+
+            val state = awaitItem()
+            assertThat(state.notes).isEqualTo(tagNotes)
+            verify { noteUseCases.getNotesWithTags(any(), tag) }
         }
     }
 
