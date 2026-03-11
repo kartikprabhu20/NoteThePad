@@ -65,9 +65,11 @@ fun NotesScreen (
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
-    val currentOrder by notesViewModel.noteOrder.collectAsStateWithLifecycle()
     val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
     val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
+    val filterState by notesViewModel.filterState.collectAsStateWithLifecycle()
+    val isFiltered = filterState.filter != NotesFilterType.ALL.filter
+    val currentOrder = filterState.order
 
     val scope = rememberCoroutineScope()
 
@@ -78,12 +80,8 @@ fun NotesScreen (
         navigationDrawerViewModel.onLoggedIn(user != null)
     }
 
-    val filterType by notesViewModel.filterType.collectAsStateWithLifecycle()
-    val isFiltered = filterType != NotesFilterType.ALL.filter
     BackHandler(enabled = isFiltered) {
-        navController.navigate(Screen.NotesScreen.passArgs(filterType = NotesFilterType.ALL.filter)) {
-            popUpTo(Screen.NotesScreen.route) { inclusive = true }
-        }
+        notesViewModel.updateFilter(NotesFilterType.ALL.filter)
     }
 
     val context = LocalContext.current
@@ -112,31 +110,23 @@ fun NotesScreen (
                     scope.launch { drawerState.close() }
                     when (item) {
                         is DrawerItem.LabelDrawerItem -> {
-                            navController.navigate(item.route)
+                            notesViewModel.updateFilter(NotesFilterType.TAGS.filter, item.tag.tagId, item.tag.tagName)
                         }
                         is DrawerItem.NavigationDrawerItem -> {
-
-                            when (item.title) {
-                                "Notes", "Reminders" -> {
-                                    navController.navigate(item.route)
+                            if (item.title == "Notes") notesViewModel.updateFilter(NotesFilterType.ALL.filter)
+                            else if (item.title == "Reminders") notesViewModel.updateFilter(NotesFilterType.REMINDERS.filter)
+                            else if (item.route == Screen.LogOut.route) {
+                                scope.launch {
+                                    authViewModel.signOut()
+                                    onLogOut()
                                 }
-                                else -> {
-                                    if (item.route == Screen.LogOut.route) {
-                                        scope.launch {
-                                            authViewModel.signOut()
-                                            onLogOut()
-                                        }
-                                    } else {
-                                        navController.navigate(item.route)
-                                    }
-                                }
+                            } else {
+                                navController.navigate(item.route)
                             }
                         }
-
                         is DrawerItem.AddLabelDrawerItem -> {
                             notesViewModel.onEvent(NotesEvent.ShowLabelDialog)
                         }
-
                         else -> Unit // Do nothing for Dividers or Headers
                     }
                 },

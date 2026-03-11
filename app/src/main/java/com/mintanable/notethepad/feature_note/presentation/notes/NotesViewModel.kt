@@ -50,18 +50,23 @@ class NotesViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
-    private val _filterType = savedStateHandle.getStateFlow("filterType", NotesFilterType.ALL.filter)
-    private val _tagId = savedStateHandle.getStateFlow("tagId", -1L)
-    private val _tagName = savedStateHandle.getStateFlow("tagName", "")
-    private val _noteOrder = MutableStateFlow<NoteOrder>(NoteOrder.Date(OrderType.Descending))
+    private val _filterState = MutableStateFlow(
+        DataQuery(
+            filter = savedStateHandle.get<String>("filterType") ?: NotesFilterType.ALL.filter,
+            tagId = savedStateHandle.get<Long>("tagId") ?: -1L,
+            tagName = savedStateHandle.get<String>("tagName") ?: "",
+            order = NoteOrder.Date(OrderType.Descending)
+        )
+    )
+    val filterState = _filterState.asStateFlow()
 
-    val filterType = _filterType
-    val noteOrder = _noteOrder.asStateFlow()
-
-    private val _navFilter = combine(_filterType, _tagId, _tagName
-    ) { filter, tagId, tagName ->
-        Triple(filter, tagId, tagName)
-    }.debounce(100L)
+    private val _notesFromDb = _filterState.flatMapLatest {  query ->
+        when (query.filter) {
+            NotesFilterType.REMINDERS.filter -> noteUseCases.getNotesWithReminders(query.order)
+            NotesFilterType.TAGS.filter -> noteUseCases.getNotesWithTags(query.order, Tag(tagId = query.tagId, tagName = query.tagName))
+            else -> noteUseCases.getDetailedNotes(query.order)
+        }
+    }.flowOn(dispatchers.io)
 
     private var recentlyDeletedNote: DetailedNote? = null
 
@@ -75,18 +80,6 @@ class NotesViewModel @Inject constructor(
     val searchInputText = _searchInputText.asStateFlow()
     private val _debouncedSearchQuery = _searchInputText.debounce(300L).distinctUntilChanged()
 
-    private val _notesFromDb = combine(_filterType,_tagId,_tagName,_noteOrder) { filterType, tagId, tagName, noteOrder ->
-        DataQuery(filterType, tagId, tagName, noteOrder)
-    }
-        .debounce(100L)
-        .distinctUntilChanged()
-        .flatMapLatest { query ->
-        when (query.filter) {
-            NotesFilterType.REMINDERS.filter -> noteUseCases.getNotesWithReminders(query.order)
-            NotesFilterType.TAGS.filter -> noteUseCases.getNotesWithTags(query.order, Tag(tagId = query.tagId, tagName = query.tagName))
-            else -> noteUseCases.getDetailedNotes(query.order)
-        }
-    }.flowOn(dispatchers.io)
 
     val state: StateFlow<NotesState> = combine(
         _notesFromDb,
@@ -120,16 +113,21 @@ class NotesViewModel @Inject constructor(
             initialValue = false
         )
 
-    fun updateNavArguments(filter: String, id: Long, name: String) {
+    fun updateFilter(filter: String, tagId: Long = -1L, tagName: String = "") {
+        _filterState.value = _filterState.value.copy(
+            filter = filter,
+            tagId = tagId,
+            tagName = tagName
+        )
         savedStateHandle["filterType"] = filter
-        savedStateHandle["tagId"] = id
-        savedStateHandle["tagName"] = name
+        savedStateHandle["tagId"] = tagId
+        savedStateHandle["tagName"] = tagName
     }
 
     fun onEvent(event: NotesEvent) {
         when (event) {
             is NotesEvent.Order -> {
-                _noteOrder.value = event.noteOrder
+                _filterState.value = _filterState.value.copy(order = event.noteOrder)
             }
 
             is NotesEvent.ToggleOrderSection -> {
