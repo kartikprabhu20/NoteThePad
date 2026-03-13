@@ -20,7 +20,7 @@
 
 |                 **Quick Filters**                 |                    **Widgets**                    |  
 |:-------------------------------------------------:|:-------------------------------------------------:|
-| <img src="metadata/Screenshot_4.png" width="250"> | <img src="metadata/Screenshot_5.png" width="250"> | 
+| <img src="metadata/Screenshot_4.png" width="250"> | <img src="metadata/Screenshot_5.jpg" width="250"> | 
 |              *Sort, Search, Filter*               |              *Single, Recent Notes*               |
 
 ---
