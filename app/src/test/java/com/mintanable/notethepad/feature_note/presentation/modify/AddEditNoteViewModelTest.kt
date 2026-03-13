@@ -17,6 +17,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
@@ -58,6 +59,7 @@ class AddEditNoteViewModelTest {
     private val mediaPlayer = mockk<MediaPlayer>(relaxed = true)
     private val audioMetadataProvider = mockk<AudioMetadataProvider>(relaxed = true)
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
+    private val tagUseCases = mockk<TagUseCases>(relaxed = true)
 
     private lateinit var viewModel: AddEditNoteViewModel
 
@@ -73,8 +75,8 @@ class AddEditNoteViewModelTest {
         every { mediaPlayer.mediaState } returns MutableStateFlow(MediaState())
 
         viewModel = AddEditNoteViewModel(
-            noteUseCases, savedStateHandle, context, permissionUsecases,
-            audioRecorder, fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler
+            noteUseCases, savedStateHandle, context, permissionUsecases, audioRecorder,
+            fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases
         )
     }
 
@@ -115,7 +117,8 @@ class AddEditNoteViewModelTest {
             fileIOUseCases,
             mediaPlayer,
             audioMetadataProvider,
-            reminderScheduler
+            reminderScheduler,
+            tagUseCases
         )
 
         viewModel.uiState.test {
@@ -445,8 +448,8 @@ class AddEditNoteViewModelTest {
             reminderTime = 5000L
         )
         coEvery { noteUseCases.getDetailedNote(noteId) } returns detailedNote
-        viewModel = AddEditNoteViewModel(noteUseCases, handle, context, permissionUsecases,
-            audioRecorder, fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler)
+        viewModel = AddEditNoteViewModel(noteUseCases, handle, context, permissionUsecases, audioRecorder,
+            fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases)
         advanceUntilIdle()
         viewModel.onEvent(AddEditNoteEvent.CancelReminder)
 

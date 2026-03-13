@@ -28,7 +28,8 @@ fun TagUI(
     imageVector: ImageVector? = null,
     description: String,
     onDelete: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enableDeletion: Boolean = true
 ){
 
     Surface(
@@ -49,17 +50,19 @@ fun TagUI(
                     contentDescription = "icon"
                 )
             }
-            Text(modifier = Modifier.clickable(
-                onClick = onClick
-            ),
+            Text(modifier = Modifier
+                .clickable(onClick = onClick),
                 text = description)
-            Icon(
-                modifier = Modifier.clickable(
-                    onClick = onDelete
-                ),
-                imageVector = Icons.Default.Close,
-                contentDescription = "icon"
-            )
+
+            if(enableDeletion) {
+                Icon(
+                    modifier = Modifier.clickable(
+                        onClick = onDelete
+                    ),
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "icon"
+                )
+            }
         }
     }
 }

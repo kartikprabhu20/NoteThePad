@@ -19,6 +19,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
@@ -26,6 +27,7 @@ import com.mintanable.notethepad.feature_settings.presentation.use_cases.Permiss
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +35,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,7 +52,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val fileIOUseCases: FileIOUseCases,
     private val mediaPlayer: MediaPlayer,
     private val audioMetadataProvider: AudioMetadataProvider,
-    private val reminderScheduler: ReminderScheduler
+    private val reminderScheduler: ReminderScheduler,
+    private val tagUseCases: TagUseCases
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
@@ -74,6 +78,12 @@ class AddEditNoteViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = AddEditNoteUiState()
     )
+
+    val existingTags = tagUseCases.getAllTags().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()

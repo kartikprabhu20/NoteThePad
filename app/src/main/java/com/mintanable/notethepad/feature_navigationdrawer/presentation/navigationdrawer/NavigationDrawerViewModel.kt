@@ -13,13 +13,24 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import android.util.Log
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
+import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 
 @HiltViewModel
 class NavigationDrawerViewModel @Inject constructor(
-    private val getNavigationDrawerItems: GetNavigationDrawerItems
+    private val getNavigationDrawerItems: GetNavigationDrawerItems,
+    private val tagUseCases: TagUseCases
 ): ViewModel() {
 
     private val _isLoggedIn = MutableStateFlow(false)
+
+    val existingTags = tagUseCases.getAllTags()
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     val navigationDrawerState: StateFlow<NavigationDrawerState> = _isLoggedIn
         .flatMapLatest { loggedIn ->

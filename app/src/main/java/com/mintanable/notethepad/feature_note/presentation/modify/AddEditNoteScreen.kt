@@ -87,6 +87,7 @@ fun AddEditNoteScreen(
     val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val existingTags by viewModel.existingTags.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -332,7 +333,8 @@ fun AddEditNoteScreen(
         if (uiState.showAddNewTagDialog){
             EditTextDialog(
                 onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs)} ,
-                onConfirm = {tagName -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tagName))}
+                onConfirm = {tagName -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tagName))},
+                tags = existingTags
             )
         }
 

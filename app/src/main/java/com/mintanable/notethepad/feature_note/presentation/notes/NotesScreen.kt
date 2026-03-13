@@ -70,6 +70,7 @@ fun NotesScreen (
     val filterState by notesViewModel.filterState.collectAsStateWithLifecycle()
     val isFiltered = filterState.filter != NotesFilterType.ALL.filter
     val currentOrder = filterState.order
+    val existingTags by navigationDrawerViewModel.existingTags.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
 
@@ -94,7 +95,8 @@ fun NotesScreen (
     if(showLabelDialog){
         EditTextDialog(
             onDismiss = { notesViewModel.onEvent(NotesEvent.DismissLabelDialog)},
-            onConfirm = { notesViewModel.onEvent(NotesEvent.AddLabel(it))}
+            onConfirm = { notesViewModel.onEvent(NotesEvent.AddLabel(it))},
+            tags = existingTags
         )
     }
 
