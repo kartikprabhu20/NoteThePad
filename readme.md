@@ -15,7 +15,13 @@
 |             **Beautiful Interfaces**              |                **Rich Multimedia**                |               **Smart Checklists**                |
 |:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|
 | <img src="metadata/Screenshot_1.png" width="250"> | <img src="metadata/Screenshot_2.png" width="250"> | <img src="metadata/Screenshot_3.png" width="250"> |
-|                 *Dynamic Theming*                 |                  *Audio & Video*                  |                *Actionable Tasks*                 |
+|                 *Dynamic Theming*                 |             *Images, Videos, Audios*              |            *Actionable Tasks, Labels*             |
+
+
+|                 **Quick Filters**                 |                    **Widgets**                    |  
+|:-------------------------------------------------:|:-------------------------------------------------:|
+| <img src="metadata/Screenshot_4.png" width="250"> | <img src="metadata/Screenshot_5.png" width="250"> | 
+|              *Sort, Search, Filter*               |              *Single, Recent Notes*               |
 
 ---
 
