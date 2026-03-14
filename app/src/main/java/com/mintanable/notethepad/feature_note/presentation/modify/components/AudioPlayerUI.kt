@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -75,7 +76,8 @@ fun AudioPlayer(
             IconButton(onClick = onPlayPause) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -84,20 +86,24 @@ fun AudioPlayer(
                 modifier = Modifier
                     .padding(end = 12.dp)
                     .weight(1f),
-                strokeCap = StrokeCap.Round
+                strokeCap = StrokeCap.Round,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+                trackColor = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = formatMillisToTime(totalDuration),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.widthIn(min = 45.dp)
+                modifier = Modifier.widthIn(min = 45.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
 
 
             IconButton(onClick = onDelete) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove audio"
+                    contentDescription = "Remove audio",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -109,7 +115,10 @@ fun AudioPlayer(
 @Composable
 fun PreviewAudioPlayer(){
     NoteThePadTheme {
-        AudioPlayer(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {})
+        Box(modifier = Modifier.background(NoteColors.colors[2]).padding(8.dp)){
+            AudioPlayer(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {})
+
+        }
     }
 }
 
