@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.feature_ai.presentation.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
@@ -60,6 +61,7 @@ class AddEditNoteViewModelTest {
     private val audioMetadataProvider = mockk<AudioMetadataProvider>(relaxed = true)
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
     private val tagUseCases = mockk<TagUseCases>(relaxed = true)
+    private val getAutoTagsUseCase = mockk<GetAutoTagsUseCase>(relaxed = true)
 
     private lateinit var viewModel: AddEditNoteViewModel
 
@@ -76,7 +78,8 @@ class AddEditNoteViewModelTest {
 
         viewModel = AddEditNoteViewModel(
             noteUseCases, savedStateHandle, context, permissionUsecases, audioRecorder,
-            fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases
+            fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases,
+            getAutoTagsUseCase
         )
     }
 
@@ -118,7 +121,8 @@ class AddEditNoteViewModelTest {
             mediaPlayer,
             audioMetadataProvider,
             reminderScheduler,
-            tagUseCases
+            tagUseCases,
+            getAutoTagsUseCase
         )
 
         viewModel.uiState.test {
@@ -449,7 +453,7 @@ class AddEditNoteViewModelTest {
         )
         coEvery { noteUseCases.getDetailedNote(noteId) } returns detailedNote
         viewModel = AddEditNoteViewModel(noteUseCases, handle, context, permissionUsecases, audioRecorder,
-            fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases)
+            fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases, getAutoTagsUseCase)
         advanceUntilIdle()
         viewModel.onEvent(AddEditNoteEvent.CancelReminder)
 

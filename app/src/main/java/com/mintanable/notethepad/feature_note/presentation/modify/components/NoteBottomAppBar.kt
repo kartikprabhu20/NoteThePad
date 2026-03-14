@@ -37,6 +37,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -68,7 +69,6 @@ fun NoteBottomAppBar(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    Log.d("kptest", "Recompose NoteBottomAppBar")
     with(sharedTransitionScope) {
         var isVisible by remember { mutableStateOf(false) }
         val wiggleAnim = remember { Animatable(0f) }
@@ -121,7 +121,7 @@ fun NoteBottomAppBar(
                     alpha = barAlpha
                     compositingStrategy = CompositingStrategy.Offscreen
                 },
-            containerColor = Color.Black.copy(alpha = 0.75f),
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
             tonalElevation = 0.dp,
             actions = {
 
@@ -221,7 +221,7 @@ fun PreviewBottomAppBar(){
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(NoteColors.colors[0])
+                                    .background(NoteColors.colors[1])
                             ) {
                                 LazyColumn(
                                     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),

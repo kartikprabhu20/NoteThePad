@@ -266,6 +266,8 @@ fun AddEditNoteScreen(
                 mediaState = uiState.mediaState,
                 reminderTime = uiState.reminderTime,
                 tags = uiState.tags,
+                suggestedTags = uiState.suggestedTags,
+                isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
                 onEvent = onEvent,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope

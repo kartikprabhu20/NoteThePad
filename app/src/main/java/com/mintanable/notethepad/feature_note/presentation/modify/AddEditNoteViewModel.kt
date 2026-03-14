@@ -8,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
+import com.mintanable.notethepad.feature_ai.presentation.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.domain.AddEditNoteUiState
@@ -27,7 +28,6 @@ import com.mintanable.notethepad.feature_settings.presentation.use_cases.Permiss
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,7 +52,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val mediaPlayer: MediaPlayer,
     private val audioMetadataProvider: AudioMetadataProvider,
     private val reminderScheduler: ReminderScheduler,
-    private val tagUseCases: TagUseCases
+    private val tagUseCases: TagUseCases,
+    private val getAutoTagsUseCase: GetAutoTagsUseCase
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
@@ -316,7 +316,12 @@ class AddEditNoteViewModel @Inject constructor(
                     } else {
                         currentState.tags + Tag(event.tagName)
                     }
-                    currentState.copy(tags = newTags, showAddNewTagDialog = false)
+                    val newSuggestedTags = if(currentState.suggestedTags.contains(event.tagName)){
+                        currentState.suggestedTags - event.tagName
+                    }else{
+                        currentState.suggestedTags
+                    }
+                    currentState.copy(tags = newTags, showAddNewTagDialog = false, suggestedTags = newSuggestedTags)
                 }
             }
             is AddEditNoteEvent.DeleteLabel -> {
@@ -324,6 +329,23 @@ class AddEditNoteViewModel @Inject constructor(
                     val newList = currentState.tags.filterNot { it.tagName == event.tagName }
                     currentState.copy(tags = newList, showAddNewTagDialog = false)
                 }
+            }
+
+            is AddEditNoteEvent.ShowSuggestions -> {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isTagSuggestionLoading = true) }
+                    getAutoTagsUseCase(title = uiState.value.titleState.text, content = uiState.value.contentState.text)
+                        .onSuccess { suggestions ->
+                            _uiState.update { it.copy(isTagSuggestionLoading = false, suggestedTags = suggestions) } }
+                        .onFailure { exeption ->
+                            _uiState.update { it.copy(isTagSuggestionLoading = false) }
+                            _eventFlow.emit(UiEvent.ShowSnackbar(exeption.message ?: "Save Failed"))
+                        }
+                }
+            }
+
+            is AddEditNoteEvent.ClearSuggestions -> {
+                _uiState.update { it.copy(suggestedTags = emptyList()) }
             }
         }
     }

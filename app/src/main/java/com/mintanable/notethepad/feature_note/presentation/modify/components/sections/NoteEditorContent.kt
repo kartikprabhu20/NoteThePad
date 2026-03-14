@@ -1,7 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -32,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +48,9 @@ import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent
+import com.mintanable.notethepad.feature_note.presentation.modify.components.MagicButton
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
+import com.mintanable.notethepad.feature_note.presentation.modify.components.SuggestedTagsRow
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
@@ -67,6 +69,8 @@ fun NoteEditorContent(
     mediaState: MediaState?,
     reminderTime: Long,
     tags: List<Tag> = emptyList(),
+    suggestedTags: List<String> = emptyList(),
+    isSuggestionTagsLoading: Boolean = false,
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -88,6 +92,10 @@ fun NoteEditorContent(
             }
         }
     }
+
+    val checklistCharCount by remember(checkListItems) { derivedStateOf { checkListItems.sumOf { it.text.length } } }
+    val charCount = titleState.text.length + contentState.text.length + checklistCharCount
+    val showMagicButton = charCount > 400 && !isSuggestionTagsLoading
 
     with(sharedTransitionScope) {
         Scaffold(
@@ -125,12 +133,22 @@ fun NoteEditorContent(
                         },
                         onSaveClick = { onEvent(AddEditNoteEvent.SaveNote) },
                         sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
+                        animatedVisibilityScope = animatedVisibilityScope
                     )
                 }
 
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            floatingActionButton = {
+                MagicButton(
+                    title = "Auto-Tag",
+                    isVisible = showMagicButton,
+                    modifier = Modifier,
+                    onButtonClicked = { onEvent(AddEditNoteEvent.ShowSuggestions)},
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
         ) { paddingValue ->
 
             Box(
@@ -163,11 +181,19 @@ fun NoteEditorContent(
                         .padding(horizontal = 16.dp),
                     contentPadding = paddingValue
                 ) {
-
                     colorSelectorSection(
                         selectedColor = noteColor,
                         onColorClick = { colorInt -> onEvent(AddEditNoteEvent.ChangeColor(colorInt)) }
                     )
+
+                    item {
+                        SuggestedTagsRow(
+                            suggestions = suggestedTags,
+                            isLoading = isSuggestionTagsLoading,
+                            onTagAccepted = { tag -> onEvent(AddEditNoteEvent.InsertLabel(tag)) },
+                            onDismiss = { onEvent(AddEditNoteEvent.ClearSuggestions) }
+                        )
+                    }
 
                     attachedImagesSection(
                         images = attachedImages,

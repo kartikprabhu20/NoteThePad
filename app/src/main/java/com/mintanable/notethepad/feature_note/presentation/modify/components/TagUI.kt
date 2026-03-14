@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +35,7 @@ fun TagUI(
 
     Surface(
         shape = RoundedCornerShape(8.dp),
-        color = Color.Black.copy(alpha = 0.5f),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
         border = BorderStroke(0.5.dp, Color.Black)
     ) {
         Row(
@@ -43,16 +44,19 @@ fun TagUI(
         ){
             if(imageVector != null) {
                 Icon(
-                    modifier = Modifier.clickable(
-                        onClick = onClick
-                    ),
+                    modifier = Modifier
+                        .clickable(onClick = onClick),
                     imageVector = imageVector,
-                    contentDescription = "icon"
+                    contentDescription = "icon",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-            Text(modifier = Modifier
-                .clickable(onClick = onClick),
-                text = description)
+            Text(
+                text = description,
+                modifier = Modifier
+                    .clickable(onClick = onClick),
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             if(enableDeletion) {
                 Icon(
@@ -60,7 +64,8 @@ fun TagUI(
                         onClick = onDelete
                     ),
                     imageVector = Icons.Default.Close,
-                    contentDescription = "icon"
+                    contentDescription = "icon",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

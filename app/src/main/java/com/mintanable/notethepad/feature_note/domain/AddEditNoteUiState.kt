@@ -32,5 +32,9 @@ data class AddEditNoteUiState(
     val zoomedImageUri: Uri? = null,
     val mediaState: MediaState? = null,
     val showDataAndTimePicker: Boolean = false,
-    val showAddNewTagDialog: Boolean = false
+    val showAddNewTagDialog: Boolean = false,
+
+    val isTagSuggestionLoading: Boolean = false,
+    val suggestedTags: List<String> = emptyList()
+
 )

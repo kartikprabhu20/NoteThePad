@@ -35,4 +35,6 @@ sealed class AddEditNoteEvent{
     data object ShowLabelDialog : AddEditNoteEvent()
     data class InsertLabel(val tagName: String) : AddEditNoteEvent()
     data class DeleteLabel(val tagName: String) : AddEditNoteEvent()
+    data object ShowSuggestions: AddEditNoteEvent()
+    data object ClearSuggestions: AddEditNoteEvent()
 }
