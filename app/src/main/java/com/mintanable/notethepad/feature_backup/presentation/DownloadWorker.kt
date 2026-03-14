@@ -44,11 +44,11 @@ class DownloadWorker@AssistedInject constructor(
             googleDriveRepository.downloadBackupFile(accessToken, tempFile).collect { status ->
                 Log.d("kptest", "doWork Download status: $status")
                 when (status) {
-                    is BackupStatus.Progress -> {
+                    is LoadStatus.Progress -> {
                         setForeground(createForegroundInfo(status.percentage))
                         setProgress(workDataOf("percent" to status.percentage))
                     }
-                    is BackupStatus.Success -> {
+                    is LoadStatus.Success -> {
                         try {
                             dbManager.swapDatabase(tempFile)
                             finalResult = Result.success()
@@ -56,7 +56,7 @@ class DownloadWorker@AssistedInject constructor(
                             tempFile.delete()
                         }
                     }
-                    is BackupStatus.Error -> {
+                    is LoadStatus.Error -> {
                         tempFile.delete()
                         finalResult = Result.failure()
                     }

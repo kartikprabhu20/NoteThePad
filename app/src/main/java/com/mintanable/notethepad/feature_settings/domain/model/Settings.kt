@@ -1,12 +1,15 @@
 package com.mintanable.notethepad.feature_settings.domain.model
 
+import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
+
 data class Settings(
     val notificationsEnabled: Boolean = true,
     val backupEnabled: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isGridViewSelected: Boolean = false,
     val googleAccount: String? = null,
-    val backupSettings: BackupSettings = BackupSettings()
+    val backupSettings: BackupSettings = BackupSettings(),
+    val aiModelType: AiModelType = AiModelType.NONE
 )
 
 data class BackupSettings(

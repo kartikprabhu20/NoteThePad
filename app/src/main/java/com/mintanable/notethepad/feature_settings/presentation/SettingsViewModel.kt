@@ -9,16 +9,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
+import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
+import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
+import com.mintanable.notethepad.feature_ai.domain.use_case.DownloadAiModelUseCase
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledBackupUsecase
 import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.DownloadBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
-import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
+import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
-import com.mintanable.notethepad.feature_backup.presentation.UploadDownload
+import com.mintanable.notethepad.feature_backup.presentation.LoadType
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
@@ -55,11 +58,12 @@ class SettingsViewModel @Inject constructor(
     private val scheduleBackup: ScheduleBackupUseCase,
     private val cancelScheduledBackup: CancelScheduledBackupUsecase,
     private val checkForExistingBackup: CheckForExistingBackup,
-    workManager: WorkManager,
+    private val workManager: WorkManager,
     private val noteUseCases: NoteUseCases,
     private val downloadBackup: DownloadBackup,
     private val savedStateHandle: SavedStateHandle,
-    private val networkMonitor: NetworkMonitor
+    private val networkMonitor: NetworkMonitor,
+    private val downloadAiModelUseCase: DownloadAiModelUseCase
 ) : ViewModel() {
 
     companion object {
@@ -70,31 +74,41 @@ class SettingsViewModel @Inject constructor(
         tryEmit(Unit)
     }
 
-    private val _backupUploadStatus = workManager.getBackupStatusFlow(
+    private val _backupUploadStatus = workManager.getLoadStatusFLow(
         workName = BackupSchedulerImpl.WORK_NAME,
-        type = UploadDownload.UPLOAD,
+        type = LoadType.UPLOAD,
         onSuccess = { refreshTrigger.tryEmit(Unit) }
     )
 
-    private val _backupDownloadState = workManager.getBackupStatusFlow(
+    private val _backupDownloadState = workManager.getLoadStatusFLow(
         workName = DownloadBackup.DOWNLOAD_BACKUP_TASK,
-        type = UploadDownload.DOWNLOAD
+        type = LoadType.DOWNLOAD
     )
 
-    val backupUploadDownloadState: StateFlow<BackupStatus> = combine(
+    val backupUploadDownloadState: StateFlow<LoadStatus> = combine(
         _backupUploadStatus,
         _backupDownloadState
-    ){ upload, download ->
-        when{
-            download is BackupStatus.Progress -> download
-            upload is BackupStatus.Progress -> upload
-            download is BackupStatus.Success || download is BackupStatus.Error -> download
+    ) { upload, download ->
+        when {
+            download is LoadStatus.Progress -> download
+            upload is LoadStatus.Progress -> upload
+            download is LoadStatus.Success || download is LoadStatus.Error -> download
             else -> upload
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = BackupStatus.Idle
+        initialValue = LoadStatus.Idle
+    )
+
+    private val _aiModelDownloadStatus = workManager.getLoadStatusFLow(
+        workName = MODEL_DOWNLOAD_TASK,
+        type = LoadType.DOWNLOAD
+    )
+    val aiModelDownloadStatus: StateFlow<LoadStatus> = _aiModelDownloadStatus.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = LoadStatus.Idle
     )
 
     private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
@@ -104,8 +118,8 @@ class SettingsViewModel @Inject constructor(
         authRepository.getSignedInFirebaseUser(),
         dataStore.settingsFlow
     ) { user, settings ->
-        val googleEmail = if(user?.isGoogleSignedIn==true) user.email else null
-        settings.copy(googleAccount=googleEmail)
+        val googleEmail = if (user?.isGoogleSignedIn == true) user.email else null
+        settings.copy(googleAccount = googleEmail)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -120,7 +134,7 @@ class SettingsViewModel @Inject constructor(
         .flatMapLatest { email ->
             if (email == null) {
                 flow<BackupUiState> { emit(BackupUiState.NoBackup) }
-            }else {
+            } else {
 
                 flow<BackupUiState> {
                     emit(BackupUiState.Loading)
@@ -157,7 +171,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { dataStore.updateTheme(mode) }
     }
 
-    fun signOut(){
+    fun signOut() {
         viewModelScope.launch {
             driveRepository.clearDriveCredentials()
             resetBackupSettings()
@@ -179,20 +193,20 @@ class SettingsViewModel @Inject constructor(
         backupSettings: BackupSettings,
         backupNow: Boolean = false,
         onAuthRequired: (PendingIntent) -> Unit,
-        onFailure:(String)->Unit
+        onFailure: (String) -> Unit
     ) {
         viewModelScope.launch {
             dataStore.updateBackupSettings(backupSettings)
 
             if (!canPerformNetworkTask(onFailure)) return@launch
-            if(backupSettings.backupFrequency==BackupFrequency.OFF) {
+            if (backupSettings.backupFrequency == BackupFrequency.OFF) {
                 cancelScheduledBackup()
                 return@launch
             }
 
             if (driveRepository.hasDriveAccess()) {
                 rescheduleBackup(backupSettings, backupNow)
-            }else{
+            } else {
                 handleNewAuthorization(backupNow, onAuthRequired, onFailure)
             }
         }
@@ -250,14 +264,15 @@ class SettingsViewModel @Inject constructor(
                 }
                 .onFailure { error ->
                     Log.e("kptest", "Token exchange failed ${error.message}")
-                    onFailure("Token exchange failed ${error.message}") }
+                    onFailure("Token exchange failed ${error.message}")
+                }
         } else {
             Log.e("kptest", "CRITICAL: No Resolution AND No Auth Code!")
             onFailure("Could not retrieve auth code")
         }
     }
 
-    fun onAuthResultCompleted(data: Intent?, onFailure:(String)->Unit) {
+    fun onAuthResultCompleted(data: Intent?, onFailure: (String) -> Unit) {
         viewModelScope.launch {
             _isAuthorisingBackup.value = true
             val authCode = driveRepository.getAuthCodeFromIntent(data)
@@ -266,7 +281,8 @@ class SettingsViewModel @Inject constructor(
                 authCode,
                 onSuccess =
                     {
-                        val wasBackupNowRequested = savedStateHandle.get<Boolean>(KEY_PENDING_BACKUP_NOW) ?: false
+                        val wasBackupNowRequested =
+                            savedStateHandle.get<Boolean>(KEY_PENDING_BACKUP_NOW) ?: false
                         cancelScheduledBackup()
                         scheduleBackup(settingsState.value.backupSettings, wasBackupNowRequested)
                         savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
@@ -315,12 +331,26 @@ class SettingsViewModel @Inject constructor(
 
     fun createMassiveDummyData() {
         viewModelScope.launch(Dispatchers.IO) {
-            for (i in 1..10000){
-                noteUseCases.saveNoteWithAttachments(Note(title = "Note #$i",
-                    content = "Content for $i",
-                    timestamp = System.currentTimeMillis(),
-                    color = NoteColors.colors.random().toArgb()))
+            for (i in 1..10000) {
+                noteUseCases.saveNoteWithAttachments(
+                    Note(
+                        title = "Note #$i",
+                        content = "Content for $i",
+                        timestamp = System.currentTimeMillis(),
+                        color = NoteColors.colors.random().toArgb()
+                    )
+                )
             }
         }
+    }
+
+    fun onAiModelChanged(type: AiModelType) {
+        viewModelScope.launch {
+            dataStore.updateAiModel(type)
+        }
+    }
+
+    fun downloadAiModel(type: AiModelType) {
+        downloadAiModelUseCase(type)
     }
 }

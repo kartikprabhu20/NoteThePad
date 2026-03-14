@@ -152,7 +152,7 @@ dependencies {
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     implementation 'androidx.compose.material3:material3-android:1.4.0'
-    implementation 'androidx.work:work-runtime-ktx:2.10.0'
+    implementation 'androidx.work:work-runtime-ktx:2.11.1'
 
     // Use BOM to manage Compose versions automatically
     def composeBom = platform('androidx.compose:compose-bom:2024.02.01')
@@ -251,4 +251,7 @@ dependencies {
 
     //Ai
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation("com.google.mlkit:common:18.11.0") // Cloud
+    implementation("com.google.mlkit:genai-prompt:1.0.0-beta1") //Gemini Nano (via ML Kit)
+    implementation("com.google.mediapipe:tasks-genai:0.10.27") //For Gemma (1B, E2B, E4B)
 }

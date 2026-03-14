@@ -20,10 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
+import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
-import com.mintanable.notethepad.feature_backup.presentation.UploadDownload
+import com.mintanable.notethepad.feature_backup.presentation.LoadType
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,23 +31,22 @@ import java.util.Locale
 
 @Composable
 fun BackupStatusUI(
-    backupUploadDownloadState: BackupStatus,
+    backupUploadDownloadState: LoadStatus,
     backupUiState: BackupUiState,
     onRestoreClicked: () -> Unit
 ) {
     val context = LocalContext.current
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        val isRunning = backupUploadDownloadState is BackupStatus.Progress
-        val progress = if (backupUploadDownloadState is BackupStatus.Progress) {
+        val isRunning = backupUploadDownloadState is LoadStatus.Progress
+        val progress = if (backupUploadDownloadState is LoadStatus.Progress) {
             backupUploadDownloadState.percentage * 1f
         } else {
             0f
         }
 
         if (isRunning && progress >= 0) {
-            val type = if (backupUploadDownloadState is BackupStatus.Progress) { backupUploadDownloadState.type} else null
             Text(
-                if(type==UploadDownload.UPLOAD) {
+                if(backupUploadDownloadState.type==LoadType.UPLOAD) {
                     stringResource(R.string.msg_uploading_to_drive, progress.toInt())
                 } else {
                     stringResource(R.string.msg_downloading_from_drive, progress.toInt())
@@ -112,7 +111,7 @@ fun BackupStatusUI(
 fun PreviewBackupHasData() {
     NoteThePadTheme {
         BackupStatusUI(
-            backupUploadDownloadState = BackupStatus.Idle,
+            backupUploadDownloadState = LoadStatus.Idle,
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
             ),
@@ -126,7 +125,7 @@ fun PreviewBackupHasData() {
 fun PreviewBackupUINoBackup() {
     NoteThePadTheme {
         BackupStatusUI(
-            backupUploadDownloadState = BackupStatus.Idle,
+            backupUploadDownloadState = LoadStatus.Idle,
             backupUiState = BackupUiState.NoBackup,
             onRestoreClicked = {}
         )
@@ -138,7 +137,7 @@ fun PreviewBackupUINoBackup() {
 fun PreviewBackupUILoading() {
     NoteThePadTheme {
         BackupStatusUI(
-            backupUploadDownloadState = BackupStatus.Idle,
+            backupUploadDownloadState = LoadStatus.Idle,
             backupUiState = BackupUiState.Loading,
             onRestoreClicked = {}
         )
@@ -151,7 +150,7 @@ fun PreviewBackupUILoading() {
 fun PreviewBackupUIWorkInfoUploading() {
     NoteThePadTheme {
         BackupStatusUI(
-            backupUploadDownloadState = BackupStatus.Progress(12, UploadDownload.UPLOAD),
+            backupUploadDownloadState = LoadStatus.Progress(12, LoadType.UPLOAD),
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
             ),
@@ -165,7 +164,7 @@ fun PreviewBackupUIWorkInfoUploading() {
 fun PreviewBackupUIError() {
     NoteThePadTheme {
         BackupStatusUI(
-            backupUploadDownloadState =  BackupStatus.Idle,
+            backupUploadDownloadState =  LoadStatus.Idle,
             backupUiState = BackupUiState.Error("No internet connection"),
             onRestoreClicked = {}
         )

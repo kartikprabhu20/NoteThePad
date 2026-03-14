@@ -39,6 +39,7 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
+    <string name="setting_backup">Backup</string>
     <string name="setting_auto_backup_title">Automatic backup on Google drive</string>
     <string name="msg_signin_google_backups">Please sign in with Google to enable backups</string>
     <string name="setting_backup_time">Backup time</string>
@@ -51,7 +52,13 @@
     <string name="msg_last_cloud_backup">Last cloud backup: %s</string>
     <string name="btn_restore_now">"Restore Now"</string>
     <string name="msg_no_backups_found">No backups found in Drive</string>
-
+    <string name="setting_ai_assistant">AI Assistant</string>
+    <string name="setting_ai_model">AI Model</string>
+    <string name="setting_appearance">Appearance</string>
+    <string name="dialog_select_ai_model_title">Select AI Model</string>
+    <string name="dialog_download_ai_model_title">Download AI Model</string>
+    <string name="dialog_download_ai_model_description">The model needs %s storage on-device. Do you want to start the download?</string>
+    <string name="dialog_download_ai_model_size">Size: %s</string>
 
     <!-- Search Bar -->
     <string name="search_hint">Search notes…</string>
@@ -116,6 +123,7 @@
     <string name="label_existing">Existing:</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_download">Download</string>
 
     <!-- Note Item -->
     <string name="content_description_images_attached">Images attached</string>

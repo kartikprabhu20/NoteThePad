@@ -9,43 +9,50 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
+import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
+import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
 import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
@@ -62,7 +69,8 @@ import java.util.Locale
 fun SettingsScreen(
     onBackPressed: () -> Unit,
     currentSettings: Settings,
-    backupUploadDownloadState: BackupStatus,
+    backupUploadDownloadState: LoadStatus,
+    aiModelDownloadStatus: LoadStatus,
     backupUiState: BackupUiState,
     isAuthorisingBackup: Boolean,
     onThemeChanged: (ThemeMode) -> Unit,
@@ -70,16 +78,33 @@ fun SettingsScreen(
     onBackupNowClicked: () -> Unit,
     onRestoreClicked: () -> Unit,
     onDummyDataCreate: () -> Unit,
-    onBackupSettingsChanged: (BackupSettings) -> Unit
+    onBackupSettingsChanged: (BackupSettings) -> Unit,
+    onAiModelChanged: (AiModelType) -> Unit,
+    onAiModelDownload: (AiModelType) -> Unit
 ) {
 
     var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
+    var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
+    var modelToDownload by remember { mutableStateOf<AiModelType?>(null) }
+
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
-    val notificationPermissionState = rememberPermissionState(
-        android.Manifest.permission.POST_NOTIFICATIONS
-    )
+
+    val notificationPermissionState = if (LocalInspectionMode.current) {
+        remember {
+            object : PermissionState {
+                override val permission: String = android.Manifest.permission.POST_NOTIFICATIONS
+                override val status: PermissionStatus = PermissionStatus.Granted
+                override fun launchPermissionRequest() {}
+            }
+        }
+    } else {
+        rememberPermissionState(
+            android.Manifest.permission.POST_NOTIFICATIONS
+        )
+    }
+
     val msgSigninGoogleBackups = stringResource(R.string.msg_signin_google_backups)
     val checkAndRequestNotificationPermission = { action: () -> Unit ->
         action() //Perform action in anycase, since backup progress can be foreground too
@@ -122,6 +147,12 @@ fun SettingsScreen(
             .padding(horizontal = 16.dp)
         ) {
             item {
+                Text(
+                    text = stringResource(R.string.setting_backup),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
                 SettingItem(
                     stringResource(R.string.setting_auto_backup_title),
                     currentSettings.backupSettings.backupFrequency.name.lowercase(),
@@ -170,16 +201,6 @@ fun SettingsScreen(
                         onRestoreClicked = { checkAndRequestNotificationPermission { onRestoreClicked() }}
                     )
                 }
-
-//                item {
-//                    Button(
-//                        modifier = Modifier.padding(8.dp).clip(RectangleShape).fillMaxWidth(),
-//                        onClick = { onDummyDataCreate() }
-//                    ) {
-//                        Text("Create dummy data")
-//                    }
-//                }
-
             }
 
 
@@ -187,13 +208,43 @@ fun SettingsScreen(
                 item {
                     SettingItem(
                         stringResource(R.string.setting_google_account),
-                        currentSettings.googleAccount,
+                        currentSettings.googleAccount ?: "",
                         onClick = {}
                     )
                 }
             }
 
             item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                Text(
+                    text = stringResource(R.string.setting_ai_assistant),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                SettingItem(
+                    title = stringResource(R.string.setting_ai_model),
+                    subtitle = currentSettings.aiModelType.displayName,
+                    onClick = { showAiModelDialog = true }
+                )
+                if (aiModelDownloadStatus is LoadStatus.Progress) {
+                    LinearProgressIndicator(
+                        progress = { aiModelDownloadStatus.percentage / 100f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+            }
+
+            item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                Text(
+                    text = stringResource(R.string.setting_appearance),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
                 SettingRadioGroup(
                     title = stringResource(R.string.setting_theme_modes),
                     selectedOption = currentSettings.themeMode,
@@ -222,6 +273,43 @@ fun SettingsScreen(
             )
         }
 
+        if(showAiModelDialog) {
+            AiModelSelectionDialog(
+                currentModel = currentSettings.aiModelType,
+                onDismiss = { showAiModelDialog = false },
+                onConfirm = { selectedModel ->
+                    if (selectedModel.modelUrl != null) {
+                        modelToDownload = selectedModel
+                    } else {
+                        onAiModelChanged(selectedModel)
+                    }
+                    showAiModelDialog = false
+                }
+            )
+        }
+
+        modelToDownload?.let { model ->
+            AlertDialog(
+                onDismissRequest = { modelToDownload = null },
+                title = { Text(stringResource(R.string.dialog_download_ai_model_title)) },
+                text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.storageSize)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onAiModelChanged(model)
+                        onAiModelDownload(model)
+                        modelToDownload = null
+                    }) {
+                        Text(stringResource(R.string.btn_download))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { modelToDownload = null }) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
+            )
+        }
+
         if(showTimePickerDialog){
             TimePickerDialog(
                 initialHour = currentSettings.backupSettings.backupTimeHour,
@@ -240,12 +328,11 @@ fun SettingsScreen(
                     showRationaleDialog = false
                     notificationPermissionState.launchPermissionRequest()
                 },
-                onDismissRequest = {showRationaleDialog = false}
+                onDismissRequest = { showRationaleDialog = false }
             )
         }
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Preview(name = "Light Mode", showBackground = true)
@@ -261,7 +348,8 @@ fun PreviewSettingsScreen(
         SettingsScreen(
             onBackPressed = {},
             currentSettings = Settings(googleAccount="test@google.com"),
-            backupUploadDownloadState = BackupStatus.Idle,
+            backupUploadDownloadState = LoadStatus.Idle,
+            aiModelDownloadStatus = LoadStatus.Idle,
             backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2)),
             isAuthorisingBackup = false,
             onThemeChanged = {},
@@ -270,6 +358,8 @@ fun PreviewSettingsScreen(
             onBackupNowClicked = {},
             onRestoreClicked = {},
             onDummyDataCreate = {},
+            onAiModelChanged = {},
+            onAiModelDownload = {}
         )
     }
 }

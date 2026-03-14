@@ -51,15 +51,15 @@ class BackupWorker @AssistedInject constructor(
                 Log.d("kptest", "doWork status: $status")
 
                 when (status) {
-                    is BackupStatus.Progress -> {
+                    is LoadStatus.Progress -> {
                         setForeground(createForegroundInfo(status.percentage))
                         setProgress(workDataOf("percent" to status.percentage))
                     }
-                    is BackupStatus.Success -> {
+                    is LoadStatus.Success -> {
                         backupScheduler.onWorkCompleted(inputData)
                         finalResult = Result.success()
                     }
-                    is BackupStatus.Error -> {
+                    is LoadStatus.Error -> {
                         finalResult = if (runAttemptCount < 3) Result.retry() else Result.failure()
                     }
                     else -> {}

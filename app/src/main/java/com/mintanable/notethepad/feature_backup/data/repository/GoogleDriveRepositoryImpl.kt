@@ -6,9 +6,9 @@ import com.google.api.client.googleapis.media.MediaHttpUploader
 import com.google.api.client.http.FileContent
 import com.mintanable.notethepad.feature_backup.domain.GoogleDriveService
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
-import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
+import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
-import com.mintanable.notethepad.feature_backup.presentation.UploadDownload
+import com.mintanable.notethepad.feature_backup.presentation.LoadType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.channels.awaitClose
@@ -26,7 +26,7 @@ class GoogleDriveRepositoryImpl @Inject constructor(
     companion object{
         const val BACKUP_FILE_NAME = "NoteThePad_Backup.db"
     }
-    override suspend fun uploadFileWithProgress(accessToken: String, dbFile: File): Flow<BackupStatus> = callbackFlow {
+    override suspend fun uploadFileWithProgress(accessToken: String, dbFile: File): Flow<LoadStatus> = callbackFlow {
         try {
             val driveService = driveService.getDriveService(accessToken)
 
@@ -65,12 +65,12 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                     MediaHttpUploader.UploadState.MEDIA_IN_PROGRESS -> {
                         val percent = (uploader.progress * 100).toInt()
                         Log.d("kptest", "upload progress: $percent")
-                        trySend(BackupStatus.Progress(percent, UploadDownload.UPLOAD))
+                        trySend(LoadStatus.Progress(percent, LoadType.UPLOAD))
                     }
                     MediaHttpUploader.UploadState.MEDIA_COMPLETE -> {
                         Log.d("kptest", "upload successful")
-                        trySend(BackupStatus.Progress(100, UploadDownload.UPLOAD))
-                        trySend(BackupStatus.Success)
+                        trySend(LoadStatus.Progress(100, LoadType.UPLOAD))
+                        trySend(LoadStatus.Success)
                         close()
                     }
                     else -> {}
@@ -83,13 +83,13 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                 Log.d("kptest", "Flow channel closed.")
             }
         } catch (e: Exception) {
-            trySend(BackupStatus.Error(e.message ?: "Upload failed"))
+            trySend(LoadStatus.Error(e.message ?: "Upload failed"))
             close(e)
         }
     }
 
 
-    override suspend fun downloadBackupFile(accessToken: String, dbFile: File) : Flow<BackupStatus> = callbackFlow {
+    override suspend fun downloadBackupFile(accessToken: String, dbFile: File) : Flow<LoadStatus> = callbackFlow {
         try {
             val driveService = driveService.getDriveService(accessToken)
 
@@ -111,11 +111,11 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                     when (downloader.downloadState) {
                         MediaHttpDownloader.DownloadState.MEDIA_IN_PROGRESS -> {
                             val percent = (downloader.progress * 100).toInt()
-                            trySend(BackupStatus.Progress(percent, UploadDownload.DOWNLOAD))
+                            trySend(LoadStatus.Progress(percent, LoadType.DOWNLOAD))
                         }
                         MediaHttpDownloader.DownloadState.MEDIA_COMPLETE -> {
-                            trySend(BackupStatus.Progress(100, UploadDownload.DOWNLOAD))
-                            trySend(BackupStatus.Success)
+                            trySend(LoadStatus.Progress(100, LoadType.DOWNLOAD))
+                            trySend(LoadStatus.Success)
                             close()
                         }
                         else -> Unit
@@ -132,7 +132,7 @@ class GoogleDriveRepositoryImpl @Inject constructor(
             close()
             awaitClose { }
         } catch (e: Exception) {
-            trySend(BackupStatus.Error(e.message ?: "Download failed"))
+            trySend(LoadStatus.Error(e.message ?: "Download failed"))
             close(e)
         }
     }
