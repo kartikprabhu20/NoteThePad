@@ -32,11 +32,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -166,7 +168,7 @@ fun CheckboxRow(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Delete checkbox",
+                contentDescription = stringResource(R.string.option_delete),
                 tint = Color.Black
             )
         }

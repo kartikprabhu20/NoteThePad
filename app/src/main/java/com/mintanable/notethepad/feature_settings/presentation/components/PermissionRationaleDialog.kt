@@ -4,7 +4,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
@@ -16,18 +18,18 @@ fun PermissionRationaleDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(permissionRationaleType.title) },
+        title = { Text(stringResource(permissionRationaleType.titleRes)) },
         text = {
-            Text(permissionRationaleType.message)
+            Text(stringResource(permissionRationaleType.messageRes))
         },
         confirmButton = {
             TextButton(onClick = onConfirmClicked) {
-                Text("Allow")
+                Text(stringResource(R.string.btn_allow))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text("Not Now")
+                Text(stringResource(R.string.btn_not_now))
             }
         }
     )

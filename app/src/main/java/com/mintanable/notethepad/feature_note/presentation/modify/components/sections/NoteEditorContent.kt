@@ -28,8 +28,8 @@ import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -40,9 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.Attachment
@@ -105,21 +107,21 @@ fun NoteEditorContent(
                 CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
                     NoteBottomAppBar(
                         utilityButtons = listOf(
-                            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
+                            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, stringResource(R.string.content_description_attach)),
                             Triple(
                                 if (isCheckboxListAvailable) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                                 BottomSheetType.CHECKBOX,
-                                "CheckBox"
+                                stringResource(R.string.content_description_checkbox)
                             ),
                             Triple(
                                 Icons.Default.NotificationAdd,
                                 BottomSheetType.REMINDER,
-                                "Reminders"
+                                stringResource(R.string.content_description_reminders)
                             ),
                             Triple(
                                 Icons.Default.MoreHoriz,
                                 BottomSheetType.MORE_SETTINGS,
-                                "Settings"
+                                stringResource(R.string.content_description_settings)
                             )
                         ),
                         modifier = Modifier,
@@ -141,7 +143,7 @@ fun NoteEditorContent(
             modifier = Modifier.fillMaxSize(),
             floatingActionButton = {
                 MagicButton(
-                    title = "Auto-Tag",
+                    title = stringResource(R.string.btn_auto_tag),
                     isVisible = showMagicButton,
                     modifier = Modifier,
                     onButtonClicked = { onEvent(AddEditNoteEvent.ShowSuggestions)},

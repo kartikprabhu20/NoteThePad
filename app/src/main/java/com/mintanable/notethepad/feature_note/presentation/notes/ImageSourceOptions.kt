@@ -5,27 +5,39 @@ import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.VideoCameraFront
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.mintanable.notethepad.R
 
 enum class ImageSourceOptions(
-    override val title: String,
+    private val titleRes: Int,
     override val  icon: ImageVector
 ) : AdditionalOption {
-    PHOTO_CAMERA("Camera", Icons.Default.PhotoCamera),
-    PHOTO_GALLERY("Gallery", Icons.Default.Collections),
+    PHOTO_CAMERA(R.string.option_camera, Icons.Default.PhotoCamera),
+    PHOTO_GALLERY(R.string.option_gallery, Icons.Default.Collections);
+
+    override val title: String
+        @Composable get() = stringResource(titleRes)
 }
 
 enum class VideoSourceOptions(
-    override val title: String,
+    private val titleRes: Int,
     override val  icon: ImageVector
 ) : AdditionalOption {
-    VIDEO_CAMERA("Video recorder", Icons.Default.VideoCameraFront),
-    VIDEO_GALLERY("Gallery", Icons.Default.Collections)
+    VIDEO_CAMERA(R.string.option_video_recorder, Icons.Default.VideoCameraFront),
+    VIDEO_GALLERY(R.string.option_gallery, Icons.Default.Collections);
+
+    override val title: String
+        @Composable get() = stringResource(titleRes)
 }
 
 enum class AudioSourceOptions(
-    override val title: String,
+    private val titleRes: Int,
     override val  icon: ImageVector
 ) : AdditionalOption {
-    AUDIO_RECORDER("Audio recorder", Icons.Default.RecordVoiceOver),
+    AUDIO_RECORDER(R.string.option_audio_recorder, Icons.Default.RecordVoiceOver);
+
+    override val title: String
+        @Composable get() = stringResource(titleRes)
 }

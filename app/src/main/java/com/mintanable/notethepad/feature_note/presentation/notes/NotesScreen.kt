@@ -36,6 +36,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
@@ -181,7 +182,7 @@ fun NotesScreen (
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
-                                    contentDescription = "Menu"
+                                    contentDescription = stringResource(R.string.content_description_menu)
                                 )
                             }
                         }
@@ -205,7 +206,7 @@ fun NotesScreen (
                                 )
                             .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 2f)
                     ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
+                        Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.content_description_add_note))
                     }
                 },
                 snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -269,7 +270,7 @@ fun NotesScreen (
                         ) {
                             Image(
                                 painter = painterResource(resource),
-                                contentDescription = "empty list"
+                                contentDescription = stringResource(R.string.content_description_empty_list)
                             )
                         }
                     }

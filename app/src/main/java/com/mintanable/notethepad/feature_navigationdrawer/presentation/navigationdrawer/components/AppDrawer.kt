@@ -46,11 +46,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.mintanable.notethepad.BuildConfig
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_firebase.domain.model.User
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 import com.mintanable.notethepad.feature_note.domain.model.Tag
@@ -160,7 +162,7 @@ fun AppDrawer(
                                 ) {
                                     Icon(
                                         imageVector = if(!isLabelEditing)Icons.Default.Edit else Icons.Default.Check,
-                                        contentDescription = "edit labels",
+                                        contentDescription = stringResource(R.string.content_description_edit_labels),
                                         tint = if (isLabelEditing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -201,12 +203,12 @@ fun AppDrawer(
             ) {
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                 Text(
-                    text = "Version ${BuildConfig.VERSION_NAME}",
+                    text = stringResource(R.string.version_format, BuildConfig.VERSION_NAME),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Build ${BuildConfig.VERSION_CODE}",
+                    text = stringResource(R.string.build_format, BuildConfig.VERSION_CODE),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -218,7 +220,7 @@ fun AppDrawer(
 @Composable
 fun DrawerHeader(
     modifier: Modifier = Modifier,
-    title: String = "NoteThePad",
+    title: String = stringResource(R.string.app_name),
     user: User?
 ) {
     Column(modifier = modifier,
@@ -238,7 +240,7 @@ fun DrawerHeader(
                         .data(url)
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Profile Picture",
+                    contentDescription = stringResource(R.string.content_description_profile_picture),
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .size(72.dp)
@@ -296,7 +298,7 @@ fun LabelEditRow(
         badge = {
             if (isLabelEditing) {
                 IconButton(onClick = { onTagDeleted(item.tag) }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete Label")
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_description_delete_label))
                 }
             }
         },

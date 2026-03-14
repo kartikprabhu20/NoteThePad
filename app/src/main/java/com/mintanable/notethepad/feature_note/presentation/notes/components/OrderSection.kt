@@ -3,8 +3,10 @@ package com.mintanable.notethepad.feature_note.presentation.notes.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_note.presentation.modify.components.DefaultRadioButton
@@ -23,19 +25,19 @@ fun OrderSection (
             modifier = Modifier.fillMaxWidth()
         ) {
             DefaultRadioButton(
-                text = "Title",
+                text = stringResource(R.string.order_title),
                 selected = noteOrder is NoteOrder.Title,
                 onSelect = {onOrderChange(NoteOrder.Title(noteOrder.orderType))}
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
-                text = "Date",
+                text = stringResource(R.string.order_date),
                 selected = noteOrder is NoteOrder.Date,
                 onSelect = {onOrderChange(NoteOrder.Date(noteOrder.orderType))}
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
-                text = "Color",
+                text = stringResource(R.string.order_color),
                 selected = noteOrder is NoteOrder.Color,
                 onSelect = {onOrderChange(NoteOrder.Color(noteOrder.orderType))}
             )
@@ -45,13 +47,13 @@ fun OrderSection (
             modifier = Modifier.fillMaxWidth()
         ) {
             DefaultRadioButton(
-                text = "Ascending",
+                text = stringResource(R.string.order_ascending),
                 selected = noteOrder.orderType is OrderType.Ascending,
                 onSelect = {onOrderChange(noteOrder.copyOrder(OrderType.Ascending))}
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
-                text = "Descending",
+                text = stringResource(R.string.order_descending),
                 selected = noteOrder.orderType is OrderType.Descending,
                 onSelect = {onOrderChange(noteOrder.copyOrder(OrderType.Descending))}
             )

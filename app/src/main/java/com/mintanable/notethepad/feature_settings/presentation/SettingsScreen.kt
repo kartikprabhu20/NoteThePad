@@ -30,12 +30,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
@@ -77,6 +80,7 @@ fun SettingsScreen(
     val notificationPermissionState = rememberPermissionState(
         android.Manifest.permission.POST_NOTIFICATIONS
     )
+    val msgSigninGoogleBackups = stringResource(R.string.msg_signin_google_backups)
     val checkAndRequestNotificationPermission = { action: () -> Unit ->
         action() //Perform action in anycase, since backup progress can be foreground too
 
@@ -94,7 +98,7 @@ fun SettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings_title),
                         style = MaterialTheme.typography.headlineLarge
                     )
                         },
@@ -104,7 +108,7 @@ fun SettingsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "back"
+                            contentDescription = stringResource(R.string.content_description_back)
                         )
                     }
                 }
@@ -119,11 +123,11 @@ fun SettingsScreen(
         ) {
             item {
                 SettingItem(
-                    "Automatic backup on Google drive",
+                    stringResource(R.string.setting_auto_backup_title),
                     currentSettings.backupSettings.backupFrequency.name.lowercase(),
                     onClick = {
                         if (!isGoogleLinked) {
-                            showToast("Please sign in with Google to enable backups")
+                            showToast(msgSigninGoogleBackups)
                         } else {
                             showIntervalDialog = true
                         }
@@ -146,7 +150,7 @@ fun SettingsScreen(
                             currentSettings.backupSettings.backupTimeMinutes
                         )
                         SettingItem(
-                            "Backup time",
+                            stringResource(R.string.setting_backup_time),
                             formattedTime,
                             onClick = { showTimePickerDialog = true },
                             modifier = Modifier.weight(1f),
@@ -156,7 +160,7 @@ fun SettingsScreen(
                             modifier = Modifier.padding(8.dp).clip(RectangleShape),
                             onClick = { checkAndRequestNotificationPermission{onBackupNowClicked()} }
                         ) {
-                            Text("Backup Now")
+                            Text(stringResource(R.string.btn_backup_now))
                         }
                     }
 
@@ -182,7 +186,7 @@ fun SettingsScreen(
             if(currentSettings.backupEnabled && currentSettings.googleAccount?.isNotBlank() == true) {
                 item {
                     SettingItem(
-                        "Google Account",
+                        stringResource(R.string.setting_google_account),
                         currentSettings.googleAccount,
                         onClick = {}
                     )
@@ -191,7 +195,7 @@ fun SettingsScreen(
 
             item {
                 SettingRadioGroup(
-                    title = "Theme modes",
+                    title = stringResource(R.string.setting_theme_modes),
                     selectedOption = currentSettings.themeMode,
                     onOptionSelected = { onThemeChanged(it) },
                     entries = ThemeMode.entries
@@ -269,4 +273,3 @@ fun PreviewSettingsScreen(
         )
     }
 }
-

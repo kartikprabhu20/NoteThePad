@@ -14,8 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mintanable.notethepad.R
 
 @Composable
 fun SavingOverlay(
@@ -34,7 +36,7 @@ fun SavingOverlay(
                 CircularProgressIndicator(color = Color.White)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Saving Note...",
+                    text = stringResource(R.string.msg_saving_note),
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium
                 )

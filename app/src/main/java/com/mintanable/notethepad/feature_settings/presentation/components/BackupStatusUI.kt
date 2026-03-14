@@ -16,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_backup.presentation.BackupStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
@@ -33,6 +35,7 @@ fun BackupStatusUI(
     backupUiState: BackupUiState,
     onRestoreClicked: () -> Unit
 ) {
+    val context = LocalContext.current
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         val isRunning = backupUploadDownloadState is BackupStatus.Progress
         val progress = if (backupUploadDownloadState is BackupStatus.Progress) {
@@ -45,9 +48,9 @@ fun BackupStatusUI(
             val type = if (backupUploadDownloadState is BackupStatus.Progress) { backupUploadDownloadState.type} else null
             Text(
                 if(type==UploadDownload.UPLOAD) {
-                    "Uploading to Drive: $progress%"
+                    stringResource(R.string.msg_uploading_to_drive, progress.toInt())
                 } else {
-                    "Downloading from Drive: $progress%"
+                    stringResource(R.string.msg_downloading_from_drive, progress.toInt())
                 },
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -60,7 +63,7 @@ fun BackupStatusUI(
 
         when (backupUiState) {
             is BackupUiState.Loading -> {
-                Text("Checking cloud status...",
+                Text(stringResource(R.string.msg_checking_cloud_status),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(horizontal = 16.dp))
             }
@@ -74,12 +77,7 @@ fun BackupStatusUI(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Last cloud backup:\n$formattedDate (${
-                            formatFileSize(
-                                LocalContext.current,
-                                backupUiState.metadata.size
-                            )
-                        })",
+                        stringResource(R.string.msg_last_cloud_backup, formattedDate, formatFileSize(context, backupUiState.metadata.size)),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -90,12 +88,12 @@ fun BackupStatusUI(
                         modifier = Modifier.padding(8.dp).clip(RectangleShape),
                         onClick = onRestoreClicked
                     ) {
-                        Text("Restore Now")
+                        Text(stringResource(R.string.btn_restore_now))
                     }
                 }
             }
             is BackupUiState.NoBackup -> {
-                Text("No backups found in Drive",
+                Text(stringResource(R.string.msg_no_backups_found),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(horizontal = 16.dp))
             }

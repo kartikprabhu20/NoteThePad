@@ -27,9 +27,8 @@ import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthState
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.ui.util.Screen
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
@@ -48,6 +47,7 @@ fun LoginScreen(
     val state by viewModel.authState.collectAsStateWithLifecycle()
     val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val errorMsg = stringResource(R.string.error_signin)
 
     LaunchedEffect(state) {
         if (state is AuthState.Success) {
@@ -57,7 +57,7 @@ fun LoginScreen(
         }
         if(state is AuthState.Error) {
             Toast.makeText(context,
-                "Error occured while signing in, try again!",
+                errorMsg,
                 Toast.LENGTH_LONG)
                 .show()
         }
@@ -89,7 +89,7 @@ fun LoginScreenContent(
                 painter = painterResource(
                     id = if(darkTheme) R.drawable.google_signin_dark else R.drawable.google_signin_light
                 ),
-                contentDescription = "Google Sign In",
+                contentDescription = stringResource(R.string.content_description_google_signin),
                 modifier = Modifier
                     .clickable(enabled = true, onClick = onGoogleSigInClick)
             )

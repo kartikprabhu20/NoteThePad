@@ -24,12 +24,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.video.videoFrameMillis
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -61,7 +63,7 @@ fun AttachedImageItem(
                     .crossfade(true)
                     .build()
             },
-            contentDescription = "Attached image",
+            contentDescription = stringResource(R.string.content_description_attached_image),
             contentScale = ContentScale.Crop,
             modifier = Modifier.clickable {
                 onClick(uri)
@@ -77,7 +79,7 @@ fun AttachedImageItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Play Video",
+                    contentDescription = stringResource(R.string.content_description_play_video),
                     tint = Color.White,
                     modifier = Modifier.size(36.dp)
                 )
@@ -95,7 +97,7 @@ fun AttachedImageItem(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Remove",
+                contentDescription = stringResource(R.string.content_description_remove),
                 tint = Color.White,
                 modifier = Modifier.padding(4.dp)
             )

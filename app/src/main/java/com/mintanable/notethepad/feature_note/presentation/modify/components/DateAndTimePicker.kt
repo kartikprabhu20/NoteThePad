@@ -10,7 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import java.util.Calendar
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_settings.presentation.components.TimePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +29,7 @@ fun DateAndTimePicker(
         DatePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(onClick = { showTimePicker = true }) { Text("Next") }
+                TextButton(onClick = { showTimePicker = true }) { Text(stringResource(R.string.next)) }
             }
         ) {
             DatePicker(state = dateState)

@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 
@@ -34,7 +36,7 @@ fun AudioRecorderUI(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Audio Recorder",
+        Text(text = stringResource(R.string.title_audio_recorder),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface)
 
@@ -65,7 +67,7 @@ fun AudioRecorderUI(
                 contentDescription = null
             )
             Spacer(Modifier.width(8.dp))
-            Text(if (isRecording) "Stop Recording" else "Start Recording")
+            Text(if (isRecording) stringResource(R.string.btn_stop_recording) else stringResource(R.string.btn_start_recording))
         }
     }
 }

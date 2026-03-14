@@ -10,7 +10,10 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.mintanable.notethepad.R
 
 enum class BottomSheetType {
     NONE,
@@ -27,32 +30,42 @@ enum class BottomSheetType {
 
 interface AdditionalOption {
     val title: String
+        @Composable get
     val icon: ImageVector
 }
 
 enum class AttachmentOptions(
-    override val title: String,
+    private val titleRes: Int,
     override val icon: ImageVector
 ) : AdditionalOption {
-    IMAGE("Image", Icons.Default.Image),
-    VIDEO("Video", Icons.Default.Videocam),
-    AUDIO("Audio", Icons.Default.Mic)
+    IMAGE(R.string.option_image, Icons.Default.Image),
+    VIDEO(R.string.option_video, Icons.Default.Videocam),
+    AUDIO(R.string.option_audio, Icons.Default.Mic);
+
+    override val title: String
+        @Composable get() = stringResource(titleRes)
 }
 
 enum class ReminderOptions(
-    override val title: String,
+    private val titleRes: Int,
     override val icon: ImageVector
 ) : AdditionalOption {
-    DATE_AND_TIME("Choose a data & time", Icons.Default.AccessTime),
+    DATE_AND_TIME(R.string.option_choose_date_time, Icons.Default.AccessTime);
+
+    override val title: String
+        @Composable get() = stringResource(titleRes)
 }
 
 enum class MoreSettingsOptions(
-    override val title: String,
+    private val titleRes: Int,
     override val icon: ImageVector
 ) : AdditionalOption {
-    PIN("Pin as widget", Icons.Default.PushPin),
-    LABEL("Add label", Icons.AutoMirrored.Filled.Label),
-    DELETE("Delete", Icons.Default.Delete),
-    COPY("Make a copy", Icons.Default.ContentCopy),
+    PIN(R.string.option_pin_widget, Icons.Default.PushPin),
+    LABEL(R.string.option_add_label, Icons.AutoMirrored.Filled.Label),
+    DELETE(R.string.option_delete, Icons.Default.Delete),
+    COPY(R.string.option_make_copy, Icons.Default.ContentCopy);
 //    SHARE("Send", Icons.Default.Share)
+
+    override val title: String
+        @Composable get() = stringResource(titleRes)
 }

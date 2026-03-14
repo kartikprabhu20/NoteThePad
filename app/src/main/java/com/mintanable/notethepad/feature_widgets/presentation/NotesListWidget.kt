@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.glance.ColorFilter
@@ -81,13 +82,14 @@ class NoteListWidget : GlanceAppWidget() {
 fun WidgetContent(
     items: List<DetailedNote>,
 ) {
+    val context = LocalContext.current
     Scaffold(
         titleBar = {
             WidgetTitleBar(
-                title = "Recent Notes",
+                title = context.getString(R.string.title_recent_notes),
                 titleIconRes = R.mipmap.notethepad_launcher_round,
                 titleBarActionIconRes = R.drawable.baseline_refresh_24,
-                titleBarActionIconContentDescription = "refresh widgets",
+                titleBarActionIconContentDescription = context.getString(R.string.content_description_refresh_widgets),
             ) {
                 actionRunCallback<RefreshNoteWidgetCallback>()
             }
@@ -138,7 +140,7 @@ private fun Grid(items: List<DetailedNote>) {
             ) {
                 Image(
                     provider = ImageProvider(R.drawable.baseline_add_24),
-                    contentDescription = "Add Note",
+                    contentDescription = context.getString(R.string.content_description_add_note),
                     modifier = GlanceModifier.size(24.dp),
                 )
             }
@@ -203,7 +205,7 @@ fun rememberNoteHeight(note: DetailedNote): Dp {
     val contentHeight = if (note.content.isBlank()) {
         0.dp
     } else {
-        val charsPerLine = 38  // approx for 12sp in typical widget width
+        val charsPerLine = 38  // approx for 12sp in typical width
         val lines = (note.content.length / charsPerLine + 1).coerceIn(1, 5)
         (lines * 18).dp
     }

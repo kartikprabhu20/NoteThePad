@@ -12,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
@@ -39,7 +41,7 @@ fun SimpleCheckbox(itemText: String, isChecked: Boolean, modifier: Modifier = Mo
     ) {
         Icon(
             imageVector = if(isChecked)Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
-            contentDescription = "checkbox"
+            contentDescription = stringResource(R.string.content_description_checkbox_state)
         )
         Text(
             text = itemText,

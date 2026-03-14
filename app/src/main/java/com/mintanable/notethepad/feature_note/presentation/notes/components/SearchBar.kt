@@ -38,8 +38,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,7 +52,7 @@ fun SearchBar(
     onValueChange: (String)-> Unit,
     onFocusChanged: (FocusState)-> Unit,
     onClearClicked: () -> Unit,
-    hint: String = "Search notes...",
+    hint: String = stringResource(R.string.search_hint),
     modifier: Modifier=Modifier,
     textStyle: TextStyle = TextStyle(),
     isSingleLine: Boolean = false
@@ -97,7 +99,7 @@ fun SearchBar(
                 ) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = "Clear text"
+                        contentDescription = stringResource(R.string.content_description_clear_text)
                     )
                 }
             }
@@ -155,7 +157,7 @@ fun TopSearchBar(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Sort,
-                contentDescription = "Sort"
+                contentDescription = stringResource(R.string.content_description_sort)
             )
         }
 
@@ -163,7 +165,7 @@ fun TopSearchBar(
             onToogleGridView(!isGridView)}) {
             Icon(
                 imageVector = if (isGridView) Icons.AutoMirrored.Filled.ViewList else Icons.Default.GridView,
-                contentDescription = "Toggle Layout"
+                contentDescription = stringResource(R.string.content_description_toggle_layout)
             )
         }
 

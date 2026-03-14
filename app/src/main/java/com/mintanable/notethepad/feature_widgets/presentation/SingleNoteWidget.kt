@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
@@ -73,8 +74,8 @@ class SingleNoteWidget : GlanceAppWidget() {
                     NoteItem(
                         DetailedNote(
                             id = 0L,
-                            title = "No note found",
-                            content = "Please go to the app and add some notes",
+                            title = context.getString(R.string.msg_no_note_found),
+                            content = context.getString(R.string.msg_add_notes_prompt),
                             timestamp = System.currentTimeMillis(),
                             color = NoteColors.colors[0].toArgb()
                         ),

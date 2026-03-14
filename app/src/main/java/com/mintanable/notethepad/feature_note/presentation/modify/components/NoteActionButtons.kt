@@ -28,8 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import kotlinx.coroutines.delay
@@ -66,10 +68,10 @@ fun NoteActionButtons(
     ) {
 
         val utilityButtons = listOf(
-            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, "Attach"),
-            Triple(Icons.Default.CheckBox, BottomSheetType.CHECKBOX, "CheckBox") ,
-            Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, "Reminders"),
-            Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, "Settings")
+            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, stringResource(R.string.content_description_attach)),
+            Triple(Icons.Default.CheckBox, BottomSheetType.CHECKBOX, stringResource(R.string.content_description_checkbox)) ,
+            Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, stringResource(R.string.content_description_reminders)),
+            Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, stringResource(R.string.content_description_settings))
         )
 
         utilityButtons.forEachIndexed { index, (icon, type, label) ->
@@ -97,7 +99,7 @@ fun NoteActionButtons(
             onClick = onSaveClick,
             containerColor = MaterialTheme.colorScheme.primary,
         ) {
-            Icon(imageVector = Icons.Default.Save, contentDescription = "Save Note")
+            Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(R.string.content_description_save_note))
         }
     }
 }

@@ -37,12 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.core.net.toUri
+import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
 import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.model.Tag
@@ -141,7 +143,7 @@ fun NoteItem(
                     if(note.imageUris.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Collections,
-                            contentDescription = "Images attached",
+                            contentDescription = stringResource(R.string.content_description_images_attached),
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
                         )
@@ -149,7 +151,7 @@ fun NoteItem(
                     if(note.audioAttachments.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Mic,
-                            contentDescription = "Images attached",
+                            contentDescription = stringResource(R.string.content_description_audio_attached),
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
                         )
@@ -160,7 +162,7 @@ fun NoteItem(
                                 Icons.Default.Notifications
                             else
                                 Icons.Default.NotificationsOff,
-                            contentDescription = "Images attached",
+                            contentDescription = stringResource(R.string.content_description_reminder_set),
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
                         )
@@ -169,7 +171,7 @@ fun NoteItem(
                     if(note.checkListItems.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Checklist,
-                            contentDescription = "checkboxes available",
+                            contentDescription = stringResource(R.string.content_description_checkboxes_available),
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
                         )
@@ -178,7 +180,7 @@ fun NoteItem(
                     if(note.tags.isNotEmpty()){
                         Icon(
                             imageVector = Icons.Default.Label,
-                            contentDescription = "Tags available",
+                            contentDescription = stringResource(R.string.content_description_tags_available),
                             modifier = Modifier.alpha(alpha = 0.5f),
                             tint = Color.Black
                         )
@@ -193,7 +195,7 @@ fun NoteItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PushPin,
-                                contentDescription = "Pin note as widget",
+                                contentDescription = stringResource(R.string.content_description_pin_note),
                                 tint = Color.Black
                             )
                         }
@@ -204,7 +206,7 @@ fun NoteItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete note",
+                                contentDescription = stringResource(R.string.content_description_delete_note),
                                 tint = Color.Black
                             )
                         }
