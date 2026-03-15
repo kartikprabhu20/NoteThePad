@@ -38,7 +38,8 @@ class NoteWidgetConfigActivity : AppCompatActivity() {
 
         setContent {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
-            val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
+            val state by settingsViewModel.state.collectAsStateWithLifecycle()
+            val settings = state.settings
             val isDarkTheme = if(settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else settings.themeMode == ThemeMode.DARK
 
             NoteThePadTheme(darkTheme = isDarkTheme) {

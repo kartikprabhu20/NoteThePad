@@ -39,6 +39,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
 import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
@@ -62,8 +63,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
 
             val settingsViewModel: SettingsViewModel = hiltViewModel()
-            val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
-            val isDarkTheme = if(settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else settings.themeMode == ThemeMode.DARK
+            val state by settingsViewModel.state.collectAsStateWithLifecycle()
+            val isDarkTheme = if(state.settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else state.settings.themeMode == ThemeMode.DARK
             val currentIntent by intentState
 
             NoteThePadTheme(darkTheme = isDarkTheme) {
@@ -94,9 +95,12 @@ class MainActivity : AppCompatActivity() {
                         contract = ActivityResultContracts.StartIntentSenderForResult(),
                         onResult = { result ->
                             if (result.resultCode == RESULT_OK) {
-                                settingsViewModel.onAuthResultCompleted(result.data) { error -> showToast(error) }
+                                settingsViewModel.onEvent(SettingsEvent.AuthResultCompleted(
+                                    intent = result.data,
+                                    onFailure = showToast
+                                ))
                             } else {
-                                settingsViewModel.onAuthCancelled()
+                                settingsViewModel.onEvent(SettingsEvent.AuthCancelled)
                             }
                         }
                     )
@@ -118,7 +122,7 @@ class MainActivity : AppCompatActivity() {
                                     navController = navController,
                                     onLogOut = {
                                         credentialHelper.clearCredentials()
-                                        settingsViewModel.signOut()
+                                        settingsViewModel.onEvent(SettingsEvent.SignOut)
                                     },
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@composable
@@ -156,12 +160,6 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
                             composable(route = Screen.SettingsScreen.route) {
-                                val isAuthorisingBackup by settingsViewModel.isAuthorisingBackup.collectAsStateWithLifecycle()
-                                val backupUiState by settingsViewModel.backupUiState.collectAsStateWithLifecycle()
-                                val backupUploadDownloadState by settingsViewModel.backupUploadDownloadState.collectAsStateWithLifecycle()
-                                val aiModelDownloadStatus by settingsViewModel.aiModelDownloadStatus.collectAsStateWithLifecycle()
-                                val aiModels by settingsViewModel.aiModels.collectAsStateWithLifecycle()
-
                                 LaunchedEffect(Unit) {
                                     settingsViewModel.restoreEvents.collect { event ->
                                         when (event) {
@@ -175,60 +173,20 @@ class MainActivity : AppCompatActivity() {
                                 }
 
                                 SettingsScreen(
+                                    state = state,
                                     onBackPressed = {
                                         navController.navigateUp()
                                     },
-                                    isAuthorisingBackup = isAuthorisingBackup,
-                                    currentSettings = settings,
-                                    aiModels = aiModels,
-                                    backupUploadDownloadState = backupUploadDownloadState,
-                                    aiModelDownloadStatus = aiModelDownloadStatus,
-                                    backupUiState = backupUiState,
-                                    onThemeChanged = { theme ->
-                                        settingsViewModel.updateTheme(theme)
-                                    },
-                                    onBackupSettingsChanged = { backupSettings ->
-                                        settingsViewModel.updateBackupSettings(
-                                            backupSettings = backupSettings,
-                                            onAuthRequired =
-                                            { pendingIntent ->
+                                    onEvent = { event ->
+                                        if (event is SettingsEvent.UpdateBackupSettings) {
+                                            settingsViewModel.onEvent(event.copy(onAuthRequired = { pendingIntent ->
                                                 launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
-                                            },
-                                            onFailure = { error ->
-                                                showToast(error)
-                                            }
-                                        )
-                                    },
-                                    onBackupNowClicked = {
-                                        settingsViewModel.updateBackupSettings(
-                                            backupSettings = settings.backupSettings,
-                                            backupNow = true,
-                                            onAuthRequired =
-                                            { pendingIntent ->
-                                                launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
-                                            },
-                                            onFailure = { error ->
-                                                showToast(error)
-                                            }
-                                        )
-                                    },
-                                    onRestoreClicked = {
-                                        settingsViewModel.startRestore { error ->
-                                            showToast(error)
+                                            }))
+                                        } else {
+                                            settingsViewModel.onEvent(event)
                                         }
                                     },
-                                    onDummyDataCreate = {
-                                        settingsViewModel.createMassiveDummyData()
-                                    },
-                                    showToast = { message ->
-                                        showToast(message)
-                                    },
-                                    onAiModelChanged = { type ->
-                                        settingsViewModel.onAiModelChanged(type)
-                                    },
-                                    onAiModelDownload = { type ->
-                                        settingsViewModel.downloadAiModel(aiModels.find { it.name==type })
-                                    }
+                                    showToast = showToast
                                 )
                             }
                         }

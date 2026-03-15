@@ -66,7 +66,8 @@ fun NotesScreen (
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
-    val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
+    val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
+    val settings = settingsState.settings
     val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
     val filterState by notesViewModel.filterState.collectAsStateWithLifecycle()
     val isFiltered = filterState.filter != NotesFilterType.ALL.filter

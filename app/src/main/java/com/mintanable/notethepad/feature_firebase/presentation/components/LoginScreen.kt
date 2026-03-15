@@ -45,7 +45,8 @@ fun LoginScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.authState.collectAsStateWithLifecycle()
-    val settings by settingsViewModel.settingsState.collectAsStateWithLifecycle()
+    val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
+    val settings = settingsState.settings
     val context = LocalContext.current
     val errorMsg = stringResource(R.string.error_signin)
 

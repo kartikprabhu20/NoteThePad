@@ -9,12 +9,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
 import com.mintanable.notethepad.feature_ai.domain.model.AiModel
-import com.mintanable.notethepad.feature_ai.domain.model.AiModelCatalog
 import com.mintanable.notethepad.feature_ai.domain.use_case.DownloadAiModelUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_case.GetSupportedAiModels
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
@@ -27,15 +24,16 @@ import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
 import com.mintanable.notethepad.feature_backup.presentation.LoadType
+import com.mintanable.notethepad.feature_firebase.domain.model.User
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
+import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +43,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -53,12 +50,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
-import kotlin.collections.find
-import kotlin.collections.map
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -99,77 +92,61 @@ class SettingsViewModel @Inject constructor(
         type = LoadType.DOWNLOAD
     )
 
-    val backupUploadDownloadState: StateFlow<LoadStatus> = combine(
-        _backupUploadStatus,
-        _backupDownloadState
-    ) { upload, download ->
-        when {
-            download is LoadStatus.Progress -> download
-            upload is LoadStatus.Progress -> upload
-            download is LoadStatus.Success || download is LoadStatus.Error -> download
-            else -> upload
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = LoadStatus.Idle
-    )
-
     private val _aiModelDownloadStatus = workManager.getLoadStatusFLow(
         workName = MODEL_DOWNLOAD_TASK,
         type = LoadType.DOWNLOAD
     )
-    val aiModelDownloadStatus: StateFlow<LoadStatus> = _aiModelDownloadStatus.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = LoadStatus.Idle
-    )
 
-    val aiModels: StateFlow<List<AiModel>> = getSupportedAiModels()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = listOf(AiModel(
-                name = "None",
-                displayName = "None",
-                info = "No AI assistance will be provided.",
-            ))
-        )
-
-    private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
-    val restoreEvents = _restoreEvents.asSharedFlow()
-
-    val settingsState: StateFlow<Settings> = combine(
-        authRepository.getSignedInFirebaseUser(),
-        dataStore.settingsFlow
-    ) { user, settings ->
-        val googleEmail = if (user?.isGoogleSignedIn == true) user.email else null
-        settings.copy(googleAccount = googleEmail)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = Settings()
-    )
+    private val _isAuthorisingBackup = MutableStateFlow(false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val backupUiState: StateFlow<BackupUiState> = combine(
-        settingsState.map { it.googleAccount }.distinctUntilChanged(),
-        refreshTrigger
-    ) { email, _ -> email }
-        .flatMapLatest { email ->
-            if (email == null) {
-                flow<BackupUiState> { emit(BackupUiState.NoBackup) }
-            } else {
+    val state: StateFlow<SettingsState> = combine(
+        dataStore.settingsFlow,
+        authRepository.getSignedInFirebaseUser(),
+        combine(_backupUploadStatus, _backupDownloadState) { upload, download ->
+            when {
+                download is LoadStatus.Progress -> download
+                upload is LoadStatus.Progress -> upload
+                download is LoadStatus.Success || download is LoadStatus.Error -> download
+                else -> upload
+            }
+        },
+        _aiModelDownloadStatus,
+        getSupportedAiModels(),
+        _isAuthorisingBackup
+    ) { args: Array<Any?> ->
+        val settings = args[0] as Settings
+        val user = args[1] as User?
+        val backupStatus = args[2] as LoadStatus
+        val aiDownloadStatus = args[3] as LoadStatus
+        val models = args[4] as List<AiModel>
+        val isAuthorising = args[5] as Boolean
+        val googleEmail = if (user?.isGoogleSignedIn == true) user.email else null
 
-                flow<BackupUiState> {
-                    emit(BackupUiState.Loading)
+        SettingsState(
+            settings = settings.copy(googleAccount = googleEmail),
+            backupUploadDownloadState = backupStatus,
+            aiModels = models,
+            aiModelDownloadStatus = aiDownloadStatus,
+            isAuthorisingBackup = isAuthorising
+        )
+    }.flatMapLatest { currentState ->
+        val email = currentState.settings.googleAccount
+        if (email == null) {
+            flow { emit(currentState.copy(backupUiState = BackupUiState.NoBackup)) }
+        } else {
+            refreshTrigger.map { }.flowWith(Unit).flatMapLatest {
+                flow {
+                    emit(currentState.copy(backupUiState = BackupUiState.Loading))
                     try {
                         checkForExistingBackup().collect { metadata ->
                             emit(
-                                if (metadata != null)
-                                    BackupUiState.HasBackup(metadata)
-                                else
-                                    BackupUiState.NoBackup
+                                currentState.copy(
+                                    backupUiState = if (metadata != null)
+                                        BackupUiState.HasBackup(metadata)
+                                    else
+                                        BackupUiState.NoBackup
+                                )
                             )
                         }
                     } catch (e: Exception) {
@@ -178,25 +155,50 @@ class SettingsViewModel @Inject constructor(
                         } else {
                             "Failed to check backup"
                         }
-                        emit(BackupUiState.Error(errorMessage))
+                        emit(currentState.copy(backupUiState = BackupUiState.Error(errorMessage)))
                     }
                 }
             }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = BackupUiState.Loading
-        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = SettingsState()
+    )
 
-    private val _isAuthorisingBackup = MutableStateFlow(false)
-    val isAuthorisingBackup = _isAuthorisingBackup.asStateFlow()
+    // Helper for combining with refreshTrigger
+    private fun <T> kotlinx.coroutines.flow.Flow<T>.flowWith(initial: T): kotlinx.coroutines.flow.Flow<T> = flow {
+        emit(initial)
+        collect { emit(it) }
+    }
 
-    fun updateTheme(mode: ThemeMode) {
+    private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
+    val restoreEvents = _restoreEvents.asSharedFlow()
+
+    fun onEvent(event: SettingsEvent) {
+        when (event) {
+            is SettingsEvent.UpdateTheme -> updateTheme(event.themeMode)
+            is SettingsEvent.UpdateBackupSettings -> updateBackupSettings(
+                event.backupSettings,
+                event.backupNow,
+                event.onAuthRequired,
+                event.onFailure
+            )
+            is SettingsEvent.AuthResultCompleted -> onAuthResultCompleted(event.intent, event.onFailure)
+            SettingsEvent.AuthCancelled -> onAuthCancelled()
+            is SettingsEvent.StartRestore -> startRestore(event.onFailure)
+            SettingsEvent.CreateDummyData -> createMassiveDummyData()
+            is SettingsEvent.ChangeAiModel -> onAiModelChanged(event.modelName)
+            is SettingsEvent.DownloadAiModel -> downloadAiModel(event.aiModel)
+            SettingsEvent.SignOut -> signOut()
+        }
+    }
+
+    private fun updateTheme(mode: ThemeMode) {
         viewModelScope.launch { dataStore.updateTheme(mode) }
     }
 
-    fun signOut() {
+    private fun signOut() {
         viewModelScope.launch {
             driveRepository.clearDriveCredentials()
             resetBackupSettings()
@@ -206,17 +208,18 @@ class SettingsViewModel @Inject constructor(
 
     private fun resetBackupSettings() {
         viewModelScope.launch {
+            val currentSettings = state.value.settings
             dataStore.updateBackupSettings(
-                settingsState.value.backupSettings.copy(
+                currentSettings.backupSettings.copy(
                     backupFrequency = BackupFrequency.OFF
                 )
             )
         }
     }
 
-    fun updateBackupSettings(
+    private fun updateBackupSettings(
         backupSettings: BackupSettings,
-        backupNow: Boolean = false,
+        backupNow: Boolean,
         onAuthRequired: (PendingIntent) -> Unit,
         onFailure: (String) -> Unit
     ) {
@@ -249,7 +252,14 @@ class SettingsViewModel @Inject constructor(
     ) {
         _isAuthorisingBackup.value = true
 
-        driveRepository.authorizeDriveAccess(settingsState.value.googleAccount!!)
+        val googleAccount = state.value.settings.googleAccount
+        if (googleAccount == null) {
+            _isAuthorisingBackup.value = false
+            onFailure("No Google account linked")
+            return
+        }
+
+        driveRepository.authorizeDriveAccess(googleAccount)
             .onSuccess { result ->
                 if (result.hasResolution()) {
                     savedStateHandle[KEY_PENDING_BACKUP_NOW] = backupNow
@@ -258,7 +268,7 @@ class SettingsViewModel @Inject constructor(
                     exchangeCodeForTokens(
                         code = result.serverAuthCode,
                         onSuccess = {
-                            rescheduleBackup(settingsState.value.backupSettings, backupNow)
+                            rescheduleBackup(state.value.settings.backupSettings, backupNow)
                         },
                         onFailure = { message ->
                             onFailure(message)
@@ -297,7 +307,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAuthResultCompleted(data: Intent?, onFailure: (String) -> Unit) {
+    private fun onAuthResultCompleted(data: Intent?, onFailure: (String) -> Unit) {
         viewModelScope.launch {
             _isAuthorisingBackup.value = true
             val authCode = driveRepository.getAuthCodeFromIntent(data)
@@ -309,7 +319,7 @@ class SettingsViewModel @Inject constructor(
                         val wasBackupNowRequested =
                             savedStateHandle.get<Boolean>(KEY_PENDING_BACKUP_NOW) ?: false
                         cancelScheduledBackup()
-                        scheduleBackup(settingsState.value.backupSettings, wasBackupNowRequested)
+                        scheduleBackup(state.value.settings.backupSettings, wasBackupNowRequested)
                         savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
                     },
                 onFailure = { message ->
@@ -321,13 +331,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAuthCancelled() {
+    private fun onAuthCancelled() {
         resetBackupSettings()
         _isAuthorisingBackup.value = false
         savedStateHandle[KEY_PENDING_BACKUP_NOW] = false
     }
 
-    fun startRestore(onFailure: (String) -> Unit) {
+    private fun startRestore(onFailure: (String) -> Unit) {
         viewModelScope.launch {
             if (!canPerformNetworkTask(onFailure)) return@launch
             downloadBackup()
@@ -354,7 +364,7 @@ class SettingsViewModel @Inject constructor(
         return true
     }
 
-    fun createMassiveDummyData() {
+    private fun createMassiveDummyData() {
         viewModelScope.launch(Dispatchers.IO) {
             for (i in 1..10000) {
                 noteUseCases.saveNoteWithAttachments(
@@ -369,15 +379,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAiModelChanged(type: String) {
+    private fun onAiModelChanged(modelName: String) {
         viewModelScope.launch {
-            dataStore.updateAiModel(type)
+            dataStore.updateAiModel(modelName)
         }
     }
 
-    fun downloadAiModel(aiModel: AiModel?) {
-        aiModel?.let {
-            downloadAiModelUseCase(it.url, it.downloadFileName)
-        }
+    private fun downloadAiModel(aiModel: AiModel) {
+        downloadAiModelUseCase(aiModel.url, aiModel.downloadFileName)
     }
 }

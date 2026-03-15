@@ -51,9 +51,7 @@ import com.mintanable.notethepad.feature_ai.presentation.humanReadableSize
 import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
-import com.mintanable.notethepad.feature_backup.presentation.LoadType
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
-import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
@@ -71,21 +69,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsScreen(
+    state: SettingsState,
     onBackPressed: () -> Unit,
-    currentSettings: Settings,
-    backupUploadDownloadState: LoadStatus,
-    aiModels: List<AiModel>,
-    aiModelDownloadStatus: LoadStatus,
-    backupUiState: BackupUiState,
-    isAuthorisingBackup: Boolean,
-    onThemeChanged: (ThemeMode) -> Unit,
-    showToast: (String) -> Unit,
-    onBackupNowClicked: () -> Unit,
-    onRestoreClicked: () -> Unit,
-    onDummyDataCreate: () -> Unit,
-    onBackupSettingsChanged: (BackupSettings) -> Unit,
-    onAiModelChanged: (String) -> Unit,
-    onAiModelDownload: (String) -> Unit
+    onEvent: (SettingsEvent) -> Unit,
+    showToast: (String) -> Unit
 ) {
 
     var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
@@ -94,6 +81,7 @@ fun SettingsScreen(
     var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
     var modelToDownload by remember { mutableStateOf<AiModel?>(null) }
 
+    val currentSettings = state.settings
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
 
     val notificationPermissionState = if (LocalInspectionMode.current) {
@@ -169,7 +157,7 @@ fun SettingsScreen(
                         }
                     },
                 )
-                if (isAuthorisingBackup) {
+                if (state.isAuthorisingBackup) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
                 }
             }
@@ -194,16 +182,25 @@ fun SettingsScreen(
 
                         Button(
                             modifier = Modifier.padding(8.dp).clip(RectangleShape),
-                            onClick = { checkAndRequestNotificationPermission{onBackupNowClicked()} }
+                            onClick = { checkAndRequestNotificationPermission {
+                                onEvent(SettingsEvent.UpdateBackupSettings(
+                                    backupSettings = currentSettings.backupSettings,
+                                    backupNow = true,
+                                    onAuthRequired = {}, // Handled in MainActivity
+                                    onFailure = showToast
+                                ))
+                            } }
                         ) {
                             Text(stringResource(R.string.btn_backup_now))
                         }
                     }
 
                     BackupStatusUI(
-                        backupUploadDownloadState = backupUploadDownloadState,
-                        backupUiState = backupUiState,
-                        onRestoreClicked = { checkAndRequestNotificationPermission { onRestoreClicked() }}
+                        backupUploadDownloadState = state.backupUploadDownloadState,
+                        backupUiState = state.backupUiState,
+                        onRestoreClicked = { checkAndRequestNotificationPermission {
+                            onEvent(SettingsEvent.StartRestore(onFailure = showToast))
+                        }}
                     )
                 }
             }
@@ -229,17 +226,17 @@ fun SettingsScreen(
                 )
                 SettingItem(
                     title = stringResource(R.string.setting_ai_model),
-                    subtitle = aiModels.find { it.name == currentSettings.aiModelName }?.displayName
+                    subtitle = state.aiModels.find { it.name == currentSettings.aiModelName }?.displayName
                         ?: stringResource(R.string.loading),
                     onClick = { showAiModelDialog = true }
                 )
-                if (aiModelDownloadStatus is LoadStatus.Progress) {
-                    Text(stringResource(R.string.msg_downloading_model, aiModelDownloadStatus.percentage),
+                if (state.aiModelDownloadStatus is LoadStatus.Progress) {
+                    Text(stringResource(R.string.msg_downloading_model, state.aiModelDownloadStatus.percentage),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     )
                     LinearProgressIndicator(
-                        progress = { aiModelDownloadStatus.percentage / 100f },
+                        progress = { state.aiModelDownloadStatus.percentage / 100f },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -258,7 +255,7 @@ fun SettingsScreen(
                 SettingRadioGroup(
                     title = stringResource(R.string.setting_theme_modes),
                     selectedOption = currentSettings.themeMode,
-                    onOptionSelected = { onThemeChanged(it) },
+                    onOptionSelected = { onEvent(SettingsEvent.UpdateTheme(it)) },
                     entries = ThemeMode.entries
                 )
             }
@@ -274,9 +271,19 @@ fun SettingsScreen(
                 onConfirm = { backupFrequency ->
                     val newSettings = currentSettings.backupSettings.copy(backupFrequency = backupFrequency)
                     if (backupFrequency != BackupFrequency.OFF) {
-                        checkAndRequestNotificationPermission { onBackupSettingsChanged(newSettings) }
+                        checkAndRequestNotificationPermission {
+                            onEvent(SettingsEvent.UpdateBackupSettings(
+                                backupSettings = newSettings,
+                                onAuthRequired = {},
+                                onFailure = showToast
+                            ))
+                        }
                     } else {
-                        onBackupSettingsChanged(newSettings)
+                        onEvent(SettingsEvent.UpdateBackupSettings(
+                            backupSettings = newSettings,
+                            onAuthRequired = {},
+                            onFailure = showToast
+                        ))
                     }
                     showIntervalDialog = false
                 },
@@ -286,15 +293,15 @@ fun SettingsScreen(
         if(showAiModelDialog) {
             AiModelSelectionDialog(
                 currentModel = currentSettings.aiModelName,
-                aiModels = aiModels,
+                aiModels = state.aiModels,
                 onDismiss = { showAiModelDialog = false },
-                onConfirm = { selectedModel ->
-                    val aiModel = aiModels.find { it.name == selectedModel }
+                onConfirm = { selectedModelName ->
+                    val aiModel = state.aiModels.find { it.name == selectedModelName }
                     aiModel?.let {
                         if (aiModel.url.isNotEmpty()) {
                             modelToDownload = aiModel
                         } else {
-                            onAiModelChanged(selectedModel)
+                            onEvent(SettingsEvent.ChangeAiModel(selectedModelName))
                         }
                     }
                     showAiModelDialog = false
@@ -309,8 +316,8 @@ fun SettingsScreen(
                 text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.sizeInBytes.humanReadableSize())) },
                 confirmButton = {
                     TextButton(onClick = {
-                        onAiModelDownload(model.name)
-                        onAiModelChanged(model.name)
+                        onEvent(SettingsEvent.ChangeAiModel(model.name))
+                        onEvent(SettingsEvent.DownloadAiModel(model))
                         modelToDownload = null
                     }) {
                         Text(stringResource(R.string.btn_download))
@@ -330,7 +337,11 @@ fun SettingsScreen(
                 initialMinute = currentSettings.backupSettings.backupTimeMinutes,
                 onDismiss = { showTimePickerDialog = false }
             ){ hours, minutes ->
-                onBackupSettingsChanged(currentSettings.backupSettings.copy(backupTimeHour = hours, backupTimeMinutes = minutes))
+                onEvent(SettingsEvent.UpdateBackupSettings(
+                    backupSettings = currentSettings.backupSettings.copy(backupTimeHour = hours, backupTimeMinutes = minutes),
+                    onAuthRequired = {},
+                    onFailure = showToast
+                ))
                 showTimePickerDialog = false
             }
         }
@@ -355,33 +366,16 @@ fun SettingsScreen(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewSettingsScreen(
-
-) {
+fun PreviewSettingsScreen() {
     NoteThePadTheme {
         SettingsScreen(
-            onBackPressed = {},
-            currentSettings = Settings(googleAccount = "test@google.com"),
-            backupUploadDownloadState = LoadStatus.Idle,
-            aiModelDownloadStatus = LoadStatus.Progress(12, LoadType.DOWNLOAD),
-            backupUiState = BackupUiState.HasBackup(
-                DriveFileMetadata(
-                    "1",
-                    "Notes.db",
-                    1708600000000L,
-                    1024 * 1024 * 2
-                )
+            state = SettingsState(
+                settings = Settings(googleAccount="test@google.com"),
+                backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2))
             ),
-            isAuthorisingBackup = false,
-            onThemeChanged = {},
-            showToast = {},
-            onBackupNowClicked = {},
-            onRestoreClicked = {},
-            onDummyDataCreate = {},
-            onBackupSettingsChanged = {},
-            onAiModelChanged = {},
-            onAiModelDownload = {},
-            aiModels = emptyList(),
+            onBackPressed = {},
+            onEvent = {},
+            showToast = {}
         )
     }
 }
