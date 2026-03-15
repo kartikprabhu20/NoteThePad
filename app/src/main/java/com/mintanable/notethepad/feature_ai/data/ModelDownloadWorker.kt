@@ -2,7 +2,11 @@ package com.mintanable.notethepad.feature_ai.data
 
 import android.annotation.SuppressLint
 import android.app.DownloadManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
@@ -12,14 +16,19 @@ import kotlinx.coroutines.delay
 import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.ForegroundInfo
+import com.mintanable.notethepad.NoteThePadApp.Companion.DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.NoteThePadApp.Companion.DOWNLOAD_MODEL_NOTIFICATION_ID
 import com.mintanable.notethepad.R
+import com.mintanable.notethepad.feature_ai.domain.DownloadCancelReceiver
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
 import java.security.MessageDigest
+import kotlin.jvm.java
 
 @HiltWorker
 class ModelDownloadWorker @AssistedInject constructor(
@@ -31,23 +40,43 @@ class ModelDownloadWorker @AssistedInject constructor(
         const val MODEL_DOWNLOAD_TASK = "model_download_task"
         const val MODEL_URL = "model_url"
         const val MODEL_FILE_NAME = "model_file_name"
+        const val HF_TOKEN = "hf_token"
+        const val DOWNLOAD_ID= "DOWNLOAD_ID"
 
     }
+
+    private val client = OkHttpClient.Builder()
+        .followRedirects(true)
+        .build()
 
     @SuppressLint("Range", "RestrictedApi")
     override suspend fun doWork(): Result {
         val modelUrl = inputData.getString(MODEL_URL) ?: return Result.failure()
         val fileName = inputData.getString(MODEL_FILE_NAME) ?: return Result.failure()
+        val token = inputData.getString(HF_TOKEN) ?: ""
+        val expectedContentSize = getExpectedContentSize(modelUrl, token)
+
+        Log.d("kptest", "modelUrl = $modelUrl, fileName = $fileName, token = $token, expectedContentSize = $expectedContentSize")
+
+        val destinationFile = File(applicationContext.getExternalFilesDir(null), fileName)
+        if (destinationFile.exists()) {
+            Log.d("kptest", "Old file found, deleting to prevent naming conflicts: $fileName")
+            destinationFile.delete()
+        }
 
         val downloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
         val existingId = findActiveDownload(downloadManager, fileName)
         val id = existingId ?: run {
             val request = DownloadManager.Request(modelUrl.toUri())
-                .setTitle("NoteThePad AI Update\"")
+                .setTitle("NoteThePad AI assistant Update")
                 .setDescription("Downloading $fileName")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                .addRequestHeader("Authorization", "Bearer $token")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
                 .setDestinationInExternalFilesDir(applicationContext, null, fileName)
+                .setAllowedOverMetered(false)
+                .setAllowedOverRoaming(false)
+
             downloadManager.enqueue(request)
         }
 
@@ -55,74 +84,136 @@ class ModelDownloadWorker @AssistedInject constructor(
         var result = Result.failure()
 
         while (isDownloading) {
+            Log.d("kptest", "isDownloading")
             val query = DownloadManager.Query().setFilterById(id)
-            val cursor = downloadManager.query(query)
-            if (cursor != null && cursor.moveToFirst()) {
-                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                when(status) {
-                    DownloadManager.STATUS_SUCCESSFUL -> {
-                        isDownloading = false
-                        result = Result.success()
-                        setProgress(workDataOf("percent" to 100))
-                    }
-                    DownloadManager.STATUS_FAILED -> {
-                        isDownloading = false
-                        result = Result.failure()
-                    }
-                    DownloadManager.STATUS_RUNNING, DownloadManager.STATUS_PAUSED -> {
-                        val downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-                        val total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+            downloadManager.query(query)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                    when (status) {
+                        DownloadManager.STATUS_SUCCESSFUL -> {
+                            isDownloading = false
+                            result = Result.success()
+                            Log.d("kptest", "STATUS_SUCCESSFUL")
+                            setProgress(workDataOf("percent" to 100))
+                        }
 
-                        if (total > 0) {
-                            val progress = ((downloaded * 100) / total).toInt()
-                            setProgress(workDataOf("percent" to progress))
-                            setForeground(createForegroundInfo(progress, fileName))
+                        DownloadManager.STATUS_FAILED -> {
+                            val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
+                            val errorMessage = getDownloadErrorMessage(reason)
+                            Log.e("kptest", "STATUS_FAILED: $errorMessage (Code: $reason)")
+                            isDownloading = false
+                            result = Result.failure(workDataOf("ERROR" to errorMessage))
+                        }
+
+                        DownloadManager.STATUS_RUNNING, DownloadManager.STATUS_PAUSED -> {
+                            val downloaded =
+                                cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                            val total =
+                                cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+
+                            if (total > 0) {
+                                val progress = ((downloaded * 100) / total).toInt()
+                                Log.d("kptest", "Model download in progress: $progress")
+
+                                setProgress(workDataOf("percent" to progress))
+                                setForeground(createForegroundInfo(downloadId = id, progress, fileName))
+                            }
                         }
                     }
+                } else {
+                    isDownloading = false
                 }
                 cursor.close()
-            } else {
-                isDownloading = false
             }
             if (isDownloading) delay(1000)
         }
 
         if (result is Result.Success) {
+            setForeground(createForegroundInfo(downloadId = id, 100, "Verifying integrity..."))
             val downloadedFile = File(applicationContext.getExternalFilesDir(null), fileName)
-            val expectedHash = inputData.getString("EXPECTED_HASH") ?: return Result.success()
 
-            setForeground(createForegroundInfo(100, "Verifying integrity..."))
-            val actualHash = withContext(Dispatchers.IO) {
-                calculateSHA256(downloadedFile)
+            val downloadedSize = withContext(Dispatchers.IO) {
+                downloadedFile.length()
             }
 
-            return if (actualHash.equals(expectedHash, ignoreCase = true)) {
-                Log.d("kptest", "Checksum verified!")
+            return if (downloadedSize == expectedContentSize) {
+                Log.d("kptest", "Size match verified!")
                 Result.success()
             } else {
-                Log.e("kptest", "Checksum mismatch! Expected: $expectedHash, Actual: $actualHash")
-                downloadedFile.delete() // Delete corrupted file
-                Result.failure(workDataOf("ERROR" to "File corrupted during download"))
+                Log.e("kptest", "File size mismatch! Actual: $downloadedSize, Expected: $expectedContentSize")
+                downloadedFile.delete()
+                Result.failure(workDataOf("ERROR" to "Checksum verification failed, File corrupted during download"))
             }
         }
-
         return result
     }
 
-    private fun createForegroundInfo(progress: Int, modelName: String): ForegroundInfo {
-        val notification = NotificationCompat.Builder(applicationContext, "AI_DOWNLOAD_CHANNEL")
+    private suspend fun getExpectedContentSize(url: String, token: String): Long = withContext(Dispatchers.IO) {
+        val redirectClient = client.newBuilder()
+            .followRedirects(true)
+            .build()
+
+        try {
+            val request = Request.Builder()
+                .url(url)
+                .head()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            redirectClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e("kptest", "Failed to fetch metadata: Code ${response.code}")
+                    return@withContext 0L
+                }
+
+                val size = response.header("Content-Length")?.toLongOrNull() ?: -1L
+                Log.d("kptest", "Expected size: $size bytes")
+                size
+            }
+        } catch (e: Exception) {
+            Log.e("kptest", "Network Error: ${e.message}")
+            -1L
+        }
+    }
+
+    private fun createForegroundInfo(downloadId: Long, progress: Int, modelName: String): ForegroundInfo {
+        var pendingCancelIntent: PendingIntent? = null
+
+        if(downloadId > -1) {
+           val cancelIntent =
+               Intent(applicationContext, DownloadCancelReceiver::class.java).apply {
+                   putExtra(DOWNLOAD_ID, downloadId)
+               }
+
+            pendingCancelIntent = PendingIntent.getBroadcast(
+               applicationContext,
+               0,
+               cancelIntent,
+               PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+           )
+       }
+        val notification = NotificationCompat.Builder(applicationContext, DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID)
             .setContentTitle("AI Model Sync")
             .setContentText("Downloading $modelName: $progress%")
             .setSmallIcon(R.drawable.notethepad_launcher_foreground)
             .setProgress(100, progress, false)
             .setOngoing(true)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Cancel", pendingCancelIntent)
             .build()
 
-        return ForegroundInfo(DOWNLOAD_MODEL_NOTIFICATION_ID, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                DOWNLOAD_MODEL_NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(DOWNLOAD_MODEL_NOTIFICATION_ID, notification)
+        }
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return createForegroundInfo(0,"")
+        return createForegroundInfo(-1,0,"")
     }
 
     @SuppressLint("Range")
@@ -150,5 +241,19 @@ class ModelDownloadWorker @AssistedInject constructor(
         }
         val hashBytes = digest.digest()
         return hashBytes.joinToString("") { "%02x".format(it) }
+    }
+
+    private fun getDownloadErrorMessage(reason: Int): String {
+        return when (reason) {
+            DownloadManager.ERROR_INSUFFICIENT_SPACE -> "Not enough storage space on device"
+            DownloadManager.ERROR_FILE_ALREADY_EXISTS -> "File already exists"
+            DownloadManager.ERROR_CANNOT_RESUME -> "Network connection lost and cannot resume"
+            DownloadManager.ERROR_HTTP_DATA_ERROR -> "HTTP data error (Check URL)"
+            DownloadManager.ERROR_TOO_MANY_REDIRECTS -> "Too many redirects"
+            DownloadManager.ERROR_UNHANDLED_HTTP_CODE -> "Unhandled HTTP error code"
+            DownloadManager.ERROR_DEVICE_NOT_FOUND -> "External storage not found"
+            DownloadManager.ERROR_FILE_ERROR -> "Local file system error"
+            else -> "Unknown error (Code $reason)"
+        }
     }
 }

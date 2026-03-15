@@ -70,6 +70,7 @@ data class AiModelEntry(
 
         return AiModel(
             name = name,
+            displayName = name,
             version = version,
             info = description,
             url = downloadUrl,

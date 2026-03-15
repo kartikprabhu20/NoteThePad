@@ -18,6 +18,8 @@ class NoteThePadApp : Application(), Configuration.Provider {
         const val DOWNLOAD_MODEL_NOTIFICATION_ID = 1003
 
         const val BACKUP_NOTIFICATION_CHANNEL_ID = "backup_channel"
+        const val DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID = "download_aimodel_channel"
+
     }
 
     @Inject
@@ -30,19 +32,28 @@ class NoteThePadApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
+        createNotificationChannels()
     }
 
-    private fun createNotificationChannel() {
-        val name = "Backup Service"
-        val descriptionText = "Shows progress of Google Drive backups"
-        val importance = NotificationManager.IMPORTANCE_LOW
+    private fun createNotificationChannels() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val channel = NotificationChannel(BACKUP_NOTIFICATION_CHANNEL_ID, name, importance).apply {
-            description = descriptionText
+        val backupChannel = NotificationChannel(
+            BACKUP_NOTIFICATION_CHANNEL_ID,
+            "Backup Service",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Shows progress of Google Drive backups"
         }
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+        val downloadChannel = NotificationChannel(
+            DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID,
+            "Model Downloads",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Shows progress of AI model downloads"
+        }
+
+        notificationManager.createNotificationChannels(listOf(backupChannel, downloadChannel))
     }
 }

@@ -380,10 +380,4 @@ class SettingsViewModel @Inject constructor(
             downloadAiModelUseCase(it.url, it.downloadFileName)
         }
     }
-
-    fun loadModelAllowlist() {
-        viewModelScope.launch(Dispatchers.IO) {
-
-        }
-    }
 }

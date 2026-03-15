@@ -51,6 +51,7 @@ import com.mintanable.notethepad.feature_ai.presentation.humanReadableSize
 import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
+import com.mintanable.notethepad.feature_backup.presentation.LoadType
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
@@ -233,6 +234,10 @@ fun SettingsScreen(
                     onClick = { showAiModelDialog = true }
                 )
                 if (aiModelDownloadStatus is LoadStatus.Progress) {
+                    Text(stringResource(R.string.msg_downloading_model, aiModelDownloadStatus.percentage),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    )
                     LinearProgressIndicator(
                         progress = { aiModelDownloadStatus.percentage / 100f },
                         modifier = Modifier
@@ -304,6 +309,7 @@ fun SettingsScreen(
                 text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.sizeInBytes.humanReadableSize())) },
                 confirmButton = {
                     TextButton(onClick = {
+                        onAiModelDownload(model.name)
                         onAiModelChanged(model.name)
                         modelToDownload = null
                     }) {
@@ -357,7 +363,7 @@ fun PreviewSettingsScreen(
             onBackPressed = {},
             currentSettings = Settings(googleAccount = "test@google.com"),
             backupUploadDownloadState = LoadStatus.Idle,
-            aiModelDownloadStatus = LoadStatus.Idle,
+            aiModelDownloadStatus = LoadStatus.Progress(12, LoadType.DOWNLOAD),
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata(
                     "1",

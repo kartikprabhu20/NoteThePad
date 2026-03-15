@@ -59,6 +59,7 @@
     <string name="dialog_download_ai_model_title">Download AI Model</string>
     <string name="dialog_download_ai_model_description">The model needs %s storage on-device. Do you want to start the download?</string>
     <string name="dialog_download_ai_model_size">Size: %s</string>
+    <string name="msg_downloading_model">Downloading Ai model in progress: %1$d%%</string>
 
     <!-- Search Bar -->
     <string name="search_hint">Search notes…</string>
