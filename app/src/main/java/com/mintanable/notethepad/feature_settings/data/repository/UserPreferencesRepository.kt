@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import com.mintanable.notethepad.feature_settings.domain.model.Settings
@@ -33,7 +32,7 @@ class UserPreferencesRepository @Inject constructor(
         val BACKUP_INTERVAL = stringPreferencesKey("backup_interval")
         val BACKUP_TIME_HOUR = intPreferencesKey("backup_time_hour")
         val BACKUP_TIME_MINUTE = intPreferencesKey("backup_time_minute")
-        val AI_MODEL_TYPE = stringPreferencesKey("ai_model_type")
+        val AI_MODEL_NAME = stringPreferencesKey("ai_model_name")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -48,7 +47,7 @@ class UserPreferencesRepository @Inject constructor(
             val backupInterval = preferences[PreferencesKeys.BACKUP_INTERVAL] ?: BackupFrequency.OFF.name
             val backupTimeHour = preferences[PreferencesKeys.BACKUP_TIME_HOUR] ?: 2
             val backupTimeMinutes = preferences[PreferencesKeys.BACKUP_TIME_MINUTE] ?: 0
-            val aiModelType = preferences[PreferencesKeys.AI_MODEL_TYPE] ?: AiModelType.NONE.name
+            val aiModelName = preferences[PreferencesKeys.AI_MODEL_NAME] ?: "None"
 
             Settings(
                 backupEnabled = backupEnabled,
@@ -60,7 +59,7 @@ class UserPreferencesRepository @Inject constructor(
                     backupTimeHour = backupTimeHour,
                     backupTimeMinutes =backupTimeMinutes
                 ),
-                aiModelType = AiModelType.valueOf(aiModelType)
+                aiModelName = aiModelName
             )
         }
 
@@ -110,9 +109,9 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-    suspend fun updateAiModel(type: AiModelType) {
+    suspend fun updateAiModel(type: String) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.AI_MODEL_TYPE] = type.name
+            preferences[PreferencesKeys.AI_MODEL_NAME] = type
         }
     }
 }

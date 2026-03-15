@@ -41,6 +41,7 @@ android {
         buildConfigField("String", "DRIVE_CLIENT_ID", "\"${localProperties.getProperty("DRIVE_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "DRIVE_CLIENT_SECRET", "\"${localProperties.getProperty("DRIVE_CLIENT_SECRET") ?: ""}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY") ?: ""}\"")
+        buildConfigField("String", "HUGGING_FACE_AUTH_TOKEN", "\"${localProperties.getProperty("HUGGING_FACE_AUTH_TOKEN") ?: ""}\"")
 
     }
     signingConfigs {
@@ -254,4 +255,8 @@ dependencies {
     implementation("com.google.mlkit:common:18.11.0") // Cloud
     implementation("com.google.mlkit:genai-prompt:1.0.0-beta1") //Gemini Nano (via ML Kit)
     implementation("com.google.mediapipe:tasks-genai:0.10.27") //For Gemma (1B, E2B, E4B)
+    implementation("com.google.ai.edge.litertlm:litertlm-android:0.8.0") //engine
+
+    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
 }
