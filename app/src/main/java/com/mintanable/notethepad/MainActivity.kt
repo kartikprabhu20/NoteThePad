@@ -160,6 +160,7 @@ class MainActivity : AppCompatActivity() {
                                 val backupUiState by settingsViewModel.backupUiState.collectAsStateWithLifecycle()
                                 val backupUploadDownloadState by settingsViewModel.backupUploadDownloadState.collectAsStateWithLifecycle()
                                 val aiModelDownloadStatus by settingsViewModel.aiModelDownloadStatus.collectAsStateWithLifecycle()
+                                val aiModels by settingsViewModel.aiModels.collectAsStateWithLifecycle()
 
                                 LaunchedEffect(Unit) {
                                     settingsViewModel.restoreEvents.collect { event ->
@@ -179,6 +180,7 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     isAuthorisingBackup = isAuthorisingBackup,
                                     currentSettings = settings,
+                                    aiModels = aiModels,
                                     backupUploadDownloadState = backupUploadDownloadState,
                                     aiModelDownloadStatus = aiModelDownloadStatus,
                                     backupUiState = backupUiState,
@@ -225,7 +227,7 @@ class MainActivity : AppCompatActivity() {
                                         settingsViewModel.onAiModelChanged(type)
                                     },
                                     onAiModelDownload = { type ->
-                                        settingsViewModel.downloadAiModel(type)
+                                        settingsViewModel.downloadAiModel(aiModels.find { it.name==type })
                                     }
                                 )
                             }
