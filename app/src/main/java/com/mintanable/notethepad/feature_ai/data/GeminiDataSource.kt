@@ -3,7 +3,7 @@ package com.mintanable.notethepad.feature_ai.data
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.generationConfig
 
-class GeminiService(private val apiKey: String) {
+class GeminiDataSource(private val apiKey: String) {
 
     private val model = GenerativeModel(
         modelName = "gemini-3-flash-preview",

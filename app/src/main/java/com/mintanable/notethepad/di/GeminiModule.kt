@@ -1,7 +1,7 @@
 package com.mintanable.notethepad.di
 
 import com.mintanable.notethepad.BuildConfig
-import com.mintanable.notethepad.feature_ai.data.GeminiService
+import com.mintanable.notethepad.feature_ai.data.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.NoteAssistantRepositoryImpl
 import com.mintanable.notethepad.feature_ai.domain.NoteAssistantRepository
 import dagger.Module
@@ -23,14 +23,14 @@ object GeminiModule {
 
     @Provides
     @Singleton
-    fun provideGeminiService(apiKey: String): GeminiService {
-        return GeminiService(apiKey)
+    fun provideGeminiDataSource(apiKey: String): GeminiDataSource {
+        return GeminiDataSource(apiKey)
     }
 
     @Provides
     @Singleton
-    fun provideNoteAssistantRepository(geminiService: GeminiService): NoteAssistantRepository {
-        return NoteAssistantRepositoryImpl(geminiService)
+    fun provideNoteAssistantRepository(geminiDataSource: GeminiDataSource): NoteAssistantRepository {
+        return NoteAssistantRepositoryImpl(geminiDataSource)
     }
 
 }
