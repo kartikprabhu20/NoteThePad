@@ -23,15 +23,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
+import com.mintanable.notethepad.feature_ai.domain.model.AiModel
+import com.mintanable.notethepad.feature_ai.presentation.humanReadableSize
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 
 @Composable
 fun AiModelSelectionDialog(
-    currentModel: AiModelType,
+    currentModel: String,
+    aiModels: List<AiModel>,
     onDismiss: () -> Unit,
-    onConfirm: (AiModelType) -> Unit
+    onConfirm: (String) -> Unit
 ) {
     var selectedModel by remember { mutableStateOf(currentModel) }
 
@@ -40,20 +42,20 @@ fun AiModelSelectionDialog(
         title = { Text(text = stringResource(R.string.dialog_select_ai_model_title)) },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                AiModelType.entries.forEach { model ->
+                aiModels.forEach { model ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .selectable(
-                                selected = (model == selectedModel),
-                                onClick = { selectedModel = model }
+                                selected = (model.name == selectedModel),
+                                onClick = { selectedModel = model.name }
                             )
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (model == selectedModel),
-                            onClick = { selectedModel = model }
+                            selected = (model.name == selectedModel),
+                            onClick = { selectedModel = model.name}
                         )
                         Column(
                             modifier = Modifier
@@ -66,12 +68,12 @@ fun AiModelSelectionDialog(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = model.description,
+                                text = model.info,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = stringResource(R.string.dialog_download_ai_model_size, model.storageSize),
+                                text = stringResource(R.string.dialog_download_ai_model_size, model.sizeInBytes.humanReadableSize()),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(top = 4.dp)
@@ -97,9 +99,51 @@ fun AiModelSelectionDialog(
 @ThemePreviews
 @Composable
 fun PreviewAiModelSelectionDialog(modifier: Modifier = Modifier) {
+
+    val testModels = listOf(
+        AiModel(
+            name = "None",
+            displayName = "None",
+            info = "No AI assistance will be provided.",
+        ),
+        AiModel(
+            name = "Gemini 3 Flash (Cloud)",
+            displayName = "Gemini 3 Flash (Cloud)",
+            info = "Fastest response, requires internet connection.",
+        ),
+        AiModel(
+            name = "Gemini Nano (System)",
+            displayName = "Gemini Nano (System)",
+            info = "On-device privacy and performance. Only on supported devices.",
+        ),
+
+        AiModel(
+            name = "Gemma3-1B-IT",
+            displayName = "Gemma 3 1B",
+            info = "Lightweight on-device model. Good balance between speed and performance.",
+            sizeInBytes = 584417280L,
+            minDeviceMemoryInGb = 6,
+        ),
+        AiModel(
+            name = "Gemma-3n-E2B-it",
+            displayName = "Gemma 3 E2B",
+            info = "Higher quality on-device reasoning. Requires more storage and RAM.",
+            sizeInBytes = 3655827456L,
+            minDeviceMemoryInGb = 8,
+        ),
+        AiModel(
+            name = "Gemma-3n-E4B-it",
+            displayName = "Gemma 3 E4B",
+            info = "Best on-device performance. Recommended for powerful devices only.",
+            sizeInBytes = 4919541760L,
+            minDeviceMemoryInGb = 12,
+        )
+    )
+
     NoteThePadTheme {
         AiModelSelectionDialog(
-            currentModel = AiModelType.SYSTEM_NANO,
+            currentModel = "None",
+            aiModels = testModels,
             onDismiss = {},
             onConfirm = {}
         )

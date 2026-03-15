@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
@@ -8,10 +9,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
-import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
+import com.mintanable.notethepad.feature_ai.domain.model.AiModel
+import com.mintanable.notethepad.feature_ai.domain.model.AiModelCatalog
 import com.mintanable.notethepad.feature_ai.domain.use_case.DownloadAiModelUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_case.GetSupportedAiModels
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledBackupUsecase
@@ -32,6 +37,7 @@ import com.mintanable.notethepad.feature_settings.data.repository.UserPreference
 import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
 import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,11 +53,16 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
+import kotlin.collections.find
+import kotlin.collections.map
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dataStore: UserPreferencesRepository,
     private val authRepository: AuthRepository,
     private val driveRepository: GoogleAuthRepository,
@@ -63,12 +74,15 @@ class SettingsViewModel @Inject constructor(
     private val downloadBackup: DownloadBackup,
     private val savedStateHandle: SavedStateHandle,
     private val networkMonitor: NetworkMonitor,
-    private val downloadAiModelUseCase: DownloadAiModelUseCase
+    private val downloadAiModelUseCase: DownloadAiModelUseCase,
+    private val getSupportedAiModels: GetSupportedAiModels
 ) : ViewModel() {
 
     companion object {
         private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
     }
+
+    private val externalFilesDir = context.getExternalFilesDir(null)
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
         tryEmit(Unit)
@@ -110,6 +124,17 @@ class SettingsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = LoadStatus.Idle
     )
+
+    val aiModels: StateFlow<List<AiModel>> = getSupportedAiModels()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf(AiModel(
+                name = "None",
+                displayName = "None",
+                info = "No AI assistance will be provided.",
+            ))
+        )
 
     private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
     val restoreEvents = _restoreEvents.asSharedFlow()
@@ -344,13 +369,21 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAiModelChanged(type: AiModelType) {
+    fun onAiModelChanged(type: String) {
         viewModelScope.launch {
             dataStore.updateAiModel(type)
         }
     }
 
-    fun downloadAiModel(type: AiModelType) {
-        downloadAiModelUseCase(type)
+    fun downloadAiModel(aiModel: AiModel?) {
+        aiModel?.let {
+            downloadAiModelUseCase(it.url, it.downloadFileName)
+        }
+    }
+
+    fun loadModelAllowlist() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+        }
     }
 }

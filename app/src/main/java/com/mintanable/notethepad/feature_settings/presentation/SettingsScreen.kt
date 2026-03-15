@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
+import android.Manifest
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Row
@@ -44,7 +46,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_ai.domain.model.AiModelType
+import com.mintanable.notethepad.feature_ai.domain.model.AiModel
+import com.mintanable.notethepad.feature_ai.presentation.humanReadableSize
 import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.DriveFileMetadata
@@ -70,6 +73,7 @@ fun SettingsScreen(
     onBackPressed: () -> Unit,
     currentSettings: Settings,
     backupUploadDownloadState: LoadStatus,
+    aiModels: List<AiModel>,
     aiModelDownloadStatus: LoadStatus,
     backupUiState: BackupUiState,
     isAuthorisingBackup: Boolean,
@@ -79,29 +83,29 @@ fun SettingsScreen(
     onRestoreClicked: () -> Unit,
     onDummyDataCreate: () -> Unit,
     onBackupSettingsChanged: (BackupSettings) -> Unit,
-    onAiModelChanged: (AiModelType) -> Unit,
-    onAiModelDownload: (AiModelType) -> Unit
+    onAiModelChanged: (String) -> Unit,
+    onAiModelDownload: (String) -> Unit
 ) {
 
     var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
-    var modelToDownload by remember { mutableStateOf<AiModelType?>(null) }
+    var modelToDownload by remember { mutableStateOf<AiModel?>(null) }
 
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
 
     val notificationPermissionState = if (LocalInspectionMode.current) {
         remember {
             object : PermissionState {
-                override val permission: String = android.Manifest.permission.POST_NOTIFICATIONS
+                override val permission: String = Manifest.permission.POST_NOTIFICATIONS
                 override val status: PermissionStatus = PermissionStatus.Granted
                 override fun launchPermissionRequest() {}
             }
         }
     } else {
         rememberPermissionState(
-            android.Manifest.permission.POST_NOTIFICATIONS
+            Manifest.permission.POST_NOTIFICATIONS
         )
     }
 
@@ -224,7 +228,8 @@ fun SettingsScreen(
                 )
                 SettingItem(
                     title = stringResource(R.string.setting_ai_model),
-                    subtitle = currentSettings.aiModelType.displayName,
+                    subtitle = aiModels.find { it.name == currentSettings.aiModelName }?.displayName
+                        ?: stringResource(R.string.loading),
                     onClick = { showAiModelDialog = true }
                 )
                 if (aiModelDownloadStatus is LoadStatus.Progress) {
@@ -275,13 +280,17 @@ fun SettingsScreen(
 
         if(showAiModelDialog) {
             AiModelSelectionDialog(
-                currentModel = currentSettings.aiModelType,
+                currentModel = currentSettings.aiModelName,
+                aiModels = aiModels,
                 onDismiss = { showAiModelDialog = false },
                 onConfirm = { selectedModel ->
-                    if (selectedModel.modelUrl != null) {
-                        modelToDownload = selectedModel
-                    } else {
-                        onAiModelChanged(selectedModel)
+                    val aiModel = aiModels.find { it.name == selectedModel }
+                    aiModel?.let {
+                        if (aiModel.url.isNotEmpty()) {
+                            modelToDownload = aiModel
+                        } else {
+                            onAiModelChanged(selectedModel)
+                        }
                     }
                     showAiModelDialog = false
                 }
@@ -292,11 +301,10 @@ fun SettingsScreen(
             AlertDialog(
                 onDismissRequest = { modelToDownload = null },
                 title = { Text(stringResource(R.string.dialog_download_ai_model_title)) },
-                text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.storageSize)) },
+                text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.sizeInBytes.humanReadableSize())) },
                 confirmButton = {
                     TextButton(onClick = {
-                        onAiModelChanged(model)
-                        onAiModelDownload(model)
+                        onAiModelChanged(model.name)
                         modelToDownload = null
                     }) {
                         Text(stringResource(R.string.btn_download))
@@ -339,7 +347,7 @@ fun SettingsScreen(
 @Preview(
     name = "Dark Mode",
     showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+    uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewSettingsScreen(
 
@@ -347,19 +355,27 @@ fun PreviewSettingsScreen(
     NoteThePadTheme {
         SettingsScreen(
             onBackPressed = {},
-            currentSettings = Settings(googleAccount="test@google.com"),
+            currentSettings = Settings(googleAccount = "test@google.com"),
             backupUploadDownloadState = LoadStatus.Idle,
             aiModelDownloadStatus = LoadStatus.Idle,
-            backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2)),
+            backupUiState = BackupUiState.HasBackup(
+                DriveFileMetadata(
+                    "1",
+                    "Notes.db",
+                    1708600000000L,
+                    1024 * 1024 * 2
+                )
+            ),
             isAuthorisingBackup = false,
             onThemeChanged = {},
-            onBackupSettingsChanged = {},
             showToast = {},
             onBackupNowClicked = {},
             onRestoreClicked = {},
             onDummyDataCreate = {},
+            onBackupSettingsChanged = {},
             onAiModelChanged = {},
-            onAiModelDownload = {}
+            onAiModelDownload = {},
+            aiModels = emptyList(),
         )
     }
 }
