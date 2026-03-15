@@ -9,9 +9,7 @@ import com.mintanable.notethepad.feature_note.domain.util.DispatcherProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val MODEL_ALLOWLIST_FILENAME = "ai_model_catelog.json"

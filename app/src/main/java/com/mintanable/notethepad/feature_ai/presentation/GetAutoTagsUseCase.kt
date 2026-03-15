@@ -13,7 +13,7 @@ class GetAutoTagsUseCase @Inject constructor(
         return try {
             val existingTags = noteRepository.getAllTags().first().map { it.tagName }
 
-            val suggestions = assistantRepository.suggestTags(
+            val suggestions = assistantRepository.suggestTagsFromCloud(
                 title = title,
                 content = content,
                 existingTags = existingTags
