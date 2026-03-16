@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_ai.presentation
 
+import android.util.Log
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
@@ -22,7 +23,7 @@ class GetAutoTagsUseCase @Inject constructor(
                 existingTags = existingTags,
                 modelName = settings.aiModelName
             )
-
+            Log.d("kptest", "suggested tags: $suggestions")
             Result.success(suggestions)
         } catch (e: Exception) {
             Result.failure(e)

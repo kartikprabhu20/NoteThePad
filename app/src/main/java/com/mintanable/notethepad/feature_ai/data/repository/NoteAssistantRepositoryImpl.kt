@@ -1,0 +1,93 @@
+package com.mintanable.notethepad.feature_ai.data.repository
+
+import com.google.mlkit.genai.common.FeatureStatus
+import com.google.mlkit.genai.prompt.Generation
+import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
+import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
+import com.mintanable.notethepad.feature_ai.data.source.NanoDataSource
+import com.mintanable.notethepad.feature_ai.domain.model.AiModelDownloadStatus
+import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
+import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+
+class NoteAssistantRepositoryImpl @Inject constructor(
+    private val geminiDataSource: GeminiDataSource,
+    private val gemmaLocalDataSource: GemmaLocalDataSource,
+    private val nanoDataSource: NanoDataSource,
+    private val aiModelRepository: AiModelRepository
+) : NoteAssistantRepository {
+
+    override suspend fun suggestTags(
+        title: String,
+        content: String,
+        existingTags: List<String>,
+        modelName: String
+    ): List<String> {
+        return when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> geminiDataSource.generateTags(title, content, existingTags)
+            "Gemini Nano (System)" -> {
+                val prompt = createPrompt(title, content, existingTags)
+                val response = nanoDataSource.generate(prompt)
+                parseResponse(response)
+            }
+            "None" -> emptyList()
+            else -> {
+                //Gemma models
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.url.isNotEmpty()) {
+                    val prompt = createPrompt(title, content, existingTags)
+                    val response = gemmaLocalDataSource.generate(prompt, selectedModel.downloadFileName)
+                    parseResponse(response)
+                } else {
+                    emptyList()
+                }
+            }
+        }
+    }
+
+    private fun createPrompt(title: String, content: String, existingTags: List<String>): String {
+//        return """
+//            Suggest 3-5 relevant tags for a note with the following title and content.
+//            Title: $title
+//            Content: $content
+//            Existing tags in the app: ${existingTags.joinToString(", ")}
+//            Return only a comma-separated list of tags.
+//        """.trimIndent()
+        return """
+            You are an expert organizational assistant for the app "NoteThePad".
+            
+            TASK: Analyze the note below and suggest 3-5 relevant one-word tags.
+            
+            CONTEXT:
+            - Note Title: $title
+            - Note Content: $content
+            - User's Existing Tags: ${existingTags.joinToString(", ")}
+            
+            CRITICAL RULES:
+            1. If a suggested tag matches an 'Existing Tag' semantically, use the EXACT name from the existing list.
+            2. Return ONLY a comma-separated list of words.
+            3. No hashtags, no explanations.
+            
+            Example Output: Work, Finance, Urgent
+        """.trimIndent()
+    }
+
+    private fun parseResponse(response: String?): List<String> {
+        return response?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
+    }
+
+    override fun checkLocalStatus(): Flow<AiModelDownloadStatus> = flow {
+        val status = Generation.getClient().checkStatus()
+        val mappedStatus = when (status) {
+            FeatureStatus.AVAILABLE -> AiModelDownloadStatus.Ready
+            FeatureStatus.DOWNLOADING -> AiModelDownloadStatus.Downloading
+            FeatureStatus.DOWNLOADABLE -> AiModelDownloadStatus.Downloadable
+            else -> AiModelDownloadStatus.Unavailable
+        }
+        emit(mappedStatus)
+    }
+}
