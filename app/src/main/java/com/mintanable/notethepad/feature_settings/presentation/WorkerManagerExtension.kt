@@ -32,6 +32,11 @@ fun WorkManager.getLoadStatusFLow(
                     Log.d("kptest", "[${type.name}] failed")
                     LoadStatus.Error("Background ${type.name.lowercase()} failed")
                 }
+
+                WorkInfo.State.CANCELLED -> {
+                    Log.d("kptest", "[${type.name}] cancelled")
+                    LoadStatus.Error("Background ${type.name.lowercase()} cancelled")
+                }
                 else -> LoadStatus.Idle
             }
         }
