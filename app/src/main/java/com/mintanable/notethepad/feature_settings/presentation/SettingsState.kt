@@ -11,5 +11,6 @@ data class SettingsState(
     val aiModels: List<AiModel> = emptyList(),
     val aiModelDownloadStatus: LoadStatus = LoadStatus.Idle,
     val backupUiState: BackupUiState = BackupUiState.Loading,
-    val isAuthorisingBackup: Boolean = false
+    val isAuthorisingBackup: Boolean = false,
+    val showDownloadModelDialog: AiModel? = null
 )

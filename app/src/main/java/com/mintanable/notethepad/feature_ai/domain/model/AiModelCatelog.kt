@@ -82,7 +82,7 @@ data class AiModelEntry(
             llmMaxToken = llmMaxToken,
             accelerators = accelerators,
             bestForTaskIds = bestForTaskTypes ?: emptyList(),
-            isLlm = isLlmModel,
+            isLlm = isLlmModel
         )
     }
 }

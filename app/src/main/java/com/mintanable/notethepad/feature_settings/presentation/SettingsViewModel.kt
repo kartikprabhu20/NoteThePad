@@ -24,7 +24,6 @@ import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
 import com.mintanable.notethepad.feature_backup.presentation.LoadType
-import com.mintanable.notethepad.feature_firebase.domain.model.User
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_note.domain.model.Note
 import com.mintanable.notethepad.feature_note.domain.model.NoteColors
@@ -52,6 +51,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,8 +77,6 @@ class SettingsViewModel @Inject constructor(
         private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
     }
 
-    private val externalFilesDir = context.getExternalFilesDir(null)
-
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
         tryEmit(Unit)
     }
@@ -99,6 +98,8 @@ class SettingsViewModel @Inject constructor(
         workName = MODEL_DOWNLOAD_TASK,
         type = LoadType.DOWNLOAD
     )
+
+    private val _downloadDialogModel = MutableStateFlow<AiModel?>(null)
 
     private val _dataStoreSettings : StateFlow<Settings> = combine(
         authRepository.getSignedInFirebaseUser(),
@@ -145,7 +146,8 @@ class SettingsViewModel @Inject constructor(
         _backupDownloadStatus,
         _aiModelDownloadStatus,
         getSupportedAiModels(),
-        _isAuthorisingBackup
+        _isAuthorisingBackup,
+        _downloadDialogModel
     ) { args: Array<Any?> ->
         val settings = args[0] as Settings
         val metadata = args[1] as BackupUiState
@@ -154,6 +156,7 @@ class SettingsViewModel @Inject constructor(
         val aiStatus = args[4] as LoadStatus
         val models = args[5] as List<AiModel>
         val isAuthorising = args[6] as Boolean
+        val downloadDialogModel = args[7] as AiModel?
 
         val activeTransferStatus = when {
             download is LoadStatus.Progress -> download
@@ -168,19 +171,14 @@ class SettingsViewModel @Inject constructor(
             backupUploadDownloadState = activeTransferStatus,
             aiModels = models,
             aiModelDownloadStatus = aiStatus,
-            isAuthorisingBackup = isAuthorising
+            isAuthorisingBackup = isAuthorising,
+            showDownloadModelDialog = downloadDialogModel
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = SettingsState()
     )
-
-    // Helper for combining with refreshTrigger
-    private fun <T> kotlinx.coroutines.flow.Flow<T>.flowWith(initial: T): kotlinx.coroutines.flow.Flow<T> = flow {
-        emit(initial)
-        collect { emit(it) }
-    }
 
     private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
     val restoreEvents = _restoreEvents.asSharedFlow()
@@ -198,9 +196,39 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.AuthCancelled -> onAuthCancelled()
             is SettingsEvent.StartRestore -> startRestore(event.onFailure)
             SettingsEvent.CreateDummyData -> createMassiveDummyData()
-            is SettingsEvent.ChangeAiModel -> onAiModelChanged(event.modelName)
-            is SettingsEvent.DownloadAiModel -> downloadAiModel(event.aiModel)
+            is SettingsEvent.SelectAiModel -> selectAiModel(event.aiModel)
+            is SettingsEvent.ConfirmDownloadAiModel -> confirmDownloadAiModel(event.aiModel)
+            SettingsEvent.DismissDownloadDialog -> _downloadDialogModel.value = null
             SettingsEvent.SignOut -> signOut()
+        }
+    }
+
+    private fun selectAiModel(aiModel: AiModel) {
+        viewModelScope.launch {
+            if (aiModel.url.isEmpty()) {
+                withContext(Dispatchers.IO) { dataStore.updateAiModel(aiModel.name) }
+                return@launch
+            }
+
+            val isDownloaded = withContext(Dispatchers.IO) {
+                val externalFilesDir = context.getExternalFilesDir(null)
+                val modelFile = externalFilesDir?.let { File(it, aiModel.downloadFileName) }
+                modelFile?.exists() == true && modelFile.length() == aiModel.sizeInBytes
+            }
+
+            if (isDownloaded) {
+                withContext(Dispatchers.IO) { dataStore.updateAiModel(aiModel.name) }
+            } else {
+                _downloadDialogModel.value = aiModel
+            }
+        }
+    }
+
+    private fun confirmDownloadAiModel(aiModel: AiModel) {
+        _downloadDialogModel.value = null
+        viewModelScope.launch(Dispatchers.Default) {
+            dataStore.updateAiModel(aiModel.name)
+            downloadAiModelUseCase(aiModel.url, aiModel.downloadFileName)
         }
     }
 
@@ -387,15 +415,5 @@ class SettingsViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun onAiModelChanged(modelName: String) {
-        viewModelScope.launch {
-            dataStore.updateAiModel(modelName)
-        }
-    }
-
-    private fun downloadAiModel(aiModel: AiModel) {
-        downloadAiModelUseCase(aiModel.url, aiModel.downloadFileName)
     }
 }

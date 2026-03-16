@@ -46,7 +46,6 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_ai.domain.model.AiModel
 import com.mintanable.notethepad.feature_ai.presentation.humanReadableSize
 import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
@@ -79,7 +78,6 @@ fun SettingsScreen(
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
-    var modelToDownload by remember { mutableStateOf<AiModel?>(null) }
 
     val currentSettings = state.settings
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
@@ -298,33 +296,27 @@ fun SettingsScreen(
                 onConfirm = { selectedModelName ->
                     val aiModel = state.aiModels.find { it.name == selectedModelName }
                     aiModel?.let {
-                        if (aiModel.url.isNotEmpty()) {
-                            modelToDownload = aiModel
-                        } else {
-                            onEvent(SettingsEvent.ChangeAiModel(selectedModelName))
-                        }
+                        onEvent(SettingsEvent.SelectAiModel(aiModel))
                     }
                     showAiModelDialog = false
                 }
             )
         }
 
-        modelToDownload?.let { model ->
+        state.showDownloadModelDialog?.let { model ->
             AlertDialog(
-                onDismissRequest = { modelToDownload = null },
+                onDismissRequest = { onEvent(SettingsEvent.DismissDownloadDialog) },
                 title = { Text(stringResource(R.string.dialog_download_ai_model_title)) },
                 text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.sizeInBytes.humanReadableSize())) },
                 confirmButton = {
                     TextButton(onClick = {
-                        onEvent(SettingsEvent.ChangeAiModel(model.name))
-                        onEvent(SettingsEvent.DownloadAiModel(model))
-                        modelToDownload = null
+                        onEvent(SettingsEvent.ConfirmDownloadAiModel(model))
                     }) {
                         Text(stringResource(R.string.btn_download))
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { modelToDownload = null }) {
+                    TextButton(onClick = { onEvent(SettingsEvent.DismissDownloadDialog) }) {
                         Text(stringResource(R.string.btn_cancel))
                     }
                 }
@@ -370,7 +362,7 @@ fun PreviewSettingsScreen() {
     NoteThePadTheme {
         SettingsScreen(
             state = SettingsState(
-                settings = Settings(googleAccount="test@google.com"),
+                settings = Settings(googleAccount = "test@google.com"),
                 backupUiState = BackupUiState.HasBackup(DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2))
             ),
             onBackPressed = {},

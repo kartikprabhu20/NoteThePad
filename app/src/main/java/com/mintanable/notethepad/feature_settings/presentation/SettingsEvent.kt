@@ -21,7 +21,8 @@ sealed class SettingsEvent {
     object AuthCancelled : SettingsEvent()
     data class StartRestore(val onFailure: (String) -> Unit) : SettingsEvent()
     object CreateDummyData : SettingsEvent()
-    data class ChangeAiModel(val modelName: String) : SettingsEvent()
-    data class DownloadAiModel(val aiModel: AiModel) : SettingsEvent()
+    data class SelectAiModel(val aiModel: AiModel) : SettingsEvent()
+    data class ConfirmDownloadAiModel(val aiModel: AiModel) : SettingsEvent()
+    object DismissDownloadDialog : SettingsEvent()
     object SignOut : SettingsEvent()
 }
