@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -87,79 +88,88 @@ class SettingsViewModel @Inject constructor(
         onSuccess = { refreshTrigger.tryEmit(Unit) }
     )
 
-    private val _backupDownloadState = workManager.getLoadStatusFLow(
+    private val _backupDownloadStatus = workManager.getLoadStatusFLow(
         workName = DownloadBackup.DOWNLOAD_BACKUP_TASK,
         type = LoadType.DOWNLOAD
     )
+
+    private val _isAuthorisingBackup = MutableStateFlow(false)
 
     private val _aiModelDownloadStatus = workManager.getLoadStatusFLow(
         workName = MODEL_DOWNLOAD_TASK,
         type = LoadType.DOWNLOAD
     )
 
-    private val _isAuthorisingBackup = MutableStateFlow(false)
+    private val _dataStoreSettings : StateFlow<Settings> = combine(
+        authRepository.getSignedInFirebaseUser(),
+        dataStore.settingsFlow
+    ) { user, settings ->
+        val googleEmail = if (user?.isGoogleSignedIn == true) user.email else null
+        settings.copy(googleAccount = googleEmail)
+    }
+        .distinctUntilChanged()
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = Settings()
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _backupMetadataFlow = _dataStoreSettings
+        .map { it.googleAccount }
+        .distinctUntilChanged()
+        .flatMapLatest { email ->
+            if (email == null) {
+                flowOf(BackupUiState.NoBackup)
+            } else {
+                refreshTrigger.flatMapLatest {
+                    flow<BackupUiState> {
+                        emit(BackupUiState.Loading)
+                        try {
+                            checkForExistingBackup().collect { metadata ->
+                                emit(if (metadata != null) BackupUiState.HasBackup(metadata) else BackupUiState.NoBackup)
+                            }
+                        } catch (e: Exception) {
+                            emit(BackupUiState.Error("Failed to check backup"))
+                        }
+                    }
+                }
+            }
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<SettingsState> = combine(
-        dataStore.settingsFlow,
-        authRepository.getSignedInFirebaseUser(),
-        combine(_backupUploadStatus, _backupDownloadState) { upload, download ->
-            when {
-                download is LoadStatus.Progress -> download
-                upload is LoadStatus.Progress -> upload
-                download is LoadStatus.Success || download is LoadStatus.Error -> download
-                else -> upload
-            }
-        },
+        _dataStoreSettings,
+        _backupMetadataFlow,
+        _backupUploadStatus,
+        _backupDownloadStatus,
         _aiModelDownloadStatus,
         getSupportedAiModels(),
         _isAuthorisingBackup
     ) { args: Array<Any?> ->
         val settings = args[0] as Settings
-        val user = args[1] as User?
-        val backupStatus = args[2] as LoadStatus
-        val aiDownloadStatus = args[3] as LoadStatus
-        val models = args[4] as List<AiModel>
-        val isAuthorising = args[5] as Boolean
-        val googleEmail = if (user?.isGoogleSignedIn == true) user.email else null
+        val metadata = args[1] as BackupUiState
+        val upload = args[2] as LoadStatus
+        val download = args[3] as LoadStatus
+        val aiStatus = args[4] as LoadStatus
+        val models = args[5] as List<AiModel>
+        val isAuthorising = args[6] as Boolean
+
+        val activeTransferStatus = when {
+            download is LoadStatus.Progress -> download
+            upload is LoadStatus.Progress -> upload
+            download is LoadStatus.Success || download is LoadStatus.Error -> download
+            else -> upload
+        }
 
         SettingsState(
-            settings = settings.copy(googleAccount = googleEmail),
-            backupUploadDownloadState = backupStatus,
+            settings = settings,
+            backupUiState = metadata,
+            backupUploadDownloadState = activeTransferStatus,
             aiModels = models,
-            aiModelDownloadStatus = aiDownloadStatus,
+            aiModelDownloadStatus = aiStatus,
             isAuthorisingBackup = isAuthorising
         )
-    }.flatMapLatest { currentState ->
-        val email = currentState.settings.googleAccount
-        if (email == null) {
-            flow { emit(currentState.copy(backupUiState = BackupUiState.NoBackup)) }
-        } else {
-            refreshTrigger.map { }.flowWith(Unit).flatMapLatest {
-                flow {
-                    emit(currentState.copy(backupUiState = BackupUiState.Loading))
-                    try {
-                        checkForExistingBackup().collect { metadata ->
-                            emit(
-                                currentState.copy(
-                                    backupUiState = if (metadata != null)
-                                        BackupUiState.HasBackup(metadata)
-                                    else
-                                        BackupUiState.NoBackup
-                                )
-                            )
-                        }
-                    } catch (e: Exception) {
-                        val errorMessage = if (e is java.io.IOException) {
-                            "No internet connection"
-                        } else {
-                            "Failed to check backup"
-                        }
-                        emit(currentState.copy(backupUiState = BackupUiState.Error(errorMessage)))
-                    }
-                }
-            }
-        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
