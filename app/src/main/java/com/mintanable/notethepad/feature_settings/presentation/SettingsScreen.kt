@@ -310,7 +310,10 @@ fun SettingsScreen(
                 text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.sizeInBytes.humanReadableSize())) },
                 confirmButton = {
                     TextButton(onClick = {
-                        onEvent(SettingsEvent.ConfirmDownloadAiModel(model))
+                        onEvent(SettingsEvent.ConfirmDownloadAiModel(
+                            aiModel = model,
+                            onFailure = showToast
+                        ))
                     }) {
                         Text(stringResource(R.string.btn_download))
                     }

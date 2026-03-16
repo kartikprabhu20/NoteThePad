@@ -197,7 +197,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.StartRestore -> startRestore(event.onFailure)
             SettingsEvent.CreateDummyData -> createMassiveDummyData()
             is SettingsEvent.SelectAiModel -> selectAiModel(event.aiModel)
-            is SettingsEvent.ConfirmDownloadAiModel -> confirmDownloadAiModel(event.aiModel)
+            is SettingsEvent.ConfirmDownloadAiModel -> confirmDownloadAiModel(event.aiModel, event.onFailure)
             SettingsEvent.DismissDownloadDialog -> _downloadDialogModel.value = null
             SettingsEvent.SignOut -> signOut()
         }
@@ -224,9 +224,15 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun confirmDownloadAiModel(aiModel: AiModel) {
+    private fun confirmDownloadAiModel(aiModel: AiModel, onFailure: (String) -> Unit) {
         _downloadDialogModel.value = null
         viewModelScope.launch(Dispatchers.Default) {
+            val isNetworkReady = canPerformNetworkTask { message ->
+                viewModelScope.launch(Dispatchers.Main) {
+                    onFailure(message)
+                }
+            }
+            if (!isNetworkReady) return@launch
             dataStore.updateAiModel(aiModel.name)
             downloadAiModelUseCase(aiModel.url, aiModel.downloadFileName)
         }

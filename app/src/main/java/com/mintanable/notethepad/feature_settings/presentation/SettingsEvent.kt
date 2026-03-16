@@ -22,7 +22,10 @@ sealed class SettingsEvent {
     data class StartRestore(val onFailure: (String) -> Unit) : SettingsEvent()
     object CreateDummyData : SettingsEvent()
     data class SelectAiModel(val aiModel: AiModel) : SettingsEvent()
-    data class ConfirmDownloadAiModel(val aiModel: AiModel) : SettingsEvent()
+    data class ConfirmDownloadAiModel(
+        val aiModel: AiModel,
+        val onFailure: (String) -> Unit
+    ) : SettingsEvent()
     object DismissDownloadDialog : SettingsEvent()
     object SignOut : SettingsEvent()
 }
