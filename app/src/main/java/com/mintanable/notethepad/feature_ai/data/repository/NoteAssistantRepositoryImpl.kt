@@ -39,7 +39,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.url.isNotEmpty()) {
-                    val prompt = createPrompt(title, content, existingTags)
+                    val prompt = fewShotsPrompt(title, content, existingTags)
                     val response = gemmaLocalDataSource.generate(prompt, selectedModel.downloadFileName)
                     parseResponse(response)
                 } else {
@@ -50,13 +50,6 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     private fun createPrompt(title: String, content: String, existingTags: List<String>): String {
-//        return """
-//            Suggest 3-5 relevant tags for a note with the following title and content.
-//            Title: $title
-//            Content: $content
-//            Existing tags in the app: ${existingTags.joinToString(", ")}
-//            Return only a comma-separated list of tags.
-//        """.trimIndent()
         return """
             You are an expert organizational assistant for the app "NoteThePad".
             
@@ -74,6 +67,18 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             
             Example Output: Work, Finance, Urgent
         """.trimIndent()
+    }
+
+    private fun fewShotsPrompt(title: String, content: String, existingTags: List<String>): String {
+        val prompt = """
+            NOTE DATA:
+            - Title: $title
+            - Content: $content
+            - Existing Tags: ${existingTags.joinToString(", ")}
+    
+            Tags:
+            """.trimIndent()
+        return prompt
     }
 
     private fun parseResponse(response: String?): List<String> {

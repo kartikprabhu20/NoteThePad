@@ -4,7 +4,9 @@ import android.util.Log
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetAutoTagsUseCase @Inject constructor(
@@ -12,12 +14,14 @@ class GetAutoTagsUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
-    suspend operator fun invoke(title: String, content: String): Result<List<String>> {
-        return try {
+    suspend operator fun invoke(title: String, content: String): Result<List<String>> =
+        withContext(Dispatchers.IO) {
+         try {
             val settings = userPreferencesRepository.settingsFlow.first()
             val existingTags = noteRepository.getAllTags().first().map { it.tagName }
 
-            val suggestions = assistantRepository.suggestTags(
+             Log.d("kptest", "Generating tags using: ${settings.aiModelName}")
+             val suggestions = assistantRepository.suggestTags(
                 title = title,
                 content = content,
                 existingTags = existingTags,
