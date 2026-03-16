@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_ai.data
+package com.mintanable.notethepad.feature_ai.data.source
 
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.generationConfig

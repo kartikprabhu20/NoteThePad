@@ -2,13 +2,12 @@ package com.mintanable.notethepad.feature_ai.domain.use_case
 
 import com.mintanable.notethepad.feature_ai.domain.model.AiModel
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetSupportedAiModels @Inject constructor(
+class GetAiModelByName @Inject constructor(
     private val repository: AiModelRepository
 ) {
-    operator fun invoke(): Flow<List<AiModel>> {
-        return repository.getModels()
+    suspend operator fun invoke(name: String): AiModel? {
+        return repository.getModelByName(name)
     }
 }
