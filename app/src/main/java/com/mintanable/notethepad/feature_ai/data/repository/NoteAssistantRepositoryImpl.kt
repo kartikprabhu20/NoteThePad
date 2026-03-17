@@ -26,8 +26,8 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.generateTags(title, content, existingTags)
             "Gemini Nano (System)" -> {
-                val prompt = createPrompt(title, content, existingTags)
-                val response = geminiNanoDataSource.generate(prompt)
+                val prompt = createTagPrompt(title, content, existingTags)
+                val response = geminiNanoDataSource.generateTags(prompt)
                 parseResponse(response)
             }
 
@@ -37,9 +37,9 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.url.isNotEmpty()) {
-                    val prompt = fewShotsPrompt(title, content, existingTags)
+                    val prompt = createFewShotTagPrompt(title, content, existingTags)
                     val response =
-                        gemmaLocalDataSource.generate(prompt, selectedModel.downloadFileName)
+                        gemmaLocalDataSource.generateTags(prompt, selectedModel.downloadFileName)
                     parseResponse(response)
                 } else {
                     emptyList()
@@ -48,7 +48,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun createPrompt(title: String, content: String, existingTags: List<String>): String {
+    private fun createTagPrompt(title: String, content: String, existingTags: List<String>): String {
         return """
             You are an expert organizational assistant for the app "NoteThePad".
             
@@ -68,7 +68,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         """.trimIndent()
     }
 
-    private fun fewShotsPrompt(title: String, content: String, existingTags: List<String>): String {
+    private fun createFewShotTagPrompt(title: String, content: String, existingTags: List<String>): String {
         val prompt = """
             NOTE DATA:
             - Title: $title

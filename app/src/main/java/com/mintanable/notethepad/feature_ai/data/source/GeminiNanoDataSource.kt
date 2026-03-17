@@ -10,7 +10,7 @@ import javax.inject.Inject
 class GeminiNanoDataSource @Inject constructor() {
     private val client = Generation.getClient()
 
-    suspend fun generate(prompt: String): String? {
+    suspend fun generateTags(prompt: String): String? {
         return try {
             client.generateContent(prompt).candidates.firstOrNull()?.text
         } catch (e: Exception) {

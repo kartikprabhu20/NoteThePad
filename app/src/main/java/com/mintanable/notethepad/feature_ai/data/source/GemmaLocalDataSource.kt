@@ -30,7 +30,7 @@ class GemmaLocalDataSource @Inject constructor(
     private var currentModelPath: String? = null
     private val mutex = Mutex()
 
-    suspend fun generate(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
+    suspend fun generateTags(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
         mutex.withLock {
             try {
                 withTimeout(20000L) { //20seconds
@@ -44,7 +44,8 @@ class GemmaLocalDataSource @Inject constructor(
                         val config = EngineConfig(
                             modelPath = newPath,
                             backend = Backend.GPU(), // Mandatory for Gemma 3 speed
-                            cacheDir = context.cacheDir.path
+                            cacheDir = context.cacheDir.path,
+                            maxNumTokens = 1024,
                         )
 
                         engine = Engine(config).apply { initialize() }

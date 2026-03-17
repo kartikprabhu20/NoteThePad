@@ -91,7 +91,7 @@ fun SuggestedTagsRow(
             } else {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     suggestions.forEach { tag ->
                         SuggestionChip(
@@ -125,7 +125,7 @@ fun previewSuggestedTagsRow() {
             .padding(8.dp)
             .background(NoteColors.colors[1])){
             SuggestedTagsRow(
-                suggestions = listOf("test","abc","shopping"),
+                suggestions = listOf("test","abc","shopping","finance","sport"),
                 onTagAccepted = {},
                 onDismiss = { },
                 isLoading = false
