@@ -247,4 +247,8 @@ dependencies {
     implementation("com.google.ai.edge.litertlm:litertlm-android:latest.release")//For Gemma (1B, E2B, E4B)
 
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
+
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
 }

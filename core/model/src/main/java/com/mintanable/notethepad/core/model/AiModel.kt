@@ -59,19 +59,24 @@ data class AiModelEntry(
         val version = commitHash
         val downloadedFileName = modelFile
         val downloadUrl = "https://huggingface.co/$modelId/resolve/$commitHash/$modelFile?download=true"
-        
-        val isLlmModel = taskTypes.contains("llm_chat") || 
-                         taskTypes.contains("llm_prompt_lab") || 
-                         taskTypes.contains("llm_ask_audio") || 
-                         taskTypes.contains("llm_ask_image")
+
+
+
+        val safeTaskTypes = taskTypes ?: emptyList()
+        val safeBestForTaskTypes = bestForTaskTypes ?: emptyList()
+        val isLlmModel = safeTaskTypes.contains("llm_chat") ||
+                safeTaskTypes.contains("llm_prompt_lab") ||
+                safeTaskTypes.contains("llm_ask_audio") ||
+                safeTaskTypes.contains("llm_ask_image")
         
         var llmMaxToken = 1024
         var accelerators: List<Accelerator> = emptyList()
-        
-        if (isLlmModel) {
+
+        if (isLlmModel && defaultConfig != null) {
             llmMaxToken = defaultConfig.maxTokens
-            if (defaultConfig.accelerators.isNotEmpty()) {
-                val items = defaultConfig.accelerators.split(",")
+            val configAccels = defaultConfig.accelerators ?: ""
+            if (configAccels.isNotEmpty()) {
+                val items = configAccels.split(",")
                 val accelList = mutableListOf<Accelerator>()
                 for (item in items) {
                     when (item.trim().lowercase()) {
@@ -97,7 +102,7 @@ data class AiModelEntry(
             llmSupportAudio = llmSupportAudio,
             llmMaxToken = llmMaxToken,
             accelerators = accelerators,
-            bestForTaskIds = bestForTaskTypes,
+            bestForTaskIds = safeBestForTaskTypes,
             isLlm = isLlmModel
         )
     }
