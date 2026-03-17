@@ -17,9 +17,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -141,7 +144,12 @@ fun CheckboxRow(
 
         Checkbox(
             checked = item.isChecked,
-            onCheckedChange = { onItemChanged(item.copy(isChecked = !item.isChecked)) }
+            onCheckedChange = { onItemChanged(item.copy(isChecked = !item.isChecked)) },
+            colors = CheckboxDefaults.colors().copy(
+                checkedBorderColor = Color.Black,
+                uncheckedBorderColor = Color.Black,
+                checkedBoxColor = MaterialTheme.colorScheme.onSurface
+            )
         )
 
         BasicTextField(
@@ -195,7 +203,7 @@ fun LazyListScope.checkboxGroup(
             focusRequester = requester,
             textStyle = TextStyle(
                 textDecoration = if (isDoneGroup) TextDecoration.LineThrough else TextDecoration.None,
-                color = if (isDoneGroup) Color.Gray else Color.Unspecified
+                color = if (isDoneGroup) Color.Gray else Color.Black
             ),
             modifier = Modifier
                 .animateItem()

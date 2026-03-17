@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.notes.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +20,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import com.mintanable.notethepad.R
 import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
+import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 
@@ -41,7 +45,8 @@ fun SimpleCheckbox(itemText: String, isChecked: Boolean, modifier: Modifier = Mo
     ) {
         Icon(
             imageVector = if(isChecked)Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
-            contentDescription = stringResource(R.string.content_description_checkbox_state)
+            contentDescription = stringResource(R.string.content_description_checkbox_state),
+            tint = if(isChecked) Color.Gray else Color.Black
         )
         Text(
             text = itemText,
@@ -81,6 +86,8 @@ fun PreviewSimpleCheckbox() {
     )
 
     NoteThePadTheme {
-        SimpleCheckboxList(items)
+        Box(modifier = Modifier.background(NoteColors.colors.get(3))) {
+            SimpleCheckboxList(items)
+        }
     }
 }
