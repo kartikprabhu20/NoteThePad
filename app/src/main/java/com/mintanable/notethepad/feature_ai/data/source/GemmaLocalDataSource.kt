@@ -9,9 +9,13 @@ import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.SamplerConfig
 import com.google.ai.edge.litertlm.Message
+import com.mintanable.notethepad.feature_ai.domain.model.AiModel
+import com.mintanable.notethepad.feature_ai.domain.model.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -93,6 +97,19 @@ class GemmaLocalDataSource @Inject constructor(
                 engine = null
                 null
             }
+        }
+    }
+
+    fun checkLocalStatus(selectedModel: AiModel?): Flow<AiModelDownloadStatus> = flow {
+        if (selectedModel != null) {
+            val file = File(context.getExternalFilesDir(null), selectedModel.downloadFileName)
+            if (file.exists()) {
+                emit(AiModelDownloadStatus.Ready)
+            } else {
+                emit(AiModelDownloadStatus.Downloadable)
+            }
+        } else {
+            emit(AiModelDownloadStatus.Unavailable)
         }
     }
 }

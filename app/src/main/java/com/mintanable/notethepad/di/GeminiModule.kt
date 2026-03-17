@@ -6,7 +6,7 @@ import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.repository.NoteAssistantRepositoryImpl
 import com.mintanable.notethepad.feature_ai.data.repository.AiModelRepositoryImpl
 import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
-import com.mintanable.notethepad.feature_ai.data.source.NanoDataSource
+import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_note.domain.util.DispatcherProvider
@@ -48,13 +48,13 @@ object GeminiModule {
     fun provideNoteAssistantRepository(
         geminiDataSource: GeminiDataSource,
         gemmaLocalDataSource: GemmaLocalDataSource,
-        nanoDataSource: NanoDataSource,
+        geminiNanoDataSource: GeminiNanoDataSource,
         aiModelRepository: AiModelRepository
     ): NoteAssistantRepository {
         return NoteAssistantRepositoryImpl(
             geminiDataSource,
             gemmaLocalDataSource,
-            nanoDataSource,
+            geminiNanoDataSource,
             aiModelRepository
         )
     }

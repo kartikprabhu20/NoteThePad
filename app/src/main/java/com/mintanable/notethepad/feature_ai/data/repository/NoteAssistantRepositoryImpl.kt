@@ -1,23 +1,20 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
-import com.google.mlkit.genai.common.FeatureStatus
-import com.google.mlkit.genai.prompt.Generation
 import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
+import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
-import com.mintanable.notethepad.feature_ai.data.source.NanoDataSource
 import com.mintanable.notethepad.feature_ai.domain.model.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class NoteAssistantRepositoryImpl @Inject constructor(
     private val geminiDataSource: GeminiDataSource,
     private val gemmaLocalDataSource: GemmaLocalDataSource,
-    private val nanoDataSource: NanoDataSource,
-    private val aiModelRepository: AiModelRepository
+    private val geminiNanoDataSource: GeminiNanoDataSource,
+    private val aiModelRepository: AiModelRepository,
 ) : NoteAssistantRepository {
 
     override suspend fun suggestTags(
@@ -30,9 +27,10 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.generateTags(title, content, existingTags)
             "Gemini Nano (System)" -> {
                 val prompt = createPrompt(title, content, existingTags)
-                val response = nanoDataSource.generate(prompt)
+                val response = geminiNanoDataSource.generate(prompt)
                 parseResponse(response)
             }
+
             "None" -> emptyList()
             else -> {
                 //Gemma models
@@ -40,7 +38,8 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.url.isNotEmpty()) {
                     val prompt = fewShotsPrompt(title, content, existingTags)
-                    val response = gemmaLocalDataSource.generate(prompt, selectedModel.downloadFileName)
+                    val response =
+                        gemmaLocalDataSource.generate(prompt, selectedModel.downloadFileName)
                     parseResponse(response)
                 } else {
                     emptyList()
@@ -85,14 +84,11 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         return response?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
     }
 
-    override fun checkLocalStatus(): Flow<AiModelDownloadStatus> = flow {
-        val status = Generation.getClient().checkStatus()
-        val mappedStatus = when (status) {
-            FeatureStatus.AVAILABLE -> AiModelDownloadStatus.Ready
-            FeatureStatus.DOWNLOADING -> AiModelDownloadStatus.Downloading
-            FeatureStatus.DOWNLOADABLE -> AiModelDownloadStatus.Downloadable
-            else -> AiModelDownloadStatus.Unavailable
+    override suspend fun checkLocalStatus(modelName: String): Flow<AiModelDownloadStatus> =
+        if (modelName == "Gemini Nano (System)") {
+            geminiNanoDataSource.checkLocalStatus()
+        } else {
+            gemmaLocalDataSource.checkLocalStatus(aiModelRepository.getModelByName(modelName))
         }
-        emit(mappedStatus)
-    }
+
 }

@@ -11,5 +11,5 @@ interface NoteAssistantRepository {
         modelName: String
     ): List<String>
 
-    fun checkLocalStatus(): Flow<AiModelDownloadStatus>
+    suspend fun checkLocalStatus(modelName: String): Flow<AiModelDownloadStatus>
 }
