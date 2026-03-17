@@ -15,6 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -77,16 +78,26 @@ class GemmaLocalDataSource @Inject constructor(
 
                     // Inference
                     engine?.createConversation(conversationConfig)?.use { conversation ->
-                        try {
-                            val responseMessage: Message = conversation.sendMessage(prompt)
-                            val textResponse = responseMessage.contents.toString()
+//                        try {
+//                            val responseMessage: Message = conversation.sendMessage(prompt)
+//                            val textResponse = responseMessage.contents.toString()
+//
+//                            Log.d("kptest", "AI Raw Result: $textResponse")
+//                            textResponse
+//                        } catch (e: Exception) {
+//                            Log.e("kptest", "Inference failed: ${e.message}")
+//                            null
+//                        }
 
-                            Log.d("kptest", "AI Raw Result: $textResponse")
-                            textResponse
-                        } catch (e: Exception) {
-                            Log.e("kptest", "Inference failed: ${e.message}")
-                            null
-                        }
+                        var textResponse = ""
+                        conversation.sendMessageAsync(prompt)
+                            .catch {
+                                Log.e("kptest", "Inference failed: ${it.message}")
+                            }
+                            .collect {
+                                textResponse = it.toString()
+                            }
+                        textResponse
                     }
                 }
             } catch (e: TimeoutCancellationException) {
