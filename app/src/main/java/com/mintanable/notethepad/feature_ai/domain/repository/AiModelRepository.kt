@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface AiModelRepository {
     fun getModels(): Flow<List<AiModel>>
     suspend fun getModelByName(name: String): AiModel?
+    suspend fun refreshModels()
 }

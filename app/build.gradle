@@ -42,6 +42,8 @@ android {
         buildConfigField("String", "DRIVE_CLIENT_SECRET", "\"${localProperties.getProperty("DRIVE_CLIENT_SECRET") ?: ""}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY") ?: ""}\"")
         buildConfigField("String", "HUGGING_FACE_AUTH_TOKEN", "\"${localProperties.getProperty("HUGGING_FACE_AUTH_TOKEN") ?: ""}\"")
+        buildConfigField("String", "GITHUB_GIST_ACCESS_TOKEN", "\"${localProperties.getProperty("GITHUB_GIST_ACCESS_TOKEN") ?: ""}\"")
+        buildConfigField("String", "AI_CATELOG_GIST_URL", "\"${localProperties.getProperty("AI_CATELOG_GIST_URL") ?: ""}\"")
 
     }
     signingConfigs {
