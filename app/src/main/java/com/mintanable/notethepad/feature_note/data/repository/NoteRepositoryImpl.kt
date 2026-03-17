@@ -1,13 +1,13 @@
 package com.mintanable.notethepad.feature_note.data.repository
 
 import androidx.room.withTransaction
+import com.mintanable.notethepad.core.model.Note
+import com.mintanable.notethepad.core.model.NoteTagCrossRef
+import com.mintanable.notethepad.core.model.NoteWithTags
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.data.source.NoteDao
 import com.mintanable.notethepad.feature_note.data.source.NoteDatabase
 import com.mintanable.notethepad.feature_note.data.source.TagDao
-import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.domain.model.NoteTagCrossRef
-import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
-import com.mintanable.notethepad.feature_note.domain.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import com.mintanable.notethepad.feature_note.domain.util.OrderType
@@ -41,7 +41,7 @@ class NoteRepositoryImpl(
             db.withTransaction {
                 var noteId = noteDao.inserNote(note)
 
-                if (noteId == -1L) {
+                if (noteId == -1L || noteId == 0L) { // Room returns 0 or -1 depending on setup for failed insert
                     noteDao.updateNote(note)
                     noteId = note.id
                 }
@@ -50,8 +50,9 @@ class NoteRepositoryImpl(
                 tags.forEach { tag ->
                     var tagId = tagDao.insertTag(tag)
 
-                    if (tagId == -1L) {
-                        tagId = tagDao.getTagByName(tag.tagName).tagId
+                    if (tagId == -1L || tagId == 0L) {
+                         val existingTag = tagDao.getTagByName(tag.tagName)
+                         tagId = existingTag?.tagId ?: 0L
                     }
 
                     noteDao.insertNoteTagCrossRef(NoteTagCrossRef(noteId, tagId))

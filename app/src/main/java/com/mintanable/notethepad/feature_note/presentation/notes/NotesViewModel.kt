@@ -6,8 +6,8 @@ import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.DetailedNote
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases

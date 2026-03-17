@@ -13,7 +13,7 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
+import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 
 @Composable

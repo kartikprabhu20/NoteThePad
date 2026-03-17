@@ -43,7 +43,7 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 

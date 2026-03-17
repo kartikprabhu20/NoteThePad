@@ -3,10 +3,10 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 import android.content.Context
 import android.net.Uri
 import com.mintanable.notethepad.core.file.FileManager
-import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
-import com.mintanable.notethepad.feature_note.domain.model.InvalidNoteException
-import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.InvalidNoteException
+import com.mintanable.notethepad.core.model.Note
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper

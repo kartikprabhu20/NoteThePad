@@ -45,9 +45,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
-import com.mintanable.notethepad.feature_note.domain.model.Tag
-import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.MagicButton

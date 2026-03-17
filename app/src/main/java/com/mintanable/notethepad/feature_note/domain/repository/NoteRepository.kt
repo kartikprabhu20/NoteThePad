@@ -1,8 +1,8 @@
 package com.mintanable.notethepad.feature_note.domain.repository
 
-import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.Note
+import com.mintanable.notethepad.core.model.NoteWithTags
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
 import kotlinx.coroutines.flow.Flow
 

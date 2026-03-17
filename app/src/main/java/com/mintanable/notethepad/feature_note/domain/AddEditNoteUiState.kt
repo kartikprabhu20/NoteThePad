@@ -2,9 +2,9 @@ package com.mintanable.notethepad.feature_note.domain
 
 import android.net.Uri
 import androidx.compose.runtime.Stable
-import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
-import com.mintanable.notethepad.feature_note.domain.model.Tag
-import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.core.model.Attachment
+import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.NoteTextFieldState

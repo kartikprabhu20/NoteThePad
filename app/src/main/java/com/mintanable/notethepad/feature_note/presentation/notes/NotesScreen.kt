@@ -38,12 +38,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.mintanable.notethepad.R
+import com.mintanable.notethepad.core.model.DetailedNote
+import com.mintanable.notethepad.core.model.ThemeMode
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
 import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
-import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.components.EditTextDialog
 import com.mintanable.notethepad.ui.util.NotesFilterType
@@ -62,7 +62,7 @@ fun NotesScreen (
 ){
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
-    val searchQuery = notesViewModel.searchInputText.collectAsState().value
+    val searchQuery by notesViewModel.searchInputText.collectAsStateWithLifecycle()
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()

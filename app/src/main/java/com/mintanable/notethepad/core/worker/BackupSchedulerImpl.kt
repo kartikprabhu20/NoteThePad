@@ -1,8 +1,6 @@
 package com.mintanable.notethepad.core.worker
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -12,10 +10,10 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
 import com.mintanable.notethepad.feature_backup.presentation.BackupWorker
-import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
+import com.mintanable.notethepad.core.model.BackupFrequency
 import java.util.concurrent.TimeUnit
 import androidx.work.workDataOf
-import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
+import com.mintanable.notethepad.core.model.BackupSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

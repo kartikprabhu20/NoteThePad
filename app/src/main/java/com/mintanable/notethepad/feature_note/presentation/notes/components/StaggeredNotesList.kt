@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
+import com.mintanable.notethepad.core.model.DetailedNote
 
 @Composable
 fun StaggeredNotesList(

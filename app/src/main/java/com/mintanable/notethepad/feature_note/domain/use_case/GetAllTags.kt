@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 

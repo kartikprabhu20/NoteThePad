@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_ai.domain.model.AiModel
+import com.mintanable.notethepad.core.model.AiModel
 import com.mintanable.notethepad.feature_ai.presentation.humanReadableSize
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews

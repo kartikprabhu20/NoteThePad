@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.domain.model
+package com.mintanable.notethepad.core.model
 
 import androidx.compose.runtime.Immutable
 import androidx.room.Embedded
@@ -7,7 +7,6 @@ import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import java.lang.Exception
 
 @Immutable
 @Entity(
@@ -29,7 +28,7 @@ data class Note(
     val reminderTime: Long = -1
 )
 
-class InvalidNoteException(message: String):Exception(message)
+class InvalidNoteException(message: String): Exception(message)
 
 data class NoteWithTags(
     @Embedded val note: Note,

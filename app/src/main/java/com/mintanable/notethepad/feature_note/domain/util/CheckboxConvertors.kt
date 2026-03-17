@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain.util
 
-import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
+import com.mintanable.notethepad.core.model.CheckboxItem
 
 object CheckboxConvertors {
 

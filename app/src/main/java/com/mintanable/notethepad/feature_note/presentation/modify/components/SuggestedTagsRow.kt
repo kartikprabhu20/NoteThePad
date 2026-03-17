@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 

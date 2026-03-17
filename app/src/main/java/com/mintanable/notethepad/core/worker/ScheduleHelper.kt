@@ -1,8 +1,6 @@
 package com.mintanable.notethepad.core.worker
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
+import com.mintanable.notethepad.core.model.BackupFrequency
 import java.time.Duration
 import java.time.ZonedDateTime
 

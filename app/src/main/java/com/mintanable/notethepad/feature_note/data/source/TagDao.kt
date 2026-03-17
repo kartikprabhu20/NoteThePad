@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.Tag
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,6 +25,6 @@ interface TagDao {
     suspend fun updateTag(tag: Tag)
 
     @Query("SELECT * FROM tag_table where tagName = :tagName")
-    fun getTagByName(tagName: String): Tag
+    suspend fun getTagByName(tagName: String): Tag?
 
 }

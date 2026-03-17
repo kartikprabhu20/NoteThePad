@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.Note
+import com.mintanable.notethepad.core.model.Note
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver.Companion.PINNING_ACTION

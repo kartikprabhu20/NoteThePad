@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_settings.domain.model
+package com.mintanable.notethepad.core.model
 
 data class Settings(
     val notificationsEnabled: Boolean = true,
@@ -15,6 +15,7 @@ data class BackupSettings(
     val backupTimeHour: Int = 2,
     val backupTimeMinutes: Int = 0
 )
+
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
 
 enum class BackupFrequency(val days: Long, val title: String) {

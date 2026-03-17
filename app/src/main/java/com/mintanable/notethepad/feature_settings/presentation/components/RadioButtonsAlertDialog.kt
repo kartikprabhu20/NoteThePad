@@ -3,7 +3,7 @@ package com.mintanable.notethepad.feature_settings.presentation.components
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
+import com.mintanable.notethepad.core.model.BackupFrequency
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 
 @Composable

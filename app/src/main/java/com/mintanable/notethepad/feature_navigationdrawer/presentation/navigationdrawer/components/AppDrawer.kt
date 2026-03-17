@@ -53,9 +53,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.mintanable.notethepad.BuildConfig
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_firebase.domain.model.User
+import com.mintanable.notethepad.core.model.User
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 import com.mintanable.notethepad.ui.util.NotesFilterType

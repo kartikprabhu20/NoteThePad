@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.domain.util
+package com.mintanable.notethepad.core.model
 
 import android.net.Uri
 import androidx.compose.runtime.Immutable

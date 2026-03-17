@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.core.model.Attachment
 import com.mintanable.notethepad.feature_note.domain.util.MediaState
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioPlayerUI
 

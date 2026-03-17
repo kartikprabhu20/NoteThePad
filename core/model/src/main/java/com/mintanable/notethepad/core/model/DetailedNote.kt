@@ -1,7 +1,6 @@
-package com.mintanable.notethepad.feature_note.domain.model
+package com.mintanable.notethepad.core.model
 
 import android.net.Uri
-import com.mintanable.notethepad.feature_note.domain.util.Attachment
 
 data class DetailedNote (
     val id: Long = 0L,

@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_ai.domain.model
+package com.mintanable.notethepad.core.model
 
 sealed class AiModelDownloadStatus {
     object Unavailable : AiModelDownloadStatus()

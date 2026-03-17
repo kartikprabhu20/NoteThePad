@@ -9,9 +9,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.mintanable.notethepad.core.model.AiModel
+import com.mintanable.notethepad.core.model.BackupFrequency
+import com.mintanable.notethepad.core.model.BackupSettings
+import com.mintanable.notethepad.core.model.Note
+import com.mintanable.notethepad.core.model.NoteColors
+import com.mintanable.notethepad.core.model.Settings
+import com.mintanable.notethepad.core.model.ThemeMode
 import com.mintanable.notethepad.core.worker.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
-import com.mintanable.notethepad.feature_ai.domain.model.AiModel
 import com.mintanable.notethepad.feature_ai.domain.use_case.DownloadAiModelUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_case.GetSupportedAiModels
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
@@ -25,14 +31,8 @@ import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
 import com.mintanable.notethepad.feature_backup.presentation.LoadType
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
-import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.data.repository.UserPreferencesRepository
-import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
-import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
-import com.mintanable.notethepad.feature_settings.domain.model.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -410,13 +410,14 @@ class SettingsViewModel @Inject constructor(
 
     private fun createMassiveDummyData() {
         viewModelScope.launch(Dispatchers.IO) {
-            for (i in 1..10000) {
+            for (i in 1..1000) {
+                 val colors = listOf(0xffffab91, 0xffe7ed9b, 0xffcf94da, 0xff81deea, 0xfff48fb1)
                 noteUseCases.saveNoteWithAttachments(
                     Note(
                         title = "Note #$i",
                         content = "Content for $i",
                         timestamp = System.currentTimeMillis(),
-                        color = NoteColors.colors.random().toArgb()
+                        color = colors.random().toInt()
                     )
                 )
             }

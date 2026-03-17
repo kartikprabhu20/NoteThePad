@@ -38,7 +38,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScr
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
-import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.core.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
 import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel

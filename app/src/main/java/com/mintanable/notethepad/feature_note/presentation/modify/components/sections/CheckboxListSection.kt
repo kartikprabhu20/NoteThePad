@@ -42,8 +42,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.ThemePreviews
 import java.util.UUID

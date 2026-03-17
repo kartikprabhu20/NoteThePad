@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
@@ -30,9 +29,8 @@ import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.MainActivity
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
-import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.core.model.DetailedNote
+import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.utils.GridBreakpointPreviews

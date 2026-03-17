@@ -10,8 +10,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.NoteColors
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TagUI
 import com.mintanable.notethepad.feature_note.presentation.notes.TagType
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme

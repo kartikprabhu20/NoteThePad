@@ -1,9 +1,9 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
-import com.mintanable.notethepad.feature_ai.domain.model.AiModel
+import com.mintanable.notethepad.core.model.AiModel
+import com.mintanable.notethepad.core.model.Settings
 import com.mintanable.notethepad.feature_backup.presentation.BackupUiState
 import com.mintanable.notethepad.feature_backup.presentation.LoadStatus
-import com.mintanable.notethepad.feature_settings.domain.model.Settings
 
 data class SettingsState(
     val settings: Settings = Settings(),

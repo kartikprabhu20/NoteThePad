@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_firebase.presentation.auth
 
-import com.mintanable.notethepad.feature_firebase.domain.model.User
+import com.mintanable.notethepad.core.model.User
 
 sealed class AuthState {
     object Idle : AuthState()

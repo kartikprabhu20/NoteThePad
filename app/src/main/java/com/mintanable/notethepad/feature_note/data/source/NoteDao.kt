@@ -1,9 +1,9 @@
 package com.mintanable.notethepad.feature_note.data.source
 
 import androidx.room.*
-import com.mintanable.notethepad.feature_note.domain.model.Note
-import com.mintanable.notethepad.feature_note.domain.model.NoteTagCrossRef
-import com.mintanable.notethepad.feature_note.domain.model.NoteWithTags
+import com.mintanable.notethepad.core.model.Note
+import com.mintanable.notethepad.core.model.NoteTagCrossRef
+import com.mintanable.notethepad.core.model.NoteWithTags
 import kotlinx.coroutines.flow.Flow
 
 @Dao

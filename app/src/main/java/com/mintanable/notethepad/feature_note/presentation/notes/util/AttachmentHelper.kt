@@ -5,7 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
-import com.mintanable.notethepad.feature_note.domain.util.AttachmentType
+import com.mintanable.notethepad.core.model.AttachmentType
 
 object AttachmentHelper {
 

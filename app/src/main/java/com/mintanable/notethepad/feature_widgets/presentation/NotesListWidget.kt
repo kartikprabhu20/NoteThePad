@@ -38,8 +38,8 @@ import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.MainActivity
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
-import com.mintanable.notethepad.feature_note.domain.model.NoteColors
+import com.mintanable.notethepad.core.model.DetailedNote
+import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID

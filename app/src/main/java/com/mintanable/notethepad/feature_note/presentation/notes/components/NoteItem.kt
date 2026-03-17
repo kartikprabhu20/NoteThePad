@@ -45,10 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.core.net.toUri
 import com.mintanable.notethepad.R
-import com.mintanable.notethepad.feature_note.domain.model.CheckboxItem
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
-import com.mintanable.notethepad.feature_note.domain.model.Tag
-import com.mintanable.notethepad.feature_note.domain.util.Attachment
+import com.mintanable.notethepad.core.model.Attachment
+import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.DetailedNote
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.ui.theme.NoteThePadTheme
 import com.mintanable.notethepad.ui.theme.RedOrange
 import com.mintanable.notethepad.ui.theme.ThemePreviews
@@ -233,7 +233,7 @@ fun NoteItemPreviewCheckboxes() {
                         NoteItem(
                             note = DetailedNote(
                                 title = "Meeting Notes",
-                                content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
+                                content = "Discuss the new architecture for the platform.",
                                 timestamp = System.currentTimeMillis(),
                                 color = RedOrange.toArgb(),
                                 id = 1,
@@ -273,7 +273,7 @@ fun NoteItemPreview() {
                         NoteItem(
                             note = DetailedNote(
                                 title = "Meeting Notes",
-                                content = "Discuss the new architecture for the JioHotstar platform. Focus on performance and scalability.",
+                                content = "Discuss the new architecture for the platform.",
                                 timestamp = System.currentTimeMillis(),
                                 color = RedOrange.toArgb(),
                                 id = 1,

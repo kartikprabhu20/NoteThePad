@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_firebase.domain.model
+package com.mintanable.notethepad.core.model
 
 data class User(
     val id: String,

@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.domain.model
+package com.mintanable.notethepad.core.model
 
 import java.util.UUID
 

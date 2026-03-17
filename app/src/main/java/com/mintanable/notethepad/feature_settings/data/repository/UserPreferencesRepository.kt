@@ -7,10 +7,10 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.mintanable.notethepad.feature_settings.domain.model.BackupFrequency
-import com.mintanable.notethepad.feature_settings.domain.model.BackupSettings
-import com.mintanable.notethepad.feature_settings.domain.model.Settings
-import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.core.model.BackupFrequency
+import com.mintanable.notethepad.core.model.BackupSettings
+import com.mintanable.notethepad.core.model.Settings
+import com.mintanable.notethepad.core.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

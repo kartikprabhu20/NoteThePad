@@ -1,7 +1,7 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
-import com.mintanable.notethepad.feature_note.domain.model.DetailedNote
-import com.mintanable.notethepad.feature_note.domain.model.Tag
+import com.mintanable.notethepad.core.model.DetailedNote
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
 import com.mintanable.notethepad.feature_note.domain.util.NoteOrder

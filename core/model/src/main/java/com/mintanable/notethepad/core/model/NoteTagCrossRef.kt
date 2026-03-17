@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.domain.model
+package com.mintanable.notethepad.core.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -13,16 +13,16 @@ import androidx.room.Index
             entity = Note::class,
             parentColumns = ["id"],
             childColumns = ["noteId"],
-            onDelete = ForeignKey.CASCADE // If note is deleted, the link is deleted
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = Tag::class,
             parentColumns = ["tagId"],
             childColumns = ["tagId"],
-            onDelete = ForeignKey.CASCADE // If tag is deleted, the link is deleted
+            onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("tagId"),Index("noteId")]
+    indices = [Index("tagId"), Index("noteId")]
 )
 data class NoteTagCrossRef(
     val noteId: Long,
