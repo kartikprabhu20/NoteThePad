@@ -8,7 +8,6 @@ import com.mintanable.notethepad.core.model.Note
 import com.mintanable.notethepad.core.model.NoteWithTags
 import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
-import com.mintanable.notethepad.feature_note.domain.util.DetailedNoteMapper
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf

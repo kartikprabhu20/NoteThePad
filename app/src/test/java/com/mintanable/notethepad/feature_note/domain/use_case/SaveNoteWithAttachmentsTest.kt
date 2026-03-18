@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import com.mintanable.notethepad.core.file.FileManager
+import com.mintanable.notethepad.core.common.file.FileManager
 import com.mintanable.notethepad.core.model.CheckboxItem
 import com.mintanable.notethepad.core.model.InvalidNoteException
 import com.mintanable.notethepad.core.model.Tag

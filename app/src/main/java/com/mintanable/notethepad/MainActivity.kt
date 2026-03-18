@@ -20,7 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
@@ -28,27 +28,31 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.mintanable.notethepad.core.common.Screen
+import com.mintanable.notethepad.core.model.ThemeMode
 import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper
 import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
-import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
-import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
-import com.mintanable.notethepad.ui.theme.NoteThePadTheme
-import com.mintanable.notethepad.ui.util.Screen
+import com.mintanable.notethepad.theme.NoteThePadTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var mediaPlayer: MediaPlayer
 
     private lateinit var credentialHelper: GoogleClientHelper
     private var intentState = mutableStateOf<Intent?>(null)
@@ -59,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         intentState.value = intent
 
-        credentialHelper = GoogleClientHelper(this)
+        credentialHelper = GoogleClientHelper(this, this.getString(R.string.default_web_client_id))
         setContent {
 
             val settingsViewModel: SettingsViewModel = hiltViewModel()
@@ -117,7 +121,7 @@ class MainActivity : AppCompatActivity() {
                                     navArgument("tagName") { type = NavType.StringType; defaultValue = "" },
                                     navArgument("filterType") { type = NavType.StringType; defaultValue = "all" }
                                 )
-                            ) { entry ->
+                            ) {
                                 NotesScreen(
                                     navController = navController,
                                     onLogOut = {
@@ -125,7 +129,8 @@ class MainActivity : AppCompatActivity() {
                                         settingsViewModel.onEvent(SettingsEvent.SignOut)
                                     },
                                     sharedTransitionScope = this@SharedTransitionLayout,
-                                    animatedVisibilityScope = this@composable
+                                    animatedVisibilityScope = this@composable,
+                                    appVersionProvider = AndroidAppVersionProvider()
                                 )
                             }
                             composable(
@@ -204,8 +209,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(isFinishing){
-            AndroidMediaPlayer(this).release()
+        if (isFinishing) {
+            mediaPlayer.release()
         }
     }
 }

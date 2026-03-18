@@ -15,3 +15,11 @@ dependencyResolutionManagement {
 rootProject.name = "NoteThePad"
 include ':app'
 include ':core:model'
+include ':core:database'
+include ':core:common'
+include ':core:file'
+include ':core:security'
+include ':core:ui'
+include ':feature:note'
+include ':feature:ai'
+include ':feature:settings'

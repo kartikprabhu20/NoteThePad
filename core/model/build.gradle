@@ -30,8 +30,10 @@ dependencies {
     api "androidx.room:room-ktx:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
 
-    //Compose
+    //Compose - use api so consumers (like core:database) can see @Immutable
+    api platform('androidx.compose:compose-bom:2026.03.00')
+    api "androidx.compose.runtime:runtime"
     implementation 'androidx.compose.ui:ui'
-    implementation "androidx.compose.ui:ui-graphics:1.10.5"
+    implementation "androidx.compose.ui:ui-graphics"
 
 }

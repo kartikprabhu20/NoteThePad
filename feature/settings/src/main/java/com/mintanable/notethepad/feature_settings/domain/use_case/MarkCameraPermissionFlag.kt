@@ -1,0 +1,12 @@
+package com.mintanable.notethepad.feature_settings.domain.use_case
+
+import com.mintanable.notethepad.preference.repository.SharedPreferencesRepository
+import javax.inject.Inject
+
+class MarkCameraPermissionFlag @Inject constructor(
+    private val sharedPreferencesRepository: SharedPreferencesRepository
+) {
+    suspend operator fun invoke() {
+        sharedPreferencesRepository.markCameraPermissionRequested()
+    }
+}

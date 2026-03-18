@@ -8,8 +8,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.mintanable.notethepad.feature_ai.presentation.GetAutoTagsUseCase
-import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
+import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.core.model.CheckboxItem
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.InvalidNoteException
@@ -20,8 +19,9 @@ import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.core.model.AttachmentType
-import com.mintanable.notethepad.feature_note.domain.util.MediaState
-import com.mintanable.notethepad.feature_settings.presentation.use_cases.PermissionUsecases
+import com.mintanable.notethepad.core.model.MediaState
+import com.mintanable.notethepad.database.util.AudioMetadataProvider
+import com.mintanable.notethepad.feature_settings.domain.use_case.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import io.mockk.coEvery
 import io.mockk.coVerify

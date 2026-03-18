@@ -20,6 +20,7 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:name=".NoteThePadApp"
         android:allowBackup="false"
@@ -31,6 +32,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:extractNativeLibs="true">
+
         <uses-native-library android:name="libvndksupport.so" android:required="false"/>
         <uses-native-library android:name="libOpenCL.so" android:required="false"/>
 
@@ -41,8 +43,12 @@
             android:theme="@style/Theme.MyApplication.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.mintanable.notethepad.ACTION_OPEN_NOTE" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
@@ -78,7 +84,7 @@
             tools:node="merge" />
 
         <receiver
-            android:name=".core.BootReceiver"
+            android:name=".feature_note.worker.BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -88,13 +94,13 @@
         </receiver>
 
         <receiver
-            android:name=".feature_note.presentation.notes.util.ReminderReceiver"
+            android:name="com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver"
             android:enabled="true"
             android:exported="false">
         </receiver>
 
         <receiver
-            android:name=".feature_widgets.presentation.utils.NoteListWidgetProvider"
+            android:name="com.mintanable.notethepad.feature_widgets.presentation.utils.NoteListWidgetProvider"
             android:exported="true"
             android:label="@string/widget_title_note_collection">
             <intent-filter>
@@ -104,7 +110,7 @@
         </receiver>
 
         <receiver
-            android:name=".feature_widgets.presentation.utils.SingleNoteWidgetReceiver"
+            android:name="com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_title_single_note">
             <intent-filter>
@@ -113,7 +119,7 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/single_note_widget_info" />
         </receiver>
 
-        <receiver android:name=".feature_ai.domain.DownloadCancelReceiver" android:exported="true">
+        <receiver android:name="com.mintanable.notethepad.feature_ai.domain.DownloadCancelReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.DOWNLOAD_CANCELLEDBYREQUEST" />

@@ -11,8 +11,6 @@ import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
-import com.mintanable.notethepad.feature_note.domain.util.NoteOrder
-import com.mintanable.notethepad.feature_note.domain.util.OrderType
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
 import com.mintanable.notethepad.ui.util.NotesFilterType
