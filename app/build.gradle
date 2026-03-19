@@ -134,11 +134,9 @@ dependencies {
     implementation project(':core:data')
     implementation project(':core:ui')
     implementation project(':feature:note')
-    implementation project(':feature:backup')
     implementation project(':feature:auth')
     implementation project(':feature:navigationdrawer')
     implementation project(':feature:widgets')
-    implementation project(':feature:ai')
     implementation project(':feature:settings')
 
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")

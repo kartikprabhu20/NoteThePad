@@ -18,13 +18,13 @@ sealed class SettingsEvent {
         val intent: Intent?,
         val onFailure: (String) -> Unit
     ) : SettingsEvent()
-    object AuthCancelled : SettingsEvent()
+    data object AuthCancelled : SettingsEvent()
     data class StartRestore(val onFailure: (String) -> Unit) : SettingsEvent()
     data class SelectAiModel(val aiModel: AiModel) : SettingsEvent()
     data class ConfirmDownloadAiModel(
         val aiModel: AiModel,
         val onFailure: (String) -> Unit
     ) : SettingsEvent()
-    object DismissDownloadDialog : SettingsEvent()
-    object SignOut : SettingsEvent()
+    data object DismissDownloadDialog : SettingsEvent()
+    data object SignOut : SettingsEvent()
 }

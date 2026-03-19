@@ -25,7 +25,6 @@ import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledB
 import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.DownloadBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
-import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import com.mintanable.notethepad.feature_settings.presentation.BackupUiState
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
@@ -177,9 +176,6 @@ class SettingsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = SettingsState()
     )
-
-    private val _restoreEvents = MutableSharedFlow<RestoreEvent>()
-    val restoreEvents = _restoreEvents.asSharedFlow()
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
