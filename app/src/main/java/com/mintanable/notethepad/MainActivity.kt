@@ -42,8 +42,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
-import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
-import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
+import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
@@ -82,17 +81,17 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val navController = rememberNavController()
                     LaunchedEffect(currentIntent) {
-                        val noteId = currentIntent?.getLongExtra(TARGET_NOTE_ID, -1L) ?: -1L
+                        val noteId = currentIntent?.getLongExtra(NavigationConstants.EXTRA_NOTE_ID, -1L) ?: -1L
                         if (noteId != -1L) {
                             navController.navigate(Screen.AddEditNoteScreen.passArgs(noteId=noteId)) {
                                 launchSingleTop = true
                             }
-                            currentIntent?.removeExtra(TARGET_NOTE_ID)
+                            currentIntent?.removeExtra(NavigationConstants.EXTRA_NOTE_ID)
                         }
-                        val launchEditScreen = currentIntent?.getBooleanExtra(LAUNCH_EDIT_SCREEN, false) ?: false
+                        val launchEditScreen = currentIntent?.getBooleanExtra(NavigationConstants.LAUNCH_EDIT_SCREEN, false) ?: false
                         if(launchEditScreen){
                             navController.navigate(Screen.AddEditNoteScreen.route)
-                            currentIntent?.removeExtra(LAUNCH_EDIT_SCREEN)
+                            currentIntent?.removeExtra(NavigationConstants.LAUNCH_EDIT_SCREEN)
                         }
                     }
                     val showToast = { message: String ->

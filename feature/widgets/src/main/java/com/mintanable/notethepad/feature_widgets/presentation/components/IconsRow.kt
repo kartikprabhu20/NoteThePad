@@ -12,9 +12,9 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
+import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.model.DetailedNote
-import com.mintanable.notethepad.feature_note.R
-import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
+import com.mintanable.notethepad.feature_widgets.R
 
 @Composable
 fun IconsRow(

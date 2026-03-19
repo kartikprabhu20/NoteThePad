@@ -1,8 +1,8 @@
 package com.mintanable.notethepad.feature_widgets.presentation
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -30,7 +30,7 @@ import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.NoteColors
-import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.utils.GridBreakpointPreviews
 import com.mintanable.notethepad.feature_widgets.presentation.utils.LargeWidgetPreview
@@ -51,13 +51,13 @@ class SingleNoteWidget : GlanceAppWidget() {
                 context,
                 WidgetEntryPoint::class.java
             )
-            entryPoint.noteUseCases().getDetailedNote(noteId)
+            val noteWithTags = entryPoint.noteRepository().getNoteById(noteId)
+            noteWithTags?.let { entryPoint.detailedNoteMapper().toDetailedNote(it.note, it.tags) }
         } else null
-
 
         provideContent {
             val intent = Intent(NavigationConstants.ACTION_OPEN_NOTE).apply {
-                setPackage(context.packageName)
+                component = ComponentName(context.packageName, NavigationConstants.MAIN_ACTIVITY_CLASS)
                 if (note != null) {
                     putExtra(NavigationConstants.EXTRA_NOTE_ID, note.id)
                 }
@@ -138,12 +138,7 @@ fun NoteItem(
 }
 
 private fun GlanceModifier.maybeClickable(action: Action?): GlanceModifier {
-    return if (action != null) {
-        Log.d("kptest", "maybeClickable")
-        this.clickable(action)
-    } else {
-        this
-    }
+    return if (action != null) this.clickable(action) else this
 }
 
 @GridBreakpointPreviews

@@ -11,7 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mintanable.notethepad.core.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
-import com.mintanable.notethepad.feature_widgets.presentation.NoteWidgetConfigScreen
+import com.mintanable.notethepad.feature_note.presentation.widget.NoteWidgetConfigScreen
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_widgets.repository.NoteWidgetPrefs
 import com.mintanable.notethepad.theme.NoteThePadTheme

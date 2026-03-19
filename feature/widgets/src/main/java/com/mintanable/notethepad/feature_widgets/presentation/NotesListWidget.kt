@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_widgets.presentation
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -35,12 +36,11 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
+import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.NoteColors
-import com.mintanable.notethepad.feature_note.R
-import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
-import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
+import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.components.RoundedScrollingLazyVerticalGrid
 import com.mintanable.notethepad.feature_widgets.presentation.components.WidgetTitleBar
@@ -53,6 +53,9 @@ import com.mintanable.notethepad.feature_widgets.presentation.utils.RefreshNoteW
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SmallWidgetPreview
 import com.mintanable.notethepad.feature_widgets.presentation.utils.WidgetEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.map
 
 class NoteListWidget : GlanceAppWidget() {
 
@@ -60,15 +63,20 @@ class NoteListWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
 
-        val noteUseCases = EntryPointAccessors.fromApplication(
-            context, WidgetEntryPoint::class.java
-        ).noteUseCases()
+        val entryPoint = EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java)
+        val repository = entryPoint.noteRepository()
+        val mapper = entryPoint.detailedNoteMapper()
+
+        val notesFlow = repository.getTopNotes(10).map { list ->
+            coroutineScope {
+                list.map { noteWithTags ->
+                    async { mapper.toDetailedNote(noteWithTags.note, noteWithTags.tags) }
+                }.map { it.await() }
+            }
+        }
 
         provideContent {
-
-            val notes by noteUseCases.getTopNotes(10)
-                .collectAsState(initial = emptyList())
-
+            val notes by notesFlow.collectAsState(initial = emptyList())
             GlanceTheme {
                 WidgetContent(notes)
             }
@@ -85,7 +93,7 @@ fun WidgetContent(
         titleBar = {
             WidgetTitleBar(
                 title = context.getString(R.string.title_recent_notes),
-                titleIconRes = R.mipmap.notethepad_launcher_round,
+                titleIconRes = context.resources.getIdentifier("notethepad_launcher_round", "mipmap", context.packageName),
                 titleBarActionIconRes = R.drawable.baseline_refresh_24,
                 titleBarActionIconContentDescription = context.getString(R.string.content_description_refresh_widgets),
             ) {
@@ -120,14 +128,13 @@ private fun Grid(items: List<DetailedNote>) {
             modifier = GlanceModifier
                 .fillMaxSize()
                 .padding(16.dp),
-            contentAlignment = Alignment.BottomEnd // Positions it at the bottom right
+            contentAlignment = Alignment.BottomEnd
         ) {
             val context = LocalContext.current
 
             val intent = Intent(NavigationConstants.ACTION_OPEN_NOTE).apply {
-                setPackage(context.packageName)
-                putExtra(LAUNCH_EDIT_SCREEN, true)
-
+                component = ComponentName(context.packageName, NavigationConstants.MAIN_ACTIVITY_CLASS)
+                putExtra(NavigationConstants.LAUNCH_EDIT_SCREEN, true)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
 
@@ -153,11 +160,14 @@ private fun Grid(items: List<DetailedNote>) {
 @Composable
 fun NoteItemRow(note: DetailedNote) {
     val context = LocalContext.current
-    val intent = Intent(NavigationConstants.ACTION_OPEN_NOTE).apply {
-        setPackage(context.packageName)
-        putExtra(NavigationConstants.EXTRA_NOTE_ID, note.id)
+    // Note item click opens the app at NotesScreen (the start destination)
+    val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+    } ?: Intent(NavigationConstants.ACTION_OPEN_NOTE).apply {
+        component = ComponentName(context.packageName, NavigationConstants.MAIN_ACTIVITY_CLASS)
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
     }
+
     val estimatedHeight = rememberNoteHeight(note)
 
     var containerModifier = GlanceModifier
@@ -180,7 +190,7 @@ fun NoteItemRow(note: DetailedNote) {
                     colorFilter = ColorFilter.tint(ColorProvider(Color(note.color)))
                 )
                 .padding(8.dp)
-                .clickable(actionStartActivity(intent))
+                .clickable(actionStartActivity(launchIntent))
         ) {
             Text(
                 text = note.title,
@@ -203,12 +213,12 @@ fun NoteItemRow(note: DetailedNote) {
 @Composable
 fun rememberNoteHeight(note: DetailedNote): Dp {
     val titleHeight = 20.dp
-    val paddingTotal = 12.dp + 12.dp + 4.dp + 4.dp  // top + bottom padding + spacers
+    val paddingTotal = 12.dp + 12.dp + 4.dp + 4.dp
 
     val contentHeight = if (note.content.isBlank()) {
         0.dp
     } else {
-        val charsPerLine = 38  // approx for 12sp in typical width
+        val charsPerLine = 38
         val lines = (note.content.length / charsPerLine + 1).coerceIn(1, 5)
         (lines * 18).dp
     }
@@ -244,7 +254,6 @@ private fun NoteListContentPreview() {
                 timestamp = 123,
                 color = NoteColors.colors[2].toArgb()
             ),
-
             DetailedNote(
                 title = "Remember to call landlord",
                 content = "Repairing basin and pipes",
@@ -258,20 +267,6 @@ private fun NoteListContentPreview() {
                 timestamp = 123,
                 color = NoteColors.colors[2].toArgb()
             ),
-
-            DetailedNote(
-                title = "Remember to call landlord",
-                content = "Repairing basin and pipes",
-                timestamp = 123,
-                color = NoteColors.colors[1].toArgb()
-            ),
-            DetailedNote(
-                title = "Remember to call landlord",
-                content = "Repairing basin and pipes",
-                timestamp = 123,
-                color = NoteColors.colors[3].toArgb(),
-                reminderTime = 1234556
-            )
         )
     )
 }

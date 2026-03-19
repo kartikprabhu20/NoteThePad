@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.mintanable.notethepad.core.common.NavigationConstants.EXTRA_NOTE_ID
 
 class ReminderReceiver : BroadcastReceiver() {
 
@@ -16,8 +17,6 @@ class ReminderReceiver : BroadcastReceiver() {
         const val NOTE_TITLE = "NOTE_TITLE"
         const val NOTE_CONTENT = "NOTE_CONTENT"
         const val CHANNEL_ID = "note_reminders"
-        const val TARGET_NOTE_ID = "TARGET_NOTE_ID"
-        const val LAUNCH_EDIT_SCREEN = "LAUNCH_EDIT_SCREEN"
     }
 
     @SuppressLint("ServiceCast")
@@ -36,7 +35,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val clickIntent = Intent().apply {
             setClassName(context.packageName, "com.mintanable.notethepad.MainActivity")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(TARGET_NOTE_ID, noteId)
+            putExtra(EXTRA_NOTE_ID, noteId)
         }
 
         val pendingIntent = PendingIntent.getActivity(

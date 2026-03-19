@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_widgets.presentation
+package com.mintanable.notethepad.feature_note.presentation.widget
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
