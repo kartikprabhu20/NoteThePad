@@ -24,9 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.core.model.Attachment
 import com.mintanable.notethepad.core.model.MediaState
+import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews

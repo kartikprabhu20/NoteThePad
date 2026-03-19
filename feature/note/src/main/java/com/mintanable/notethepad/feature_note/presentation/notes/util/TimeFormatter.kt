@@ -1,7 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.notes.util
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

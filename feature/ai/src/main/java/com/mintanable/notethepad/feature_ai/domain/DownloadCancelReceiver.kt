@@ -6,8 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.work.WorkManager
-import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker
+import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -9,13 +9,12 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
-import androidx.work.workDataOf
-import kotlinx.coroutines.delay
 import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_MODEL_NOTIFICATION_ID
 import com.mintanable.notethepad.feature_ai.R
@@ -23,6 +22,7 @@ import com.mintanable.notethepad.feature_ai.domain.DownloadCancelReceiver
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request

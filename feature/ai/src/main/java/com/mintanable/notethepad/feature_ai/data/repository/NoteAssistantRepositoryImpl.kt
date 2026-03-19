@@ -1,9 +1,9 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
+import com.mintanable.notethepad.core.model.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
-import com.mintanable.notethepad.core.model.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import kotlinx.coroutines.flow.Flow

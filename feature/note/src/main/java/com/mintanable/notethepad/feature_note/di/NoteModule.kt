@@ -1,10 +1,8 @@
 package com.mintanable.notethepad.feature_note.di
 
 import android.content.Context
-import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.file.FileManager
 import com.mintanable.notethepad.database.repository.NoteRepository
-import com.mintanable.notethepad.database.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl

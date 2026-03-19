@@ -1,13 +1,13 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
 import android.util.Log
-import androidx.work.WorkManager
 import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.mintanable.notethepad.core.model.LoadStatus
 import com.mintanable.notethepad.core.model.LoadType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 fun WorkManager.getLoadStatusFLow(
     workName: String,

@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope

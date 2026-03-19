@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_backup.data.repository
 import android.accounts.Account
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -12,20 +13,19 @@ import com.google.android.gms.auth.api.identity.AuthorizationResult
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.Scope
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.DriveScopes
 import com.mintanable.notethepad.core.security.CryptoManager
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
-import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import kotlinx.coroutines.flow.first
-import android.util.Log
-import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest
 import com.mintanable.notethepad.feature_note.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class GoogleAuthRepositoryImpl @Inject constructor(
     private val cryptoManager: CryptoManager,

@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,9 +40,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.core.model.CheckboxItem
 import com.mintanable.notethepad.core.model.NoteColors
+import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 import java.util.UUID

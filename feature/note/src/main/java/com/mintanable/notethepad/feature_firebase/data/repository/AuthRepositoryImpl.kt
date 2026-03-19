@@ -2,17 +2,17 @@ package com.mintanable.notethepad.feature_firebase.data.repository
 
 import android.util.Log
 import androidx.credentials.exceptions.ClearCredentialException
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.FacebookAuthProvider
 import com.mintanable.notethepad.core.model.User
 import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth

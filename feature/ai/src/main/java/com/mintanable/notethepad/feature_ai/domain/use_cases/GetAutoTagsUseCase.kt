@@ -2,8 +2,8 @@ package com.mintanable.notethepad.feature_ai.domain.use_cases
 
 import android.util.Log
 import com.mintanable.notethepad.database.repository.NoteRepository
-import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
+import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext

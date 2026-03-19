@@ -2,13 +2,13 @@ package com.mintanable.notethepad.helper
 
 import androidx.collection.LruCache
 import androidx.core.net.toUri
+import com.mintanable.notethepad.core.common.CheckboxConvertors
+import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.model.Attachment
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.Note
 import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.database.util.AudioMetadataProvider
-import com.mintanable.notethepad.core.common.DispatcherProvider
-import com.mintanable.notethepad.core.common.CheckboxConvertors
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext

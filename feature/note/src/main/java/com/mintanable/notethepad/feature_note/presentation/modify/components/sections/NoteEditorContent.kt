@@ -28,8 +28,8 @@ import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -44,11 +44,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.mintanable.notethepad.feature_note.R
-import com.mintanable.notethepad.core.model.CheckboxItem
-import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.core.model.Attachment
+import com.mintanable.notethepad.core.model.CheckboxItem
 import com.mintanable.notethepad.core.model.MediaState
+import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.MagicButton

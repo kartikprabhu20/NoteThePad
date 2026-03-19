@@ -1,8 +1,8 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
 import com.mintanable.notethepad.core.model.DetailedNote
-import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.core.model.NoteOrder
+import com.mintanable.notethepad.core.model.Tag
 
 sealed class NotesEvent {
     data class Order(val noteOrder: NoteOrder) : NotesEvent()

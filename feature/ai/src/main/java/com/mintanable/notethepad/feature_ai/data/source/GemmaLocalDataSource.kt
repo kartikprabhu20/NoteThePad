@@ -4,11 +4,10 @@ import android.content.Context
 import android.util.Log
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Contents
+import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
-import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.SamplerConfig
-import com.google.ai.edge.litertlm.Message
 import com.mintanable.notethepad.core.model.AiModel
 import com.mintanable.notethepad.core.model.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext

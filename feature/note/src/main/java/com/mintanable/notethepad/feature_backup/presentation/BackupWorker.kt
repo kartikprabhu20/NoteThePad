@@ -3,23 +3,23 @@ package com.mintanable.notethepad.feature_backup.presentation
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
-import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
-import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
-import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
+import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.mintanable.notethepad.core.model.LoadStatus
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_ID
 import com.mintanable.notethepad.database.NoteDatabase
+import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
+import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
+import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
 import com.mintanable.notethepad.feature_note.R
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 @HiltWorker
 class BackupWorker @AssistedInject constructor(

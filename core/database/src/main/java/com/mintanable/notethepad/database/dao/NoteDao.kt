@@ -1,6 +1,12 @@
 package com.mintanable.notethepad.database.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.mintanable.notethepad.core.model.Note
 import com.mintanable.notethepad.core.model.NoteTagCrossRef
 import com.mintanable.notethepad.core.model.NoteWithTags

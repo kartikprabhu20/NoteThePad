@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.HorizontalDivider
@@ -55,9 +54,9 @@ import coil3.request.crossfade
 import com.mintanable.notethepad.core.common.AppVersionProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
+import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.core.model.User
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
-import com.mintanable.notethepad.core.model.Tag
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews

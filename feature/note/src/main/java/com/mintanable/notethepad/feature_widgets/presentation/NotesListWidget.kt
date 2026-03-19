@@ -36,9 +36,9 @@ import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.core.common.NavigationConstants
-import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.NoteColors
+import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.domain.util.CheckboxConvertors
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow

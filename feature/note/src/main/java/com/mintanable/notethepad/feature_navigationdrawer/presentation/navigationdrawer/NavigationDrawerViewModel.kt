@@ -2,8 +2,11 @@ package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigati
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
+import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,12 +14,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-import android.util.Log
-import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
-import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOn
 
 @HiltViewModel
 class NavigationDrawerViewModel @Inject constructor(
