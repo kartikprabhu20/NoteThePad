@@ -28,7 +28,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
 import java.security.MessageDigest
-import kotlin.jvm.java
 
 @HiltWorker
 class ModelDownloadWorker @AssistedInject constructor(

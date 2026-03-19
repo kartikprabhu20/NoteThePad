@@ -1,4 +1,4 @@
-package com.mintanable.notethepad
+package com.mintanable.notethepad.feature_widgets.presentation
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
@@ -12,7 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel

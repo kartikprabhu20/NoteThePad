@@ -7,10 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mintanable.notethepad.core.model.ThemeMode
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
+import com.mintanable.notethepad.feature_widgets.presentation.NoteWidgetConfigScreen
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_widgets.repository.NoteWidgetPrefs
 import com.mintanable.notethepad.theme.NoteThePadTheme
@@ -46,7 +47,7 @@ class NoteWidgetConfigActivity : AppCompatActivity() {
                 NoteWidgetConfigScreen(onNoteClicked = { note ->
                     note.id?.let {
                         saveAndFinish(it)
-                    } ?:  setResult(RESULT_CANCELED)
+                    } ?: setResult(RESULT_CANCELED)
 
                 })
             }
