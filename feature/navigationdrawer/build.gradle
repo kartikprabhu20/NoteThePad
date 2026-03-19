@@ -7,12 +7,8 @@ plugins {
 }
 
 android {
-    namespace 'com.mintanable.notethepad.feature_settings'
+    namespace 'com.mintanable.notethepad.feature_navigationdrawer'
     compileSdk 35
-
-    buildFeatures {
-        buildConfig = true
-    }
 
     defaultConfig {
         minSdk 26
@@ -32,34 +28,25 @@ android {
 
 dependencies {
     implementation project(':core:model')
-    implementation project(':core:database')
     implementation project(':core:common')
+    implementation project(':core:database')
     implementation project(':core:ui')
-    implementation project(':feature:ai')
-    implementation project(':feature:backup')
-    implementation project(':feature:auth')
 
-    // Compose and UI
+    // Compose
     def composeBom = platform('androidx.compose:compose-bom:2026.03.00')
     implementation composeBom
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.material3:material3'
-    implementation 'androidx.compose.material:material-android:1.10.5'
     implementation "androidx.compose.material:material-icons-extended"
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.compose.ui:ui-tooling:1.10.3'
+
+    // Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.57"
     ksp "com.google.dagger:hilt-android-compiler:2.57"
-
-    // DataStore
-    implementation "androidx.datastore:datastore-preferences:1.2.0"
-
-    //Work
-    implementation 'androidx.work:work-runtime-ktx:2.11.1'
-
-    //Google
-    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
-
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.4'
 }

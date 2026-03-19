@@ -75,41 +75,38 @@ android {
         }
     }
 }
+android.applicationVariants.all { variant ->
+    def type = variant.buildType.name
+    def variantName = variant.name.capitalize()
 
-afterEvaluate {
-    android.applicationVariants.configureEach { variant ->
-        def type = variant.buildType.name
-        def variantName = variant.name.capitalize()
+    // Handle AAB Renaming
+    tasks.matching { it.name == "bundle${variantName}" }.configureEach { bundleTask ->
+        bundleTask.doLast {
+            def buildDir = layout.buildDirectory.get().asFile
+            def bundleDir = new File(buildDir, "outputs/bundle/${type}")
+            def oldFile = new File(bundleDir, "app-${type}.aab")
+            def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
 
-        def bundleTaskName = "bundle${variantName}"
-        tasks.matching { it.name == bundleTaskName }.all { bundleTask ->
-            bundleTask.doLast {
-                def buildDir = layout.buildDirectory.get().asFile
-                def bundleDir = new File(buildDir, "outputs/bundle/${type}")
-                def oldFile = new File(bundleDir, "app-${type}.aab")
-                def newFile = new File(bundleDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.aab")
-
-                if (oldFile.exists()) {
-                    oldFile.renameTo(newFile)
-                    println "🚀 Renamed Bundle to: ${newFile.name}"
-                }
+            if (oldFile.exists()) {
+                oldFile.renameTo(newFile)
+                println "🚀 Renamed Bundle to: ${newFile.name}"
             }
         }
+    }
 
-        def assembleTaskName = "assemble${variantName}"
-        tasks.matching { it.name == assembleTaskName }.all { assembleTask ->
-            assembleTask.doLast {
-                def buildDir = layout.buildDirectory.get().asFile
-                def apkDir = new File(buildDir, "outputs/apk/${type}")
-                def oldFile = new File(apkDir, "app-${type}.apk")
+    // Handle APK Renaming
+    tasks.matching { it.name == "assemble${variantName}" }.configureEach { assembleTask ->
+        assembleTask.doLast {
+            def buildDir = layout.buildDirectory.get().asFile
+            def apkDir = new File(buildDir, "outputs/apk/${type}")
+            def oldFile = new File(apkDir, "app-${type}.apk")
 
-                if (!oldFile.exists()) oldFile = new File(apkDir, "app-${type}-unsigned.apk")
-                def newFile = new File(apkDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.apk")
+            if (!oldFile.exists()) oldFile = new File(apkDir, "app-${type}-unsigned.apk")
+            def newFile = new File(apkDir, "NoteThePad-v${variant.versionName}-b${variant.versionCode}-${type}.apk")
 
-                if (oldFile.exists()) {
-                    oldFile.renameTo(newFile)
-                    println "🚀 Renamed APK to: ${newFile.name}"
-                }
+            if (oldFile.exists()) {
+                oldFile.renameTo(newFile)
+                println "🚀 Renamed APK to: ${newFile.name}"
             }
         }
     }
@@ -139,12 +136,15 @@ dependencies {
     implementation project(':core:security')
     implementation project(':core:ui')
     implementation project(':feature:note')
+    implementation project(':feature:backup')
+    implementation project(':feature:auth')
+    implementation project(':feature:navigationdrawer')
+    implementation project(':feature:widgets')
     implementation project(':feature:ai')
     implementation project(':feature:settings')
 
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
-    implementation 'androidx.compose.material3:material3-android:1.4.0'
     implementation 'androidx.work:work-runtime-ktx:2.11.1'
 
     def composeBom = platform('androidx.compose:compose-bom:2024.02.01')

@@ -1,12 +1,12 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
 import android.content.Context
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
+import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.NoteOrder
 import com.mintanable.notethepad.core.model.OrderType
@@ -16,7 +16,6 @@ import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
-import com.mintanable.notethepad.feature_widgets.presentation.NoteListWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,7 +45,8 @@ class NotesViewModel @Inject constructor(
     getLayoutSettings: GetLayoutSettings,
     private val toggleLayoutSettings: ToggleLayoutSettings,
     private val fileIOUseCases: FileIOUseCases,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val widgetRefresher: WidgetRefresher
 ) : ViewModel() {
 
     private val _filterState = MutableStateFlow(
@@ -204,7 +204,7 @@ class NotesViewModel @Inject constructor(
 
     suspend fun updateNoteWidget(context: Context) {
         delay(300)
-        NoteListWidget().updateAll(context)
+        widgetRefresher.refresh(context)
     }
 
     sealed class UiEvent {

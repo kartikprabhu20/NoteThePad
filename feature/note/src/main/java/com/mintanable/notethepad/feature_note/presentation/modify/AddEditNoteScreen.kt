@@ -2,8 +2,6 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.Manifest
 import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -68,9 +66,6 @@ import com.mintanable.notethepad.feature_settings.presentation.components.Permis
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
 import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
-import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
-import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver.Companion.PINNING_ACTION
-import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver.Companion.PINNING_NOTE_ID
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -82,7 +77,8 @@ fun AddEditNoteScreen(
     noteId: Long,
     viewModel: AddEditNoteViewModel = hiltViewModel(),
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedContentScope
+    animatedVisibilityScope: AnimatedContentScope,
+    onPinWidget: (Long) -> Unit = {}
 ){
     val context = LocalContext.current
 
@@ -223,7 +219,7 @@ fun AddEditNoteScreen(
                 }
 
                 is AddEditNoteViewModel.UiEvent.RequestWidgetPin -> {
-                    event.noteId?.let { pinSingleNoteWidget(context, it) }
+                    event.noteId?.let { onPinWidget(it) }
                 }
             }
         }
@@ -468,25 +464,3 @@ fun AddEditNoteScreen(
     SavingOverlay(uiState.isSaving)
 }
 
-private fun pinSingleNoteWidget(context: Context, noteId: Long) {
-    val appWidgetManager = AppWidgetManager.getInstance(context)
-    val myProvider = ComponentName(context, SingleNoteWidgetReceiver::class.java)
-
-    if (appWidgetManager.isRequestPinAppWidgetSupported) {
-        val successCallback = Intent(context, SingleNoteWidgetReceiver::class.java).apply {
-            putExtra(PINNING_NOTE_ID, noteId)
-            action = PINNING_ACTION
-        }
-
-        val successPendingIntent = PendingIntent.getBroadcast(
-            context,
-            noteId.toInt(),
-            successCallback,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        appWidgetManager.requestPinAppWidget(myProvider, null, successPendingIntent)
-    } else {
-        Toast.makeText(context, "Pinned widgets are not supported on this launcher", Toast.LENGTH_SHORT).show()
-    }
-}

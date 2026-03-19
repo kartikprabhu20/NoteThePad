@@ -1,5 +1,8 @@
 package com.mintanable.notethepad
 
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -36,6 +39,7 @@ import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper
 import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
+import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
@@ -130,7 +134,24 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@composable,
-                                    appVersionProvider = AndroidAppVersionProvider()
+                                    appVersionProvider = AndroidAppVersionProvider(),
+                                    onPinWidget = { note ->
+                                        val appWidgetManager = AppWidgetManager.getInstance(this@MainActivity)
+                                        val provider = ComponentName(this@MainActivity, SingleNoteWidgetReceiver::class.java)
+                                        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                            val callback = Intent(this@MainActivity, SingleNoteWidgetReceiver::class.java).apply {
+                                                putExtra(SingleNoteWidgetReceiver.PINNING_NOTE_ID, note.id)
+                                                action = SingleNoteWidgetReceiver.PINNING_ACTION
+                                            }
+                                            val pendingIntent = PendingIntent.getBroadcast(
+                                                this@MainActivity, note.id?.toInt() ?: 0, callback,
+                                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                            )
+                                            appWidgetManager.requestPinAppWidget(provider, null, pendingIntent)
+                                        } else {
+                                            Toast.makeText(this@MainActivity, "Pinned widgets are not supported on this launcher", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 )
                             }
                             composable(
@@ -143,7 +164,24 @@ class MainActivity : AppCompatActivity() {
                                     noteId = it.arguments?.getLong("noteId") ?: 0L,
                                     navController = navController,
                                     sharedTransitionScope = this@SharedTransitionLayout,
-                                    animatedVisibilityScope = this@composable
+                                    animatedVisibilityScope = this@composable,
+                                    onPinWidget = { noteId ->
+                                        val appWidgetManager = AppWidgetManager.getInstance(this@MainActivity)
+                                        val provider = ComponentName(this@MainActivity, SingleNoteWidgetReceiver::class.java)
+                                        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                            val callback = Intent(this@MainActivity, SingleNoteWidgetReceiver::class.java).apply {
+                                                putExtra(SingleNoteWidgetReceiver.PINNING_NOTE_ID, noteId)
+                                                action = SingleNoteWidgetReceiver.PINNING_ACTION
+                                            }
+                                            val pendingIntent = PendingIntent.getBroadcast(
+                                                this@MainActivity, noteId.toInt(), callback,
+                                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                            )
+                                            appWidgetManager.requestPinAppWidget(provider, null, pendingIntent)
+                                        } else {
+                                            Toast.makeText(this@MainActivity, "Pinned widgets are not supported on this launcher", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 )
                             }
                             composable(route = Screen.FirebaseLoginScreen.route) {
@@ -151,6 +189,7 @@ class MainActivity : AppCompatActivity() {
 
                                 LoginScreen(
                                     navController = navController,
+                                    currentTheme = state.settings.themeMode,
                                     onGoogleSigInClick = {
                                         lifecycleScope.launch {
                                             val token = credentialHelper.getGoogleCredential()

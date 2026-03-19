@@ -82,7 +82,8 @@ fun NotesScreen(
     onLogOut: suspend () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
-    appVersionProvider: AppVersionProvider
+    appVersionProvider: AppVersionProvider,
+    onPinWidget: (com.mintanable.notethepad.core.model.Note) -> Unit = {}
 ) {
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
@@ -116,7 +117,7 @@ fun NotesScreen(
         notesViewModel.updateNoteWidget(context)
     }
     val snackBarHostState = remember { SnackbarHostState() }
-    EvenHandler(snackBarHostState = snackBarHostState)
+    EvenHandler(snackBarHostState = snackBarHostState, onPinWidget = onPinWidget)
 
     if (showLabelDialog) {
         EditTextDialog(
