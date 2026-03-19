@@ -13,7 +13,7 @@ import androidx.work.workDataOf
 import com.mintanable.notethepad.core.model.LoadStatus
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_ID
-import com.mintanable.notethepad.database.NoteDatabase
+import com.mintanable.notethepad.database.db.NoteDatabase
 import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository

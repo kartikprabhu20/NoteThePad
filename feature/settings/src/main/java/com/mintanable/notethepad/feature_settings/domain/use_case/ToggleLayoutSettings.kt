@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_settings.domain.use_case
 
-import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import javax.inject.Inject
 
 class ToggleLayoutSettings @Inject constructor(

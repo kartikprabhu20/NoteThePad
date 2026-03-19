@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
-import com.mintanable.notethepad.core.file.FileManager
+import com.mintanable.notethepad.file.FileManager
 import java.io.File
 import javax.inject.Inject
 

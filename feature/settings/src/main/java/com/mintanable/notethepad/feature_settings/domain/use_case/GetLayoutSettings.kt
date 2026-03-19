@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_settings.domain.use_case
 
-import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

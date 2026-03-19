@@ -5,7 +5,7 @@ import com.mintanable.notethepad.feature_settings.domain.use_case.GetMicrophoneP
 import com.mintanable.notethepad.feature_settings.domain.use_case.MarkCameraPermissionFlag
 import com.mintanable.notethepad.feature_settings.domain.use_case.MarkMicrophonePermissionFlag
 import com.mintanable.notethepad.feature_settings.domain.use_case.PermissionUsecases
-import com.mintanable.notethepad.preference.repository.SharedPreferencesRepository
+import com.mintanable.notethepad.database.preference.repository.SharedPreferencesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

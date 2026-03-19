@@ -2,7 +2,7 @@ package com.mintanable.notethepad.feature_ai.di
 
 import android.content.Context
 import com.mintanable.notethepad.core.common.DispatcherProvider
-import com.mintanable.notethepad.database.repository.NoteRepository
+import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_ai.BuildConfig
 import com.mintanable.notethepad.feature_ai.data.repository.AiModelRepositoryImpl
 import com.mintanable.notethepad.feature_ai.data.repository.NoteAssistantRepositoryImpl
@@ -12,7 +12,7 @@ import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
-import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -31,7 +31,7 @@ import com.mintanable.notethepad.feature_settings.presentation.BackupUiState
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsState
 import com.mintanable.notethepad.feature_settings.presentation.getLoadStatusFLow
-import com.mintanable.notethepad.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

@@ -3,7 +3,7 @@ package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigati
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
-import com.mintanable.notethepad.database.repository.NoteRepository
+import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

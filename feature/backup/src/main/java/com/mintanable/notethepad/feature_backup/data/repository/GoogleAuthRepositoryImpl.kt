@@ -17,7 +17,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.DriveScopes
-import com.mintanable.notethepad.core.security.CryptoManager
+import com.mintanable.notethepad.security.CryptoManager
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext

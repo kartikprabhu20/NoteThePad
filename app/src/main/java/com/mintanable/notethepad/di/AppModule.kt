@@ -2,6 +2,7 @@ package com.mintanable.notethepad.di
 
 import com.mintanable.notethepad.AndroidAppVersionProvider
 import com.mintanable.notethepad.core.common.AppVersionProvider
+import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_navigationdrawer.data.repository.NavigationDrawerItemRepositoryImpl
 import com.mintanable.notethepad.feature_navigationdrawer.domain.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
@@ -19,7 +20,7 @@ object AppModule {
     @Singleton
     fun provideGetNavigationDrawerItemsUseCase(
         repository: NavigationDrawerItemRepository,
-        noteRepository: com.mintanable.notethepad.database.repository.NoteRepository
+        noteRepository: NoteRepository
     ): GetNavigationDrawerItems {
         return GetNavigationDrawerItems(repository, noteRepository)
     }

@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_settings.domain.use_case
 
-import com.mintanable.notethepad.preference.repository.SharedPreferencesRepository
+import com.mintanable.notethepad.database.preference.repository.SharedPreferencesRepository
 import javax.inject.Inject
 
 class MarkMicrophonePermissionFlag @Inject constructor(

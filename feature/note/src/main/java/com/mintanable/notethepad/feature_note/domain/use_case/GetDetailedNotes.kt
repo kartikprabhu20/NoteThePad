@@ -2,8 +2,8 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 
 import com.mintanable.notethepad.core.model.DetailedNote
 import com.mintanable.notethepad.core.model.NoteOrder
-import com.mintanable.notethepad.database.repository.NoteRepository
-import com.mintanable.notethepad.helper.DetailedNoteMapper
+import com.mintanable.notethepad.database.db.repository.NoteRepository
+import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest

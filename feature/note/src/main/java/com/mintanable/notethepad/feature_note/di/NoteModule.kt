@@ -1,8 +1,8 @@
 package com.mintanable.notethepad.feature_note.di
 
 import android.content.Context
-import com.mintanable.notethepad.core.file.FileManager
-import com.mintanable.notethepad.database.repository.NoteRepository
+import com.mintanable.notethepad.file.FileManager
+import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl
@@ -25,7 +25,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.SaveMediaToStorage
 import com.mintanable.notethepad.feature_note.domain.use_case.SaveNoteWithAttachments
 import com.mintanable.notethepad.feature_note.domain.use_case.SaveTag
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
-import com.mintanable.notethepad.helper.DetailedNoteMapper
+import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

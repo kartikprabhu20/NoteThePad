@@ -14,7 +14,7 @@ import com.mintanable.notethepad.core.model.AttachmentType
 import com.mintanable.notethepad.core.model.CheckboxItem
 import com.mintanable.notethepad.core.model.NoteColors
 import com.mintanable.notethepad.core.model.Tag
-import com.mintanable.notethepad.database.util.AudioMetadataProvider
+import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder

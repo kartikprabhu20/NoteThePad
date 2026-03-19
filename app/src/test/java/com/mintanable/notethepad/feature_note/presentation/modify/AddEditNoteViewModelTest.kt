@@ -20,7 +20,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.core.model.AttachmentType
 import com.mintanable.notethepad.core.model.MediaState
-import com.mintanable.notethepad.database.util.AudioMetadataProvider
+import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_settings.domain.use_case.PermissionUsecases
 import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
 import io.mockk.coEvery

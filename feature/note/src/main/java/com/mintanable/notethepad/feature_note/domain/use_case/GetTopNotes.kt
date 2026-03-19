@@ -1,8 +1,8 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
 import com.mintanable.notethepad.core.model.DetailedNote
-import com.mintanable.notethepad.database.repository.NoteRepository
-import com.mintanable.notethepad.helper.DetailedNoteMapper
+import com.mintanable.notethepad.database.db.repository.NoteRepository
+import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
