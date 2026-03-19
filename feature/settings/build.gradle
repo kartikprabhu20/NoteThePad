@@ -48,8 +48,8 @@ dependencies {
     implementation 'androidx.compose.ui:ui-tooling:1.10.3'
 
     // Hilt
-    implementation "com.google.dagger:hilt-android:2.52"
-    ksp "com.google.dagger:hilt-android-compiler:2.52"
+    implementation "com.google.dagger:hilt-android:2.57"
+    ksp "com.google.dagger:hilt-android-compiler:2.57"
 
     // DataStore
     implementation "androidx.datastore:datastore-preferences:1.2.0"
