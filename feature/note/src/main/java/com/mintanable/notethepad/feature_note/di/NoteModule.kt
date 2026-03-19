@@ -72,15 +72,6 @@ object NoteModule {
 
     @Provides
     @Singleton
-    fun provideDetailedNoteMapper(
-        audioMetadataProvider: AudioMetadataProvider,
-        dispatchers: DispatcherProvider
-    ): DetailedNoteMapper {
-        return DetailedNoteMapper(audioMetadataProvider, dispatchers)
-    }
-
-    @Provides
-    @Singleton
     fun provideAudioRecorder(@ApplicationContext context: Context): AudioRecorder {
         return AndroidAudioRecorder(context)
     }
