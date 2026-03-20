@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Permission Rationale -->
-    <string name="permission_notification_title">Notification permission</string>
-    <string name="permission_notification_msg">We use notifications to show you the upload progress. Without this, you won’t know if the backup finishes successfully while the app is in the background.</string>
-    <string name="permission_camera_title">Camera permission</string>
-    <string name="permission_camera_msg">We use camera to add images and video to your note item. Without this you won’t be able to attach images/videos directly, instead attach it from gallery</string>
-    <string name="permission_microphone_title">Microphone permission</string>
-    <string name="permission_microphone_msg">We use microphone to record and attach voice notes. Without this you will not be able to create voice notes.</string>
-    <string name="permission_camera_denied_title">Camera Permission Required</string>
-    <string name="permission_camera_denied_msg">You have permanently denied camera access. To take photos for your notes, please enable it in the app settings.</string>
-    <string name="permission_microphone_denied_title">Microphone Permission Required</string>
-    <string name="permission_microphone_denied_msg">You have permanently denied microphone access. To record voice notes, please enable it in the app settings.</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -48,7 +37,4 @@
     <string name="content_description_back">back</string>
     <string name="loading">Loading...</string>
 
-    <!-- Permission Dialogs -->
-    <string name="btn_allow">Allow</string>
-    <string name="btn_not_now">Not Now</string>
 </resources>

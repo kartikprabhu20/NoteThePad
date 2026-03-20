@@ -57,19 +57,17 @@ import com.mintanable.notethepad.core.common.AppVersionProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.settings.ThemeMode
-import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.core.model.settings.DrawerItem
 import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.settings.User
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.notes.components.EditTextDialog
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
 import com.mintanable.notethepad.feature_note.presentation.notes.components.StaggeredNotesList
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TopSearchBar
-import com.mintanable.notethepad.feature_settings.SettingsViewModel
-import com.mintanable.notethepad.feature_settings.presentation.components.EditTextDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,8 +76,8 @@ fun NotesScreen(
     navController: NavController,
     notesViewModel: NotesViewModel = hiltViewModel(),
     navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    user: User? = null,
+    isDarkTheme: Boolean,
     onLogOut: suspend () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
@@ -89,12 +87,9 @@ fun NotesScreen(
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery by notesViewModel.searchInputText.collectAsStateWithLifecycle()
-    val user by authViewModel.currentUser.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
-    val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
-    val settings = settingsState.settings
-    val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
+     val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
     val filterState by notesViewModel.filterState.collectAsStateWithLifecycle()
     val isFiltered = filterState.filter != NotesFilterType.ALL.filter
     val currentOrder = filterState.order
@@ -154,7 +149,6 @@ fun NotesScreen(
                             )
                             else if (item.route == Screen.LogOut.route) {
                                 scope.launch {
-                                    authViewModel.signOut()
                                     onLogOut()
                                 }
                             } else {
@@ -284,9 +278,8 @@ fun NotesScreen(
                             onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) }
                         )
                     } else {
-                        val isDark = settings.themeMode == ThemeMode.DARK
                         val resource =
-                            if (isDark) {
+                            if (isDarkTheme) {
                                 if (searchQuery.isNotEmpty())
                                     R.drawable.search_female_dark
                                 else

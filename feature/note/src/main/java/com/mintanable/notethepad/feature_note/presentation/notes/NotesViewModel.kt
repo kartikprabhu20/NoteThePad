@@ -11,11 +11,11 @@ import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.core.model.note.Tag
-import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
-import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
-import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

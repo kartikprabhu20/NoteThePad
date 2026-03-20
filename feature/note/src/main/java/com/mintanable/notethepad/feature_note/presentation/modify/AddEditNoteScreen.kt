@@ -1,13 +1,10 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.Manifest
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -46,6 +43,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.mintanable.notethepad.components.PermissionRationaleDialog
+import com.mintanable.notethepad.core.common.NavigatationHelper
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.note.AttachmentType
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
@@ -61,11 +60,9 @@ import com.mintanable.notethepad.feature_note.presentation.notes.ImageSourceOpti
 import com.mintanable.notethepad.feature_note.presentation.notes.MoreSettingsOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.ReminderOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOptions
-import com.mintanable.notethepad.feature_settings.presentation.components.EditTextDialog
-import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
-import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
-import com.mintanable.notethepad.feature_settings.presentation.util.NavigatationHelper
-import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
+import com.mintanable.notethepad.feature_note.presentation.notes.components.EditTextDialog
+import com.mintanable.notethepad.permissions.DeniedType
+import com.mintanable.notethepad.permissions.PermissionRationaleType
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -79,7 +76,7 @@ fun AddEditNoteScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
     onPinWidget: (Long) -> Unit = {}
-){
+) {
     val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -138,7 +135,8 @@ fun AddEditNoteScreen(
         )
 
         if (!cameraPermissionState.status.isGranted &&
-            !cameraPermissionState.status.shouldShowRationale) {
+            !cameraPermissionState.status.shouldShowRationale
+        ) {
             cameraPermissionState.launchPermissionRequest()
         }
     }
@@ -151,7 +149,8 @@ fun AddEditNoteScreen(
         )
         // Physical trigger for first-time system popup
         if (!microphonePermissionState.status.isGranted &&
-            !microphonePermissionState.status.shouldShowRationale) {
+            !microphonePermissionState.status.shouldShowRationale
+        ) {
             microphonePermissionState.launchPermissionRequest()
         }
     }
@@ -167,13 +166,14 @@ fun AddEditNoteScreen(
     }
 
     val focusManager = LocalFocusManager.current
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
-            when(event){
-                is AddEditNoteViewModel.UiEvent.ShowSnackbar->{
-                    snackBarHostState.showSnackbar( message = event.message)
+            when (event) {
+                is AddEditNoteViewModel.UiEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(message = event.message)
                 }
-                is AddEditNoteViewModel.UiEvent.SaveNote->{
+
+                is AddEditNoteViewModel.UiEvent.SaveNote -> {
                     focusManager.clearFocus()
                     withContext(NonCancellable) {
                         if (sheetState.isVisible) {
@@ -188,7 +188,7 @@ fun AddEditNoteScreen(
                     hideSheetAndNavigate {
                         viewModel.onEvent(AddEditNoteEvent.StopMedia)
                         navController.navigate(
-                            Screen.AddEditNoteScreen.passArgs(noteId=event.newNoteId)
+                            Screen.AddEditNoteScreen.passArgs(noteId = event.newNoteId)
                         ) {
                             popUpTo(Screen.AddEditNoteScreen.route + "?noteId={noteId}") {
                                 inclusive = true
@@ -196,6 +196,7 @@ fun AddEditNoteScreen(
                         }
                     }
                 }
+
                 is AddEditNoteViewModel.UiEvent.DeleteNote -> {
                     withContext(NonCancellable) {
                         hideSheetAndNavigate {
@@ -204,9 +205,11 @@ fun AddEditNoteScreen(
                         }
                     }
                 }
+
                 is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
                     viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.AUDIO_RECORDER))
                 }
+
                 is AddEditNoteViewModel.UiEvent.LaunchCamera -> {
                     val uri = viewModel.generateTempUri(event.type)
                     if (event.type == AttachmentType.IMAGE) {
@@ -227,19 +230,22 @@ fun AddEditNoteScreen(
 
     BackHandler {
         viewModel.onEvent(AddEditNoteEvent.StopMedia)
-        if(uiState.zoomedImageUri == null){
+        if (uiState.zoomedImageUri == null) {
             navController.navigateUp()
         }
         when {
             uiState.zoomedImageUri != null -> {
                 viewModel.onEvent(AddEditNoteEvent.StopMedia)
             }
+
             uiState.currentSheetType != BottomSheetType.NONE && uiState.isRecording -> {
                 viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
             }
+
             uiState.currentSheetType != BottomSheetType.NONE -> {
                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
             }
+
             else -> {
                 viewModel.onEvent(AddEditNoteEvent.StopMedia)
                 navController.navigateUp()
@@ -250,26 +256,27 @@ fun AddEditNoteScreen(
     val onEvent = remember { { event: AddEditNoteEvent -> viewModel.onEvent(event) } }
 
     Box(modifier = Modifier.fillMaxSize()) {
-            NoteEditorContent(
-                noteId = noteId,
-                noteColor = uiState.noteColor,
-                attachedImages = uiState.attachedImages,
-                titleState = uiState.titleState,
-                contentState = uiState.contentState,
-                isCheckboxListAvailable = uiState.isCheckboxListAvailable,
-                checkListItems = uiState.checkListItems,
-                attachedAudios = uiState.attachedAudios,
-                mediaState = uiState.mediaState,
-                reminderTime = uiState.reminderTime,
-                tags = uiState.tags,
-                suggestedTags = uiState.suggestedTags,
-                isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
-                onEvent = onEvent,
-                sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope
-            )
+        NoteEditorContent(
+            noteId = noteId,
+            noteColor = uiState.noteColor,
+            attachedImages = uiState.attachedImages,
+            titleState = uiState.titleState,
+            contentState = uiState.contentState,
+            isCheckboxListAvailable = uiState.isCheckboxListAvailable,
+            checkListItems = uiState.checkListItems,
+            attachedAudios = uiState.attachedAudios,
+            mediaState = uiState.mediaState,
+            reminderTime = uiState.reminderTime,
+            tags = uiState.tags,
+            suggestedTags = uiState.suggestedTags,
+            isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
+            onEvent = onEvent,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
 
-        val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val navigationBarHeight =
+            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier
@@ -288,7 +295,7 @@ fun AddEditNoteScreen(
             )
         }
 
-        if(uiState.showAlarmPermissionRationale){
+        if (uiState.showAlarmPermissionRationale) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                     data = Uri.fromParts("package", context.packageName, null)
@@ -297,7 +304,7 @@ fun AddEditNoteScreen(
             }
         }
 
-        if(uiState.showDataAndTimePicker){
+        if (uiState.showDataAndTimePicker) {
             DateAndTimePicker(
                 onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissReminder) },
                 onConfirm = { selectedTimestamp ->
@@ -328,10 +335,10 @@ fun AddEditNoteScreen(
             )
         }
 
-        if (uiState.showAddNewTagDialog){
+        if (uiState.showAddNewTagDialog) {
             EditTextDialog(
-                onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs)} ,
-                onConfirm = {tagName -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tagName))},
+                onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) },
+                onConfirm = { tagName -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tagName)) },
                 tags = existingTags
             )
         }
@@ -372,8 +379,10 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                 },
             sheetState = sheetState,
-            dragHandle = if (uiState.isRecording) null else { { BottomSheetDefaults.DragHandle() } }        ) {
-            if(uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER){
+            dragHandle = if (uiState.isRecording) null else {
+                { BottomSheetDefaults.DragHandle() }
+            }) {
+            if (uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER) {
                 AudioRecorderUI(
                     isRecording = uiState.isRecording,
                     onStartRecordingClicked = {
@@ -387,7 +396,7 @@ fun AddEditNoteScreen(
                 BottomSheetContent(
                     items = sheetItems,
                     optionSelected = { additionalOption ->
-                        when(additionalOption){
+                        when (additionalOption) {
                             AttachmentOptions.IMAGE -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.IMAGE_SOURCES))
                             }
@@ -406,6 +415,7 @@ fun AddEditNoteScreen(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )
                             }
+
                             ImageSourceOptions.PHOTO_CAMERA -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                                 checkAndRequestCameraPermission(AttachmentType.IMAGE)
@@ -453,6 +463,7 @@ fun AddEditNoteScreen(
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                                 viewModel.checkExactAlarmPermission()
                             }
+
                             else -> {}
                         }
                     }

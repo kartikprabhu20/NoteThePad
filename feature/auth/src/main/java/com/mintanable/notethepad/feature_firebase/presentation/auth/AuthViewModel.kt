@@ -2,8 +2,8 @@ package com.mintanable.notethepad.feature_firebase.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.model.settings.User
-import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -54,6 +54,7 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.LoginEmail -> performAuth { repository.loginWithEmail(event.email, event.pass) }
             is AuthEvent.GoogleSignIn -> performAuth { repository.signInWithGoogle(event.idToken) }
             is AuthEvent.FacebookSignIn -> performAuth { repository.signInWithFacebook(event.accessToken) }
+            is AuthEvent.LogOut -> signOut()
         }
     }
 

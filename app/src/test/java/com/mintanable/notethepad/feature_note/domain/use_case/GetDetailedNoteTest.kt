@@ -9,6 +9,7 @@ import com.mintanable.notethepad.core.model.note.NoteWithTags
 import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetDetailedNote
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

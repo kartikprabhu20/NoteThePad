@@ -9,6 +9,7 @@ import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.InvalidNoteException
 import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.SaveNoteWithAttachments
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

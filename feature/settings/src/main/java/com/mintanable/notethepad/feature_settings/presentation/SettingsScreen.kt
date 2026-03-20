@@ -54,12 +54,12 @@ import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.R
 import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
-import com.mintanable.notethepad.feature_settings.presentation.components.PermissionRationaleDialog
+import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
-import com.mintanable.notethepad.feature_settings.presentation.components.TimePickerDialog
-import com.mintanable.notethepad.feature_settings.presentation.util.PermissionRationaleType
+import com.mintanable.notethepad.components.TimePickerDialog
+import com.mintanable.notethepad.permissions.PermissionRationaleType
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import java.util.Locale
 

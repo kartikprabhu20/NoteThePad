@@ -10,24 +10,31 @@ import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerI
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
-import com.mintanable.notethepad.feature_note.domain.use_case.CreateFile
-import com.mintanable.notethepad.feature_note.domain.use_case.CreateUri
-import com.mintanable.notethepad.feature_note.domain.use_case.DeleteFiles
-import com.mintanable.notethepad.feature_note.domain.use_case.DeleteNote
-import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.GetAllTags
-import com.mintanable.notethepad.feature_note.domain.use_case.GetDetailedNote
-import com.mintanable.notethepad.feature_note.domain.use_case.GetDetailedNotes
-import com.mintanable.notethepad.feature_note.domain.use_case.GetNotesWithReminders
-import com.mintanable.notethepad.feature_note.domain.use_case.GetNotesWithTag
-import com.mintanable.notethepad.feature_note.domain.use_case.GetTopNotes
-import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.SaveMediaToStorage
-import com.mintanable.notethepad.feature_note.domain.use_case.SaveNoteWithAttachments
-import com.mintanable.notethepad.feature_note.domain.use_case.SaveTag
-import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.CreateFile
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.CreateUri
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.DeleteFiles
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.DeleteNote
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.GetAllTags
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetDetailedNote
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetDetailedNotes
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetNotesWithReminders
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetNotesWithTag
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetTopNotes
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.SaveMediaToStorage
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.SaveNoteWithAttachments
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.SaveTag
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
+import com.mintanable.notethepad.database.preference.repository.SharedPreferencesRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNavigationDrawerItems
+import com.mintanable.notethepad.feature_note.domain.use_case.permissions.GetCameraPermissionFlag
+import com.mintanable.notethepad.feature_note.domain.use_case.permissions.GetMicrophonePermissionFlag
+import com.mintanable.notethepad.feature_note.domain.use_case.permissions.MarkCameraPermissionFlag
+import com.mintanable.notethepad.feature_note.domain.use_case.permissions.MarkMicrophonePermissionFlag
+import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.DeleteTag
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -65,7 +72,7 @@ object NoteModule {
     ): TagUseCases {
         return TagUseCases(
             getAllTags = GetAllTags(repository),
-            deleteTag = com.mintanable.notethepad.feature_note.domain.use_case.DeleteTag(repository),
+            deleteTag = DeleteTag(repository),
             saveTag = SaveTag(repository)
         )
     }
@@ -106,5 +113,16 @@ object NoteModule {
         noteRepository: NoteRepository
     ): GetNavigationDrawerItems {
         return GetNavigationDrawerItems(repository, noteRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun providePermissionUseCases(repository: SharedPreferencesRepository): PermissionUsecases {
+        return PermissionUsecases(
+            markCameraPermissionFlag = MarkCameraPermissionFlag(repository),
+            getCameraPermissionFlag = GetCameraPermissionFlag(repository),
+            markMicrophonePermissionFlag = MarkMicrophonePermissionFlag(repository),
+            getMicrophonePermissionFlag = GetMicrophonePermissionFlag(repository)
+        )
     }
 }

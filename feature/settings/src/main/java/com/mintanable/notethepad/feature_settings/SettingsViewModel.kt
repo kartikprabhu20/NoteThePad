@@ -25,7 +25,7 @@ import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledB
 import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.DownloadBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
-import com.mintanable.notethepad.feature_firebase.domain.repository.AuthRepository
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.feature_settings.presentation.BackupUiState
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsState

@@ -11,6 +11,7 @@ import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetDetailedNotes
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

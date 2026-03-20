@@ -8,11 +8,11 @@ import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.note.Note
 import com.mintanable.notethepad.core.model.note.Tag
-import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
-import com.mintanable.notethepad.feature_settings.domain.use_case.GetLayoutSettings
-import com.mintanable.notethepad.feature_settings.domain.use_case.ToggleLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
 import com.mintanable.notethepad.ui.util.NotesFilterType
 import io.mockk.coVerify
 import io.mockk.every
@@ -21,7 +21,6 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle

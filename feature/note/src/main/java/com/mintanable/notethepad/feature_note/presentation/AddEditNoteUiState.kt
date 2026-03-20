@@ -7,7 +7,7 @@ import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
-import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
+import com.mintanable.notethepad.permissions.DeniedType
 
 @Stable
 data class AddEditNoteUiState(

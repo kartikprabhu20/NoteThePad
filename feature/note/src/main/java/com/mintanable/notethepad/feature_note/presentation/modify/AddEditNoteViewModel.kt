@@ -20,12 +20,12 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
-import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
+import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
-import com.mintanable.notethepad.feature_settings.domain.use_case.PermissionUsecases
-import com.mintanable.notethepad.feature_settings.presentation.util.DeniedType
+import com.mintanable.notethepad.permissions.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow

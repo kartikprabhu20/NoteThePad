@@ -35,7 +35,7 @@ import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
-import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper
+import com.mintanable.notethepad.core.common.GoogleClientHelper
 import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
@@ -132,14 +132,22 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 )
                             ) {
+
+                                val authViewModel: AuthViewModel = hiltViewModel()
+                                val user by authViewModel.currentUser.collectAsStateWithLifecycle()
+                                val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
+
                                 NotesScreen(
                                     navController = navController,
                                     onLogOut = {
+                                        authViewModel.signOut()
                                         credentialHelper.clearCredentials()
                                         settingsViewModel.onEvent(SettingsEvent.SignOut)
                                     },
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@composable,
+                                    user = user,
+                                    isDarkTheme = settingsState.settings.themeMode == ThemeMode.DARK,
                                     appVersionProvider = AndroidAppVersionProvider(),
                                     onPinWidget = { note ->
                                         val appWidgetManager =
