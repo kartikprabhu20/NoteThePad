@@ -110,7 +110,7 @@ fun NotesScreen(
 
     val context = LocalContext.current
     LaunchedEffect(state.notes, context) {
-        notesViewModel.updateNoteWidget(context)
+        notesViewModel.refreshWidget()
     }
     val snackBarHostState = remember { SnackbarHostState() }
     EvenHandler(snackBarHostState = snackBarHostState, onPinWidget = onPinWidget)

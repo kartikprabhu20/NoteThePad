@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.common
+package com.mintanable.notethepad.feature_firebase
 
 import android.content.Context
 import android.util.Log

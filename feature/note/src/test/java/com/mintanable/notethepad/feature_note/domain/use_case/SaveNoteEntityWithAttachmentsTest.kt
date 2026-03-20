@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.database.db.entity.InvalidNoteException
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
@@ -29,7 +30,7 @@ class SaveNoteWithAttachmentsTest{
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        saveNote = SaveNoteWithAttachments(repository, fileManager, context)
+        saveNote = SaveNoteWithAttachments(repository, fileManager)
         coEvery { repository.insertNote(any(), any()) } returns 1L
     }
 
@@ -59,6 +60,11 @@ class SaveNoteWithAttachmentsTest{
         val newSavedPath2 = "internal/storage/test2.mp4"
 
         // Mock FileManager only for the external one
+        coEvery { fileManager.isInternalUri(internalUri) } returns true
+        coEvery { fileManager.isInternalUri(audioUri) } returns true
+        coEvery { fileManager.isInternalUri(externalUri) } returns false
+        coEvery { fileManager.isInternalUri(externalaudioUri) } returns false
+        coEvery { fileManager.getAttachmentType(any()) } returns AttachmentType.IMAGE
         coEvery { fileManager.saveMediaToStorage(externalUri, any()) } returns newSavedPath1
         coEvery { fileManager.saveMediaToStorage(externalaudioUri, any()) } returns newSavedPath2
 

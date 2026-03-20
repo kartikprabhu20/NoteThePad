@@ -36,7 +36,7 @@ class AndroidMediaPlayer @Inject constructor(
     private var progressJob: Job? = null
 
     private var _player: ExoPlayer? = null
-    val player: ExoPlayer
+    override val exoPlayer: ExoPlayer
         get() = _player ?: createPlayer().also { _player = it }
 
     private fun createPlayer(): ExoPlayer {
@@ -61,7 +61,7 @@ class AndroidMediaPlayer @Inject constructor(
             _mediaState.update { it.copy(isBuffering = state == Player.STATE_BUFFERING)}
 
             if (state == Player.STATE_READY) {
-                _mediaState.update { it.copy(totalDurationMs = player.duration.coerceAtLeast(0L)) }
+                _mediaState.update { it.copy(totalDurationMs = exoPlayer.duration.coerceAtLeast(0L)) }
             }
 
             if (state == Player.STATE_ENDED) {
@@ -72,7 +72,7 @@ class AndroidMediaPlayer @Inject constructor(
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        player.addListener(playerListener)
+        exoPlayer.addListener(playerListener)
     }
 
     override fun onStop(owner: LifecycleOwner) {
@@ -83,16 +83,16 @@ class AndroidMediaPlayer @Inject constructor(
         val currentUriString = uri.toString()
 
         if (_mediaState.value.currentUri == currentUriString) {
-            if (player.isPlaying) {
-                player.pause()
+            if (exoPlayer.isPlaying) {
+                exoPlayer.pause()
             } else {
-                player.play()
+                exoPlayer.play()
                 startProgressUpdate()
             }
             return
         }
 
-        player.apply {
+        exoPlayer.apply {
             stop()
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
@@ -107,9 +107,9 @@ class AndroidMediaPlayer @Inject constructor(
         progressJob?.cancel()
         progressJob = serviceScope.launch {
             while (isActive) {
-                if (player.isPlaying) {
-                    val pos = player.currentPosition.coerceAtLeast(0L)
-                    val dur = player.duration.coerceAtLeast(1L)
+                if (exoPlayer.isPlaying) {
+                    val pos = exoPlayer.currentPosition.coerceAtLeast(0L)
+                    val dur = exoPlayer.duration.coerceAtLeast(1L)
                     val progress = pos.toFloat() / dur.toFloat()
                     _mediaState.update { it.copy(progress = progress) }
                 }
@@ -120,8 +120,8 @@ class AndroidMediaPlayer @Inject constructor(
 
     override fun stop() {
         progressJob?.cancel()
-        player.stop()
-        player.clearMediaItems()
+        exoPlayer.stop()
+        exoPlayer.clearMediaItems()
         _mediaState.update { MediaState() }
     }
 

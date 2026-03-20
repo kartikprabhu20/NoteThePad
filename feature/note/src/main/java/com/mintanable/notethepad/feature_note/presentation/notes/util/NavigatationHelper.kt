@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.common
+package com.mintanable.notethepad.feature_note.presentation.notes.util
 
 import android.content.Context
 import android.content.Intent

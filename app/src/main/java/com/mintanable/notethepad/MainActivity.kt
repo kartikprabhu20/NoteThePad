@@ -35,7 +35,7 @@ import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
-import com.mintanable.notethepad.core.common.GoogleClientHelper
+import com.mintanable.notethepad.feature_firebase.GoogleClientHelper
 import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver

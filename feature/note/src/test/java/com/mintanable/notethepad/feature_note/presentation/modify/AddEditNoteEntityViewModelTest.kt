@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.focus.FocusState
@@ -53,7 +52,6 @@ class AddEditNoteViewModelTest {
     //Mocks
     private val noteUseCases = mockk<NoteUseCases>(relaxed = true)
     private val savedStateHandle = SavedStateHandle()
-    private val context = mockk<Context>(relaxed = true)
     private val permissionUsecases = mockk<PermissionUsecases>(relaxed = true)
     private val audioRecorder = mockk<AudioRecorder>(relaxed = true)
     private val fileIOUseCases = mockk<FileIOUseCases>(relaxed = true)
@@ -77,7 +75,7 @@ class AddEditNoteViewModelTest {
         every { mediaPlayer.mediaState } returns MutableStateFlow(MediaState())
 
         viewModel = AddEditNoteViewModel(
-            noteUseCases, savedStateHandle, context, permissionUsecases, audioRecorder,
+            noteUseCases, savedStateHandle, permissionUsecases, audioRecorder,
             fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases,
             getAutoTagsUseCase
         )
@@ -114,7 +112,6 @@ class AddEditNoteViewModelTest {
         viewModel = AddEditNoteViewModel(
             noteUseCases,
             realSavedStateHandle,
-            context,
             permissionUsecases,
             audioRecorder,
             fileIOUseCases,
@@ -400,7 +397,6 @@ class AddEditNoteViewModelTest {
     @Test
     fun `RemoveAudio stops player if the removed audio was playing`() = runTest {
         val uriString = "content://audio/1"
-        val uri = uriString.toUri()
 
         val playingState = MediaState(
             currentUri = uriString,
@@ -414,7 +410,7 @@ class AddEditNoteViewModelTest {
                 awaitItem()
             } else currentState
 
-            viewModel.onEvent(AddEditNoteEvent.RemoveAudio(uri))
+            viewModel.onEvent(AddEditNoteEvent.RemoveAudio(uriString))
             advanceUntilIdle()
             verify(exactly = 1) { mediaPlayer.stop() }
         }
@@ -452,7 +448,7 @@ class AddEditNoteViewModelTest {
             reminderTime = 5000L
         )
         coEvery { noteUseCases.getDetailedNote(noteId) } returns detailedNote
-        viewModel = AddEditNoteViewModel(noteUseCases, handle, context, permissionUsecases, audioRecorder,
+        viewModel = AddEditNoteViewModel(noteUseCases, handle, permissionUsecases, audioRecorder,
             fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler, tagUseCases, getAutoTagsUseCase)
         advanceUntilIdle()
         viewModel.onEvent(AddEditNoteEvent.CancelReminder)

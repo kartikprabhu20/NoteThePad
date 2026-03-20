@@ -10,7 +10,7 @@ import javax.inject.Inject
 class GlanceWidgetRefresher @Inject constructor(
     @ApplicationContext private val context: Context
 ) : WidgetRefresher {
-    override suspend fun refresh(context: Context) {
+    override suspend fun refresh() {
         NoteListWidget().updateAll(context)
     }
 }

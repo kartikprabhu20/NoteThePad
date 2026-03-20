@@ -51,15 +51,14 @@ object NoteModule {
     fun provideNoteUseCases(
         repository: NoteRepository,
         fileManager: FileManager,
-        detailedNoteMapper: DetailedNoteMapper,
-        @ApplicationContext context: Context
+        detailedNoteMapper: DetailedNoteMapper
     ): NoteUseCases {
         return NoteUseCases(
             getDetailedNotes = GetDetailedNotes(repository, detailedNoteMapper),
             getNotesWithReminders = GetNotesWithReminders(repository, detailedNoteMapper),
             getNotesWithTags = GetNotesWithTag(repository, detailedNoteMapper),
             deleteNote = DeleteNote(repository),
-            saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager, context),
+            saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager),
             getDetailedNote = GetDetailedNote(repository, detailedNoteMapper),
             getTopNotes = GetTopNotes(repository, detailedNoteMapper)
         )

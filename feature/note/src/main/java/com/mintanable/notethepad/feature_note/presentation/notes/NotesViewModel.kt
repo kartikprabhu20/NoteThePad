@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -202,9 +201,11 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch { toggleLayoutSettings(enabled) }
     }
 
-    suspend fun updateNoteWidget(context: Context) {
-        delay(300)
-        widgetRefresher.refresh(context)
+    fun refreshWidget() {
+        viewModelScope.launch {
+            delay(300)
+            widgetRefresher.refresh()
+        }
     }
 
     sealed class UiEvent {

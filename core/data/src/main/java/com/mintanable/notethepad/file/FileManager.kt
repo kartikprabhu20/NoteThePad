@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import com.mintanable.notethepad.database.db.entity.AttachmentType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -88,5 +89,11 @@ class FileManager @Inject constructor(
             Log.e("kptest", "Error while createTempUri: $e")
             null
         }
+    }
+
+    fun isInternalUri(uri: Uri): Boolean = uri.toString().contains(context.packageName)
+
+    fun getAttachmentType(uri: Uri): AttachmentType {
+        return AttachmentHelper.getAttachmentType(context, uri)
     }
 }

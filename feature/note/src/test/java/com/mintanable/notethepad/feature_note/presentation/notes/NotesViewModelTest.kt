@@ -172,7 +172,7 @@ class NotesViewModelTest {
             title = "Testing Title",
             content = "Testing Content",
             audioAttachments = emptyList(),
-            imageUris = listOf("content://media/1".toUri()),
+            imageUris = listOf("content://media/1"),
             color = 0,
             timestamp = 0L,
             isCheckboxListAvailable = false,

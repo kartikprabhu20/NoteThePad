@@ -28,13 +28,12 @@ class DetailedNoteMapper @Inject constructor(
         } else {
             noteEntity.audioUris.map { uriString ->
                 async {
-                    val uri = uriString.toUri()
                     var duration = durationCache[uriString]
                     if (duration == null) {
-                        duration = audioMetadataProvider.getDuration(uri)
+                        duration = audioMetadataProvider.getDuration(uriString.toUri())
                         durationCache.put(uriString, duration)
                     }
-                    Attachment(uri, duration)
+                    Attachment(uriString, duration)
                 }
             }.awaitAll()
         }
@@ -47,7 +46,7 @@ class DetailedNoteMapper @Inject constructor(
             content = noteEntity.content,
             timestamp = noteEntity.timestamp,
             color = noteEntity.color,
-            imageUris = noteEntity.imageUris.map { it.toUri() },
+            imageUris = noteEntity.imageUris,
             audioAttachments = audioAttachments,
             reminderTime = noteEntity.reminderTime,
             checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(noteEntity.content) else emptyList(),

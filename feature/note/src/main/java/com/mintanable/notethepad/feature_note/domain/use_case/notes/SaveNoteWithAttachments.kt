@@ -1,8 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain.use_case.notes
 
-import android.content.Context
 import android.net.Uri
-import com.mintanable.notethepad.file.AttachmentHelper
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -10,12 +8,10 @@ import com.mintanable.notethepad.database.db.entity.InvalidNoteException
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 class SaveNoteWithAttachments(
     private val repository: NoteRepository,
-    private val fileManager: FileManager,
-    @ApplicationContext val context: Context
+    private val fileManager: FileManager
 ) {
 
     @Throws(InvalidNoteException::class)
@@ -47,18 +43,18 @@ class SaveNoteWithAttachments(
            val newContent = if(checkboxItems.isNotEmpty()) CheckboxConvertors.checkboxesToString(checkboxItems) else content
 
             val imageUriList = imageUris.mapNotNull { uri ->
-                if (uri.toString().contains(context.packageName)) {
+                if (fileManager.isInternalUri(uri)) {
                     uri.toString()
                 } else {
-                    fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+                    fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
                 }
             }
 
             val audioUriList = audioUris.mapNotNull { uri ->
-                if (uri.toString().contains(context.packageName)) {
+                if (fileManager.isInternalUri(uri)) {
                     uri.toString()
                 } else {
-                    fileManager.saveMediaToStorage(uri, AttachmentHelper.getAttachmentType(context, uri).name.lowercase())
+                    fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
                 }
             }
 

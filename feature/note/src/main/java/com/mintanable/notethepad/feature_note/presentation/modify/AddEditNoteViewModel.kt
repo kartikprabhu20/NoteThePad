@@ -1,9 +1,9 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +16,6 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
-import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
@@ -27,7 +26,6 @@ import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
 import com.mintanable.notethepad.permissions.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -45,7 +43,6 @@ import javax.inject.Inject
 class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     savedStateHandle: SavedStateHandle,
-    @ApplicationContext val context: Context,
     private val permissionUsecases: PermissionUsecases,
     private val audioRecorder: AudioRecorder,
     private val fileIOUseCases: FileIOUseCases,
@@ -87,7 +84,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    val videoPlayerEngine: ExoPlayer? = (mediaPlayer as? AndroidMediaPlayer)?.player
+    val videoPlayerEngine: ExoPlayer? = mediaPlayer.exoPlayer
 
     init {
         loadNote(passedNoteId)
@@ -103,7 +100,7 @@ class AddEditNoteViewModel @Inject constructor(
                         titleState = it.titleState.copy(text = detailedNote.title, isHintVisible = false),
                         contentState = it.contentState.copy(text = detailedNote.content, isHintVisible = false),
                         noteColor = detailedNote.color,
-                        attachedImages = detailedNote.imageUris,
+                        attachedImages = detailedNote.imageUris.map { imgString -> imgString.toUri() },
                         attachedAudios = detailedNote.audioAttachments,
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,
@@ -213,7 +210,7 @@ class AddEditNoteViewModel @Inject constructor(
                             attachedAudios = state.attachedAudios.filterNot { it.uri == event.uri }
                         )
                     }
-                    if (mediaPlayer.mediaState.first().currentUri == event.uri.toString()) {
+                    if (mediaPlayer.mediaState.first().currentUri == event.uri) {
                         mediaPlayer.stop()
                     }
                 }
@@ -237,7 +234,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(zoomedImageUri = event.uri) }
             }
             is AddEditNoteEvent.UpdateNowPlaying -> {
-                mediaPlayer.playPause(event.uri)
+                mediaPlayer.playPause(event.uri.toUri())
             }
             is AddEditNoteEvent.StopMedia -> {
                 mediaPlayer.stop()
@@ -351,7 +348,7 @@ class AddEditNoteViewModel @Inject constructor(
     private fun deleteNote() {
         viewModelScope.launch {
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
-            fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri.toString() })
+            fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri })
             if(currentNoteId != 0L) { noteUseCases.deleteNote(currentNoteId) }
             _eventFlow.emit(UiEvent.DeleteNote(currentNoteId))
         }
@@ -366,7 +363,7 @@ class AddEditNoteViewModel @Inject constructor(
                     val uri = Uri.fromFile(file)
                     val duration = audioMetadataProvider.getDuration(uri)
                     _uiState.update { it.copy(
-                        attachedAudios = it.attachedAudios + Attachment(uri, duration)
+                        attachedAudios = it.attachedAudios + Attachment(uri.toString(), duration)
                     )}
                 }
             } else {
@@ -389,7 +386,7 @@ class AddEditNoteViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis(),
                 color = state.noteColor,
                 imageUris = state.attachedImages,
-                audioUris = state.attachedAudios.map { it.uri },
+                audioUris = state.attachedAudios.map { it.uri.toUri() },
                 reminderTime = state.reminderTime,
                 checkboxItems = state.checkListItems,
                 tagEntities = state.tagEntities

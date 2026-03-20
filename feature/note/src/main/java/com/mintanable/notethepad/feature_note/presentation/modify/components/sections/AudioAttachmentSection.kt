@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -14,8 +13,8 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Aud
 fun LazyListScope.audioAttachmentSection(
     attachedAudios: List<Attachment>,
     mediaState: MediaState?,
-    onDelete: (Uri) -> Unit,
-    onPlayPause: (Uri) -> Unit
+    onDelete: (String) -> Unit,
+    onPlayPause: (String) -> Unit
 ) {
 
     if (attachedAudios.isNotEmpty()) {

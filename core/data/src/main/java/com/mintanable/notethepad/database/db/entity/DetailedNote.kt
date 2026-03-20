@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.database.db.entity
 
-import android.net.Uri
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 
 data class DetailedNote (
@@ -9,7 +8,7 @@ data class DetailedNote (
     val content: String,
     val timestamp: Long,
     val color: Int,
-    val imageUris: List<Uri> = emptyList(),
+    val imageUris: List<String> = emptyList(),
     val audioAttachments: List<Attachment> = emptyList(),
     val reminderTime: Long = -1,
     val checkListItems: List<CheckboxItem> = emptyList(),
@@ -23,8 +22,8 @@ data class DetailedNote (
             content = content,
             timestamp = timestamp,
             color = color,
-            imageUris = imageUris.map { it.toString() },
-            audioUris = audioAttachments.map { it.uri.toString() },
+            imageUris = imageUris,
+            audioUris = audioAttachments.map { it.uri },
             reminderTime = reminderTime,
         )
     }

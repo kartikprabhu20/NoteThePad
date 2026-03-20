@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.database.db.entity
 
-import android.net.Uri
 import androidx.compose.runtime.Immutable
 
 enum class AttachmentType(val extension: String) {
@@ -11,6 +10,6 @@ enum class AttachmentType(val extension: String) {
 
 @Immutable
 data class Attachment(
-    val uri: Uri,
+    val uri: String,
     val duration: Long = 0L
 )

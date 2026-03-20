@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -35,24 +34,20 @@ import com.mintanable.notethepad.theme.ThemePreviews
 fun AudioPlayerUI(
     attachment: Attachment,
     playbackState: MediaState?,
-    onDelete: (Uri) -> Unit,
-    onPlayPause: (Uri) -> Unit) {
+    onDelete: (String) -> Unit,
+    onPlayPause: (String) -> Unit) {
 
     val uri = attachment.uri
-    val isPlaying = playbackState?.currentUri == uri.toString() && playbackState.isPlaying
+    val isPlaying = playbackState?.currentUri == uri && playbackState.isPlaying
     val totalDuration = attachment.duration
-    val progress = if (playbackState?.currentUri == uri.toString()) playbackState.progress else 0f
+    val progress = if (playbackState?.currentUri == uri) playbackState.progress else 0f
 
     AudioPlayer(
         isPlaying = isPlaying,
         progress = progress,
         totalDuration = totalDuration,
-        onPlayPause = {
-            onPlayPause(uri)
-        },
-        onDelete = {
-            onDelete(uri)
-        },
+        onPlayPause = { onPlayPause(uri) },
+        onDelete = { onDelete(uri) },
     )
 }
 
