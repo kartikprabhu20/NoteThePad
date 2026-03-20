@@ -61,8 +61,8 @@ import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.core.model.settings.DrawerItem
 import com.mintanable.notethepad.core.model.note.Note
-import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.NavigationDrawerViewModel
-import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
+import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.NavigationDrawerViewModel
+import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection

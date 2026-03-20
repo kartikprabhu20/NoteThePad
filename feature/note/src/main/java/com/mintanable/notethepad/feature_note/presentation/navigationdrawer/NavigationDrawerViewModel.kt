@@ -1,10 +1,10 @@
-package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer
+package com.mintanable.notethepad.feature_note.presentation.navigationdrawer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.core.model.settings.DrawerItem
 import com.mintanable.notethepad.database.db.repository.NoteRepository
-import com.mintanable.notethepad.feature_navigationdrawer.domain.usecase.GetNavigationDrawerItems
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNavigationDrawerItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

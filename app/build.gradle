@@ -133,6 +133,7 @@ dependencies {
     implementation project(':core:common')
     implementation project(':core:ui')
     implementation project(':feature:note')
+    implementation project(':feature:auth')
     implementation project(':feature:widgets')
     implementation project(':feature:settings')
 

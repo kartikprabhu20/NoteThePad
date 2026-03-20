@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components
+package com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,7 +57,7 @@ import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.core.model.settings.User
 import com.mintanable.notethepad.core.model.settings.DrawerItem
-import com.mintanable.notethepad.feature_navigationdrawer.R
+import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 

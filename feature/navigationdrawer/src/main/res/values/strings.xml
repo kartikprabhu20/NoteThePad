@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">NoteThePad</string>
-    <string name="content_description_profile_picture">Profile Picture</string>
-    <string name="content_description_delete_label">Delete Label</string>
-    <string name="content_description_edit_labels">edit labels</string>
-    <string name="version_format">Version %1$s</string>
-    <string name="build_format">Build %1$s</string>
-</resources>

@@ -1,13 +1,13 @@
-package com.mintanable.notethepad.feature_navigationdrawer.domain.usecase
+package com.mintanable.notethepad.feature_note.domain.use_case
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.filled.Add
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.core.model.settings.DrawerItem
 import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepository
+import com.mintanable.notethepad.database.db.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -30,6 +30,7 @@ class GetNavigationDrawerItems(
                         else if (item.title == "Logout") isLoggedIn
                         else true
                     }
+
                     else -> true
                 }
 

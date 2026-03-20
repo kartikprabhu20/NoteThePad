@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.di
 
 import android.content.Context
+import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.data.repository.AndroidAudioRecorder
@@ -26,6 +27,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.SaveNoteWithAttach
 import com.mintanable.notethepad.feature_note.domain.use_case.SaveTag
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNavigationDrawerItems
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -95,5 +97,14 @@ object NoteModule {
             deleteFiles = DeleteFiles(fileManager),
             saveMediaToStorage = SaveMediaToStorage(fileManager)
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetNavigationDrawerItemsUseCase(
+        repository: NavigationDrawerItemRepository,
+        noteRepository: NoteRepository
+    ): GetNavigationDrawerItems {
+        return GetNavigationDrawerItems(repository, noteRepository)
     }
 }

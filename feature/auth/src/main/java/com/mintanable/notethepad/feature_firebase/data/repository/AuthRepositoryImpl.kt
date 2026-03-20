@@ -71,5 +71,5 @@ class AuthRepositoryImpl @Inject constructor(
     }
 }
 
-fun FirebaseUser.toDomainUser() = User(uid, email, displayName, photoUrl.toString(),
+private fun FirebaseUser.toDomainUser() = User(uid, email, displayName, photoUrl.toString(),
     providerData.any { it.providerId == GoogleAuthProvider.PROVIDER_ID })
