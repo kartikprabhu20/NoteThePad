@@ -11,7 +11,7 @@ data class AiModel(
     val name: String,
     val displayName: String = "",
     val info: String = "",
-    val bestForTaskIds: List<String> = emptyList(), // Use emptyList() over listOf() for slightly better performance
+    val bestForTaskIds: List<String> = emptyList(),
     val minDeviceMemoryInGb: Int? = null,
     val url: String = "",
     val sizeInBytes: Long = 0L,
@@ -35,73 +35,73 @@ enum class Accelerator(val label: String) {
 
 @Serializable
 data class AiModelCatalog(
-    val models: List<AiModelEntry> // No @SerialName needed if the JSON key matches the variable name
+    val models: List<AiModelEntry>? = emptyList()
 )
 
 @Serializable
 data class ModelDefaultConfig(
-    val topK: Int,
-    val topP: Float,
-    val temperature: Float,
-    val maxTokens: Int,
-    val accelerators: String
+    val topK: Int? = 0,
+    val topP: Float? = 0f,
+    val temperature: Float? = 0f,
+    val maxTokens: Int? = 1024,
+    val accelerators: String? = ""
 )
 
 @Serializable
 data class AiModelEntry(
-    val name: String,
-    val modelId: String,
-    val modelFile: String,
-    val description: String,
-    val sizeInBytes: Long,
-    val minDeviceMemoryInGb: Int,
-    val commitHash: String,
-    val llmSupportImage: Boolean = false,
-    val llmSupportAudio: Boolean = false,
-    val defaultConfig: ModelDefaultConfig,
-    val taskTypes: List<String>,
-    val bestForTaskTypes: List<String> = emptyList()
+    val name: String? = "",
+    val modelId: String? = "",
+    val modelFile: String? = "",
+    val description: String? = "",
+    val sizeInBytes: Long? = 0L,
+    val minDeviceMemoryInGb: Int? = 0,
+    val commitHash: String? = "",
+    val llmSupportImage: Boolean? = false,
+    val llmSupportAudio: Boolean? = false,
+    val defaultConfig: ModelDefaultConfig? = null,
+    val taskTypes: List<String>? = emptyList(),
+    val bestForTaskTypes: List<String>? = emptyList()
 ) {
     fun toAiModel(): AiModel {
-        val downloadUrl = "https://huggingface.co/$modelId/resolve/$commitHash/$modelFile?download=true"
+        val downloadUrl = "https://huggingface.co/${modelId ?: ""}/resolve/${commitHash ?: "main"}/${modelFile ?: ""}?download=true"
 
-        val isLlmModel = taskTypes.any {
+        val isLlmModel = taskTypes?.any {
             it in listOf("llm_chat", "llm_prompt_lab", "llm_ask_audio", "llm_ask_image")
-        }
+        } ?: false
 
         var llmMaxToken = 1024
         var acceleratorsList: List<Accelerator> = emptyList()
 
-        // defaultConfig is non-nullable in @Serializable definition above,
-        // but if the JSON might lack it, make it nullable in the data class: ModelDefaultConfig?
-        llmMaxToken = defaultConfig.maxTokens
-        val configAccels = defaultConfig.accelerators
-        if (configAccels.isNotEmpty()) {
-            acceleratorsList = configAccels.split(",")
-                .mapNotNull { item ->
-                    when (item.trim().lowercase()) {
-                        "cpu" -> Accelerator.CPU
-                        "gpu" -> Accelerator.GPU
-                        "npu" -> Accelerator.NPU
-                        else -> null
+        defaultConfig?.let { config ->
+            llmMaxToken = config.maxTokens ?: 1024
+            val configAccels = config.accelerators
+            if (!configAccels.isNullOrEmpty()) {
+                acceleratorsList = configAccels.split(",")
+                    .mapNotNull { item ->
+                        when (item.trim().lowercase()) {
+                            "cpu" -> Accelerator.CPU
+                            "gpu" -> Accelerator.GPU
+                            "npu" -> Accelerator.NPU
+                            else -> null
+                        }
                     }
-                }
+            }
         }
 
         return AiModel(
-            name = name,
-            displayName = name,
-            version = commitHash,
-            info = description,
+            name = name ?: "Unknown",
+            displayName = name ?: "Unknown",
+            version = commitHash ?: "",
+            info = description ?: "",
             url = downloadUrl,
-            sizeInBytes = sizeInBytes,
+            sizeInBytes = sizeInBytes ?: 0L,
             minDeviceMemoryInGb = minDeviceMemoryInGb,
-            downloadFileName = modelFile,
-            llmSupportImage = llmSupportImage,
-            llmSupportAudio = llmSupportAudio,
+            downloadFileName = modelFile ?: "",
+            llmSupportImage = llmSupportImage ?: false,
+            llmSupportAudio = llmSupportAudio ?: false,
             llmMaxToken = llmMaxToken,
             accelerators = acceleratorsList,
-            bestForTaskIds = bestForTaskTypes,
+            bestForTaskIds = bestForTaskTypes ?: emptyList(),
             isLlm = isLlmModel
         )
     }

@@ -25,16 +25,8 @@ class DatabaseManager @Inject constructor(
         return Room.databaseBuilder(
             context,
             NoteDatabase::class.java,
-            NoteDatabase.Companion.DATABASE_NAME
+            NoteDatabase.DATABASE_NAME
         )
-            .addMigrations(NoteDatabase.Companion.MIGRATION_1_2)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_2_3)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_3_4)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_4_5)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_5_6)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_6_7)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_7_8)
-            .addMigrations(NoteDatabase.Companion.MIGRATION_8_9)
             .build()
     }
 

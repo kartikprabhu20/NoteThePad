@@ -48,7 +48,7 @@ class AiModelRepositoryImpl @Inject constructor(
             // Try to load from internal storage first
             val internalCatalog = getAiModelCatalogFromInternal()
             if (internalCatalog != null) {
-                val updatedModels = getStaticModels() + internalCatalog.models.map { it.toAiModel() }
+                val updatedModels = getStaticModels() + (internalCatalog.models?.map { it.toAiModel() } ?: emptyList())
                 if (updatedModels != _cachedModels.value) {
                     _cachedModels.value = updatedModels
                     emit(updatedModels)
@@ -61,7 +61,7 @@ class AiModelRepositoryImpl @Inject constructor(
             // After Gist fetch, check if internal storage has new data
             val freshCatalog = getAiModelCatalogFromInternal()
             if (freshCatalog != null) {
-                val finalModels = getStaticModels() + freshCatalog.models.map { it.toAiModel() }
+                val finalModels = getStaticModels() + (freshCatalog.models?.map { it.toAiModel() } ?: emptyList())
                 if (finalModels != _cachedModels.value) {
                     _cachedModels.value = finalModels
                     emit(finalModels)
@@ -113,12 +113,12 @@ class AiModelRepositoryImpl @Inject constructor(
 
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    val gistResponse = response.body.string()
+                    val gistResponse = response.body?.string()
                     Log.d("kptest", "gistResponse $gistResponse")
 
-                    if (gistResponse.isNotEmpty()) {
+                    if (!gistResponse.isNullOrEmpty()) {
                         val wrapper = gson.fromJson(gistResponse, GistWrapper::class.java)
-                        val content = wrapper.files[MODEL_CATALOG_FILENAME]?.content
+                        val content = wrapper?.files?.get(MODEL_CATALOG_FILENAME)?.content
 
                         if (content != null) {
                             val internalFile = File(context.filesDir, MODEL_CATALOG_FILENAME)
@@ -159,9 +159,9 @@ class AiModelRepositoryImpl @Inject constructor(
 }
 
 data class GistWrapper(
-    val files: Map<String, GistFile>
+    val files: Map<String, GistFile>? = null
 )
 
 data class GistFile(
-    val content: String?
+    val content: String? = null
 )

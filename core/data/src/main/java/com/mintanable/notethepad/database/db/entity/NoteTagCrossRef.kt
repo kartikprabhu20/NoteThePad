@@ -12,13 +12,13 @@ import androidx.room.Index
             entity = NoteEntity::class,
             parentColumns = ["id"],
             childColumns = ["noteId"],
-            onDelete = ForeignKey.Companion.CASCADE
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = TagEntity::class,
             parentColumns = ["tagId"],
             childColumns = ["tagId"],
-            onDelete = ForeignKey.Companion.CASCADE
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [Index("tagId"), Index("noteId")]
