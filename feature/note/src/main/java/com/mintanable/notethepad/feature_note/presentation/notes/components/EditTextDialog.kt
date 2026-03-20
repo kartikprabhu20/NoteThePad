@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
@@ -31,17 +31,17 @@ import com.mintanable.notethepad.theme.ThemePreviews
 fun EditTextDialog(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
-    tags: List<Tag> = emptyList()
+    tagEntities: List<TagEntity> = emptyList()
 ) {
     var editTextFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
-    val filteredTags by remember(editTextFieldValue.text, tags) {
+    val filteredTags by remember(editTextFieldValue.text, tagEntities) {
         derivedStateOf {
             val list = if (editTextFieldValue.text.isBlank()) {
-                tags
+                tagEntities
             } else {
-                tags.filter { it.tagName.contains(editTextFieldValue.text, ignoreCase = true) }
+                tagEntities.filter { it.tagName.contains(editTextFieldValue.text, ignoreCase = true) }
             }
             list.take(3)
         }
@@ -62,7 +62,7 @@ fun EditTextDialog(
                     placeholder = { Text(stringResource(R.string.placeholder_tag_example)) }
                 )
 
-                if(tags.isNotEmpty()) {
+                if(tagEntities.isNotEmpty()) {
 
 
                     FlowRow(modifier = Modifier.fillMaxWidth().padding(8.dp),
@@ -115,7 +115,7 @@ fun PreviewEditTextDialog(modifier: Modifier = Modifier) {
         EditTextDialog(
             onConfirm = {},
             onDismiss = {},
-            tags = listOf(Tag("Grocery"), Tag("Shopping"), Tag("Travel"), Tag("home"), Tag("Expenses"))
+            tagEntities = listOf(TagEntity("Grocery"), TagEntity("Shopping"), TagEntity("Travel"), TagEntity("home"), TagEntity("Expenses"))
         )
     }
 }

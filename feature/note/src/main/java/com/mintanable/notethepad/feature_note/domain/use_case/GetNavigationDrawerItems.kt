@@ -41,7 +41,7 @@ class GetNavigationDrawerItems(
                         tags.forEach { tag ->
                             resultList.add(
                                 DrawerItem.LabelDrawerItem(
-                                    tag = tag,
+                                    tagEntity = tag,
                                     icon = Icons.AutoMirrored.Outlined.Label,
                                     route = Screen.NotesScreen.passArgs(
                                         tagId = tag.tagId,

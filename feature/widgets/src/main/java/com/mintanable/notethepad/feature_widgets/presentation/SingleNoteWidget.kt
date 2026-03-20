@@ -52,7 +52,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 WidgetEntryPoint::class.java
             )
             val noteWithTags = entryPoint.noteRepository().getNoteById(noteId)
-            noteWithTags?.let { entryPoint.detailedNoteMapper().toDetailedNote(it.note, it.tags) }
+            noteWithTags?.let { entryPoint.detailedNoteMapper().toDetailedNote(it.noteEntity, it.tagEntities) }
         } else null
 
         provideContent {

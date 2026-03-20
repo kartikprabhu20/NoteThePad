@@ -12,19 +12,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TagUI
 import com.mintanable.notethepad.core.model.note.NoteColors
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.feature_note.domain.util.TagType
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 
 fun LazyListScope.tagsSection(
-    tags: List<Tag>,
+    tagEntities: List<TagEntity>,
     onDelete: (String) -> Unit,
 ){
-    if(tags.isNotEmpty()) {
+    if(tagEntities.isNotEmpty()) {
         item {
         FlowRow(modifier = Modifier.fillMaxWidth()) {
-            tags.forEach { tag ->
+            tagEntities.forEach { tag ->
                     Box(
                         modifier = Modifier.padding(4.dp)
                     ) {
@@ -45,11 +45,11 @@ fun LazyListScope.tagsSection(
 @Composable
 fun PreviewTagSection() {
     NoteThePadTheme {
-        val tags = listOf(Tag("abcdefghijklmnop"),Tag("testing"),Tag("1234"), Tag("b"),Tag("xyztesting2"),Tag("9876"))
+        val tagEntities = listOf(TagEntity("abcdefghijklmnop"),TagEntity("testing"),TagEntity("1234"), TagEntity("b"),TagEntity("xyztesting2"),TagEntity("9876"))
        LazyColumn(
            modifier = Modifier.fillMaxWidth().background(NoteColors.colors[0])
        ) {
-           tagsSection(tags = tags, onDelete = {})
+           tagsSection(tagEntities = tagEntities, onDelete = {})
        }
     }
 }

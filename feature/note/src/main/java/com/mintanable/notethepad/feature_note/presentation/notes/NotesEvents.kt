@@ -2,7 +2,7 @@ package com.mintanable.notethepad.feature_note.presentation.notes
 
 import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 
 sealed class NotesEvent {
     data class Order(val noteOrder: NoteOrder) : NotesEvent()
@@ -14,6 +14,6 @@ sealed class NotesEvent {
     data object ShowLabelDialog : NotesEvent()
     data object DismissLabelDialog : NotesEvent()
     data class AddLabel(val tagName: String) : NotesEvent()
-    data class EditLabel(val tag: Tag) : NotesEvent()
-    data class DeleteLabel(val tag: Tag) : NotesEvent()
+    data class EditLabel(val tagEntity: TagEntity) : NotesEvent()
+    data class DeleteLabel(val tagEntity: TagEntity) : NotesEvent()
 }

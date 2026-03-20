@@ -79,7 +79,13 @@ android {
         checkDependencies true
         abortOnError false
     }
+
+    composeCompiler {
+        // Point to the file in your root project directory
+        stabilityConfigurationFile = rootProject.file("compose_stability.conf")
+    }
 }
+
 android.applicationVariants.all { variant ->
     def type = variant.buildType.name
     def variantName = variant.name.capitalize()
@@ -130,6 +136,19 @@ tasks.register("printVersionInfo") {
 tasks.register("printVersionName") {
     doLast {
         println android.defaultConfig.versionName
+    }
+}
+
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            freeCompilerArgs += [
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir}/compose_metrics",
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir}/compose_metrics"
+            ]
+        }
     }
 }
 

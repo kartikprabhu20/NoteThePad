@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteTagCrossRef
 import com.mintanable.notethepad.core.model.note.NoteWithTags
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +17,7 @@ interface NoteDao {
 
     @Transaction
     @Query("""
-        SELECT * FROM note 
+        SELECT * FROM noteEntity 
         ORDER BY 
             CASE WHEN :order = 'title' AND :ascending = 1 THEN title END ASC,
             CASE WHEN :order = 'title' AND :ascending = 0 THEN title END DESC,
@@ -29,20 +29,20 @@ interface NoteDao {
     fun getNotes(order: String, ascending: Int): Flow<List<NoteWithTags>>
 
     @Transaction
-    @Query("SELECT * FROM note WHERE id =:id")
+    @Query("SELECT * FROM noteEntity WHERE id =:id")
     suspend fun getNoteById(id: Long): NoteWithTags?
 
     @Transaction
-    @Query("SELECT * FROM note WHERE reminderTime > :currentTime")
+    @Query("SELECT * FROM noteEntity WHERE reminderTime > :currentTime")
     suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags>
 
     @Transaction
-    @Query("SELECT * FROM note ORDER BY timestamp DESC LIMIT :limit")
+    @Query("SELECT * FROM noteEntity ORDER BY timestamp DESC LIMIT :limit")
     fun getTopNotes(limit: Int): Flow<List<NoteWithTags>>
 
     @Transaction
     @Query("""
-    SELECT * FROM note
+    SELECT * FROM noteEntity
     WHERE id IN (
         SELECT noteId FROM note_tag_cross_ref 
         WHERE tagId = :tagId
@@ -51,18 +51,18 @@ interface NoteDao {
     fun getNotesByTag(tagId: Long): Flow<List<NoteWithTags>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun inserNote(note: Note): Long
+    suspend fun inserNote(noteEntity: NoteEntity): Long
 
     @Update
-    suspend fun updateNote(note: Note)
+    suspend fun updateNote(noteEntity: NoteEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef)
 
     @Delete
-    suspend fun deleteNote(note: Note)
+    suspend fun deleteNote(noteEntity: NoteEntity)
 
-    @Query("DELETE FROM note WHERE id = :id")
+    @Query("DELETE FROM noteEntity WHERE id = :id")
     suspend fun deleteNoteWithId(id: Long)
 
     @Query("DELETE FROM note_tag_cross_ref WHERE noteId = :noteId")

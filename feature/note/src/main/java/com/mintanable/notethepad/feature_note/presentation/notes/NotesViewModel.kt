@@ -10,7 +10,7 @@ import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
@@ -62,7 +62,7 @@ class NotesViewModel @Inject constructor(
     private val _notesFromDb = _filterState.flatMapLatest {  query ->
         when (query.filter) {
             NotesFilterType.REMINDERS.filter -> noteUseCases.getNotesWithReminders(query.order)
-            NotesFilterType.TAGS.filter -> noteUseCases.getNotesWithTags(query.order, Tag(tagId = query.tagId, tagName = query.tagName))
+            NotesFilterType.TAGS.filter -> noteUseCases.getNotesWithTags(query.order, TagEntity(tagId = query.tagId, tagName = query.tagName))
             else -> noteUseCases.getDetailedNotes(query.order)
         }
     }.flowOn(dispatchers.io)
@@ -156,7 +156,7 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.RestoreNote -> {
                 viewModelScope.launch {
                     val note = recentlyDeletedNote?.toNote() ?: return@launch
-                    val tags = recentlyDeletedNote?.tags ?: return@launch
+                    val tags = recentlyDeletedNote?.tagEntities ?: return@launch
                     noteUseCases.saveNoteWithAttachments(note, tags)
                     recentlyDeletedNote = null
                 }
@@ -178,19 +178,19 @@ class NotesViewModel @Inject constructor(
 
             is NotesEvent.EditLabel -> {
                 viewModelScope.launch {
-                    tagUseCases.saveTag(event.tag)
+                    tagUseCases.saveTag(event.tagEntity)
                 }
             }
 
             is NotesEvent.DeleteLabel -> {
                 viewModelScope.launch {
-                    tagUseCases.deleteTag(event.tag)
+                    tagUseCases.deleteTag(event.tagEntity)
                 }
             }
 
             is NotesEvent.AddLabel -> {
                 viewModelScope.launch {
-                    tagUseCases.saveTag(Tag(event.tagName))
+                    tagUseCases.saveTag(TagEntity(event.tagName))
                     _showLabelDialog.value = false
                 }
             }

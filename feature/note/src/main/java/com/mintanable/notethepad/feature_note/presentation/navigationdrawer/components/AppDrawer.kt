@@ -54,7 +54,7 @@ import coil3.request.crossfade
 import com.mintanable.notethepad.core.common.AppVersionProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.core.model.settings.User
 import com.mintanable.notethepad.core.model.settings.DrawerItem
 import com.mintanable.notethepad.feature_note.R
@@ -68,8 +68,8 @@ fun AppDrawer(
     selectedItemIndex: Int,
     modifier: Modifier = Modifier,
     onItemSelected: (Int, DrawerItem) -> Unit,
-    onTagDeleted: (Tag) -> Unit,
-    onTagEdited: (Tag) -> Unit,
+    onTagDeleted: (TagEntity) -> Unit,
+    onTagEdited: (TagEntity) -> Unit,
     appVersionProvider: AppVersionProvider?
 ) {
     var isLabelEditing by rememberSaveable { mutableStateOf(false) }
@@ -118,7 +118,7 @@ fun AppDrawer(
                         }
 
                         is DrawerItem.LabelDrawerItem -> {
-                            val currentText = pendingEdits[item.tag.tagId] ?: item.tag.tagName
+                            val currentText = pendingEdits[item.tagEntity.tagId] ?: item.tagEntity.tagName
 
                             LabelEditRow(
                                 item = item,
@@ -127,7 +127,7 @@ fun AppDrawer(
                                 isLabelEditing = isLabelEditing,
                                 currentText = currentText,
                                 onTextChanged = { newText ->
-                                    pendingEdits = pendingEdits + (item.tag.tagId to newText)
+                                    pendingEdits = pendingEdits + (item.tagEntity.tagId to newText)
                                 },
                                 onTagDeleted = { onTagDeleted(it) },
                                 onItemSelected = onItemSelected
@@ -154,7 +154,7 @@ fun AppDrawer(
                                     onClick = {
                                         if (isLabelEditing) {
                                             pendingEdits.forEach { (tagId, newName) ->
-                                                if(newName.isNotEmpty())  onTagEdited(Tag(tagName = newName, tagId = tagId))
+                                                if(newName.isNotEmpty())  onTagEdited(TagEntity(tagName = newName, tagId = tagId))
                                             }
                                             pendingEdits = emptyMap()
                                         }
@@ -273,13 +273,13 @@ fun LabelEditRow(
     isLabelEditing: Boolean,
     currentText: String,
     onTextChanged: (String) -> Unit,
-    onTagDeleted: (Tag) -> Unit,
+    onTagDeleted: (TagEntity) -> Unit,
     onItemSelected: (Int, DrawerItem) -> Unit
 ) {
     NavigationDrawerItem(
         label = {
             if (!isLabelEditing) {
-                Text(text = item.tag.tagName)
+                Text(text = item.tagEntity.tagName)
             } else {
                 TextField(
                     value = currentText,
@@ -298,7 +298,7 @@ fun LabelEditRow(
         icon = { Icon(imageVector = item.icon, contentDescription = null) },
         badge = {
             if (isLabelEditing) {
-                IconButton(onClick = { onTagDeleted(item.tag) }) {
+                IconButton(onClick = { onTagDeleted(item.tagEntity) }) {
                     Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_description_delete_label))
                 }
             }
@@ -316,7 +316,7 @@ fun PreviewLabelEditRow() {
     NoteThePadTheme {
         LabelEditRow(
             item = DrawerItem.LabelDrawerItem(
-                Tag("test"),
+                TagEntity("test"),
                 icon = Icons.AutoMirrored.Filled.Label,
                 route = "route"
             ),
@@ -381,7 +381,7 @@ fun PreviewAppDrawer() {
             route = Screen.LogOut.route
         )
     )
-    val tags = listOf(Tag("Home"), Tag("Work"), Tag("Shopping"))
+    val tagEntities = listOf(TagEntity("Home"), TagEntity("Work"), TagEntity("Shopping"))
     val resultList = mutableListOf<DrawerItem>()
     items.forEach { item ->
         val shouldAdd = when (item) {
@@ -397,10 +397,10 @@ fun PreviewAppDrawer() {
             resultList.add(item)
 
             if (item is DrawerItem.TextDrawerItem && item.title == "Labels") {
-                tags.forEach { tag ->
+                tagEntities.forEach { tag ->
                     resultList.add(
                         DrawerItem.LabelDrawerItem(
-                            tag = tag,
+                            tagEntity = tag,
                             icon = Icons.AutoMirrored.Outlined.Label,
                             route = Screen.NotesScreen.passArgs(
                                 tagId = tag.tagId,

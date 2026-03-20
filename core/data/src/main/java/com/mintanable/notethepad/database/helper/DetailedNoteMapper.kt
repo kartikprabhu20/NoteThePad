@@ -6,8 +6,8 @@ import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.model.note.Attachment
 import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.note.Note
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.NoteEntity
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -21,12 +21,12 @@ class DetailedNoteMapper @Inject constructor(
 
     private val durationCache = LruCache<String, Long>(100)
 
-    suspend fun toDetailedNote(note: Note, tags: List<Tag> = emptyList()): DetailedNote = withContext(dispatchers.default) {
+    suspend fun toDetailedNote(noteEntity: NoteEntity, tagEntities: List<TagEntity> = emptyList()): DetailedNote = withContext(dispatchers.default) {
 
-        val audioAttachments = if (note.audioUris.isEmpty()) {
+        val audioAttachments = if (noteEntity.audioUris.isEmpty()) {
             emptyList()
         } else {
-            note.audioUris.map { uriString ->
+            noteEntity.audioUris.map { uriString ->
                 async {
                     val uri = uriString.toUri()
                     var duration = durationCache[uriString]
@@ -39,20 +39,20 @@ class DetailedNoteMapper @Inject constructor(
             }.awaitAll()
         }
 
-        val isCheckbox = CheckboxConvertors.isContentCheckboxList(note.content)
+        val isCheckbox = CheckboxConvertors.isContentCheckboxList(noteEntity.content)
 
         DetailedNote(
-            id = note.id,
-            title = note.title,
-            content = note.content,
-            timestamp = note.timestamp,
-            color = note.color,
-            imageUris = note.imageUris.map { it.toUri() },
+            id = noteEntity.id,
+            title = noteEntity.title,
+            content = noteEntity.content,
+            timestamp = noteEntity.timestamp,
+            color = noteEntity.color,
+            imageUris = noteEntity.imageUris.map { it.toUri() },
             audioAttachments = audioAttachments,
-            reminderTime = note.reminderTime,
-            checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(note.content) else emptyList(),
+            reminderTime = noteEntity.reminderTime,
+            checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(noteEntity.content) else emptyList(),
             isCheckboxListAvailable = isCheckbox,
-            tags = tags
+            tagEntities = tagEntities
         )
     }
 }

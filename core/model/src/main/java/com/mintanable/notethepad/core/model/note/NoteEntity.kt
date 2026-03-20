@@ -15,7 +15,7 @@ import androidx.room.Relation
         Index(value = ["reminderTime"])
     ]
 )
-data class Note(
+data class NoteEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val title: String,
     val content: String,
@@ -29,7 +29,7 @@ data class Note(
 class InvalidNoteException(message: String): Exception(message)
 
 data class NoteWithTags(
-    @Embedded val note: Note,
+    @Embedded val noteEntity: NoteEntity,
     @Relation(
         parentColumn = "id",
         entityColumn = "tagId",
@@ -39,5 +39,5 @@ data class NoteWithTags(
             entityColumn = "tagId"
         )
     )
-    val tags: List<Tag> = emptyList()
+    val tagEntities: List<TagEntity> = emptyList()
 )

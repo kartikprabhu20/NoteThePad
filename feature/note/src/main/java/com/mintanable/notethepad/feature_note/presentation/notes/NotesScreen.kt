@@ -58,7 +58,7 @@ import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.settings.DrawerItem
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.core.model.settings.User
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components.AppDrawer
@@ -82,7 +82,7 @@ fun NotesScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
     appVersionProvider: AppVersionProvider,
-    onPinWidget: (Note) -> Unit = {}
+    onPinWidget: (NoteEntity) -> Unit = {}
 ) {
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
@@ -119,7 +119,7 @@ fun NotesScreen(
         EditTextDialog(
             onDismiss = { notesViewModel.onEvent(NotesEvent.DismissLabelDialog) },
             onConfirm = { notesViewModel.onEvent(NotesEvent.AddLabel(it)) },
-            tags = existingTags
+            tagEntities = existingTags
         )
     }
 
@@ -137,8 +137,8 @@ fun NotesScreen(
                         is DrawerItem.LabelDrawerItem -> {
                             notesViewModel.updateFilter(
                                 NotesFilterType.TAGS.filter,
-                                item.tag.tagId,
-                                item.tag.tagName
+                                item.tagEntity.tagId,
+                                item.tagEntity.tagName
                             )
                         }
 

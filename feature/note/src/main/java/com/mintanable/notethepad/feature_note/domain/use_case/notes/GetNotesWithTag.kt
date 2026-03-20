@@ -2,7 +2,7 @@ package com.mintanable.notethepad.feature_note.domain.use_case.notes
 
 import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,12 +14,12 @@ class GetNotesWithTag(
     private val detailedNoteMapper: DetailedNoteMapper
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
-    operator fun invoke(order: NoteOrder, tag: Tag): Flow<List<DetailedNote>> {
+    operator fun invoke(order: NoteOrder, tagEntity: TagEntity): Flow<List<DetailedNote>> {
         return repository.getNotes(order).mapLatest { notesList ->
             notesList.map { noteWithTags ->
-                detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags)
+                detailedNoteMapper.toDetailedNote(noteWithTags.noteEntity, noteWithTags.tagEntities)
             }.filter { note ->
-                note.tags.map { it.tagName }.contains(tag.tagName)
+                note.tagEntities.map { it.tagName }.contains(tagEntity.tagName)
             }
         }
     }

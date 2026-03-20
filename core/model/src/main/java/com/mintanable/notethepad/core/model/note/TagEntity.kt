@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
     tableName = "tag_table",
     indices = [Index(value = ["tagName"], unique = true)]
 )
-data class Tag(
+data class TagEntity(
     val tagName: String,
     @PrimaryKey(autoGenerate = true) val tagId: Long = 0
 )

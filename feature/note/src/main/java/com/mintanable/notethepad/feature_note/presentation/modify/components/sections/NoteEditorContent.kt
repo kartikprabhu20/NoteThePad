@@ -47,7 +47,7 @@ import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.core.model.note.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent
@@ -70,7 +70,7 @@ fun NoteEditorContent(
     attachedAudios: List<Attachment>,
     mediaState: MediaState?,
     reminderTime: Long,
-    tags: List<Tag> = emptyList(),
+    tagEntities: List<TagEntity> = emptyList(),
     suggestedTags: List<String> = emptyList(),
     isSuggestionTagsLoading: Boolean = false,
     onEvent: (AddEditNoteEvent) -> Unit,
@@ -301,7 +301,7 @@ fun NoteEditorContent(
                     )
 
                     tagsSection(
-                        tags = tags,
+                        tagEntities = tagEntities,
                         onDelete = { tagName -> onEvent(AddEditNoteEvent.DeleteLabel(tagName)) },
                     )
                 }

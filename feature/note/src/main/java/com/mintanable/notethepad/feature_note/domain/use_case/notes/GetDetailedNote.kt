@@ -12,6 +12,6 @@ class GetDetailedNote(
 ) {
     suspend operator fun invoke(id: Long): DetailedNote? = withContext(Dispatchers.IO) {
         val noteWithTags = repository.getNoteById(id) ?: return@withContext null
-        return@withContext detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags)
+        return@withContext detailedNoteMapper.toDetailedNote(noteWithTags.noteEntity, noteWithTags.tagEntities)
     }
 }

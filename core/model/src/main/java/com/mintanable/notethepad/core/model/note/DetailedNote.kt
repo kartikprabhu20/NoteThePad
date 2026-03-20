@@ -13,10 +13,10 @@ data class DetailedNote (
     val reminderTime: Long = -1,
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
-    val tags: List<Tag> = emptyList()
+    val tagEntities: List<TagEntity> = emptyList()
 ){
-    fun toNote(): Note{
-        return Note(
+    fun toNote(): NoteEntity{
+        return NoteEntity(
             id = id,
             title = title,
             content = content,

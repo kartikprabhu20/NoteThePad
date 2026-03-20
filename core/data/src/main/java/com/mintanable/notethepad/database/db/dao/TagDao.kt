@@ -6,26 +6,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TagDao {
     @Query("SELECT * FROM tag_table")
-    fun getAllTags(): Flow<List<Tag>>
+    fun getAllTags(): Flow<List<TagEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTag(tag: Tag): Long
+    suspend fun insertTag(tagEntity: TagEntity): Long
 
     @Update
-    suspend fun updateTag(tag: Tag)
+    suspend fun updateTag(tagEntity: TagEntity)
 
     @Delete
-    suspend fun deleteTag(tag: Tag)
+    suspend fun deleteTag(tagEntity: TagEntity)
 
     @Query("SELECT * FROM tag_table WHERE tagId = :id")
-    suspend fun getTagById(id: Long): Tag?
+    suspend fun getTagById(id: Long): TagEntity?
 
     @Query("SELECT * FROM tag_table WHERE tagName = :tagName")
-    suspend fun getTagByName(tagName: String): Tag?
+    suspend fun getTagByName(tagName: String): TagEntity?
 }

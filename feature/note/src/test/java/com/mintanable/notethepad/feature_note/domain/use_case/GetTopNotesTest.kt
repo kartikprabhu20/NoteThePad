@@ -3,9 +3,9 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteWithTags
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
@@ -39,7 +39,7 @@ class GetTopNotesTest {
     fun `When invoked, returns mapped detailed notes from repository`() = runTest {
         val limit = 2
         val mockNotes = listOf(
-            NoteWithTags(Note(
+            NoteWithTags(NoteEntity(
                 id = 1,
                 title = "Top 1",
                 content = "...",
@@ -47,9 +47,9 @@ class GetTopNotesTest {
                 timestamp = 0,
                 color = 0
             ),
-                tags = listOf(Tag("test"))
+                tagEntities = listOf(TagEntity("test"))
             ),
-            NoteWithTags(Note(
+            NoteWithTags(NoteEntity(
                 id = 2,
                 title = "Top 2",
                 content = "...",
@@ -65,7 +65,7 @@ class GetTopNotesTest {
             val result = awaitItem()
             assertThat(result).hasSize(2)
             assertThat(result[0].title).isEqualTo("Top 1")
-            assertThat(result[0].tags.size).isEqualTo(1)
+            assertThat(result[0].tagEntities.size).isEqualTo(1)
             awaitComplete()
         }
     }

@@ -70,7 +70,7 @@ class NoteListWidget : GlanceAppWidget() {
         val notesFlow = repository.getTopNotes(10).map { list ->
             coroutineScope {
                 list.map { noteWithTags ->
-                    async { mapper.toDetailedNote(noteWithTags.note, noteWithTags.tags) }
+                    async { mapper.toDetailedNote(noteWithTags.noteEntity, noteWithTags.tagEntities) }
                 }.map { it.await() }
             }
         }

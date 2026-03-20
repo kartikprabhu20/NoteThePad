@@ -1,12 +1,12 @@
 package com.mintanable.notethepad.database.db.repository
 
 import androidx.room.withTransaction
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.NoteTagCrossRef
 import com.mintanable.notethepad.core.model.note.NoteWithTags
 import com.mintanable.notethepad.core.model.note.OrderType
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.database.db.NoteDatabase
 import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.dao.TagDao
@@ -35,18 +35,18 @@ class NoteRepositoryImpl(
         return noteDao.getNoteById(id)
     }
 
-    override suspend fun insertNote(note: Note, tags: List<Tag>): Long {
+    override suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): Long {
         return withContext(Dispatchers.IO) {
             db.withTransaction {
-                var noteId = noteDao.inserNote(note)
+                var noteId = noteDao.inserNote(noteEntity)
 
                 if (noteId == -1L || noteId == 0L) {
-                    noteDao.updateNote(note)
-                    noteId = note.id
+                    noteDao.updateNote(noteEntity)
+                    noteId = noteEntity.id
                 }
 
                 noteDao.deleteLinksForNote(noteId)
-                tags.forEach { tag ->
+                tagEntities.forEach { tag ->
                     var tagId = tagDao.insertTag(tag)
 
                     if (tagId == -1L || tagId == 0L) {
@@ -61,8 +61,8 @@ class NoteRepositoryImpl(
         }
     }
 
-    override suspend fun deleteNote(note: Note) {
-        noteDao.deleteNote(note)
+    override suspend fun deleteNote(noteEntity: NoteEntity) {
+        noteDao.deleteNote(noteEntity)
     }
 
     override suspend fun deleteNoteWithId(id: Long) {
@@ -77,23 +77,23 @@ class NoteRepositoryImpl(
         return noteDao.getTopNotes(limit)
     }
 
-    override fun getAllTags(): Flow<List<Tag>> {
+    override fun getAllTags(): Flow<List<TagEntity>> {
         return tagDao.getAllTags()
     }
 
-    override suspend fun insertTag(tag: Tag): Long {
-        return tagDao.insertTag(tag)
+    override suspend fun insertTag(tagEntity: TagEntity): Long {
+        return tagDao.insertTag(tagEntity)
     }
 
-    override suspend fun updateTag(tag: Tag) {
-        tagDao.updateTag(tag)
+    override suspend fun updateTag(tagEntity: TagEntity) {
+        tagDao.updateTag(tagEntity)
     }
 
-    override suspend fun deleteTag(tag: Tag) {
-        tagDao.deleteTag(tag)
+    override suspend fun deleteTag(tagEntity: TagEntity) {
+        tagDao.deleteTag(tagEntity)
     }
 
-    override suspend fun getTagByName(tagName: String): Tag? {
+    override suspend fun getTagByName(tagName: String): TagEntity? {
         return tagDao.getTagByName(tagName)
     }
 }

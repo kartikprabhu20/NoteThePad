@@ -9,7 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 @Composable
@@ -17,7 +17,7 @@ fun EvenHandler(
     snackBarHostState: SnackbarHostState,
     viewModel: NotesViewModel = hiltViewModel(),
     context: Context = LocalContext.current,
-    onPinWidget: (Note) -> Unit = {}
+    onPinWidget: (NoteEntity) -> Unit = {}
 ) {
     val noteDeletedMsg = stringResource(R.string.msg_note_deleted)
     val undoLabel = stringResource(R.string.label_undo)

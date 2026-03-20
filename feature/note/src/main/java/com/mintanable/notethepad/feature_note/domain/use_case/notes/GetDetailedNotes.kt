@@ -16,7 +16,7 @@ class GetDetailedNotes(
     operator fun invoke(order: NoteOrder): Flow<List<DetailedNote>> {
         return repository.getNotes(order).mapLatest { notesList ->
             notesList.map { noteWithTags ->
-                detailedNoteMapper.toDetailedNote(noteWithTags.note, noteWithTags.tags)
+                detailedNoteMapper.toDetailedNote(noteWithTags.noteEntity, noteWithTags.tagEntities)
             }
         }
     }

@@ -49,7 +49,7 @@ import androidx.core.net.toUri
 import com.mintanable.notethepad.core.model.note.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.RedOrange
@@ -179,7 +179,7 @@ fun NoteItemUI(
                         )
                     }
 
-                    if(note.tags.isNotEmpty()){
+                    if(note.tagEntities.isNotEmpty()){
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Label,
                             contentDescription = stringResource(R.string.content_description_tags_available),
@@ -244,7 +244,7 @@ fun NoteItemUIPreviewCheckboxes() {
                                 reminderTime = 1,
                                 checkListItems = listOf(CheckboxItem(text = "abc")),
                                 isCheckboxListAvailable = true,
-                                tags = listOf(Tag("abc"))
+                                tagEntities = listOf(TagEntity("abc"))
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},
@@ -282,7 +282,7 @@ fun NoteItemUIPreview() {
                                 imageUris = listOf("image".toUri()),
                                 audioAttachments = listOf(Attachment("x".toUri(),123)),
                                 reminderTime = 1,
-                                tags = listOf(Tag("abc"))
+                                tagEntities = listOf(TagEntity("abc"))
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},

@@ -267,7 +267,7 @@ fun AddEditNoteScreen(
             attachedAudios = uiState.attachedAudios,
             mediaState = uiState.mediaState,
             reminderTime = uiState.reminderTime,
-            tags = uiState.tags,
+            tagEntities = uiState.tagEntities,
             suggestedTags = uiState.suggestedTags,
             isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
             onEvent = onEvent,
@@ -339,7 +339,7 @@ fun AddEditNoteScreen(
             EditTextDialog(
                 onDismiss = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) },
                 onConfirm = { tagName -> viewModel.onEvent(AddEditNoteEvent.InsertLabel(tagName)) },
-                tags = existingTags
+                tagEntities = existingTags
             )
         }
 

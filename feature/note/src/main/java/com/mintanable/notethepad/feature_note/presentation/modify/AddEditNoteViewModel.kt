@@ -13,7 +13,7 @@ import com.mintanable.notethepad.core.model.note.Attachment
 import com.mintanable.notethepad.core.model.note.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.NoteColors
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
@@ -108,7 +108,7 @@ class AddEditNoteViewModel @Inject constructor(
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,
                         isCheckboxListAvailable = detailedNote.isCheckboxListAvailable,
-                        tags = detailedNote.tags
+                        tagEntities = detailedNote.tagEntities
                     )
                 }
             }
@@ -309,23 +309,23 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.InsertLabel -> {
                 _uiState.update { currentState ->
-                    val newTags = if (currentState.tags.map { it.tagName }.contains(event.tagName)) {
-                        currentState.tags
+                    val newTagEntities = if (currentState.tagEntities.map { it.tagName }.contains(event.tagName)) {
+                        currentState.tagEntities
                     } else {
-                        currentState.tags + Tag(event.tagName)
+                        currentState.tagEntities + TagEntity(event.tagName)
                     }
                     val newSuggestedTags = if(currentState.suggestedTags.contains(event.tagName)){
                         currentState.suggestedTags - event.tagName
                     }else{
                         currentState.suggestedTags
                     }
-                    currentState.copy(tags = newTags, showAddNewTagDialog = false, suggestedTags = newSuggestedTags)
+                    currentState.copy(tagEntities = newTagEntities, showAddNewTagDialog = false, suggestedTags = newSuggestedTags)
                 }
             }
             is AddEditNoteEvent.DeleteLabel -> {
                 _uiState.update { currentState ->
-                    val newList = currentState.tags.filterNot { it.tagName == event.tagName }
-                    currentState.copy(tags = newList, showAddNewTagDialog = false)
+                    val newList = currentState.tagEntities.filterNot { it.tagName == event.tagName }
+                    currentState.copy(tagEntities = newList, showAddNewTagDialog = false)
                 }
             }
 
@@ -392,7 +392,7 @@ class AddEditNoteViewModel @Inject constructor(
                 audioUris = state.attachedAudios.map { it.uri },
                 reminderTime = state.reminderTime,
                 checkboxItems = state.checkListItems,
-                tags = state.tags
+                tagEntities = state.tagEntities
             )
     }
 

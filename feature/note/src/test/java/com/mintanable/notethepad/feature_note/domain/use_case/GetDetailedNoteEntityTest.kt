@@ -3,9 +3,9 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteWithTags
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
@@ -39,7 +39,7 @@ class GetDetailedNoteTest {
     @Test
     fun `When valid ID is provided, returns correctly mapped DetailedNote`() = runTest {
         val noteId = 1L
-        val fakeNote = Note(
+        val fakeNoteEntity = NoteEntity(
             id = noteId,
             title = "Test Note",
             content = "[ ] Task 1",
@@ -49,7 +49,7 @@ class GetDetailedNoteTest {
             color = 0xFFFFFF,
         )
 
-        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNote, tags = listOf( Tag("tag")))
+        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNoteEntity, tagEntities = listOf( TagEntity("tag")))
         coEvery { audioMetadataProvider.getDuration(any()) } returns 3500L
 
         val result = getDetailedNote(noteId)
@@ -58,7 +58,7 @@ class GetDetailedNoteTest {
         assertThat(result?.title).isEqualTo("Test Note")
         assertThat(result?.isCheckboxListAvailable).isTrue()
         assertThat(result?.audioAttachments?.first()?.duration).isEqualTo(3500L)
-        assertThat(result?.tags?.get(0)).isEqualTo(Tag("tag"))
+        assertThat(result?.tagEntities?.get(0)).isEqualTo(TagEntity("tag"))
     }
 
     @Test
@@ -76,7 +76,7 @@ class GetDetailedNoteTest {
     fun `Verify Mapper Cache is utilized for multiple calls with same URI`() = runTest {
         val noteId = 1L
         val uri = "file://audio.mp3"
-        val fakeNote = Note(
+        val fakeNoteEntity = NoteEntity(
             id = noteId,
             title = "Title",
             content = "...",
@@ -86,7 +86,7 @@ class GetDetailedNoteTest {
             color = 0
         )
 
-        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNote)
+        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNoteEntity)
         coEvery { audioMetadataProvider.getDuration(any()) } returns 1000L
 
         getDetailedNote(noteId)

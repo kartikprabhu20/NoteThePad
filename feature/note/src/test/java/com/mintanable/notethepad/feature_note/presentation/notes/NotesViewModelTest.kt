@@ -8,10 +8,10 @@ import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
-import com.mintanable.notethepad.core.model.note.Tag
+import com.mintanable.notethepad.core.model.note.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
@@ -105,7 +105,7 @@ class NotesViewModelTest {
 
     @Test
     fun `Changing filter via updateFilter triggers new database fetch`() = runTest {
-        val tag = Tag(tagId = 10L, tagName = "Work")
+        val tagEntity = TagEntity(tagId = 10L, tagName = "Work")
         val tagNotes = listOf(DetailedNote(
             id = 1,
             title = "Testing Title",
@@ -126,13 +126,13 @@ class NotesViewModelTest {
 
             viewModel.updateFilter(
                 filter = NotesFilterType.TAGS.filter,
-                tagId = tag.tagId,
-                tagName = tag.tagName
+                tagId = tagEntity.tagId,
+                tagName = tagEntity.tagName
             )
 
             val state = awaitItem()
             assertThat(state.notes).isEqualTo(tagNotes)
-            verify { noteUseCases.getNotesWithTags(any(), tag) }
+            verify { noteUseCases.getNotesWithTags(any(), tagEntity) }
         }
     }
 
@@ -184,7 +184,7 @@ class NotesViewModelTest {
         advanceUntilIdle()
 
         coVerify { fileIOUseCases.deleteFiles(listOf("content://media/1")) }
-        coVerify { noteUseCases.deleteNote.invoke(any<Note>()) }
+        coVerify { noteUseCases.deleteNote.invoke(any<NoteEntity>()) }
 
         viewModel.onEvent(NotesEvent.RestoreNote)
         advanceUntilIdle()

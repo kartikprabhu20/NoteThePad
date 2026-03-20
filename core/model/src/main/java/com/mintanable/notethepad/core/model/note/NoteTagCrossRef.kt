@@ -10,13 +10,13 @@ import androidx.room.Index
     primaryKeys = ["noteId", "tagId"],
     foreignKeys = [
         ForeignKey(
-            entity = Note::class,
+            entity = NoteEntity::class,
             parentColumns = ["id"],
             childColumns = ["noteId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = Tag::class,
+            entity = TagEntity::class,
             parentColumns = ["tagId"],
             childColumns = ["tagId"],
             onDelete = ForeignKey.CASCADE
