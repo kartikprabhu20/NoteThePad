@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Module Dependency Graph</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; overflow: hidden; user-select: none; }
+  #canvas-wrap { width: 100vw; height: 100vh; position: relative; }
+  svg { width: 100%; height: 100%; }
+
+  .node rect { stroke-width: 1.5; filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+  .node text { font-size: 12px; font-weight: 500; fill: #e6edf3; pointer-events: none; }
+  .node.app     rect { fill: #1a1f35; stroke: #7c3aed; }
+  .node.feature rect { fill: #0d2136; stroke: #1f6feb; }
+  .node.core    rect { fill: #0d2014; stroke: #238636; }
+
+  .edge         { fill: none; stroke: #30363d; stroke-width: 1.5; }
+  .edge.api     { stroke: #238636; stroke-dasharray: 6 3; }
+  .edge.dim     { opacity: .15; }
+  .edge.hi      { stroke: #58a6ff; stroke-width: 2.5; }
+  .edge.hi.api  { stroke: #3fb950; }
+
+  #controls {
+    position: absolute; top: 14px; right: 14px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 30;
+  }
+  #controls button {
+    background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+    padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; text-align: left;
+  }
+  #controls button:hover { background: #30363d; border-color: #58a6ff; }
+
+  #legend {
+    position: absolute; bottom: 14px; left: 14px;
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 8px; padding: 12px 16px; font-size: 12px; z-index: 30; line-height: 2;
+  }
+  #legend .row { display: flex; align-items: center; gap: 8px; }
+  .sw { width: 28px; height: 3px; border-radius: 2px; }
+  .sw.app  { background: #7c3aed; }
+  .sw.feat { background: #1f6feb; }
+  .sw.core { background: #238636; }
+
+  #tip {
+    position: absolute; background: #161b22; border: 1px solid #30363d;
+    border-radius: 8px; padding: 10px 14px; font-size: 12px;
+    pointer-events: none; opacity: 0; transition: opacity .12s;
+    max-width: 300px; z-index: 40; line-height: 1.65;
+  }
+  #tip .title { font-weight: 700; color: #e6edf3; margin-bottom: 5px; font-size: 13px; }
+  #tip .dep   { color: #8b949e; }
+  #tip .dep span { color: #58a6ff; }
+
+  #hint {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: #484f58; pointer-events: none; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-wrap">
+  <svg id="svg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ar"        markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#30363d"/></marker>
+      <marker id="ar-hi"     markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#58a6ff"/></marker>
+      <marker id="ar-hi-api" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#3fb950"/></marker>
+      <marker id="ar-api"    markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#238636"/></marker>
+    </defs>
+    <g id="edges-layer"></g>
+    <g id="nodes-layer"></g>
+  </svg>
+  <div id="tip"></div>
+  <div id="controls">
+    <button onclick="fitView()">&#x229f; Fit view</button>
+    <button onclick="resetLayout()">&#x21ba; Reset layout</button>
+    <button onclick="resetHighlight()">&#x2715; Clear highlight</button>
+  </div>
+  <div id="legend">
+    <div class="row"><div class="sw app"></div> :app</div>
+    <div class="row"><div class="sw feat"></div> :feature:*</div>
+    <div class="row"><div class="sw core"></div> :core:*</div>
+    <div class="row" style="gap:8px;align-items:center">
+      <div style="width:28px;border-top:2px dashed #238636"></div> api dep
+    </div>
+  </div>
+  <div id="hint">Drag nodes &middot; Scroll to zoom &middot; Drag background to pan &middot; Click node to highlight</div>
+</div>
+
+<script>
+// ── AUTO-GENERATED — edit update_module_graph.py, not this file ───────────────
+const MODULES = [
+  { id: ':app', label: ':app', type: 'app' },
+  { id: ':core:model', label: ':core:model', type: 'core' },
+  { id: ':core:common', label: ':core:common', type: 'core' },
+  { id: ':core:data', label: ':core:data', type: 'core' },
+  { id: ':core:ui', label: ':core:ui', type: 'core' },
+  { id: ':core:ai', label: ':core:ai', type: 'core' },
+  { id: ':feature:note', label: ':feature:note', type: 'feature' },
+  { id: ':core:backup', label: ':core:backup', type: 'core' },
+  { id: ':feature:auth', label: ':feature:auth', type: 'feature' },
+  { id: ':feature:widgets', label: ':feature:widgets', type: 'feature' },
+  { id: ':feature:settings', label: ':feature:settings', type: 'feature' },
+  { id: ':core:template', label: ':core:template', type: 'core' },
+];
+
+// [from, to, isApi]
+const EDGES = [
+  [':app',                          ':core:model',                 false],
+  [':app',                          ':core:common',                false],
+  [':app',                          ':core:ui',                    false],
+  [':app',                          ':core:data',                  false],
+  [':app',                          ':feature:note',               false],
+  [':app',                          ':feature:auth',               false],
+  [':app',                          ':feature:widgets',            false],
+  [':app',                          ':feature:settings',           false],
+  [':core:common',                  ':core:model',                 false],
+  [':core:data',                    ':core:model',                 false],
+  [':core:data',                    ':core:common',                false],
+  [':core:ai',                      ':core:model',                 false],
+  [':core:ai',                      ':core:data',                  false],
+  [':core:ai',                      ':core:common',                false],
+  [':feature:note',                 ':core:model',                 false],
+  [':feature:note',                 ':core:data',                  false],
+  [':feature:note',                 ':core:common',                false],
+  [':feature:note',                 ':core:ui',                    false],
+  [':feature:note',                 ':core:ai',                    false],
+  [':core:backup',                  ':core:model',                 false],
+  [':core:backup',                  ':core:common',                false],
+  [':core:backup',                  ':core:data',                  false],
+  [':feature:auth',                 ':core:model',                 false],
+  [':feature:auth',                 ':core:common',                false],
+  [':feature:auth',                 ':core:ui',                    false],
+  [':feature:auth',                 ':core:data',                  false],
+  [':feature:widgets',              ':core:model',                 false],
+  [':feature:widgets',              ':core:common',                false],
+  [':feature:widgets',              ':core:data',                  false],
+  [':feature:widgets',              ':core:ui',                    false],
+  [':feature:settings',             ':core:model',                 false],
+  [':feature:settings',             ':core:data',                  false],
+  [':feature:settings',             ':core:common',                false],
+  [':feature:settings',             ':core:ui',                    false],
+  [':feature:settings',             ':core:ai',                    false],
+  [':feature:settings',             ':core:backup',                false],
+];
+
+const NODE_W = 152, NODE_H = 36;
+const COL = 168, ROW = 120, PX = 36, PY = 48;
+
+const DEFAULT_POS = {
+  ':app':                            { col: 1, row: 0 },
+  ':core:model':                     { col: 1.5, row: 4 },
+  ':core:common':                    { col: 1, row: 3 },
+  ':core:data':                      { col: 2, row: 3 },
+  ':core:ui':                        { col: 2.5, row: 2 },
+  ':core:ai':                        { col: 0.5, row: 2 },
+  ':feature:note':                   { col: 1, row: 1 },
+  ':core:backup':                    { col: 1.5, row: 2 },
+  ':feature:auth':                   { col: 0, row: 1 },
+  ':feature:widgets':                { col: 3, row: 1 },
+  ':feature:settings':               { col: 2, row: 1 },
+  ':core:template':                  { col: 2, row: 0 },
+};
+
+function defaultXY(id) {
+  const d = DEFAULT_POS[id];
+  return { x: PX + d.col * COL, y: PY + d.row * ROW };
+}
+
+const pos = {};
+MODULES.forEach(m => { pos[m.id] = { ...defaultXY(m.id) }; });
+
+function cx(id) { return pos[id].x + NODE_W / 2; }
+function cy(id) { return pos[id].y + NODE_H / 2; }
+// ── Adjacency ─────────────────────────────────────────────────────────────────
+const deps = {};
+MODULES.forEach(m => { deps[m.id] = []; });
+EDGES.forEach(([f, t, api]) => deps[f].push({ id: t, api }));
+
+// ── SVG helpers ───────────────────────────────────────────────────────────────
+const svgNS = 'http://www.w3.org/2000/svg';
+function mkEl(tag, attrs) {
+  const e = document.createElementNS(svgNS, tag);
+  Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+  return e;
+}
+
+const svg        = document.getElementById('svg');
+const edgesLayer = document.getElementById('edges-layer');
+const nodesLayer = document.getElementById('nodes-layer');
+
+let vx = 0, vy = 0, scale = 1;
+let panActive = false, panLx, panLy;
+
+const viewport = mkEl('g', {});
+svg.insertBefore(viewport, edgesLayer);
+viewport.appendChild(edgesLayer);
+viewport.appendChild(nodesLayer);
+
+function applyVP() {
+  viewport.setAttribute('transform', `translate(${vx},${vy}) scale(${scale})`);
+}
+
+// ── Edges ─────────────────────────────────────────────────────────────────────
+function edgeD(f, t) {
+  const fx = cx(f), fy = cy(f), tx = cx(t), ty = cy(t);
+  const dx = tx - fx, dy = ty - fy, len = Math.hypot(dx, dy);
+  if (len < 1) return '';
+  const nx = dx / len, ny = dy / len;
+  const sx = fx + nx * (NODE_W / 2 + 2),  sy = fy + ny * (NODE_H / 2 + 2);
+  const ex = tx - nx * (NODE_W / 2 + 7),  ey = ty - ny * (NODE_H / 2 + 7);
+  return `M${sx.toFixed(1)},${sy.toFixed(1)} L${ex.toFixed(1)},${ey.toFixed(1)}`;
+}
+
+const edgeEls = EDGES.map(([f, t, api]) => {
+  const path = mkEl('path', {
+    class: 'edge' + (api ? ' api' : ''),
+    'marker-end': api ? 'url(#ar-api)' : 'url(#ar)',
+    d: edgeD(f, t),
+  });
+  edgesLayer.appendChild(path);
+  return { el: path, from: f, to: t, api };
+});
+
+function refreshEdges(nodeId) {
+  edgeEls.forEach(e => {
+    if (!nodeId || e.from === nodeId || e.to === nodeId)
+      e.el.setAttribute('d', edgeD(e.from, e.to));
+  });
+}
+
+// ── Nodes ─────────────────────────────────────────────────────────────────────
+const nodeEls   = {};
+const nodeTypes = {};
+
+MODULES.forEach(m => {
+  nodeTypes[m.id] = m.type;
+  const g = mkEl('g', {
+    class: `node ${m.type}`,
+    transform: `translate(${pos[m.id].x},${pos[m.id].y})`,
+    'data-nid': m.id,
+  });
+  g.style.cursor = 'grab';
+  g.appendChild(mkEl('rect', { width: NODE_W, height: NODE_H }));
+  const txt = document.createElementNS(svgNS, 'text');
+  txt.setAttribute('x', NODE_W / 2);
+  txt.setAttribute('y', NODE_H / 2 + 4);
+  txt.setAttribute('text-anchor', 'middle');
+  txt.textContent = m.label;
+  g.appendChild(txt);
+  g.addEventListener('mouseenter', e => showTip(m.id, e));
+  g.addEventListener('mousemove',  e => moveTip(e));
+  g.addEventListener('mouseleave', hideTip);
+  nodesLayer.appendChild(g);
+  nodeEls[m.id] = g;
+});
+
+// ── Drag + Pan + Click — all handled from SVG level (event delegation) ────────
+let dragNode = null, dragLx, dragLy, dragMoved = false;
+
+function nodeOf(e) {
+  // Walk up from e.target to find a node <g data-nid="...">
+  let el = e.target;
+  while (el && el !== svg) {
+    if (el.dataset && el.dataset.nid) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
+
+svg.addEventListener('mousedown', e => {
+  const node = nodeOf(e);
+  if (node) {
+    dragNode  = node.dataset.nid;
+    dragLx    = e.clientX;
+    dragLy    = e.clientY;
+    dragMoved = false;
+    node.style.cursor = 'grabbing';
+    nodesLayer.appendChild(node);   // bring to front
+  } else {
+    panActive = true;
+    panLx = e.clientX;
+    panLy = e.clientY;
+    svg.style.cursor = 'grabbing';
+  }
+  e.preventDefault();
+});
+
+window.addEventListener('mousemove', e => {
+  if (dragNode) {
+    const dx = (e.clientX - dragLx) / scale;
+    const dy = (e.clientY - dragLy) / scale;
+    pos[dragNode].x += dx;
+    pos[dragNode].y += dy;
+    dragLx = e.clientX;
+    dragLy = e.clientY;
+    dragMoved = true;
+    nodeEls[dragNode].setAttribute('transform', `translate(${pos[dragNode].x},${pos[dragNode].y})`);
+    refreshEdges(dragNode);
+    return;
+  }
+  if (panActive) {
+    vx += e.clientX - panLx;
+    vy += e.clientY - panLy;
+    panLx = e.clientX;
+    panLy = e.clientY;
+    applyVP();
+  }
+});
+
+window.addEventListener('mouseup', e => {
+  if (dragNode) {
+    nodeEls[dragNode].style.cursor = 'grab';
+    if (!dragMoved) toggleHighlight(dragNode);   // click = no movement
+    dragNode = null;
+    dragMoved = false;
+  }
+  if (panActive) {
+    panActive = false;
+    svg.style.cursor = '';
+  }
+});
+
+// Background click (mouseup with no drag and no node) = clear highlight
+svg.addEventListener('click', e => {
+  if (!nodeOf(e)) resetHighlight();
+});
+
+// ── Zoom ──────────────────────────────────────────────────────────────────────
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = svg.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const factor = e.deltaY < 0 ? 1.12 : 0.89;
+  const ns = Math.max(0.15, Math.min(5, scale * factor));
+  vx = mx - (mx - vx) * (ns / scale);
+  vy = my - (my - vy) * (ns / scale);
+  scale = ns;
+  applyVP();
+}, { passive: false });
+
+// ── Fit / Reset ───────────────────────────────────────────────────────────────
+function fitView() {
+  const W = svg.clientWidth, H = svg.clientHeight;
+  const xs = MODULES.map(m => pos[m.id].x), ys = MODULES.map(m => pos[m.id].y);
+  const minX = Math.min(...xs) - 20, minY = Math.min(...ys) - 20;
+  const maxX = Math.max(...xs) + NODE_W + 20, maxY = Math.max(...ys) + NODE_H + 20;
+  scale = Math.min(W / (maxX - minX), H / (maxY - minY)) * 0.92;
+  vx = (W - (maxX + minX) * scale) / 2;
+  vy = (H - (maxY + minY) * scale) / 2;
+  applyVP();
+}
+
+function resetLayout() {
+  MODULES.forEach(m => {
+    pos[m.id] = { ...defaultXY(m.id) };
+    nodeEls[m.id].setAttribute('transform', `translate(${pos[m.id].x},${pos[m.id].y})`);
+  });
+  refreshEdges();
+  fitView();
+  resetHighlight();
+}
+
+// ── Highlight ─────────────────────────────────────────────────────────────────
+let activeHighlight = null;
+
+// Pre-build forward and reverse adjacency maps
+const fwdAdj = {};
+MODULES.forEach(m => { fwdAdj[m.id] = deps[m.id].map(d => d.id); });
+
+const rdepsMap = {};
+MODULES.forEach(m => { rdepsMap[m.id] = []; });
+EDGES.forEach(([f, t]) => rdepsMap[t].push(f));
+
+function bfs(starts, adj) {
+  const visited = new Set(starts);
+  const q = [...starts];
+  while (q.length) {
+    (adj[q.shift()] || []).forEach(n => { if (!visited.has(n)) { visited.add(n); q.push(n); } });
+  }
+  return visited;
+}
+
+function toggleHighlight(id) {
+  if (activeHighlight === id) { resetHighlight(); return; }
+  activeHighlight = id;
+
+  const active = new Set([...bfs([id], fwdAdj), ...bfs([id], rdepsMap)]);
+
+  // Nodes: dim unrelated, highlight connected, mark selected with yellow border
+  MODULES.forEach(m => {
+    const g   = nodeEls[m.id];
+    const r   = g.querySelector('rect');
+    if (m.id === id) {
+      g.style.opacity = '1';
+      r.style.stroke       = '#f5c542';
+      r.style.strokeWidth  = '3';
+      r.style.filter       = 'drop-shadow(0 0 10px #f5c542)';
+    } else if (active.has(m.id)) {
+      g.style.opacity = '1';
+      r.style.stroke       = '';
+      r.style.strokeWidth  = '2';
+      r.style.filter       = 'drop-shadow(0 0 6px rgba(255,255,255,0.2))';
+    } else {
+      g.style.opacity = '0.12';
+      r.style.stroke      = '';
+      r.style.strokeWidth = '';
+      r.style.filter      = '';
+    }
+  });
+
+  // Edges: highlight those between active nodes, dim the rest
+  edgeEls.forEach(({ el, from, to, api }) => {
+    if (active.has(from) && active.has(to)) {
+      el.style.opacity     = '1';
+      el.style.stroke      = api ? '#3fb950' : '#58a6ff';
+      el.style.strokeWidth = '2.5';
+      el.setAttribute('marker-end', api ? 'url(#ar-hi-api)' : 'url(#ar-hi)');
+    } else {
+      el.style.opacity     = '0.06';
+      el.style.stroke      = '';
+      el.style.strokeWidth = '';
+      el.setAttribute('marker-end', api ? 'url(#ar-api)' : 'url(#ar)');
+    }
+  });
+}
+
+function resetHighlight() {
+  activeHighlight = null;
+  MODULES.forEach(m => {
+    const g = nodeEls[m.id];
+    const r = g.querySelector('rect');
+    g.style.opacity      = '';
+    r.style.stroke       = '';
+    r.style.strokeWidth  = '';
+    r.style.filter       = '';
+  });
+  edgeEls.forEach(({ el, api }) => {
+    el.style.opacity     = '';
+    el.style.stroke      = '';
+    el.style.strokeWidth = '';
+    el.setAttribute('marker-end', api ? 'url(#ar-api)' : 'url(#ar)');
+  });
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+const tip = document.getElementById('tip');
+function showTip(id, e) {
+  const d = deps[id];
+  const lines = d.length
+    ? d.map(dep => `<div class="dep">&rarr; <span>${dep.id}</span>${dep.api ? ' <em style="color:#3fb950">(api)</em>' : ''}</div>`).join('')
+    : '<div class="dep" style="color:#484f58">no module deps</div>';
+  tip.innerHTML = `<div class="title">${id}</div>${lines}`;
+  tip.style.opacity = '1';
+  moveTip(e);
+}
+function moveTip(e) {
+  tip.style.left = Math.min(e.clientX + 14, window.innerWidth  - 320) + 'px';
+  tip.style.top  = Math.min(e.clientY - 10, window.innerHeight - 200) + 'px';
+}
+function hideTip() { tip.style.opacity = '0'; }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+fitView();
+</script>
+</body>
+</html>
