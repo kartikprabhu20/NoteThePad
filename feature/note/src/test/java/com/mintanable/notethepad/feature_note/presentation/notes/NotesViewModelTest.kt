@@ -5,15 +5,18 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
+import com.mintanable.notethepad.core.common.NotesFilterType
+import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.core.model.note.DetailedNote
 import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteOrder
+import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
-import com.mintanable.notethepad.ui.util.NotesFilterType
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -37,8 +40,6 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotesViewModelTest {
-    private val testDispatcher = UnconfinedTestDispatcher()
-
     private val noteUseCases = mockk<NoteUseCases>(relaxed = true)
     private val getLayoutSettings = mockk<GetLayoutSettings>(relaxed = true)
     private val toggleLayoutSettings = mockk<ToggleLayoutSettings>(relaxed = true)
@@ -46,7 +47,10 @@ class NotesViewModelTest {
     private val tagUseCases = mockk<TagUseCases>(relaxed = true)
 
     private val savedStateHandle = SavedStateHandle()
-    private val dispatcherProvider = TestDispatcherProvider()
+    private val widgetRefresher = mockk< WidgetRefresher>(relaxed = true)
+
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcherProvider = TestDispatcherProvider(testDispatcher)
 
     private lateinit var viewModel: NotesViewModel
 
@@ -55,8 +59,14 @@ class NotesViewModelTest {
         Dispatchers.setMain(testDispatcher)
         every { getLayoutSettings() } returns flowOf(true)
         viewModel = NotesViewModel(
-            savedStateHandle, noteUseCases,tagUseCases,
-            getLayoutSettings, toggleLayoutSettings, fileIOUseCases, dispatcherProvider
+            savedStateHandle = savedStateHandle,
+            noteUseCases = noteUseCases,
+            tagUseCases = tagUseCases,
+            getLayoutSettings = getLayoutSettings,
+            toggleLayoutSettings = toggleLayoutSettings,
+            fileIOUseCases = fileIOUseCases,
+            dispatchers = testDispatcherProvider,
+            widgetRefresher = widgetRefresher
         )
     }
 
