@@ -2,7 +2,7 @@ package com.mintanable.notethepad.feature_ai.data.source
 
 import com.google.mlkit.genai.common.FeatureStatus
 import com.google.mlkit.genai.prompt.Generation
-import com.mintanable.notethepad.core.model.AiModelDownloadStatus
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

@@ -9,7 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mintanable.notethepad.core.model.Note
+import com.mintanable.notethepad.core.model.note.Note
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel
 @Composable

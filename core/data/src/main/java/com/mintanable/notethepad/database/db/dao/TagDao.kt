@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Tag
 import kotlinx.coroutines.flow.Flow
 
 @Dao

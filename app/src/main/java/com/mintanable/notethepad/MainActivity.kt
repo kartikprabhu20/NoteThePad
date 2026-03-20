@@ -32,7 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper

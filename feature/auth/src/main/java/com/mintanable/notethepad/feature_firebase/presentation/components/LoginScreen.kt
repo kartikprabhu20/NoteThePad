@@ -22,7 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthState
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_firebase.R

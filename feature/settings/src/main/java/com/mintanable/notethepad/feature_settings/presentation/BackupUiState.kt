@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
-import com.mintanable.notethepad.core.model.DriveFileMetadata
+import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 
 sealed class BackupUiState {
     object Loading : BackupUiState()

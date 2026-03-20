@@ -5,10 +5,10 @@ import android.net.Uri
 import com.mintanable.notethepad.core.common.AttachmentHelper
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.file.FileManager
-import com.mintanable.notethepad.core.model.CheckboxItem
-import com.mintanable.notethepad.core.model.InvalidNoteException
-import com.mintanable.notethepad.core.model.Note
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.note.InvalidNoteException
+import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 

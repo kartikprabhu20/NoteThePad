@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_firebase.domain.repository
 
-import com.mintanable.notethepad.core.model.User
+import com.mintanable.notethepad.core.model.settings.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

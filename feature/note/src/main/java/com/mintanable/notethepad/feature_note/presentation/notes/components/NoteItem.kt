@@ -46,10 +46,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.core.net.toUri
-import com.mintanable.notethepad.core.model.Attachment
-import com.mintanable.notethepad.core.model.CheckboxItem
-import com.mintanable.notethepad.core.model.DetailedNote
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Attachment
+import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.note.DetailedNote
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.RedOrange

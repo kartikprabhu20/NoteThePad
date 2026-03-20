@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_backup.domain.use_case
 
-import com.mintanable.notethepad.core.model.BackupSettings
+import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
 import javax.inject.Inject
 

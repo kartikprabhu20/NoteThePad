@@ -47,7 +47,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.AttachmentType
+import com.mintanable.notethepad.core.model.note.AttachmentType
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.BottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.DateAndTimePicker

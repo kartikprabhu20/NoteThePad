@@ -31,7 +31,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.video.videoFrameMillis
-import com.mintanable.notethepad.core.model.AttachmentType
+import com.mintanable.notethepad.core.model.note.AttachmentType
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.theme.NoteThePadTheme

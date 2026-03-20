@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model
+package com.mintanable.notethepad.core.model.settings
 
 data class Settings(
     val notificationsEnabled: Boolean = true,

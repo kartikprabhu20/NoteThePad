@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.core.common
 
-import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.note.CheckboxItem
 
 
 object CheckboxConvertors {

@@ -1,12 +1,12 @@
 package com.mintanable.notethepad.database.db.repository
 
 import androidx.room.withTransaction
-import com.mintanable.notethepad.core.model.Note
-import com.mintanable.notethepad.core.model.NoteOrder
-import com.mintanable.notethepad.core.model.NoteTagCrossRef
-import com.mintanable.notethepad.core.model.NoteWithTags
-import com.mintanable.notethepad.core.model.OrderType
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteOrder
+import com.mintanable.notethepad.core.model.note.NoteTagCrossRef
+import com.mintanable.notethepad.core.model.note.NoteWithTags
+import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.database.db.NoteDatabase
 import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.dao.TagDao

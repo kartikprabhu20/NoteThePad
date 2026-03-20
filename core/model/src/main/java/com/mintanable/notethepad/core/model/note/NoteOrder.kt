@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model
+package com.mintanable.notethepad.core.model.note
 
 sealed class NoteOrder(open val orderType: OrderType) {
     data class Title(override val orderType: OrderType): NoteOrder(orderType)

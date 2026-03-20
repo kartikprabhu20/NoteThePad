@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_backup.domain
 
-import com.mintanable.notethepad.core.model.BackupFrequency
+import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import java.time.Duration
 import java.time.ZonedDateTime
 

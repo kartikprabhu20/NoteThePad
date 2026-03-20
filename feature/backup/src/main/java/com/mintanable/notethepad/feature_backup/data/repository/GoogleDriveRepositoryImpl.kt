@@ -4,9 +4,9 @@ import android.util.Log
 import com.google.api.client.googleapis.media.MediaHttpDownloader
 import com.google.api.client.googleapis.media.MediaHttpUploader
 import com.google.api.client.http.FileContent
-import com.mintanable.notethepad.core.model.DriveFileMetadata
-import com.mintanable.notethepad.core.model.LoadStatus
-import com.mintanable.notethepad.core.model.LoadType
+import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
+import com.mintanable.notethepad.core.model.backup.LoadStatus
+import com.mintanable.notethepad.core.model.backup.LoadType
 import com.mintanable.notethepad.feature_backup.domain.GoogleDriveService
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
 import kotlinx.coroutines.Dispatchers

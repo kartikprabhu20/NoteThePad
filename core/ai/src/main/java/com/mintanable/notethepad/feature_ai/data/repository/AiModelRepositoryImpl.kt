@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.mintanable.notethepad.core.common.DispatcherProvider
-import com.mintanable.notethepad.core.model.AiModel
-import com.mintanable.notethepad.core.model.AiModelCatalog
+import com.mintanable.notethepad.core.model.ai.AiModel
+import com.mintanable.notethepad.core.model.ai.AiModelCatalog
 import com.mintanable.notethepad.feature_ai.BuildConfig
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import dagger.hilt.android.qualifiers.ApplicationContext

@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.mintanable.notethepad.core.model.BackupFrequency
+import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.theme.NoteThePadTheme
 
 @Composable

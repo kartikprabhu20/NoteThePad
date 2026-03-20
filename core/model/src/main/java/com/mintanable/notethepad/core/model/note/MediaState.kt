@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model
+package com.mintanable.notethepad.core.model.note
 
 data class MediaState(
     val currentUri: String? = null,

@@ -44,10 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.mintanable.notethepad.core.model.Attachment
-import com.mintanable.notethepad.core.model.CheckboxItem
-import com.mintanable.notethepad.core.model.MediaState
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Attachment
+import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.note.MediaState
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEvent

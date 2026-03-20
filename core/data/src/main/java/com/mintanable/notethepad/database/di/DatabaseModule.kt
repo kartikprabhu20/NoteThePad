@@ -6,6 +6,8 @@ import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.NoteDatabase
 import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.dao.TagDao
+import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepository
+import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepositoryImpl
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.repository.NoteRepositoryImpl
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
@@ -67,5 +69,11 @@ object DatabaseModule {
     @Singleton
     fun provideSharedPreferencesRepository(@ApplicationContext context: Context): SharedPreferencesRepository {
         return SharedPreferencesRepository(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNavigationDrawerRepository(): NavigationDrawerItemRepository {
+        return NavigationDrawerItemRepositoryImpl()
     }
 }

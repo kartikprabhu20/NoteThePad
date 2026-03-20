@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_ai.domain.repository
 
-import com.mintanable.notethepad.core.model.AiModelDownloadStatus
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import kotlinx.coroutines.flow.Flow
 
 interface NoteAssistantRepository {

@@ -26,6 +26,10 @@ dependencies {
     api project(':core:model')
     implementation project(':core:common')
 
+    //Material
+    implementation "androidx.compose.material:material-icons-extended"
+
+
     // Room — runtime/ktx come transitively via api project(':core:model')
     def room_version = "2.6.1"
     ksp "androidx.room:room-compiler:$room_version"

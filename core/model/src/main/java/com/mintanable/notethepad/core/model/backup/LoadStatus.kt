@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model
+package com.mintanable.notethepad.core.model.backup
 
 sealed class LoadStatus {
     object Idle : LoadStatus()

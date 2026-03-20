@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model
+package com.mintanable.notethepad.core.model.ai
 
 import com.google.gson.annotations.SerializedName
 

@@ -9,8 +9,8 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.mintanable.notethepad.core.model.BackupFrequency
-import com.mintanable.notethepad.core.model.BackupSettings
+import com.mintanable.notethepad.core.model.settings.BackupFrequency
+import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.feature_backup.presentation.BackupWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit

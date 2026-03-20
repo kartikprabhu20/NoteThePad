@@ -2,9 +2,9 @@ package com.mintanable.notethepad.feature_settings.presentation
 
 import android.app.PendingIntent
 import android.content.Intent
-import com.mintanable.notethepad.core.model.AiModel
-import com.mintanable.notethepad.core.model.BackupSettings
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.core.model.ai.AiModel
+import com.mintanable.notethepad.core.model.settings.BackupSettings
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 
 sealed class SettingsEvent {
     data class UpdateTheme(val themeMode: ThemeMode) : SettingsEvent()

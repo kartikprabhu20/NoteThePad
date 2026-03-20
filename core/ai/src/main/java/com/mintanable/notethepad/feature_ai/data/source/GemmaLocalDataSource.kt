@@ -8,8 +8,8 @@ import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.SamplerConfig
-import com.mintanable.notethepad.core.model.AiModel
-import com.mintanable.notethepad.core.model.AiModelDownloadStatus
+import com.mintanable.notethepad.core.model.ai.AiModel
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException

@@ -9,7 +9,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_note.presentation.widget.NoteWidgetConfigScreen
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver

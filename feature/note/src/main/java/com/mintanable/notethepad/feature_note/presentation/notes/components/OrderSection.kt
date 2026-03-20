@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.core.model.NoteOrder
-import com.mintanable.notethepad.core.model.OrderType
+import com.mintanable.notethepad.core.model.note.NoteOrder
+import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.modify.components.DefaultRadioButton
 import com.mintanable.notethepad.theme.NoteThePadTheme

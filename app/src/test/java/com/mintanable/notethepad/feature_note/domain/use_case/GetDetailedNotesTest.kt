@@ -3,11 +3,11 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
-import com.mintanable.notethepad.core.model.Note
-import com.mintanable.notethepad.core.model.NoteOrder
-import com.mintanable.notethepad.core.model.NoteWithTags
-import com.mintanable.notethepad.core.model.OrderType
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteOrder
+import com.mintanable.notethepad.core.model.note.NoteWithTags
+import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper

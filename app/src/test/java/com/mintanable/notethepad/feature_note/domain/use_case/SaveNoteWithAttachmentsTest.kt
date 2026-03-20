@@ -5,9 +5,9 @@ import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.core.common.file.FileManager
-import com.mintanable.notethepad.core.model.CheckboxItem
-import com.mintanable.notethepad.core.model.InvalidNoteException
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.note.InvalidNoteException
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import io.mockk.coEvery
 import io.mockk.coVerify

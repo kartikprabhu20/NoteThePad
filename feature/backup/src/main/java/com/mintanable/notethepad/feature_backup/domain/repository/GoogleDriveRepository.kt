@@ -1,7 +1,7 @@
 package com.mintanable.notethepad.feature_backup.domain.repository
 
-import com.mintanable.notethepad.core.model.DriveFileMetadata
-import com.mintanable.notethepad.core.model.LoadStatus
+import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
+import com.mintanable.notethepad.core.model.backup.LoadStatus
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 

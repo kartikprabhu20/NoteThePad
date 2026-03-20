@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_backup.domain.use_case
 
-import com.mintanable.notethepad.core.model.DriveFileMetadata
+import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
 import kotlinx.coroutines.flow.Flow

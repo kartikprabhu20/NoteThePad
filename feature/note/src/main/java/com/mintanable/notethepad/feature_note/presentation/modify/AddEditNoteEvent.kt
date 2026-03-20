@@ -2,7 +2,7 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.net.Uri
 import androidx.compose.ui.focus.FocusState
-import com.mintanable.notethepad.core.model.CheckboxItem
+import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 
 sealed class AddEditNoteEvent {

@@ -10,7 +10,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.mintanable.notethepad.core.model.LoadStatus
+import com.mintanable.notethepad.core.model.backup.LoadStatus
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_NOTIFICATION_ID
 import com.mintanable.notethepad.database.db.DatabaseManager

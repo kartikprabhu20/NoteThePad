@@ -46,11 +46,11 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.core.common.humanReadableSize
-import com.mintanable.notethepad.core.model.BackupFrequency
-import com.mintanable.notethepad.core.model.DriveFileMetadata
-import com.mintanable.notethepad.core.model.LoadStatus
-import com.mintanable.notethepad.core.model.Settings
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.core.model.settings.BackupFrequency
+import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
+import com.mintanable.notethepad.core.model.backup.LoadStatus
+import com.mintanable.notethepad.core.model.settings.Settings
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.R
 import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI

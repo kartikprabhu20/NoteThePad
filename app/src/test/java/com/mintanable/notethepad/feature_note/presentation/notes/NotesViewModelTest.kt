@@ -5,9 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
-import com.mintanable.notethepad.core.model.DetailedNote
-import com.mintanable.notethepad.core.model.Note
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.DetailedNote
+import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.domain.use_case.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.TagUseCases

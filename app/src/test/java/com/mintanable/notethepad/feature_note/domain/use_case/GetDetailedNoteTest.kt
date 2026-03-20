@@ -4,9 +4,9 @@ import androidx.core.net.toUri
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.feature_note.data.repository.AudioMetadataProvider
-import com.mintanable.notethepad.core.model.Note
-import com.mintanable.notethepad.core.model.NoteWithTags
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteWithTags
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_note.domain.repository.NoteRepository
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import io.mockk.coEvery

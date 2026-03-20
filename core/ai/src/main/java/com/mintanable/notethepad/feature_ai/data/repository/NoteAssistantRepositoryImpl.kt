@@ -1,6 +1,6 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
-import com.mintanable.notethepad.core.model.AiModelDownloadStatus
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource

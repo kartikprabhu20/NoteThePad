@@ -10,7 +10,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.mintanable.notethepad.core.model.MediaState
+import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope

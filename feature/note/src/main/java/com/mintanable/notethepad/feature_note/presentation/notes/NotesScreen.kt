@@ -56,10 +56,11 @@ import androidx.navigation.NavController
 import com.mintanable.notethepad.core.common.AppVersionProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.DetailedNote
-import com.mintanable.notethepad.core.model.ThemeMode
+import com.mintanable.notethepad.core.model.note.DetailedNote
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
-import com.mintanable.notethepad.feature_navigationdrawer.domain.model.DrawerItem
+import com.mintanable.notethepad.core.model.settings.DrawerItem
+import com.mintanable.notethepad.core.model.note.Note
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_navigationdrawer.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.R
@@ -83,7 +84,7 @@ fun NotesScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
     appVersionProvider: AppVersionProvider,
-    onPinWidget: (com.mintanable.notethepad.core.model.Note) -> Unit = {}
+    onPinWidget: (Note) -> Unit = {}
 ) {
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()

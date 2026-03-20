@@ -23,7 +23,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.components.TagUI
-import com.mintanable.notethepad.core.model.Tag
+import com.mintanable.notethepad.core.model.note.Tag
 import com.mintanable.notethepad.feature_settings.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
