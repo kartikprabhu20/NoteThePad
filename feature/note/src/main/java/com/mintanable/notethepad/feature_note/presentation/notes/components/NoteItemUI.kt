@@ -56,7 +56,7 @@ import com.mintanable.notethepad.theme.RedOrange
 import com.mintanable.notethepad.theme.ThemePreviews
 
 @Composable
-fun NoteItem(
+fun NoteItemUI(
     note: DetailedNote,
     modifier:Modifier=Modifier,
     cornerRadius: Dp = 10.dp,
@@ -222,7 +222,7 @@ fun NoteItem(
 
 @ThemePreviews
 @Composable
-fun NoteItemPreviewCheckboxes() {
+fun NoteItemUIPreviewCheckboxes() {
     NoteThePadTheme {
         SharedTransitionLayout {
             AnimatedContent(targetState = true, label = "preview") { isVisible ->
@@ -232,7 +232,7 @@ fun NoteItemPreviewCheckboxes() {
                             .fillMaxWidth()
                             .padding(8.dp)
                     ) {
-                        NoteItem(
+                        NoteItemUI(
                             note = DetailedNote(
                                 title = "Meeting Notes",
                                 content = "Discuss the new architecture for the platform.",
@@ -262,7 +262,7 @@ fun NoteItemPreviewCheckboxes() {
 
 @ThemePreviews
 @Composable
-fun NoteItemPreview() {
+fun NoteItemUIPreview() {
     NoteThePadTheme {
         SharedTransitionLayout {
             AnimatedContent(targetState = true, label = "preview") { isVisible ->
@@ -272,7 +272,7 @@ fun NoteItemPreview() {
                             .fillMaxWidth()
                             .padding(8.dp)
                     ) {
-                        NoteItem(
+                        NoteItemUI(
                             note = DetailedNote(
                                 title = "Meeting Notes",
                                 content = "Discuss the new architecture for the platform.",

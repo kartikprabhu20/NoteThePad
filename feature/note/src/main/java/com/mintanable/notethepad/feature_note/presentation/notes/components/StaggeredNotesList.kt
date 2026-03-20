@@ -42,7 +42,7 @@ fun StaggeredNotesList(
                 key = { note -> note.id ?: -1 },
                 contentType = { "note_item" }
             ) { note ->
-                NoteItem(
+                NoteItemUI(
                     note = note,
                     enableDeleteIcon = enableDeletion,
                     modifier = Modifier
