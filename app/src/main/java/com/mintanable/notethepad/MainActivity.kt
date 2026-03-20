@@ -1,5 +1,8 @@
 package com.mintanable.notethepad
 
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -20,7 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
@@ -28,27 +31,30 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mintanable.notethepad.feature_backup.presentation.RestoreEvent
+import com.mintanable.notethepad.core.common.Screen
+import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
-import com.mintanable.notethepad.feature_firebase.presentation.auth.GoogleClientHelper
+import com.mintanable.notethepad.core.common.GoogleClientHelper
 import com.mintanable.notethepad.feature_firebase.presentation.components.LoginScreen
-import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
+import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
-import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.LAUNCH_EDIT_SCREEN
-import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver.Companion.TARGET_NOTE_ID
-import com.mintanable.notethepad.feature_settings.domain.model.ThemeMode
+import com.mintanable.notethepad.core.common.NavigationConstants
+import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
-import com.mintanable.notethepad.feature_settings.presentation.SettingsViewModel
-import com.mintanable.notethepad.ui.theme.NoteThePadTheme
-import com.mintanable.notethepad.ui.util.Screen
+import com.mintanable.notethepad.theme.NoteThePadTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var mediaPlayer: MediaPlayer
 
     private lateinit var credentialHelper: GoogleClientHelper
     private var intentState = mutableStateOf<Intent?>(null)
@@ -59,12 +65,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         intentState.value = intent
 
-        credentialHelper = GoogleClientHelper(this)
+        credentialHelper = GoogleClientHelper(this, this.getString(R.string.default_web_client_id))
         setContent {
 
             val settingsViewModel: SettingsViewModel = hiltViewModel()
             val state by settingsViewModel.state.collectAsStateWithLifecycle()
-            val isDarkTheme = if(state.settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else state.settings.themeMode == ThemeMode.DARK
+            val isDarkTheme = if (state.settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else state.settings.themeMode == ThemeMode.DARK
             val currentIntent by intentState
 
             NoteThePadTheme(darkTheme = isDarkTheme) {
@@ -74,17 +80,17 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val navController = rememberNavController()
                     LaunchedEffect(currentIntent) {
-                        val noteId = currentIntent?.getLongExtra(TARGET_NOTE_ID, -1L) ?: -1L
+                        val noteId = currentIntent?.getLongExtra(NavigationConstants.EXTRA_NOTE_ID, -1L) ?: -1L
                         if (noteId != -1L) {
-                            navController.navigate(Screen.AddEditNoteScreen.passArgs(noteId=noteId)) {
+                            navController.navigate(Screen.AddEditNoteScreen.passArgs(noteId = noteId)) {
                                 launchSingleTop = true
                             }
-                            currentIntent?.removeExtra(TARGET_NOTE_ID)
+                            currentIntent?.removeExtra(NavigationConstants.EXTRA_NOTE_ID)
                         }
-                        val launchEditScreen = currentIntent?.getBooleanExtra(LAUNCH_EDIT_SCREEN, false) ?: false
+                        val launchEditScreen = currentIntent?.getBooleanExtra(NavigationConstants.LAUNCH_EDIT_SCREEN, false) ?: false
                         if(launchEditScreen){
                             navController.navigate(Screen.AddEditNoteScreen.route)
-                            currentIntent?.removeExtra(LAUNCH_EDIT_SCREEN)
+                            currentIntent?.removeExtra(NavigationConstants.LAUNCH_EDIT_SCREEN)
                         }
                     }
                     val showToast = { message: String ->
@@ -95,10 +101,12 @@ class MainActivity : AppCompatActivity() {
                         contract = ActivityResultContracts.StartIntentSenderForResult(),
                         onResult = { result ->
                             if (result.resultCode == RESULT_OK) {
-                                settingsViewModel.onEvent(SettingsEvent.AuthResultCompleted(
-                                    intent = result.data,
-                                    onFailure = showToast
-                                ))
+                                settingsViewModel.onEvent(
+                                    SettingsEvent.AuthResultCompleted(
+                                        intent = result.data,
+                                        onFailure = showToast
+                                    )
+                                )
                             } else {
                                 settingsViewModel.onEvent(SettingsEvent.AuthCancelled)
                             }
@@ -113,32 +121,119 @@ class MainActivity : AppCompatActivity() {
                             composable(
                                 route = Screen.NotesScreen.route,
                                 arguments = listOf(
-                                    navArgument("tagId") { type = NavType.LongType; defaultValue = -1L },
-                                    navArgument("tagName") { type = NavType.StringType; defaultValue = "" },
-                                    navArgument("filterType") { type = NavType.StringType; defaultValue = "all" }
+                                    navArgument("tagId") {
+                                        type = NavType.LongType; defaultValue = -1L
+                                    },
+                                    navArgument("tagName") {
+                                        type = NavType.StringType; defaultValue = ""
+                                    },
+                                    navArgument("filterType") {
+                                        type = NavType.StringType; defaultValue = "all"
+                                    }
                                 )
-                            ) { entry ->
+                            ) {
+
+                                val authViewModel: AuthViewModel = hiltViewModel()
+                                val user by authViewModel.currentUser.collectAsStateWithLifecycle()
+                                val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
+
                                 NotesScreen(
                                     navController = navController,
                                     onLogOut = {
+                                        authViewModel.signOut()
                                         credentialHelper.clearCredentials()
                                         settingsViewModel.onEvent(SettingsEvent.SignOut)
                                     },
                                     sharedTransitionScope = this@SharedTransitionLayout,
-                                    animatedVisibilityScope = this@composable
+                                    animatedVisibilityScope = this@composable,
+                                    user = user,
+                                    isDarkTheme = settingsState.settings.themeMode == ThemeMode.DARK,
+                                    appVersionProvider = AndroidAppVersionProvider(),
+                                    onPinWidget = { note ->
+                                        val appWidgetManager =
+                                            AppWidgetManager.getInstance(this@MainActivity)
+                                        val provider = ComponentName(
+                                            this@MainActivity,
+                                            SingleNoteWidgetReceiver::class.java
+                                        )
+                                        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                            val callback = Intent(
+                                                this@MainActivity,
+                                                SingleNoteWidgetReceiver::class.java
+                                            ).apply {
+                                                putExtra(
+                                                    SingleNoteWidgetReceiver.PINNING_NOTE_ID,
+                                                    note.id
+                                                )
+                                                action = SingleNoteWidgetReceiver.PINNING_ACTION
+                                            }
+                                            val pendingIntent = PendingIntent.getBroadcast(
+                                                this@MainActivity, note.id?.toInt() ?: 0, callback,
+                                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                            )
+                                            appWidgetManager.requestPinAppWidget(
+                                                provider,
+                                                null,
+                                                pendingIntent
+                                            )
+                                        } else {
+                                            Toast.makeText(
+                                                this@MainActivity,
+                                                "Pinned widgets are not supported on this launcher",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
                                 )
                             }
                             composable(
                                 route = Screen.AddEditNoteScreen.route,
                                 arguments = listOf(
-                                    navArgument(name = "noteId") { type = NavType.LongType; defaultValue = -1L }
+                                    navArgument(name = "noteId") {
+                                        type = NavType.LongType; defaultValue = -1L
+                                    }
                                 )
                             ) {
                                 AddEditNoteScreen(
                                     noteId = it.arguments?.getLong("noteId") ?: 0L,
                                     navController = navController,
                                     sharedTransitionScope = this@SharedTransitionLayout,
-                                    animatedVisibilityScope = this@composable
+                                    animatedVisibilityScope = this@composable,
+                                    onPinWidget = { noteId ->
+                                        val appWidgetManager =
+                                            AppWidgetManager.getInstance(this@MainActivity)
+                                        val provider = ComponentName(
+                                            this@MainActivity,
+                                            SingleNoteWidgetReceiver::class.java
+                                        )
+                                        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                            val callback = Intent(
+                                                this@MainActivity,
+                                                SingleNoteWidgetReceiver::class.java
+                                            ).apply {
+                                                putExtra(
+                                                    SingleNoteWidgetReceiver.PINNING_NOTE_ID,
+                                                    noteId
+                                                )
+                                                action = SingleNoteWidgetReceiver.PINNING_ACTION
+                                            }
+                                            val pendingIntent = PendingIntent.getBroadcast(
+                                                this@MainActivity, noteId.toInt(), callback,
+                                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                            )
+                                            appWidgetManager.requestPinAppWidget(
+                                                provider,
+                                                null,
+                                                pendingIntent
+                                            )
+                                        } else {
+                                            Toast.makeText(
+                                                this@MainActivity,
+                                                "Pinned widgets are not supported on this launcher",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
                                 )
                             }
                             composable(route = Screen.FirebaseLoginScreen.route) {
@@ -146,6 +241,7 @@ class MainActivity : AppCompatActivity() {
 
                                 LoginScreen(
                                     navController = navController,
+                                    currentTheme = state.settings.themeMode,
                                     onGoogleSigInClick = {
                                         lifecycleScope.launch {
                                             val token = credentialHelper.getGoogleCredential()
@@ -160,18 +256,6 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
                             composable(route = Screen.SettingsScreen.route) {
-                                LaunchedEffect(Unit) {
-                                    settingsViewModel.restoreEvents.collect { event ->
-                                        when (event) {
-                                            is RestoreEvent.NavigateToHome -> {
-                                                navController.navigate(Screen.NotesScreen.route) {
-                                                    popUpTo(0) { inclusive = true }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
                                 SettingsScreen(
                                     state = state,
                                     onBackPressed = {
@@ -180,7 +264,11 @@ class MainActivity : AppCompatActivity() {
                                     onEvent = { event ->
                                         if (event is SettingsEvent.UpdateBackupSettings) {
                                             settingsViewModel.onEvent(event.copy(onAuthRequired = { pendingIntent ->
-                                                launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
+                                                launcher.launch(
+                                                    IntentSenderRequest.Builder(
+                                                        pendingIntent
+                                                    ).build()
+                                                )
                                             }))
                                         } else {
                                             settingsViewModel.onEvent(event)
@@ -204,8 +292,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(isFinishing){
-            AndroidMediaPlayer(this).release()
+        if (isFinishing) {
+            mediaPlayer.release()
         }
     }
 }

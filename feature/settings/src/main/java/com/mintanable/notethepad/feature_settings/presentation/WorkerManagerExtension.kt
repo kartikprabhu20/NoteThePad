@@ -1,0 +1,44 @@
+package com.mintanable.notethepad.feature_settings.presentation
+
+import android.util.Log
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.mintanable.notethepad.core.model.backup.LoadStatus
+import com.mintanable.notethepad.core.model.backup.LoadType
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+
+fun WorkManager.getLoadStatusFLow(
+    workName: String,
+    type: LoadType,
+    onSuccess: () -> Unit = {}
+): Flow<LoadStatus> {
+    return this.getWorkInfosForUniqueWorkFlow(workName)
+        .map { list ->
+            val workInfo = list.firstOrNull() ?: return@map LoadStatus.Idle
+            when (workInfo.state) {
+                WorkInfo.State.RUNNING -> {
+                    val progress = workInfo.progress.getInt("percent", 0)
+                    Log.d("kptest", "[${type.name}] status progress:$progress")
+                    LoadStatus.Progress(progress, type)
+                }
+                WorkInfo.State.SUCCEEDED -> {
+                    Log.d("kptest", "[${type.name}] successful")
+                    onSuccess()
+                    LoadStatus.Success
+                }
+                WorkInfo.State.FAILED -> {
+                    Log.d("kptest", "[${type.name}] failed")
+                    LoadStatus.Error("Background ${type.name.lowercase()} failed")
+                }
+
+                WorkInfo.State.CANCELLED -> {
+                    Log.d("kptest", "[${type.name}] cancelled")
+                    LoadStatus.Error("Background ${type.name.lowercase()} cancelled")
+                }
+                else -> LoadStatus.Idle
+            }
+        }
+        .distinctUntilChanged()
+}

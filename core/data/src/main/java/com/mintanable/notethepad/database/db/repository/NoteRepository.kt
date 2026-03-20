@@ -1,0 +1,22 @@
+package com.mintanable.notethepad.database.db.repository
+
+import com.mintanable.notethepad.core.model.note.Note
+import com.mintanable.notethepad.core.model.note.NoteOrder
+import com.mintanable.notethepad.core.model.note.NoteWithTags
+import com.mintanable.notethepad.core.model.note.Tag
+import kotlinx.coroutines.flow.Flow
+
+interface NoteRepository {
+    fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>>
+    suspend fun getNoteById(id: Long): NoteWithTags?
+    suspend fun insertNote(note: Note, tags: List<Tag>): Long
+    suspend fun deleteNote(note: Note)
+    suspend fun deleteNoteWithId(id: Long)
+    suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags>
+    fun getTopNotes(limit: Int): Flow<List<NoteWithTags>>
+    fun getAllTags(): Flow<List<Tag>>
+    suspend fun insertTag(tag: Tag): Long
+    suspend fun updateTag(tag: Tag)
+    suspend fun deleteTag(tag: Tag)
+    suspend fun getTagByName(tagName: String): Tag?
+}

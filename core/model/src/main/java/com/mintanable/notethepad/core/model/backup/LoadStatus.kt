@@ -1,0 +1,13 @@
+package com.mintanable.notethepad.core.model.backup
+
+sealed class LoadStatus {
+    object Idle : LoadStatus()
+    data class Progress(val percentage: Int, val type: LoadType) : LoadStatus()
+    object Success : LoadStatus()
+    data class Error(val message: String) : LoadStatus()
+}
+
+enum class LoadType(name: String){
+    UPLOAD("Upload"),
+    DOWNLOAD("Download")
+}

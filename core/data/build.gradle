@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
+}
+
+android {
+    namespace 'com.mintanable.notethepad.core.data'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 26
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    api project(':core:model')
+    implementation project(':core:common')
+
+    //Material
+    implementation "androidx.compose.material:material-icons-extended"
+
+
+    // Room — runtime/ktx come transitively via api project(':core:model')
+    def room_version = "2.6.1"
+    ksp "androidx.room:room-compiler:$room_version"
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:2.57"
+    ksp "com.google.dagger:hilt-android-compiler:2.57"
+
+    //Security
+    implementation "com.google.crypto.tink:tink-android:1.16.0"
+
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
+
+    // Firebase Auth
+    implementation platform('com.google.firebase:firebase-bom:34.9.0')
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.firebaseui:firebase-ui-auth:9.0.0")
+    implementation("com.facebook.android:facebook-android-sdk:18.1.3")
+    implementation("com.google.android.gms:play-services-auth:21.5.0")
+
+
+}

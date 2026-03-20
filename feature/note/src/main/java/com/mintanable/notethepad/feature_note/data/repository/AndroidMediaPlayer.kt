@@ -1,0 +1,136 @@
+package com.mintanable.notethepad.feature_note.data.repository
+
+import android.content.Context
+import android.net.Uri
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import com.mintanable.notethepad.core.model.note.MediaState
+import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+class AndroidMediaPlayer @Inject constructor(
+    @ApplicationContext private val context: Context
+) : MediaPlayer, DefaultLifecycleObserver {
+
+    private val _mediaState = MutableStateFlow(MediaState())
+    override val mediaState = _mediaState.asStateFlow()
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var progressJob: Job? = null
+
+    private var _player: ExoPlayer? = null
+    val player: ExoPlayer
+        get() = _player ?: createPlayer().also { _player = it }
+
+    private fun createPlayer(): ExoPlayer {
+        return ExoPlayer.Builder(context)
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .setUsage(C.USAGE_MEDIA)
+                    .build(),
+                true
+            )
+            .build().apply {
+                addListener(playerListener)
+            }
+    }
+
+    private val playerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            _mediaState.update { it.copy(isPlaying = isPlaying) }
+        }
+        override fun onPlaybackStateChanged(state: Int) {
+            _mediaState.update { it.copy(isBuffering = state == Player.STATE_BUFFERING)}
+
+            if (state == Player.STATE_READY) {
+                _mediaState.update { it.copy(totalDurationMs = player.duration.coerceAtLeast(0L)) }
+            }
+
+            if (state == Player.STATE_ENDED) {
+                _mediaState.update { it.copy(progress = 0f, isPlaying = false) }
+            }
+        }
+    }
+
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        player.addListener(playerListener)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        stop()
+    }
+
+    override fun playPause(uri: Uri) {
+        val currentUriString = uri.toString()
+
+        if (_mediaState.value.currentUri == currentUriString) {
+            if (player.isPlaying) {
+                player.pause()
+            } else {
+                player.play()
+                startProgressUpdate()
+            }
+            return
+        }
+
+        player.apply {
+            stop()
+            setMediaItem(MediaItem.fromUri(uri))
+            prepare()
+            play()
+        }
+
+        _mediaState.update { it.copy(currentUri = currentUriString) }
+        startProgressUpdate()
+    }
+
+    private fun startProgressUpdate() {
+        progressJob?.cancel()
+        progressJob = serviceScope.launch {
+            while (isActive) {
+                if (player.isPlaying) {
+                    val pos = player.currentPosition.coerceAtLeast(0L)
+                    val dur = player.duration.coerceAtLeast(1L)
+                    val progress = pos.toFloat() / dur.toFloat()
+                    _mediaState.update { it.copy(progress = progress) }
+                }
+                delay(250)
+            }
+        }
+    }
+
+    override fun stop() {
+        progressJob?.cancel()
+        player.stop()
+        player.clearMediaItems()
+        _mediaState.update { MediaState() }
+    }
+
+    override fun release() {
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        progressJob?.cancel()
+        serviceScope.cancel()
+        _player?.removeListener(playerListener)
+        _player?.release()
+        _player = null
+    }
+}

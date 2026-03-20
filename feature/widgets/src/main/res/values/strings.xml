@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_no_note_found">No note found</string>
+    <string name="msg_add_notes_prompt">Please go to the app and add some notes</string>
+    <string name="title_recent_notes">Recent Notes</string>
+    <string name="content_description_refresh_widgets">refresh widgets</string>
+    <string name="content_description_add_note">Add note</string>
+</resources>
