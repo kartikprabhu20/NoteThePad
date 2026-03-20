@@ -1,6 +1,7 @@
-package com.mintanable.notethepad.core.model.note
+package com.mintanable.notethepad.database.db.entity
 
 import android.net.Uri
+import com.mintanable.notethepad.core.model.note.CheckboxItem
 
 data class DetailedNote (
     val id: Long = 0L,

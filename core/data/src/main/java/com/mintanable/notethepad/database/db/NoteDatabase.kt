@@ -5,9 +5,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.mintanable.notethepad.core.model.note.NoteEntity
-import com.mintanable.notethepad.core.model.note.NoteTagCrossRef
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.NoteEntity
+import com.mintanable.notethepad.database.db.entity.NoteTagCrossRef
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.dao.TagDao
 import com.mintanable.notethepad.database.db.util.NoteConverters

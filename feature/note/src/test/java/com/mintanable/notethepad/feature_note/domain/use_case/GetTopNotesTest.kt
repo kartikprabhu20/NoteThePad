@@ -3,9 +3,9 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
-import com.mintanable.notethepad.core.model.note.NoteEntity
-import com.mintanable.notethepad.core.model.note.NoteWithTags
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.NoteEntity
+import com.mintanable.notethepad.database.db.entity.NoteWithTags
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper

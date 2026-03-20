@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import com.mintanable.notethepad.core.model.note.CheckboxItem
-import com.mintanable.notethepad.core.model.note.NoteColors
+import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews

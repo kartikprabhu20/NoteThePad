@@ -7,11 +7,11 @@ import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
-import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.note.NoteEntity
+import com.mintanable.notethepad.database.db.entity.DetailedNote
+import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases

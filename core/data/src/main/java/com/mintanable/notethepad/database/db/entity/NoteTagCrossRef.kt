@@ -1,9 +1,8 @@
-package com.mintanable.notethepad.core.model.note
+package com.mintanable.notethepad.database.db.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-
 
 @Entity(
     tableName = "note_tag_cross_ref",
@@ -13,13 +12,13 @@ import androidx.room.Index
             entity = NoteEntity::class,
             parentColumns = ["id"],
             childColumns = ["noteId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.Companion.CASCADE
         ),
         ForeignKey(
             entity = TagEntity::class,
             parentColumns = ["tagId"],
             childColumns = ["tagId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.Companion.CASCADE
         )
     ],
     indices = [Index("tagId"), Index("noteId")]

@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
-import com.mintanable.notethepad.core.model.note.DetailedNote
+import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases

@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.core.model.note.NoteColors
+import com.mintanable.notethepad.NoteColors
 
 fun LazyListScope.colorSelectorSection(
     selectedColor: Int,

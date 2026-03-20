@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.core.model.note.CheckboxItem
-import com.mintanable.notethepad.core.model.note.InvalidNoteException
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.InvalidNoteException
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.SaveNoteWithAttachments
 import com.mintanable.notethepad.file.FileManager
@@ -104,7 +104,7 @@ class SaveNoteWithAttachmentsTest{
             color = 1,
             reminderTime = 0L,
             checkboxItems = checkboxes,
-            tags = listOf(TagEntity("tag1"), TagEntity("tag2"))
+            tagEntities = listOf(TagEntity("tag1"), TagEntity("tag2"))
         )
 
         coVerify {

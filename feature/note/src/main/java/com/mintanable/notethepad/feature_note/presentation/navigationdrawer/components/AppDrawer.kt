@@ -54,9 +54,9 @@ import coil3.request.crossfade
 import com.mintanable.notethepad.core.common.AppVersionProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.core.model.settings.User
-import com.mintanable.notethepad.core.model.settings.DrawerItem
+import com.mintanable.notethepad.database.db.entity.DrawerItem
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews

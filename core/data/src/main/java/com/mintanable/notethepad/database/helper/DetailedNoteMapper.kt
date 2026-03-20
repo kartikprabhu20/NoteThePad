@@ -4,10 +4,10 @@ import androidx.collection.LruCache
 import androidx.core.net.toUri
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.DispatcherProvider
-import com.mintanable.notethepad.core.model.note.Attachment
-import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.note.NoteEntity
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.Attachment
+import com.mintanable.notethepad.database.db.entity.DetailedNote
+import com.mintanable.notethepad.database.db.entity.NoteEntity
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

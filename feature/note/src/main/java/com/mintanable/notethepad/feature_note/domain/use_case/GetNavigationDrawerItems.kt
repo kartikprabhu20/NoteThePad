@@ -5,7 +5,7 @@ import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.filled.Add
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.settings.DrawerItem
+import com.mintanable.notethepad.database.db.entity.DrawerItem
 import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow

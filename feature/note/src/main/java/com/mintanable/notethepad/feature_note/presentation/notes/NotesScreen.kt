@@ -56,9 +56,9 @@ import androidx.navigation.NavController
 import com.mintanable.notethepad.core.common.AppVersionProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
-import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.settings.DrawerItem
-import com.mintanable.notethepad.core.model.note.NoteEntity
+import com.mintanable.notethepad.database.db.entity.DetailedNote
+import com.mintanable.notethepad.database.db.entity.DrawerItem
+import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.settings.User
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components.AppDrawer

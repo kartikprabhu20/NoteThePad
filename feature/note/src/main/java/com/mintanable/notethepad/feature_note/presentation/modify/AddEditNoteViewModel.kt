@@ -9,11 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.core.common.CheckboxConvertors
-import com.mintanable.notethepad.core.model.note.Attachment
-import com.mintanable.notethepad.core.model.note.AttachmentType
+import com.mintanable.notethepad.database.db.entity.Attachment
+import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
-import com.mintanable.notethepad.core.model.note.NoteColors
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer

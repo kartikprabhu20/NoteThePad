@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model.note
+package com.mintanable.notethepad
 
 import androidx.compose.ui.graphics.Color
 

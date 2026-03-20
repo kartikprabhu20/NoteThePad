@@ -1,108 +1,107 @@
 package com.mintanable.notethepad.core.model.ai
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PromptTemplate(val title: String, val description: String, val prompt: String)
 
+@Serializable
 data class AiModel(
     val name: String,
     val displayName: String = "",
     val info: String = "",
-    val bestForTaskIds: List<String> = listOf(),
+    val bestForTaskIds: List<String> = emptyList(), // Use emptyList() over listOf() for slightly better performance
     val minDeviceMemoryInGb: Int? = null,
     val url: String = "",
     val sizeInBytes: Long = 0L,
     val downloadFileName: String = "_",
     val version: String = "_",
     val isLlm: Boolean = false,
-    val llmPromptTemplates: List<PromptTemplate> = listOf(),
+    val llmPromptTemplates: List<PromptTemplate> = emptyList(),
     val llmSupportImage: Boolean = false,
     val llmSupportAudio: Boolean = false,
     val llmMaxToken: Int = 0,
-    val accelerators: List<Accelerator> = listOf(),
+    val accelerators: List<Accelerator> = emptyList(),
     val imported: Boolean = false,
 )
 
+@Serializable
 enum class Accelerator(val label: String) {
-    CPU(label = "CPU"),
-    GPU(label = "GPU"),
-    NPU(label = "NPU"),
+    @SerialName("CPU") CPU("CPU"),
+    @SerialName("GPU") GPU("GPU"),
+    @SerialName("NPU") NPU("NPU"),
 }
 
+@Serializable
 data class AiModelCatalog(
-    @SerializedName("models") val models: List<AiModelEntry>
+    val models: List<AiModelEntry> // No @SerialName needed if the JSON key matches the variable name
 )
 
+@Serializable
 data class ModelDefaultConfig(
-    @SerializedName("topK") val topK: Int,
-    @SerializedName("topP") val topP: Float,
-    @SerializedName("temperature") val temperature: Float,
-    @SerializedName("maxTokens") val maxTokens: Int,
-    @SerializedName("accelerators") val accelerators: String
+    val topK: Int,
+    val topP: Float,
+    val temperature: Float,
+    val maxTokens: Int,
+    val accelerators: String
 )
 
+@Serializable
 data class AiModelEntry(
-    @SerializedName("name") val name: String,
-    @SerializedName("modelId") val modelId: String,
-    @SerializedName("modelFile") val modelFile: String,
-    @SerializedName("description") val description: String,
-    @SerializedName("sizeInBytes") val sizeInBytes: Long,
-    @SerializedName("minDeviceMemoryInGb") val minDeviceMemoryInGb: Int,
-    @SerializedName("commitHash") val commitHash: String,
-    @SerializedName("llmSupportImage") val llmSupportImage: Boolean = false,
-    @SerializedName("llmSupportAudio") val llmSupportAudio: Boolean = false,
-    @SerializedName("defaultConfig") val defaultConfig: ModelDefaultConfig,
-    @SerializedName("taskTypes") val taskTypes: List<String>,
-    @SerializedName("bestForTaskTypes") val bestForTaskTypes: List<String> = emptyList()
+    val name: String,
+    val modelId: String,
+    val modelFile: String,
+    val description: String,
+    val sizeInBytes: Long,
+    val minDeviceMemoryInGb: Int,
+    val commitHash: String,
+    val llmSupportImage: Boolean = false,
+    val llmSupportAudio: Boolean = false,
+    val defaultConfig: ModelDefaultConfig,
+    val taskTypes: List<String>,
+    val bestForTaskTypes: List<String> = emptyList()
 ) {
     fun toAiModel(): AiModel {
-        val version = commitHash
-        val downloadedFileName = modelFile
         val downloadUrl = "https://huggingface.co/$modelId/resolve/$commitHash/$modelFile?download=true"
 
+        val isLlmModel = taskTypes.any {
+            it in listOf("llm_chat", "llm_prompt_lab", "llm_ask_audio", "llm_ask_image")
+        }
 
-
-        val safeTaskTypes = taskTypes ?: emptyList()
-        val safeBestForTaskTypes = bestForTaskTypes ?: emptyList()
-        val isLlmModel = safeTaskTypes.contains("llm_chat") ||
-                safeTaskTypes.contains("llm_prompt_lab") ||
-                safeTaskTypes.contains("llm_ask_audio") ||
-                safeTaskTypes.contains("llm_ask_image")
-        
         var llmMaxToken = 1024
-        var accelerators: List<Accelerator> = emptyList()
+        var acceleratorsList: List<Accelerator> = emptyList()
 
-        if (isLlmModel && defaultConfig != null) {
-            llmMaxToken = defaultConfig.maxTokens
-            val configAccels = defaultConfig.accelerators ?: ""
-            if (configAccels.isNotEmpty()) {
-                val items = configAccels.split(",")
-                val accelList = mutableListOf<Accelerator>()
-                for (item in items) {
+        // defaultConfig is non-nullable in @Serializable definition above,
+        // but if the JSON might lack it, make it nullable in the data class: ModelDefaultConfig?
+        llmMaxToken = defaultConfig.maxTokens
+        val configAccels = defaultConfig.accelerators
+        if (configAccels.isNotEmpty()) {
+            acceleratorsList = configAccels.split(",")
+                .mapNotNull { item ->
                     when (item.trim().lowercase()) {
-                        "cpu" -> accelList.add(Accelerator.CPU)
-                        "gpu" -> accelList.add(Accelerator.GPU)
-                        "npu" -> accelList.add(Accelerator.NPU)
+                        "cpu" -> Accelerator.CPU
+                        "gpu" -> Accelerator.GPU
+                        "npu" -> Accelerator.NPU
+                        else -> null
                     }
                 }
-                accelerators = accelList
-            }
         }
 
         return AiModel(
             name = name,
             displayName = name,
-            version = version,
+            version = commitHash,
             info = description,
             url = downloadUrl,
             sizeInBytes = sizeInBytes,
             minDeviceMemoryInGb = minDeviceMemoryInGb,
-            downloadFileName = downloadedFileName,
+            downloadFileName = modelFile,
             llmSupportImage = llmSupportImage,
             llmSupportAudio = llmSupportAudio,
             llmMaxToken = llmMaxToken,
-            accelerators = accelerators,
-            bestForTaskIds = safeBestForTaskTypes,
+            accelerators = acceleratorsList,
+            bestForTaskIds = bestForTaskTypes,
             isLlm = isLlmModel
         )
     }

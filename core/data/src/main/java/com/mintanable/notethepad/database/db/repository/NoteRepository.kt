@@ -1,9 +1,9 @@
 package com.mintanable.notethepad.database.db.repository
 
-import com.mintanable.notethepad.core.model.note.NoteEntity
+import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteOrder
-import com.mintanable.notethepad.core.model.note.NoteWithTags
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.NoteWithTags
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {

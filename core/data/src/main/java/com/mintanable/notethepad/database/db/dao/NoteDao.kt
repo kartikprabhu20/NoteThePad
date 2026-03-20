@@ -7,9 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.mintanable.notethepad.core.model.note.NoteEntity
-import com.mintanable.notethepad.core.model.note.NoteTagCrossRef
-import com.mintanable.notethepad.core.model.note.NoteWithTags
+import com.mintanable.notethepad.database.db.entity.NoteEntity
+import com.mintanable.notethepad.database.db.entity.NoteTagCrossRef
+import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import kotlinx.coroutines.flow.Flow
 
 @Dao

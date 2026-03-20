@@ -1,7 +1,6 @@
-package com.mintanable.notethepad.core.model.settings
+package com.mintanable.notethepad.database.db.entity
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.mintanable.notethepad.core.model.note.TagEntity
 
 sealed class DrawerItem {
     data class NavigationDrawerItem(val title: String, val icon: ImageVector, val route: String): DrawerItem()

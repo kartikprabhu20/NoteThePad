@@ -2,13 +2,13 @@ package com.mintanable.notethepad.feature_note.domain.use_case.notes
 
 import android.content.Context
 import android.net.Uri
-import com.mintanable.notethepad.core.common.AttachmentHelper
+import com.mintanable.notethepad.file.AttachmentHelper
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.core.model.note.CheckboxItem
-import com.mintanable.notethepad.core.model.note.InvalidNoteException
-import com.mintanable.notethepad.core.model.note.NoteEntity
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.InvalidNoteException
+import com.mintanable.notethepad.database.db.entity.NoteEntity
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 

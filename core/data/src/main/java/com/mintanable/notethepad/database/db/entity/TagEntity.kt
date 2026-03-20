@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.core.model.note
+package com.mintanable.notethepad.database.db.entity
 
 import androidx.room.Entity
 import androidx.room.Index

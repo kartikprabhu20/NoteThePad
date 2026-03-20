@@ -28,8 +28,8 @@ import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.core.common.NavigationConstants
-import com.mintanable.notethepad.core.model.note.DetailedNote
-import com.mintanable.notethepad.core.model.note.NoteColors
+import com.mintanable.notethepad.database.db.entity.DetailedNote
+import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.utils.GridBreakpointPreviews

@@ -1,11 +1,11 @@
-package com.mintanable.notethepad.core.common
+package com.mintanable.notethepad.file
 
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
-import com.mintanable.notethepad.core.model.note.AttachmentType
+import com.mintanable.notethepad.database.db.entity.AttachmentType
 
 object AttachmentHelper {
 

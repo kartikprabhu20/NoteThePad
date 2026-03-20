@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TagUI
-import com.mintanable.notethepad.core.model.note.NoteColors
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.domain.util.TagType
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews

@@ -2,10 +2,10 @@ package com.mintanable.notethepad.feature_note.presentation
 
 import android.net.Uri
 import androidx.compose.runtime.Stable
-import com.mintanable.notethepad.core.model.note.Attachment
+import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
-import com.mintanable.notethepad.core.model.note.TagEntity
+import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.permissions.DeniedType
 
