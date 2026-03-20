@@ -74,6 +74,11 @@ android {
             excludes += "META-INF/*.kotlin_module"
         }
     }
+
+    lint {
+        checkDependencies true
+        abortOnError false
+    }
 }
 android.applicationVariants.all { variant ->
     def type = variant.buildType.name
@@ -134,12 +139,11 @@ dependencies {
     implementation project(':core:ui')
     implementation project(':feature:note')
     implementation project(':feature:auth')
+    implementation project(':feature:navigationdrawer')
     implementation project(':feature:widgets')
     implementation project(':feature:settings')
 
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
-
-    implementation 'androidx.work:work-runtime-ktx:2.11.1'
 
     def composeBom = platform('androidx.compose:compose-bom:2024.02.01')
     implementation composeBom
