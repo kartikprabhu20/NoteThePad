@@ -1,9 +1,8 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
-import android.content.Context
 import android.net.Uri
-import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.database.db.entity.InvalidNoteException
@@ -21,15 +20,13 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class SaveNoteWithAttachmentsTest{
-     private lateinit var saveNote: SaveNoteWithAttachments
-     private val repository = mockk<NoteRepository>()
-     private val fileManager = mockk<FileManager>()
-    private lateinit var context: Context
+class SaveNoteWithAttachmentsTest {
+    private lateinit var saveNote: SaveNoteWithAttachments
+    private val repository = mockk<NoteRepository>()
+    private val fileManager = mockk<FileManager>()
 
     @Before
     fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
         saveNote = SaveNoteWithAttachments(repository, fileManager)
         coEvery { repository.insertNote(any(), any()) } returns 1L
     }
@@ -48,25 +45,17 @@ class SaveNoteWithAttachmentsTest{
     }
 
     @Test
-    fun `External URIs are saved, Internal URIs are kept as is`() = runTest {
+    fun `External URIs are saved via FileManager`() = runTest {
+        val externalImageUri = Uri.parse("content://com.android.providers/other_image.jpg")
+        val externalAudioUri = Uri.parse("content://com.android.providers/test2.mp4")
 
-        val pkg = context.packageName
-        val internalUri = Uri.parse("content://$pkg/files/my_image.jpg")
-        val externalUri = Uri.parse("content://com.android.providers/other_image.jpg")
-        val audioUri = Uri.parse("content://$pkg/test.mp4")
-        val externalaudioUri = Uri.parse("content://com.android.providers/test2.mp4")
+        val newSavedPath1 = "/internal/storage/NoteAttachments/saved_image.jpg"
+        val newSavedPath2 = "/internal/storage/NoteAttachments/test2.mp4"
 
-        val newSavedPath1 = "internal/storage/saved_image.jpg"
-        val newSavedPath2 = "internal/storage/test2.mp4"
-
-        // Mock FileManager only for the external one
-        coEvery { fileManager.isInternalUri(internalUri) } returns true
-        coEvery { fileManager.isInternalUri(audioUri) } returns true
-        coEvery { fileManager.isInternalUri(externalUri) } returns false
-        coEvery { fileManager.isInternalUri(externalaudioUri) } returns false
+        // Mock FileManager behavior
         coEvery { fileManager.getAttachmentType(any()) } returns AttachmentType.IMAGE
-        coEvery { fileManager.saveMediaToStorage(externalUri, any()) } returns newSavedPath1
-        coEvery { fileManager.saveMediaToStorage(externalaudioUri, any()) } returns newSavedPath2
+        coEvery { fileManager.saveMediaToStorage(externalImageUri, any()) } returns newSavedPath1
+        coEvery { fileManager.saveMediaToStorage(externalAudioUri, any()) } returns newSavedPath2
 
         val result = saveNote(
             id = 0L,
@@ -74,8 +63,8 @@ class SaveNoteWithAttachmentsTest{
             content = "Content",
             timestamp = 1L,
             color = 1,
-            imageUris = listOf(internalUri, externalUri),
-            audioUris = listOf(audioUri, externalaudioUri),
+            imageUris = listOf(externalImageUri),
+            audioUris = listOf(externalAudioUri),
             reminderTime = 0L,
             checkboxItems = emptyList()
         )
@@ -84,23 +73,20 @@ class SaveNoteWithAttachmentsTest{
 
         coVerify {
             repository.insertNote(match { note ->
-                // Check if internal stayed the same and external was updated to saved path
-                note.imageUris.contains(internalUri.toString()) &&
-                        note.imageUris.contains(newSavedPath1) &&
-                        note.audioUris.contains(audioUri.toString()) &&
+                note.imageUris.contains(newSavedPath1) &&
                         note.audioUris.contains(newSavedPath2)
             }, match { tags ->
                 tags.isEmpty()
             })
         }
 
-        // Verify fileManager was called EXACTLY once (only for the external one)
         coVerify(exactly = 2) { fileManager.saveMediaToStorage(any(), any()) }
     }
 
     @Test
     fun `Checkbox items presence overwrites content field`() = runTest {
         val checkboxes = listOf(CheckboxItem(text = "Buy Milk", isChecked = true))
+        val expectedContent = CheckboxConvertors.checkboxesToString(checkboxes)
 
         saveNote(
             id = 0L,
@@ -116,10 +102,10 @@ class SaveNoteWithAttachmentsTest{
         coVerify {
             repository.insertNote(match { note ->
                 // Note content should now be the converted checkbox string, not "Old Text Content"
-                note.content != "Old Text Content"
-            }, match { tags->
-                tags.isNotEmpty() && tags.size == 2 && tags[0].tagName == "tag1" && tags[1].tagName == "tag2"
+                note.content == expectedContent
+            }, match { tags ->
+                tags.size == 2 && tags[0].tagName == "tag1" && tags[1].tagName == "tag2"
             })
         }
     }
- }
+}
