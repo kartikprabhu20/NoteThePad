@@ -13,7 +13,8 @@ data class Settings(
 data class BackupSettings(
     val backupFrequency: BackupFrequency = BackupFrequency.OFF,
     val backupTimeHour: Int = 2,
-    val backupTimeMinutes: Int = 0
+    val backupTimeMinutes: Int = 0,
+    val backupMedia: Boolean = false
 )
 
 enum class ThemeMode { LIGHT, DARK, SYSTEM }

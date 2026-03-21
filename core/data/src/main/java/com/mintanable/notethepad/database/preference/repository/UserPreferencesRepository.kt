@@ -33,6 +33,7 @@ class UserPreferencesRepository @Inject constructor(
         val BACKUP_TIME_HOUR = intPreferencesKey("backup_time_hour")
         val BACKUP_TIME_MINUTE = intPreferencesKey("backup_time_minute")
         val AI_MODEL_NAME = stringPreferencesKey("ai_model_name")
+        val BACKUP_MEDIA = booleanPreferencesKey("backup_media")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -48,6 +49,7 @@ class UserPreferencesRepository @Inject constructor(
             val backupTimeHour = preferences[PreferencesKeys.BACKUP_TIME_HOUR] ?: 2
             val backupTimeMinutes = preferences[PreferencesKeys.BACKUP_TIME_MINUTE] ?: 0
             val aiModelName = preferences[PreferencesKeys.AI_MODEL_NAME] ?: "None"
+            val backupMedia = preferences[PreferencesKeys.BACKUP_MEDIA] ?: false
 
             Settings(
                 backupEnabled = backupEnabled,
@@ -57,7 +59,8 @@ class UserPreferencesRepository @Inject constructor(
                 backupSettings = BackupSettings(
                     backupFrequency = BackupFrequency.valueOf(backupInterval),
                     backupTimeHour = backupTimeHour,
-                    backupTimeMinutes = backupTimeMinutes
+                    backupTimeMinutes = backupTimeMinutes,
+                    backupMedia = backupMedia
                 ),
                 aiModelName = aiModelName
             )
@@ -68,6 +71,7 @@ class UserPreferencesRepository @Inject constructor(
             preferences[PreferencesKeys.BACKUP_INTERVAL] = backupSettings.backupFrequency.name
             preferences[PreferencesKeys.BACKUP_TIME_HOUR] = backupSettings.backupTimeHour
             preferences[PreferencesKeys.BACKUP_TIME_MINUTE] = backupSettings.backupTimeMinutes
+            preferences[PreferencesKeys.BACKUP_MEDIA] = backupSettings.backupMedia
         }
     }
 

@@ -59,6 +59,7 @@ import com.mintanable.notethepad.feature_settings.presentation.components.RadioB
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
 import com.mintanable.notethepad.components.TimePickerDialog
+import com.mintanable.notethepad.feature_settings.presentation.components.SettingSwitchItem
 import com.mintanable.notethepad.permissions.PermissionRationaleType
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import java.util.Locale
@@ -211,6 +212,22 @@ fun SettingsScreen(
                         onClick = {}
                     )
                 }
+            }
+            item {
+                SettingSwitchItem(
+                    title = stringResource(R.string.backup_media_title),
+                    checked = currentSettings.backupSettings.backupMedia,
+                    enableSettings = true,
+                    onCheckedChange = { checked ->
+                        onEvent(
+                            SettingsEvent.UpdateBackupSettings(
+                                backupSettings = currentSettings.backupSettings.copy(backupMedia = checked),
+                                onAuthRequired = {},
+                                onFailure = showToast
+                            )
+                        )
+                    }
+                )
             }
 
             item {
