@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class GoogleDriveRepositoryImpl @Inject constructor(
@@ -95,13 +98,20 @@ class GoogleDriveRepositoryImpl @Inject constructor(
 
             val driveService = driveService.getDriveService(accessToken)
 
+
             val fileId = withContext(Dispatchers.IO) {
                 driveService.files().list()
                     .setSpaces("appDataFolder")
-                    .setQ("name = '$driveFileName'")
-                    .setFields("files(id)")
+                    .setQ("name = '$driveFileName' and trashed = false")
+                    .setOrderBy("modifiedTime desc")
+                    .setFields("files(id, name, modifiedTime)")
                     .execute()
-                    .files?.firstOrNull()?.id
+                    .files?.firstOrNull()?.let {
+                        Log.d("kptest", "Found Backup: ${it.name} uploaded at ${it.modifiedTime} ${
+                            SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                                .format(Date(it.modifiedTime.value))}")
+                        it.id
+                    }
             } ?: throw Exception("File $driveFileName not found on Google Drive")
 
             val request = driveService.files().get(fileId)
@@ -151,7 +161,12 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                     .execute()
             }
 
-            val googleFile = result.files.firstOrNull()
+            val googleFile = result.files.firstOrNull()?.let {
+                Log.d("kptest", "checkForExistingBackup: ${it.name} uploaded at ${it.modifiedTime} " +
+                        "${ SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                    .format(Date(it.modifiedTime.value))}")
+                it
+            }
 
             if (googleFile != null) {
                 emit(
@@ -310,7 +325,7 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                 val result = drive.files().list()
                     .setSpaces("appDataFolder")
                     .setQ("trashed = false")
-                    .setFields("nextPageToken, files(name)")
+                    .setFields("nextPageToken, files(name, modifiedTime)")
                     .setPageToken(pageToken)
                     .setPageSize(100)
                     .execute()

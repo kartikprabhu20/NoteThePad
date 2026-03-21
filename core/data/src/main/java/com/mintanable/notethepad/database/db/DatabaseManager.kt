@@ -3,6 +3,7 @@ package com.mintanable.notethepad.database.db
 import android.content.Context
 import androidx.room.Room
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.sync.Mutex
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -11,6 +12,7 @@ import javax.inject.Singleton
 class DatabaseManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    val mutex = Mutex()
     private var _database: NoteDatabase? = null
 
     val database: NoteDatabase
@@ -39,10 +41,23 @@ class DatabaseManager @Inject constructor(
         val walFile = File(dbFile.path + "-wal")
         val shmFile = File(dbFile.path + "-shm")
 
+        if (dbFile.exists()) dbFile.delete()
         if (walFile.exists()) walFile.delete()
         if (shmFile.exists()) shmFile.delete()
 
         tempFile.copyTo(dbFile, overwrite = true)
         tempFile.delete()
+    }
+
+    fun getDatabaseFile(): File {
+        return context.getDatabasePath(NoteDatabase.DATABASE_NAME)
+    }
+
+    //To force WAL merge into DB
+    fun closeDatabase() {
+        synchronized(this) {
+            _database?.close()
+            _database = null
+        }
     }
 }

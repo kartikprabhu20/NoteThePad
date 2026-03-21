@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.database.db.repository
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteOrder
@@ -9,8 +10,11 @@ import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,12 +30,12 @@ class NoteRepositoryImpl @Inject constructor(
 
     override fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>> {
         return noteDao.getNotes(
-            order = when(noteOrder) {
+            order = when (noteOrder) {
                 is NoteOrder.Title -> "title"
                 is NoteOrder.Date -> "date"
                 is NoteOrder.Color -> "color"
             },
-            ascending = if(noteOrder.orderType == OrderType.Ascending) 1 else 0
+            ascending = if (noteOrder.orderType == OrderType.Ascending) 1 else 0
         )
     }
 
@@ -99,5 +103,34 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun getTagByName(tagName: String): TagEntity? {
         return tagDao.getTagByName(tagName)
+    }
+
+    override suspend fun checkpoint(): File = withContext(Dispatchers.IO) {
+        dbManager.mutex.withLock {
+            val database = dbManager.database.openHelper.writableDatabase
+
+            // Execute the checkpoint
+            database.query("PRAGMA checkpoint(FULL)").use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val busy = cursor.getInt(0)
+                    val log = cursor.getInt(1)
+                    val checkpointed = cursor.getInt(2)
+                    Log.d("kptest", "Checkpoint: Busy=$busy, Log=$log, Checkpointed=$checkpointed")
+                } else {
+                    // If it's empty, the command was still executed, just no status returned
+                    Log.d("kptest", "Checkpoint executed (no status returned)")
+                }
+            }
+            dbManager.getDatabaseFile()
+        }
+    }
+
+    override suspend fun swapDatabase(dbFile: File) {
+        withContext(NonCancellable) {
+            synchronized(DatabaseManager::class.java) {
+                dbManager.swapDatabase(dbFile)
+                Log.d("kptest", "Swapping db successful (NonCancellable)")
+            }
+        }
     }
 }

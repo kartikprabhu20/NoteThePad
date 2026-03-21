@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.domain.use_case.notes
 
 import android.net.Uri
+import android.util.Log
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -35,6 +36,7 @@ class SaveNoteWithAttachments(
         tagEntities: List<TagEntity> = emptyList()
     ) : Result<Long> {
 
+        Log.d("kptest", "SaveNoteWithAttachments invoke: ${imageUris+audioUris}")
        try{
             if(title.isBlank()){
                 return Result.failure(InvalidNoteException("The title of the note cant be empty"))
@@ -43,22 +45,15 @@ class SaveNoteWithAttachments(
            val newContent = if(checkboxItems.isNotEmpty()) CheckboxConvertors.checkboxesToString(checkboxItems) else content
 
             val imageUriList = imageUris.mapNotNull { uri ->
-                if (fileManager.isInternalUri(uri)) {
-                    uri.toString()
-                } else {
-                    fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
-                }
+                fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
             }
 
             val audioUriList = audioUris.mapNotNull { uri ->
-                if (fileManager.isInternalUri(uri)) {
-                    uri.toString()
-                } else {
-                    fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
-                }
+                fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
             }
 
-            val newNoteEntityId = repository.insertNote(
+           Log.d("kptest", "SaveNoteWithAttachments save: ${imageUriList+audioUriList}")
+           val newNoteEntityId = repository.insertNote(
                 NoteEntity(
                     id = id,
                     title = title,

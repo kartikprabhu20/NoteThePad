@@ -5,6 +5,7 @@ import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface NoteRepository {
     fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>>
@@ -19,4 +20,6 @@ interface NoteRepository {
     suspend fun updateTag(tagEntity: TagEntity)
     suspend fun deleteTag(tagEntity: TagEntity)
     suspend fun getTagByName(tagName: String): TagEntity?
+    suspend fun checkpoint(): File
+    suspend fun swapDatabase(dbFile: File)
 }

@@ -16,6 +16,7 @@ import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICAT
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_ID
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.NoteDatabase
 import com.mintanable.notethepad.feature_backup.domain.BackupScheduler
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
@@ -39,7 +40,8 @@ class BackupWorker @AssistedInject constructor(
     private val backupScheduler: BackupScheduler,
     private val userPrefs: UserPreferencesRepository,
     private val noteRepository: NoteRepository,
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val dbManager: DatabaseManager
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO){
@@ -48,7 +50,7 @@ class BackupWorker @AssistedInject constructor(
                 googleAuthRepository.getDecryptedRefreshToken() ?: return@withContext Result.failure()
             val accessToken = googleAuthRepository.refreshAccessToken(refreshToken)
             val settings = userPrefs.settingsFlow.first()
-
+            dbManager.closeDatabase()
             val dbFile = applicationContext.getDatabasePath(NoteDatabase.DATABASE_NAME)
             val filesToUpload = mutableListOf(dbFile to BACKUP_DB_FILE_NAME)
 

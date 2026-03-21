@@ -14,6 +14,7 @@ import java.io.File
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 class FileManager @Inject constructor(
     @ApplicationContext private val context: Context
@@ -30,10 +31,13 @@ class FileManager @Inject constructor(
     suspend fun saveMediaToStorage(uri: Uri, prefix: String?): String? {
         return withContext(Dispatchers.IO) {
             try {
+                val internalFile = getFileFromInternalUri(uri)
+                if (internalFile != null && internalFile.exists()) {
+                    return@withContext internalFile.absolutePath
+                }
                 val extension = getExtensionFromUri(uri)
                 val fileName = (if(prefix.isNullOrBlank()) "media" else "$prefix")+ "_${System.currentTimeMillis()}_${UUID.randomUUID()}.$extension"
                 val mediaDir = getMediaDir()
-                if (!mediaDir.exists()) mediaDir.mkdirs()
                 val destFile = File(mediaDir, fileName)
                 context.contentResolver.openInputStream(uri)?.use { input ->
                     destFile.outputStream().use { output ->
@@ -42,6 +46,7 @@ class FileManager @Inject constructor(
                 }
                 destFile.absolutePath
             } catch (e: Exception) {
+                Log.e("FileManager", "Error saving media", e)
                 null
             }
         }
@@ -61,8 +66,8 @@ class FileManager @Inject constructor(
         withContext(Dispatchers.IO){
             for(path in list){
                 try {
-                    val file = File(path)
-                    if (file.exists()) {
+                    val file = getFileFromUri(path)
+                    if (file?.exists() == true) {
                         file.delete()
                     }
                 } catch (e: Exception) {
@@ -74,10 +79,10 @@ class FileManager @Inject constructor(
 
     fun createUri(extension: String,prefix: String?): Uri? {
         return try {
-            val file = File.createTempFile(if(prefix.isNullOrBlank()) "media_" else "$prefix"+"_", ".$extension", getMediaDir())
+            val file = createFile(extension, prefix) ?: return null
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        } catch (e: IOException) {
-            Log.e("kptest", "Error while createTempUri: $e")
+        } catch (e: Exception) {
+            Log.e("kptest", "Error while createUri: $e")
             null
         }
     }
@@ -86,7 +91,7 @@ class FileManager @Inject constructor(
         return try {
             File.createTempFile(if(prefix.isNullOrBlank()) "media_" else "$prefix"+"_", ".$extension", getMediaDir())
         } catch (e: IOException) {
-            Log.e("kptest", "Error while createTempUri: $e")
+            Log.e("kptest", "Error while createFile: $e")
             null
         }
     }
@@ -97,27 +102,43 @@ class FileManager @Inject constructor(
         return AttachmentHelper.getAttachmentType(context, uri)
     }
 
+    /**
+     * Attempts to resolve any URI string (content://, file://, or raw path) to a File object.
+     * Specifically handles FileProvider URIs and absolute paths that might belong to 
+     * a different device/installation by falling back to the filename in the current media dir.
+     */
     fun getFileFromUri(uriString: String): File? {
+        if (uriString.isBlank()) return null
         return try {
-            val uri = Uri.parse(uriString)
+            val uri = uriString.toUri()
 
-            // "file://" URI or a raw path string
+            // Check if it's a raw path or file:// URI
             if (uri.scheme == null || uri.scheme == "file") {
-               val rawPath = uri.path ?: uriString
+                val rawPath = uri.path ?: uriString
                 val decodedPath = Uri.decode(rawPath).removePrefix("file:")
-
                 val file = File(decodedPath)
-                if (file.exists()) {
-                    Log.d("kptest", "Found direct file: ${file.absolutePath}")
-                    return file
-                } else {
-                    Log.e("kptest", "File does not exist on disk: $decodedPath")
+                
+                if (file.exists()) return file
+                
+                // Fallback: If the absolute path is wrong (e.g. from a different device),
+                // but it's inside a folder named "NoteAttachments", try to find it locally.
+                if (decodedPath.contains(folderName)) {
+                    val fileName = decodedPath.substringAfterLast('/')
+                    val fallbackFile = File(getMediaDir(), fileName)
+                    if (fallbackFile.exists()) return fallbackFile
                 }
             }
 
-            // "content://" URI (Gallery/External)
+            // Check if it's our own FileProvider URI (content://)
+            if (uri.scheme == "content" && isInternalUri(uri)) {
+                val fileName = uri.lastPathSegment ?: uriString.substringAfterLast('/')
+                val file = File(getMediaDir(), fileName)
+                if (file.exists()) return file
+            }
+
+            // Handle external content URIs by copying to a temp file in cache
             if (uri.scheme == "content") {
-                val tempFile = File(context.cacheDir, "temp_${uri.lastPathSegment}")
+                val tempFile = File(context.cacheDir, "temp_${uri.lastPathSegment ?: UUID.randomUUID()}")
                 context.contentResolver.openInputStream(uri)?.use { input ->
                     tempFile.outputStream().use { output ->
                         input.copyTo(output)
@@ -126,11 +147,27 @@ class FileManager @Inject constructor(
                 return tempFile
             }
 
-            Log.e("kptest", "Could not resolve URI/Path: $uriString")
             null
         } catch (e: Exception) {
-            Log.e("kptest", "Error resolving $uriString", e)
+            Log.e("FileManager", "Error resolving $uriString", e)
             null
+        }
+    }
+
+    /**
+     * Resolves a URI to a File ONLY if it points to our app's internal NoteAttachments folder.
+     */
+    fun getFileFromInternalUri(uri: Uri): File? {
+        if (!isInternalUri(uri)) return null
+        
+        return when (uri.scheme) {
+            "file" -> File(uri.path ?: return null)
+            "content" -> {
+                val fileName = uri.lastPathSegment ?: return null
+                File(getMediaDir(), fileName)
+            }
+            null -> File(uri.toString()) // Assume raw path
+            else -> null
         }
     }
 }

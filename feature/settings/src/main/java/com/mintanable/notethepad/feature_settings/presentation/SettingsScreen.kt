@@ -61,6 +61,7 @@ import com.mintanable.notethepad.feature_settings.presentation.components.RadioB
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
 import com.mintanable.notethepad.components.TimePickerDialog
+import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingSwitchItem
 import com.mintanable.notethepad.permissions.PermissionRationaleType
 import com.mintanable.notethepad.theme.NoteThePadTheme
@@ -426,7 +427,7 @@ fun PreviewSettingsScreen() {
     NoteThePadTheme {
         SettingsScreen(
             state = SettingsState(
-                settings = Settings(googleAccount = "test@google.com"),
+                settings = Settings(googleAccount = "test@google.com", backupSettings = BackupSettings(backupFrequency= BackupFrequency.DAILY)),
                 backupUiState = BackupUiState.HasBackup(
                     DriveFileMetadata(
                         "1",
