@@ -25,6 +25,7 @@ import com.mintanable.notethepad.feature_backup.domain.use_case.CancelScheduledB
 import com.mintanable.notethepad.feature_backup.domain.use_case.CheckForExistingBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.DownloadBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
+import com.mintanable.notethepad.feature_backup.domain.use_case.ClearAppDataUseCase
 import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.feature_settings.presentation.BackupUiState
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
@@ -66,7 +67,8 @@ class SettingsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val networkMonitor: NetworkMonitor,
     private val downloadAiModelUseCase: DownloadAiModelUseCase,
-    private val getSupportedAiModels: GetSupportedAiModels
+    private val getSupportedAiModels: GetSupportedAiModels,
+    private val clearAppDataUseCase: ClearAppDataUseCase
 ) : ViewModel() {
 
     companion object {
@@ -192,6 +194,22 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ConfirmDownloadAiModel -> confirmDownloadAiModel(event.aiModel, event.onFailure)
             SettingsEvent.DismissDownloadDialog -> _downloadDialogModel.value = null
             SettingsEvent.SignOut -> signOut()
+            is SettingsEvent.ClearAppData -> clearAppData(event.onFailure)
+        }
+    }
+
+    private fun clearAppData(onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            if (!canPerformNetworkTask(onFailure)) return@launch
+            _isAuthorisingBackup.value = true
+            clearAppDataUseCase()
+                .onSuccess {
+                    refreshTrigger.emit(Unit)
+                }
+                .onFailure { error ->
+                    onFailure(error.message ?: "Failed to clear app data")
+                }
+            _isAuthorisingBackup.value = false
         }
     }
 

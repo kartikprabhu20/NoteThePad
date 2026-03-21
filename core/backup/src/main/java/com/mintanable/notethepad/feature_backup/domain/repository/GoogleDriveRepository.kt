@@ -10,4 +10,7 @@ interface GoogleDriveRepository{
     suspend fun downloadFile(accessToken: String, targetFile: File, driveFileName: String): Flow<LoadStatus>
     suspend fun checkForExistingBackup(accessToken: String): Flow<DriveFileMetadata?>
     suspend fun uploadMultipleFiles(accessToken: String, files: List<Pair<File, String>>): Flow<LoadStatus>
+    suspend fun downloadMultipleFiles(accessToken: String, files: List<Pair<File, String>>): Flow<LoadStatus>
+    suspend fun getAllBackupFileNames(accessToken: String): List<String>
+    suspend fun clearAppDataFolder(accessToken: String): Result<Unit>
 }

@@ -27,6 +27,10 @@
     <string name="dialog_download_ai_model_size">Size: %s</string>
     <string name="msg_downloading_model">Downloading Ai model in progress: %1$d%%</string>
     <string name="backup_media_title">Backup media(Image, Video, Audio)</string>
+    <string name="btn_clear_backup">Clear Backup from Google Drive</string>
+    <string name="dialog_clear_backup_title">Clear Cloud Backup</string>
+    <string name="dialog_clear_backup_description">Are you sure you want to delete all backup data from Google Drive? This action cannot be undone, and your data cannot be recovered.</string>
+    <string name="btn_delete">Delete</string>
 
     <!-- Edit Text Dialog -->
     <string name="dialog_title_new_tag">Enter the new Tag</string>

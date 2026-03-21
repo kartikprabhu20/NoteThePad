@@ -27,4 +27,5 @@ sealed class SettingsEvent {
     ) : SettingsEvent()
     data object DismissDownloadDialog : SettingsEvent()
     data object SignOut : SettingsEvent()
+    data class ClearAppData(val onFailure: (String) -> Unit) : SettingsEvent()
 }

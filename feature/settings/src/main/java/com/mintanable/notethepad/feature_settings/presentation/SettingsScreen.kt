@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -78,6 +80,7 @@ fun SettingsScreen(
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearBackupDialog by rememberSaveable { mutableStateOf(false) }
 
     val currentSettings = state.settings
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
@@ -193,13 +196,32 @@ fun SettingsScreen(
                         }
                     }
 
-                    BackupStatusUI(
-                        backupUploadDownloadState = state.backupUploadDownloadState,
-                        backupUiState = state.backupUiState,
-                        onRestoreClicked = { checkAndRequestNotificationPermission {
-                            onEvent(SettingsEvent.StartRestore(onFailure = showToast))
-                        }}
-                    )
+                    Column {
+                        BackupStatusUI(
+                            backupUploadDownloadState = state.backupUploadDownloadState,
+                            backupUiState = state.backupUiState,
+                            onRestoreClicked = {
+                                checkAndRequestNotificationPermission {
+                                    onEvent(SettingsEvent.StartRestore(onFailure = showToast))
+                                }
+                            }
+                        )
+
+                        if (state.backupUiState is BackupUiState.HasBackup) {
+                            Button(
+                                onClick = { showClearBackupDialog = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            ) {
+                                Text(stringResource(R.string.btn_clear_backup))
+                            }
+                        }
+                    }
                 }
             }
 
@@ -365,6 +387,29 @@ fun SettingsScreen(
                     notificationPermissionState.launchPermissionRequest()
                 },
                 onDismissRequest = { showRationaleDialog = false }
+            )
+        }
+
+        if (showClearBackupDialog) {
+            AlertDialog(
+                onDismissRequest = { showClearBackupDialog = false },
+                title = { Text(stringResource(R.string.dialog_clear_backup_title)) },
+                text = { Text(stringResource(R.string.dialog_clear_backup_description)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showClearBackupDialog = false
+                            onEvent(SettingsEvent.ClearAppData(onFailure = showToast))
+                        }
+                    ) {
+                        Text(stringResource(R.string.btn_delete), color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showClearBackupDialog = false }) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
             )
         }
     }

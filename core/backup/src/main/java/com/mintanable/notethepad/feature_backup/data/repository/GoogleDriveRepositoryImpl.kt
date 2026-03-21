@@ -233,4 +233,131 @@ class GoogleDriveRepositoryImpl @Inject constructor(
         close()
         awaitClose { }
     }
+
+    override suspend fun downloadMultipleFiles(accessToken: String, files: List<Pair<File, String>>): Flow<LoadStatus> = callbackFlow {
+        val drive = driveService.getDriveService(accessToken)
+
+        // Get metadata for all files to calculate total expected bytes
+        val totalSize = withContext(Dispatchers.IO) {
+            files.sumOf { (_, driveName) ->
+                val response = drive.files().list()
+                    .setSpaces("appDataFolder")
+                    .setQ("name = '$driveName' and trashed = false")
+                    .setFields("files(id, size)")
+                    .execute()
+
+                // Use the first file found and get its size
+                val driveFile = response.files?.firstOrNull()
+                Log.d("kptest", "File: $driveName, Size: ${driveFile?.getSize()}")
+
+                driveFile?.getSize() ?: 0L
+            }
+        }
+
+        Log.d("kptest", "Media Download size: $totalSize")
+
+        val progressMap = mutableMapOf<String, Long>()
+
+        files.forEach { (targetFile, driveFileName) ->
+            val fileId = withContext(Dispatchers.IO) {
+                drive.files().list().setSpaces("appDataFolder")
+                    .setQ("name = '$driveFileName'")
+                    .setFields("files(id, size)").execute().files?.firstOrNull()
+            } ?: return@forEach // Skip if missing
+
+            val request = drive.files().get(fileId.id)
+            val fileSize = fileId.getSize() ?: 0L
+
+            request.mediaHttpDownloader.apply {
+                isDirectDownloadEnabled = false
+                setProgressListener { downloader ->
+                    val currentBytes = (downloader.progress * fileSize).toLong()
+                    progressMap[driveFileName] = currentBytes
+
+                    val totalDownloaded = progressMap.values.sum()
+                    val totalPercent = ((totalDownloaded.toDouble() / totalSize) * 100).toInt()
+                    Log.d("kptest", "Downloading backup: $totalPercent totalDownloaded: $totalDownloaded totalSize: $totalSize")
+
+                    trySend(LoadStatus.Progress(
+                        percentage = totalPercent.coerceAtMost(99),
+                        bytes = totalDownloaded,
+                        totalBytes = totalSize,
+                        type = LoadType.DOWNLOAD
+                    ))
+                }
+            }
+
+            withContext(Dispatchers.IO) {
+                targetFile.parentFile?.mkdirs()
+                FileOutputStream(targetFile).use { request.executeMediaAndDownloadTo(it) }
+            }
+            progressMap[driveFileName] = fileSize
+        }
+
+        trySend(LoadStatus.Progress(100,LoadType.DOWNLOAD , totalSize, totalSize))
+        trySend(LoadStatus.Success)
+        close()
+        awaitClose { }
+    }
+
+    override suspend fun getAllBackupFileNames(accessToken: String): List<String> = withContext(Dispatchers.IO) {
+        try {
+            val drive = driveService.getDriveService(accessToken)
+            val fileNames = mutableListOf<String>()
+            var pageToken: String? = null
+
+            do {
+                val result = drive.files().list()
+                    .setSpaces("appDataFolder")
+                    .setQ("trashed = false")
+                    .setFields("nextPageToken, files(name)")
+                    .setPageToken(pageToken)
+                    .setPageSize(100)
+                    .execute()
+                result.files?.forEach { file ->
+                    file.name?.let { fileNames.add(it) }
+                }
+
+                pageToken = result.nextPageToken
+            } while (pageToken != null)
+
+            Log.d("kptest", "Found ${fileNames.size} files in appDataFolder")
+            fileNames
+        } catch (e: Exception) {
+            Log.e("kptest", "Error fetching all filenames", e)
+            emptyList()
+        }
+    }
+
+    override suspend fun clearAppDataFolder(accessToken: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val drive = driveService.getDriveService(accessToken)
+            var pageToken: String? = null
+            var deletedCount = 0
+
+            Log.d("kptest", "Starting full cleanup of appDataFolder...")
+
+            do {
+                val result = drive.files().list()
+                    .setSpaces("appDataFolder")
+                    .setFields("nextPageToken, files(id, name)")
+                    .setPageToken(pageToken)
+                    .execute()
+
+                result.files?.forEach { file ->
+                    drive.files().delete(file.id).execute()
+                    deletedCount++
+                    Log.d("kptest", "Deleted from Drive: ${file.name}")
+                }
+
+                pageToken = result.nextPageToken
+            } while (pageToken != null)
+
+            Log.d("kptest", "Cleanup complete. Total files removed: $deletedCount")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("kptest", "Failed to clear appDataFolder", e)
+            Result.failure(e)
+        }
+    }
 }
