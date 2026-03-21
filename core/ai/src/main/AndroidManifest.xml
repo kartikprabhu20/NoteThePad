@@ -7,5 +7,12 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
+
+        <receiver android:name="com.mintanable.notethepad.feature_ai.domain.DownloadCancelReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.DOWNLOAD_CANCELLEDBYREQUEST" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

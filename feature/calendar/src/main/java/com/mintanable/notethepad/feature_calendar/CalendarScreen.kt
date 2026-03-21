@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,7 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -44,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,13 +55,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.database.db.entity.DetailedNote
-import com.mintanable.notethepad.feature_calendar.R
+import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.ThemePreviews
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -108,14 +114,30 @@ fun CalendarScreen(
         ) {
             // View mode tabs
             val tabs = CalendarViewMode.entries
-            TabRow(selectedTabIndex = tabs.indexOf(state.viewMode)) {
+            val selectedTabIndex = tabs.indexOf(state.viewMode)
+            SecondaryTabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = MaterialTheme.colorScheme.surface, // Optional: customize background
+                indicator = {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            ) {
                 tabs.forEach { mode ->
+                    val selected = state.viewMode == mode
                     Tab(
-                        selected = state.viewMode == mode,
+                        selected = selected,
                         onClick = { viewModel.onEvent(CalendarEvent.ChangeViewMode(mode)) },
                         text = {
                             Text(
-                                text = mode.name.lowercase().replaceFirstChar { it.uppercase() }
+                                text = stringResource(mode.resId),
+                                style = if (selected) {
+                                    MaterialTheme.typography.titleSmall
+                                } else {
+                                    MaterialTheme.typography.bodyMedium
+                                }
                             )
                         }
                     )
@@ -368,99 +390,121 @@ private fun WeeklyView(
     val weekStart = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     val weekDays = (0..6).map { weekStart.plusDays(it.toLong()) }
     val today = LocalDate.now()
+    val hourLabelWidth = 40.dp
 
-    val notesByDate = notesWithReminders.groupBy { note ->
-        Instant.ofEpochMilli(note.reminderTime)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
+    // Group notes by (date, hour) for exact cell placement
+    val notesByDateHour = notesWithReminders.groupBy { note ->
+        val zdt = Instant.ofEpochMilli(note.reminderTime).atZone(ZoneId.systemDefault())
+        Pair(zdt.toLocalDate(), zdt.hour)
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            // Day headers
-            Row(
+        // Sticky day-header row
+        stickyHeader {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 4.dp)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
-                weekDays.forEach { day ->
-                    val isToday = day == today
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .then(
-                                    if (isToday) Modifier
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary)
-                                    else Modifier
-                                ),
-                            contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(Modifier.width(hourLabelWidth))
+                    weekDays.forEach { day ->
+                        val isToday = day == today
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = day.dayOfMonth.toString(),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (isToday) MaterialTheme.colorScheme.onPrimary
-                                        else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Notes row per day
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                verticalAlignment = Alignment.Top
-            ) {
-                weekDays.forEach { day ->
-                    val dayNotes = notesByDate[day] ?: emptyList()
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 2.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        dayNotes.forEach { note ->
-                            WeeklyNoteChip(note = note, onClick = { onNoteClick(note) })
-                        }
-                        // Add slot tap target
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                                .clickable {
-                                    val epochMillis = day.atTime(9, 0)
-                                        .atZone(ZoneId.systemDefault())
-                                        .toInstant()
-                                        .toEpochMilli()
-                                    onTimeSlotClick(epochMillis)
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "+",
+                                text = day.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .then(
+                                        if (isToday) Modifier
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primary)
+                                        else Modifier
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = day.dayOfMonth.toString(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (isToday) MaterialTheme.colorScheme.onPrimary
+                                            else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                }
+                HorizontalDivider()
+            }
+        }
+
+        // 24 hour rows × 7 day columns
+        items(24) { hour ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                // Hour label
+                Text(
+                    text = "%02d:00".format(hour),
+                    modifier = Modifier
+                        .width(hourLabelWidth)
+                        .defaultMinSize(minHeight = 52.dp)
+                        .padding(top = 6.dp, end = 6.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.End
+                )
+
+                // One cell per day
+                weekDays.forEach { day ->
+                    val cellNotes = notesByDateHour[Pair(day, hour)] ?: emptyList()
+                    val slotEpochMillis = day.atTime(hour, 0)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .defaultMinSize(minHeight = 52.dp)
+                            .padding(1.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .border(
+                                0.5.dp,
+                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                                RoundedCornerShape(3.dp)
+                            )
+                            .then(
+                                if (cellNotes.isEmpty()) Modifier.clickable { onTimeSlotClick(slotEpochMillis) }
+                                else Modifier
+                            )
+                    ) {
+                        if (cellNotes.isNotEmpty()) {
+                            Column(
+                                modifier = Modifier.padding(2.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                cellNotes.forEach { note ->
+                                    WeeklyNoteChip(note = note, onClick = { onNoteClick(note) })
+                                }
+                            }
                         }
                     }
                 }
             }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
         }
     }
 }
@@ -503,7 +547,7 @@ private fun DailyView(
             ) {
                 // Hour label
                 Text(
-                    text = LocalDateTime.of(currentDate, java.time.LocalTime.of(hour, 0))
+                    text = LocalDateTime.of(currentDate, LocalTime.of(hour, 0))
                         .format(DateTimeFormatter.ofPattern("HH:mm")),
                     modifier = Modifier.width(48.dp),
                     style = MaterialTheme.typography.labelSmall,
@@ -666,5 +710,125 @@ private fun NewNoteBottomSheetContent(
         }
 
         Spacer(Modifier.height(8.dp))
+    }
+}
+
+private object CalendarPreviewData {
+    val sampleNote = DetailedNote(
+        id = 1,
+        title = "Team Sync Meeting",
+        content = "Discuss calendar feature",
+        reminderTime = Instant.now().toEpochMilli(),
+        timestamp = 123,
+        color = NoteColors.colors[0].toArgb()
+    )
+
+    val notes = listOf(
+        sampleNote,
+        sampleNote.copy(id = 2, title = "Gym Session", reminderTime = Instant.now().plusSeconds(3600).toEpochMilli()),
+        sampleNote.copy(id = 3, title = "Dinner with Sarah", reminderTime = Instant.now().plusSeconds(3600).toEpochMilli())
+    )
+}
+
+@ThemePreviews
+@Composable
+fun CalendarNavigationRowPreview() {
+    NoteThePadTheme {
+        Surface {
+            CalendarNavigationRow(
+                label = "March 2026",
+                onPrevious = {},
+                onNext = {}
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun MonthlyViewPreview() {
+    NoteThePadTheme {
+        Surface {
+            MonthlyView(
+                currentDate = LocalDate.now(),
+                selectedDay = LocalDate.now(),
+                notesWithReminders = CalendarPreviewData.notes,
+                onDayClick = {},
+                onTimeSlotClick = {},
+                onNoteClick = {}
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun WeeklyViewPreview() {
+    NoteThePadTheme {
+        Surface {
+            WeeklyView(
+                currentDate = LocalDate.now(),
+                notesWithReminders = CalendarPreviewData.notes,
+                onTimeSlotClick = {},
+                onNoteClick = {}
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun DailyViewPreview() {
+    NoteThePadTheme {
+        Surface {
+            DailyView(
+                currentDate = LocalDate.now(),
+                notesWithReminders = CalendarPreviewData.notes,
+                onTimeSlotClick = {},
+                onNoteClick = {}
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun NoteReminderItemPreview() {
+    NoteThePadTheme {
+        Surface(modifier = Modifier.padding(8.dp)) {
+            NoteReminderItem(
+                note = CalendarPreviewData.sampleNote,
+                onClick = {}
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun NewNoteBottomSheetPreview() {
+    NoteThePadTheme {
+        Surface {
+            NewNoteBottomSheetContent(
+                slotTime = Instant.now().toEpochMilli(),
+                title = "My New Note",
+                onTitleChange = {},
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun WeeklyNoteChipPreview() {
+    NoteThePadTheme {
+        Surface(modifier = Modifier.width(100.dp).padding(4.dp)) {
+            WeeklyNoteChip(
+                note = CalendarPreviewData.sampleNote,
+                onClick = {}
+            )
+        }
     }
 }
