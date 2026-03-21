@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.core.common.humanReadableSize
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
 import com.mintanable.notethepad.core.model.backup.LoadType
@@ -38,24 +39,33 @@ fun BackupStatusUI(
     val context = LocalContext.current
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         val isRunning = backupUploadDownloadState is LoadStatus.Progress
-        val progress = if (backupUploadDownloadState is LoadStatus.Progress) {
-            backupUploadDownloadState.percentage * 1f
-        } else {
-            0f
-        }
 
-        if (isRunning && progress >= 0) {
+        if (isRunning && backupUploadDownloadState.percentage >= 0) {
             Text(
                 if(backupUploadDownloadState.type== LoadType.UPLOAD) {
-                    stringResource(R.string.msg_uploading_to_drive, progress.toInt())
+                    if(backupUploadDownloadState.totalBytes > 0){
+                        stringResource(R.string.msg_uploading_to_drive_with_bytes,
+                            backupUploadDownloadState.percentage, backupUploadDownloadState.bytes.humanReadableSize(),
+                            backupUploadDownloadState.totalBytes.humanReadableSize())
+                    }else{
+                        stringResource(R.string.msg_uploading_to_drive, backupUploadDownloadState.percentage)
+                    }
                 } else {
-                    stringResource(R.string.msg_downloading_from_drive, progress.toInt())
+                    if(backupUploadDownloadState.totalBytes > 0){
+                        stringResource(R.string.msg_downloading_from_drive_with_bytes,
+                            backupUploadDownloadState.percentage, backupUploadDownloadState.bytes.humanReadableSize(),
+                            backupUploadDownloadState.totalBytes.humanReadableSize())
+                    }else {
+                        stringResource(
+                            R.string.msg_downloading_from_drive, backupUploadDownloadState.percentage
+                        )
+                    }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             )
             LinearProgressIndicator(
-                progress = { progress / 100f },
+                progress = { backupUploadDownloadState.percentage / 100f },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 16.dp)
             )
         }
@@ -151,6 +161,21 @@ fun PreviewBackupUIWorkInfoUploading() {
     NoteThePadTheme {
         BackupStatusUI(
             backupUploadDownloadState = LoadStatus.Progress(12, LoadType.UPLOAD),
+            backupUiState = BackupUiState.HasBackup(
+                DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
+            ),
+            onRestoreClicked = {}
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewBackupUIWorkInfoUploadingWithBytes() {
+    NoteThePadTheme {
+        BackupStatusUI(
+            backupUploadDownloadState = LoadStatus.Progress(12, LoadType.UPLOAD, 20000, 4000000),
             backupUiState = BackupUiState.HasBackup(
                 DriveFileMetadata("1", "Notes.db", 1708600000000L, 1024 * 1024 * 2) // 2MB
             ),

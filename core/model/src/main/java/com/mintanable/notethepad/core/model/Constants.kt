@@ -7,4 +7,6 @@ object NoteThePadConstants {
 
     const val BACKUP_NOTIFICATION_CHANNEL_ID = "backup_channel"
     const val DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID = "download_aimodel_channel"
+
+    const val BACKUP_DB_FILE_NAME = "NoteThePad_Backup.db"
 }

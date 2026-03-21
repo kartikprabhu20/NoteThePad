@@ -10,8 +10,10 @@
     <string name="btn_backup_now">Backup Now</string>
     <string name="setting_google_account">Google Account</string>
     <string name="setting_theme_modes">Theme modes</string>
-    <string name="msg_uploading_to_drive">Uploading to Drive: %1$d</string>
-    <string name="msg_downloading_from_drive">Downloading from Drive: %1$d</string>
+    <string name="msg_uploading_to_drive">Uploading to Drive: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Uploading to Drive: %1$d%% (%s/%s)</string>
+    <string name="msg_downloading_from_drive">Downloading from Drive: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Uploading to Drive: %1$d%% (%s/%s)</string>
     <string name="msg_checking_cloud_status">Checking cloud status...</string>
     <string name="msg_last_cloud_backup">Last cloud backup: %s</string>
     <string name="btn_restore_now">"Restore Now"</string>

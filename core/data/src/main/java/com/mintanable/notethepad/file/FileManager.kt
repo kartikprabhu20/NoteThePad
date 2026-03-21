@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -95,5 +96,34 @@ class FileManager @Inject constructor(
 
     fun getAttachmentType(uri: Uri): AttachmentType {
         return AttachmentHelper.getAttachmentType(context, uri)
+    }
+
+    fun getFileFromUri(uriString: String): File? {
+        return try {
+            val cleanPath = uriString.removePrefix("file://")
+            val file = File(cleanPath)
+
+            if (file.exists()) {
+                Log.d("kptest", "Found direct file: $cleanPath")
+                return file
+            }
+
+            val uri = uriString.toUri()
+            if (uri.scheme == "content") {
+                val tempFile = File(context.cacheDir, "temp_${uri.lastPathSegment}")
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    tempFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                return tempFile
+            }
+
+            Log.e("kptest", "Could not resolve URI/Path: $uriString")
+            null
+        } catch (e: Exception) {
+            Log.e("kptest", "Error resolving $uriString", e)
+            null
+        }
     }
 }

@@ -30,7 +30,19 @@ object AttachmentHelper {
 
     fun getMimeType(path: String): String {
         val extension = MimeTypeMap.getFileExtensionFromUrl(path)
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "image/jpeg"
+
+        val mimeType = when (extension.lowercase()) {
+            "db" -> "application/x-sqlite3"
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "mp4" -> "video/mp4"
+            "mp3" -> "audio/mpeg"
+            "m4a" -> "audio/mp4"
+            "wav" -> "audio/wav"
+            else -> "application/octet-stream"
+        }
+
+        return mimeType
     }
 
     fun getMimeType(context: Context, uri: Uri): String? {
