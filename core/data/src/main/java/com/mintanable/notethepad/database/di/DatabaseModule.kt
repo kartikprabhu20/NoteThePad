@@ -32,25 +32,24 @@ object DatabaseModule {
     }
 
     @Provides
-    @Singleton
     fun provideNoteDatabase(manager: DatabaseManager): NoteDatabase {
         return manager.database
     }
 
     @Provides
-    @Singleton
     fun provideNoteDao(db: NoteDatabase): NoteDao {
-        return db.noteDao
+        return db.noteDao()
     }
 
     @Provides
-    @Singleton
-    fun provideTagDao(db: NoteDatabase): TagDao = db.tagDao
+    fun provideTagDao(db: NoteDatabase): TagDao = db.tagDao()
 
     @Provides
     @Singleton
-    fun provideNoteRepository(noteDao: NoteDao, tagDao: TagDao, noteDatabase: NoteDatabase): NoteRepository {
-        return NoteRepositoryImpl(noteDao, tagDao, noteDatabase)
+    fun provideNoteRepository(
+        databaseManager: DatabaseManager
+    ): NoteRepository {
+        return NoteRepositoryImpl(databaseManager)
     }
 
     @Provides

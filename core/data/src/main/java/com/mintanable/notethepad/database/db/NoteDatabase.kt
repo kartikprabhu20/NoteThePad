@@ -22,8 +22,8 @@ import com.mintanable.notethepad.database.db.util.NoteConverters
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase : RoomDatabase() {
-    abstract val noteDao: NoteDao
-    abstract val tagDao: TagDao
+    abstract fun noteDao(): NoteDao
+    abstract fun tagDao(): TagDao
 
     companion object {
         const val DATABASE_NAME = "notes_db"

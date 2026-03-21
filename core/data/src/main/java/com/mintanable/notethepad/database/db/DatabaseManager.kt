@@ -34,10 +34,15 @@ class DatabaseManager @Inject constructor(
         _database?.close()
         _database = null
 
-        val dbFile = context.getDatabasePath(NoteDatabase.Companion.DATABASE_NAME)
+        val dbFile = context.getDatabasePath(NoteDatabase.DATABASE_NAME)
+
+        val walFile = File(dbFile.path + "-wal")
+        val shmFile = File(dbFile.path + "-shm")
+
+        if (walFile.exists()) walFile.delete()
+        if (shmFile.exists()) shmFile.delete()
+
         tempFile.copyTo(dbFile, overwrite = true)
         tempFile.delete()
-
-        // Re-initialization happens automatically next time 'database' is accessed
     }
 }

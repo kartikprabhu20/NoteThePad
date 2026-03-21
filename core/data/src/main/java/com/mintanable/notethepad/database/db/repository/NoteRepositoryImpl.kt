@@ -6,19 +6,23 @@ import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.database.db.entity.NoteTagCrossRef
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.entity.TagEntity
-import com.mintanable.notethepad.database.db.NoteDatabase
-import com.mintanable.notethepad.database.db.dao.NoteDao
-import com.mintanable.notethepad.database.db.dao.TagDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NoteRepositoryImpl(
-    private val noteDao: NoteDao,
-    private val tagDao: TagDao,
-    private val db: NoteDatabase
+@Singleton
+class NoteRepositoryImpl @Inject constructor(
+    private val dbManager: DatabaseManager
 ) : NoteRepository {
+
+    // Helper properties to always get the LATEST instance
+    private val noteDao get() = dbManager.database.noteDao()
+    private val tagDao get() = dbManager.database.tagDao()
+    private val db get() = dbManager.database
 
     override fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>> {
         return noteDao.getNotes(

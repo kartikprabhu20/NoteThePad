@@ -26,7 +26,9 @@ import com.mintanable.notethepad.feature_backup.R
 import com.mintanable.notethepad.file.FileManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 @HiltWorker
 class BackupWorker @AssistedInject constructor(
@@ -40,10 +42,10 @@ class BackupWorker @AssistedInject constructor(
     private val fileManager: FileManager
 ) : CoroutineWorker(appContext, workerParams) {
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO){
         try {
             val refreshToken =
-                googleAuthRepository.getDecryptedRefreshToken() ?: return Result.failure()
+                googleAuthRepository.getDecryptedRefreshToken() ?: return@withContext Result.failure()
             val accessToken = googleAuthRepository.refreshAccessToken(refreshToken)
             val settings = userPrefs.settingsFlow.first()
 
@@ -82,11 +84,11 @@ class BackupWorker @AssistedInject constructor(
                     }
 
                     is LoadStatus.Success -> {
-                        Log.d("kptest", "Database uploaded successfully")
+                        Log.d("kptest", "Backup success")
                     }
 
                     is LoadStatus.Error -> {
-                        Log.d("kptest", "Database upload failed")
+                        Log.d("kptest", "Backup failed")
                         uploadSuccess = false
                         return@collect
                     }
@@ -95,14 +97,14 @@ class BackupWorker @AssistedInject constructor(
                 }
             }
 
-            if (!uploadSuccess) return Result.retry()
+            if (!uploadSuccess) return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
 
             backupScheduler.onWorkCompleted(inputData)
-            return Result.success()
+            return@withContext Result.success()
 
         } catch (e: Exception) {
             Log.e("kptest", "Error: ${e.message}")
-            return if (runAttemptCount < 3) Result.retry() else Result.failure()
+            return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
         }
     }
 
