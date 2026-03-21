@@ -54,6 +54,8 @@ class AddEditNoteViewModel @Inject constructor(
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
+    private val passedReminderTime: Long = savedStateHandle.get<Long>("reminderTime") ?: -1L
+    private val passedInitialTitle: String = savedStateHandle.get<String>("initialTitle") ?: ""
     private val isEditMode = passedNoteId != -1L
     private var currentNoteId: Long = 0L
     private var currentRecordingFile: File? = null
@@ -88,6 +90,14 @@ class AddEditNoteViewModel @Inject constructor(
 
     init {
         loadNote(passedNoteId)
+        if (!isEditMode) {
+            if (passedReminderTime > 0L) {
+                _uiState.update { it.copy(reminderTime = passedReminderTime) }
+            }
+            if (passedInitialTitle.isNotBlank()) {
+                _uiState.update { it.copy(titleState = it.titleState.copy(text = passedInitialTitle, isHintVisible = false)) }
+            }
+        }
     }
 
     private fun loadNote(id: Long) {

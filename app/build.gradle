@@ -149,6 +149,7 @@ dependencies {
     implementation project(':feature:auth')
     implementation project(':feature:widgets')
     implementation project(':feature:settings')
+    implementation project(':feature:calendar')
 
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 

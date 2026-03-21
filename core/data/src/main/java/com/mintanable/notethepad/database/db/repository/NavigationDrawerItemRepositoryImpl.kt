@@ -3,6 +3,7 @@ package com.mintanable.notethepad.database.db.repository
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
@@ -25,6 +26,11 @@ class NavigationDrawerItemRepositoryImpl: NavigationDrawerItemRepository {
                 title = "Reminders",
                 icon = Icons.Filled.Notifications,
                 route = Screen.NotesScreen.passArgs(filterType = NotesFilterType.REMINDERS.filter)
+            ),
+            DrawerItem.NavigationDrawerItem(
+                title = "Calendar",
+                icon = Icons.Filled.CalendarMonth,
+                route = Screen.CalendarScreen.route
             ),
             DrawerItem.TextDrawerItem(
                 title = "Labels"

@@ -41,6 +41,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
+import com.mintanable.notethepad.feature_calendar.CalendarScreen
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
@@ -191,6 +192,12 @@ class MainActivity : AppCompatActivity() {
                                 arguments = listOf(
                                     navArgument(name = "noteId") {
                                         type = NavType.LongType; defaultValue = -1L
+                                    },
+                                    navArgument(name = "reminderTime") {
+                                        type = NavType.LongType; defaultValue = -1L
+                                    },
+                                    navArgument(name = "initialTitle") {
+                                        type = NavType.StringType; defaultValue = ""
                                     }
                                 )
                             ) {
@@ -276,6 +283,9 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     showToast = showToast
                                 )
+                            }
+                            composable(route = Screen.CalendarScreen.route) {
+                                CalendarScreen(navController = navController)
                             }
                         }
                     }

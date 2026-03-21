@@ -101,6 +101,7 @@ const MODULES = [
   { id: ':feature:auth', label: ':feature:auth', type: 'feature' },
   { id: ':feature:widgets', label: ':feature:widgets', type: 'feature' },
   { id: ':feature:settings', label: ':feature:settings', type: 'feature' },
+  { id: ':feature:calendar', label: ':feature:calendar', type: 'feature' },
   { id: ':core:template', label: ':core:template', type: 'core' },
 ];
 
@@ -114,6 +115,7 @@ const EDGES = [
   [':app',                          ':feature:auth',               false],
   [':app',                          ':feature:widgets',            false],
   [':app',                          ':feature:settings',           false],
+  [':app',                          ':feature:calendar',           false],
   [':core:common',                  ':core:model',                 false],
   [':core:data',                    ':core:model',                 false],
   [':core:data',                    ':core:common',                false],
@@ -142,24 +144,28 @@ const EDGES = [
   [':feature:settings',             ':core:ui',                    false],
   [':feature:settings',             ':core:ai',                    false],
   [':feature:settings',             ':core:backup',                false],
+  [':feature:calendar',             ':core:model',                 false],
+  [':feature:calendar',             ':core:data',                  false],
+  [':feature:calendar',             ':core:common',                false],
 ];
 
 const NODE_W = 152, NODE_H = 36;
 const COL = 168, ROW = 120, PX = 36, PY = 48;
 
 const DEFAULT_POS = {
-  ':app':                            { col: 1, row: 0 },
-  ':core:model':                     { col: 1.5, row: 4 },
+  ':app':                            { col: 1.5, row: 0 },
+  ':core:model':                     { col: 3, row: 3 },
   ':core:common':                    { col: 1, row: 3 },
   ':core:data':                      { col: 2, row: 3 },
-  ':core:ui':                        { col: 2.5, row: 2 },
-  ':core:ai':                        { col: 0.5, row: 2 },
-  ':feature:note':                   { col: 1, row: 1 },
-  ':core:backup':                    { col: 1.5, row: 2 },
+  ':core:ui':                        { col: 3, row: 2 },
+  ':core:ai':                        { col: 1, row: 2 },
+  ':feature:note':                   { col: 2, row: 1 },
+  ':core:backup':                    { col: 2, row: 2 },
   ':feature:auth':                   { col: 0, row: 1 },
-  ':feature:widgets':                { col: 3, row: 1 },
-  ':feature:settings':               { col: 2, row: 1 },
-  ':core:template':                  { col: 2, row: 0 },
+  ':feature:widgets':                { col: 4, row: 1 },
+  ':feature:settings':               { col: 3, row: 1 },
+  ':feature:calendar':               { col: 1, row: 1 },
+  ':core:template':                  { col: 2.5, row: 0 },
 };
 
 function defaultXY(id) {

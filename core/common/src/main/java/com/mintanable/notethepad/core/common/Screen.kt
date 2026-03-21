@@ -10,13 +10,20 @@ sealed class Screen(val route:String){
             return "notes_screen?tagId=${tagId ?: -1L}&tagName=${tagName ?: ""}&filterType=${filterType ?: NotesFilterType.ALL.filter}"
         }
     }
-    data object AddEditNoteScreen : Screen("add_edit_note_screen?noteId={noteId}"){
+    data object AddEditNoteScreen : Screen(
+        "add_edit_note_screen?noteId={noteId}&reminderTime={reminderTime}&initialTitle={initialTitle}"
+    ) {
         fun passArgs(
             noteId: Long? = null,
+            reminderTime: Long = -1L,
+            initialTitle: String = ""
         ): String {
-            return "add_edit_note_screen?noteId=${noteId}"
+            val encodedTitle = android.net.Uri.encode(initialTitle)
+            return "add_edit_note_screen?noteId=${noteId ?: -1L}&reminderTime=$reminderTime&initialTitle=$encodedTitle"
         }
     }
+
+    data object CalendarScreen : Screen("calendar_screen")
 
     data object FirebaseLoginScreen : Screen("firebase_login_screen")
     data object LogOut : Screen("logout")
