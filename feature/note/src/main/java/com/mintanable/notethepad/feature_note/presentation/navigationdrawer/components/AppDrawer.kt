@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,8 +45,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -87,12 +90,14 @@ fun AppDrawer(
             ) {
                 itemsIndexed(
                     items = items,
-                    key = { index, item ->
+                    key = { _, item ->
+                        // Fix: Using item.route as key caused IllegalArgumentException when multiple items had the same route (e.g. Home and Reminders).
+                        // Switched to using unique identifiers for each item type.
                         when(item) {
-                            is DrawerItem.NavigationDrawerItem -> item.route
+                            is DrawerItem.NavigationDrawerItem -> "nav_${item.title}"
                             is DrawerItem.TextDrawerItem -> "header_${item.title}"
-                            is DrawerItem.AddLabelDrawerItem -> "add_label"
-                            is DrawerItem.LabelDrawerItem -> item.route
+                            is DrawerItem.AddLabelDrawerItem -> "add_label_${item.title}"
+                            is DrawerItem.LabelDrawerItem -> "label_${item.tagEntity.tagId}_${item.tagEntity.tagName}"
                         }
                     }
                 ) { index, item ->
@@ -227,11 +232,15 @@ fun DrawerHeader(
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = title,
-            modifier = Modifier.padding(16.dp), // Use fixed modifiers inside
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
+
+        Image(
+            painter = painterResource(R.drawable.notethepad_logo),
+            contentDescription = stringResource(R.string.content_description_empty_list),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .padding(vertical = 16.dp, horizontal = 32.dp),
+//            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
         )
 
         user?.photoUrl?.let { url ->
