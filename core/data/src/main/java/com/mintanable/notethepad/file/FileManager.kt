@@ -6,7 +6,6 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -100,15 +99,23 @@ class FileManager @Inject constructor(
 
     fun getFileFromUri(uriString: String): File? {
         return try {
-            val cleanPath = uriString.removePrefix("file://")
-            val file = File(cleanPath)
+            val uri = Uri.parse(uriString)
 
-            if (file.exists()) {
-                Log.d("kptest", "Found direct file: $cleanPath")
-                return file
+            // "file://" URI or a raw path string
+            if (uri.scheme == null || uri.scheme == "file") {
+               val rawPath = uri.path ?: uriString
+                val decodedPath = Uri.decode(rawPath).removePrefix("file:")
+
+                val file = File(decodedPath)
+                if (file.exists()) {
+                    Log.d("kptest", "Found direct file: ${file.absolutePath}")
+                    return file
+                } else {
+                    Log.e("kptest", "File does not exist on disk: $decodedPath")
+                }
             }
 
-            val uri = uriString.toUri()
+            // "content://" URI (Gallery/External)
             if (uri.scheme == "content") {
                 val tempFile = File(context.cacheDir, "temp_${uri.lastPathSegment}")
                 context.contentResolver.openInputStream(uri)?.use { input ->

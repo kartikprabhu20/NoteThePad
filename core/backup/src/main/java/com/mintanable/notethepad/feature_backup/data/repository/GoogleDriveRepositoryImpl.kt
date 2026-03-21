@@ -211,7 +211,7 @@ class GoogleDriveRepositoryImpl @Inject constructor(
                             // Calculate TOTAL progress
                             val totalUploaded = progressMap.values.sum()
                             val totalPercent = ((totalUploaded.toDouble() / totalSize) * 100).toInt()
-
+                            Log.d("kptest", "upload progress: $totalPercent totalUploaded: $totalUploaded totalSize: $totalSize")
                             trySend(LoadStatus.Progress(totalPercent.coerceAtMost(99), LoadType.UPLOAD, totalUploaded, totalSize))
                         }
                     }

@@ -45,7 +45,8 @@ fun BackupStatusUI(
                 if(backupUploadDownloadState.type== LoadType.UPLOAD) {
                     if(backupUploadDownloadState.totalBytes > 0){
                         stringResource(R.string.msg_uploading_to_drive_with_bytes,
-                            backupUploadDownloadState.percentage, backupUploadDownloadState.bytes.humanReadableSize(),
+                            backupUploadDownloadState.percentage,
+                            backupUploadDownloadState.bytes.humanReadableSize(),
                             backupUploadDownloadState.totalBytes.humanReadableSize())
                     }else{
                         stringResource(R.string.msg_uploading_to_drive, backupUploadDownloadState.percentage)
@@ -53,7 +54,8 @@ fun BackupStatusUI(
                 } else {
                     if(backupUploadDownloadState.totalBytes > 0){
                         stringResource(R.string.msg_downloading_from_drive_with_bytes,
-                            backupUploadDownloadState.percentage, backupUploadDownloadState.bytes.humanReadableSize(),
+                            backupUploadDownloadState.percentage,
+                            backupUploadDownloadState.bytes.humanReadableSize(),
                             backupUploadDownloadState.totalBytes.humanReadableSize())
                     }else {
                         stringResource(
