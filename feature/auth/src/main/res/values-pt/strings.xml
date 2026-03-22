@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_signin">Ocorreu um erro ao fazer login, tente novamente!</string>
+    <string name="content_description_google_signin">Fazer login com Google</string>
+</resources>

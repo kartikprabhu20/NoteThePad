@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">Not ekle</string>
+    <string name="content_description_empty_list">boş liste</string>
+    <string name="content_description_sort">Sırala</string>
+    <string name="content_description_toggle_layout">Düzeni değiştir</string>
+    <string name="content_description_delete_label">Etiketi sil</string>
+    <string name="content_description_edit_labels">etiketleri düzenle</string>
+    <string name="content_description_attach">Ekle</string>
+    <string name="content_description_checkbox">Onay kutusu</string>
+    <string name="content_description_reminders">Hatırlatıcılar</string>
+    <string name="content_description_save_note">Notu kaydet</string>
+    <string name="content_description_attached_image">Ekli resim</string>
+    <string name="content_description_play_video">Videoyu oynat</string>
+    <string name="content_description_images_attached">Resimler eklendi</string>
+    <string name="content_description_audio_attached">Ses eklendi</string>
+    <string name="content_description_reminder_set">Hatırlatıcı ayarlandı</string>
+    <string name="content_description_checkboxes_available">onay kutuları mevcut</string>
+    <string name="content_description_tags_available">Etiketler mevcut</string>
+    <string name="content_description_pin_note">Notu widget olarak sabitle</string>
+    <string name="content_description_delete_note">Notu sil</string>
+    <string name="content_description_remove_audio">Sesi kaldır</string>
+    <string name="content_description_checkbox_state">onay kutusu</string>
+
+    <string name="search_hint">Notları ara…</string>
+    <string name="enter_title_hint">Başlık girin…</string>
+    <string name="enter_content_hint">İçerik girin…</string>
+
+    <string name="btn_auto_tag">Otomatik Etiket</string>
+    <string name="msg_saving_note">Not kaydediliyor…</string>
+    <string name="title_ai_suggestions">Yapay Zeka Etiket Önerileri</string>
+    <string name="label_more_items">+ %1$d daha</string>
+    <string name="msg_note_deleted">Not silindi</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">Etiketler</string>
+    <string name="drawer_create_new_label">Yeni etiket oluştur</string>
+    <string name="content_description_appdrawer_logo">Uygulama çekmecesi logosu</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">Resim</string>
+    <string name="option_video">Video</string>
+    <string name="option_audio">Ses</string>
+    <string name="option_choose_date_time">Tarih &amp; saat seçin</string>
+    <string name="option_pin_widget">Widget olarak sabitle</string>
+    <string name="option_add_label">Etiket ekle</string>
+    <string name="option_delete">Sil</string>
+    <string name="option_make_copy">Kopya oluştur</string>
+    <string name="option_camera">Kamera</string>
+    <string name="option_gallery">Galeri</string>
+    <string name="option_video_recorder">Video kaydedici</string>
+    <string name="option_audio_recorder">Ses kaydedici</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">Ses Kaydedici</string>
+    <string name="btn_stop_recording">Kaydı durdur</string>
+    <string name="btn_start_recording">Kaydı başlat</string>
+
+    <!-- Order Section -->
+    <string name="order_title">Başlık</string>
+    <string name="order_date">Tarih</string>
+    <string name="order_color">Renk</string>
+    <string name="order_ascending">Artan</string>
+    <string name="order_descending">Azalan</string>
+</resources>

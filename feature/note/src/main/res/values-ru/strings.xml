@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">Добавить заметку</string>
+    <string name="content_description_empty_list">пустой список</string>
+    <string name="content_description_sort">Сортировать</string>
+    <string name="content_description_toggle_layout">Переключить макет</string>
+    <string name="content_description_delete_label">Удалить метку</string>
+    <string name="content_description_edit_labels">редактировать метки</string>
+    <string name="content_description_attach">Прикрепить</string>
+    <string name="content_description_checkbox">Флажок</string>
+    <string name="content_description_reminders">Напоминания</string>
+    <string name="content_description_save_note">Сохранить заметку</string>
+    <string name="content_description_attached_image">Прикреплённое изображение</string>
+    <string name="content_description_play_video">Воспроизвести видео</string>
+    <string name="content_description_images_attached">Изображения прикреплены</string>
+    <string name="content_description_audio_attached">Аудио прикреплено</string>
+    <string name="content_description_reminder_set">Напоминание установлено</string>
+    <string name="content_description_checkboxes_available">флажки доступны</string>
+    <string name="content_description_tags_available">Метки доступны</string>
+    <string name="content_description_pin_note">Закрепить заметку как виджет</string>
+    <string name="content_description_delete_note">Удалить заметку</string>
+    <string name="content_description_remove_audio">Удалить аудио</string>
+    <string name="content_description_checkbox_state">флажок</string>
+
+    <string name="search_hint">Поиск заметок…</string>
+    <string name="enter_title_hint">Введите заголовок…</string>
+    <string name="enter_content_hint">Введите содержимое…</string>
+
+    <string name="btn_auto_tag">Авто-тег</string>
+    <string name="msg_saving_note">Сохранение заметки…</string>
+    <string name="title_ai_suggestions">Предложения тегов ИИ</string>
+    <string name="label_more_items">+ ещё %1$d</string>
+    <string name="msg_note_deleted">Заметка удалена</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">Метки</string>
+    <string name="drawer_create_new_label">Создать новую метку</string>
+    <string name="content_description_appdrawer_logo">Логотип ящика приложения</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">Изображение</string>
+    <string name="option_video">Видео</string>
+    <string name="option_audio">Аудио</string>
+    <string name="option_choose_date_time">Выбрать дату &amp; время</string>
+    <string name="option_pin_widget">Закрепить как виджет</string>
+    <string name="option_add_label">Добавить метку</string>
+    <string name="option_delete">Удалить</string>
+    <string name="option_make_copy">Создать копию</string>
+    <string name="option_camera">Камера</string>
+    <string name="option_gallery">Галерея</string>
+    <string name="option_video_recorder">Видеозапись</string>
+    <string name="option_audio_recorder">Аудиозапись</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">Диктофон</string>
+    <string name="btn_stop_recording">Остановить запись</string>
+    <string name="btn_start_recording">Начать запись</string>
+
+    <!-- Order Section -->
+    <string name="order_title">Заголовок</string>
+    <string name="order_date">Дата</string>
+    <string name="order_color">Цвет</string>
+    <string name="order_ascending">По возрастанию</string>
+    <string name="order_descending">По убыванию</string>
+</resources>

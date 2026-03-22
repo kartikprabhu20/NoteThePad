@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">添加笔记</string>
+    <string name="content_description_empty_list">空列表</string>
+    <string name="content_description_sort">排序</string>
+    <string name="content_description_toggle_layout">切换布局</string>
+    <string name="content_description_delete_label">删除标签</string>
+    <string name="content_description_edit_labels">编辑标签</string>
+    <string name="content_description_attach">附加</string>
+    <string name="content_description_checkbox">复选框</string>
+    <string name="content_description_reminders">提醒</string>
+    <string name="content_description_save_note">保存笔记</string>
+    <string name="content_description_attached_image">已附加图片</string>
+    <string name="content_description_play_video">播放视频</string>
+    <string name="content_description_images_attached">图片已附加</string>
+    <string name="content_description_audio_attached">音频已附加</string>
+    <string name="content_description_reminder_set">已设置提醒</string>
+    <string name="content_description_checkboxes_available">复选框可用</string>
+    <string name="content_description_tags_available">标签可用</string>
+    <string name="content_description_pin_note">将笔记固定为小部件</string>
+    <string name="content_description_delete_note">删除笔记</string>
+    <string name="content_description_remove_audio">移除音频</string>
+    <string name="content_description_checkbox_state">复选框</string>
+
+    <string name="search_hint">搜索笔记…</string>
+    <string name="enter_title_hint">输入标题…</string>
+    <string name="enter_content_hint">输入内容…</string>
+
+    <string name="btn_auto_tag">自动标签</string>
+    <string name="msg_saving_note">正在保存笔记…</string>
+    <string name="title_ai_suggestions">AI 标签建议</string>
+    <string name="label_more_items">+ 还有 %1$d 个</string>
+    <string name="msg_note_deleted">笔记已删除</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">标签</string>
+    <string name="drawer_create_new_label">创建新标签</string>
+    <string name="content_description_appdrawer_logo">应用抽屉徽标</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">图片</string>
+    <string name="option_video">视频</string>
+    <string name="option_audio">音频</string>
+    <string name="option_choose_date_time">选择日期 &amp; 时间</string>
+    <string name="option_pin_widget">固定为小部件</string>
+    <string name="option_add_label">添加标签</string>
+    <string name="option_delete">删除</string>
+    <string name="option_make_copy">创建副本</string>
+    <string name="option_camera">相机</string>
+    <string name="option_gallery">相册</string>
+    <string name="option_video_recorder">视频录制</string>
+    <string name="option_audio_recorder">录音</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">录音机</string>
+    <string name="btn_stop_recording">停止录音</string>
+    <string name="btn_start_recording">开始录音</string>
+
+    <!-- Order Section -->
+    <string name="order_title">标题</string>
+    <string name="order_date">日期</string>
+    <string name="order_color">颜色</string>
+    <string name="order_ascending">升序</string>
+    <string name="order_descending">降序</string>
+</resources>

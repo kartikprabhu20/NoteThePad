@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">নোট যোগ করুন</string>
+    <string name="content_description_empty_list">খালি তালিকা</string>
+    <string name="content_description_sort">সাজান</string>
+    <string name="content_description_toggle_layout">লেআউট পরিবর্তন করুন</string>
+    <string name="content_description_delete_label">লেবেল মুছুন</string>
+    <string name="content_description_edit_labels">লেবেল সম্পাদনা করুন</string>
+    <string name="content_description_attach">সংযুক্ত করুন</string>
+    <string name="content_description_checkbox">চেকবক্স</string>
+    <string name="content_description_reminders">অনুস্মারক</string>
+    <string name="content_description_save_note">নোট সংরক্ষণ করুন</string>
+    <string name="content_description_attached_image">সংযুক্ত ছবি</string>
+    <string name="content_description_play_video">ভিডিও চালান</string>
+    <string name="content_description_images_attached">ছবি সংযুক্ত</string>
+    <string name="content_description_audio_attached">অডিও সংযুক্ত</string>
+    <string name="content_description_reminder_set">অনুস্মারক সেট</string>
+    <string name="content_description_checkboxes_available">চেকবক্স উপলব্ধ</string>
+    <string name="content_description_tags_available">ট্যাগ উপলব্ধ</string>
+    <string name="content_description_pin_note">নোটটি উইজেট হিসেবে পিন করুন</string>
+    <string name="content_description_delete_note">নোট মুছুন</string>
+    <string name="content_description_remove_audio">অডিও সরান</string>
+    <string name="content_description_checkbox_state">চেকবক্স</string>
+
+    <string name="search_hint">নোট খুঁজুন…</string>
+    <string name="enter_title_hint">শিরোনাম লিখুন…</string>
+    <string name="enter_content_hint">কিছু বিষয়বস্তু লিখুন…</string>
+
+    <string name="btn_auto_tag">স্বয়ংক্রিয় ট্যাগ</string>
+    <string name="msg_saving_note">নোট সংরক্ষণ হচ্ছে…</string>
+    <string name="title_ai_suggestions">এআই ট্যাগ পরামর্শ</string>
+    <string name="label_more_items">+ আরও %1$d</string>
+    <string name="msg_note_deleted">নোট মুছে ফেলা হয়েছে</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">লেবেল</string>
+    <string name="drawer_create_new_label">নতুন লেবেল তৈরি করুন</string>
+    <string name="content_description_appdrawer_logo">অ্যাপ ড্রয়ার লোগো</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">ছবি</string>
+    <string name="option_video">ভিডিও</string>
+    <string name="option_audio">অডিও</string>
+    <string name="option_choose_date_time">তারিখ &amp; সময় বেছে নিন</string>
+    <string name="option_pin_widget">উইজেট হিসেবে পিন করুন</string>
+    <string name="option_add_label">লেবেল যোগ করুন</string>
+    <string name="option_delete">মুছুন</string>
+    <string name="option_make_copy">একটি কপি তৈরি করুন</string>
+    <string name="option_camera">ক্যামেরা</string>
+    <string name="option_gallery">গ্যালারি</string>
+    <string name="option_video_recorder">ভিডিও রেকর্ডার</string>
+    <string name="option_audio_recorder">অডিও রেকর্ডার</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">অডিও রেকর্ডার</string>
+    <string name="btn_stop_recording">রেকর্ডিং বন্ধ করুন</string>
+    <string name="btn_start_recording">রেকর্ডিং শুরু করুন</string>
+
+    <!-- Order Section -->
+    <string name="order_title">শিরোনাম</string>
+    <string name="order_date">তারিখ</string>
+    <string name="order_color">রঙ</string>
+    <string name="order_ascending">আরোহী</string>
+    <string name="order_descending">অবরোহী</string>
+</resources>

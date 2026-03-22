@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_signin">Terjadi kesalahan saat masuk, coba lagi!</string>
+    <string name="content_description_google_signin">Masuk dengan Google</string>
+</resources>

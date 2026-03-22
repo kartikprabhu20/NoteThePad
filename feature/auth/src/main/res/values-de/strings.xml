@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_signin">Fehler beim Anmelden, bitte erneut versuchen!</string>
+    <string name="content_description_google_signin">Google-Anmeldung</string>
+</resources>

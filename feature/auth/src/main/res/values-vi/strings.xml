@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_signin">Đã xảy ra lỗi khi đăng nhập, hãy thử lại!</string>
+    <string name="content_description_google_signin">Đăng nhập Google</string>
+</resources>

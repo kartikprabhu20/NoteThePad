@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_signin">साइन इन करते समय त्रुटि हुई, पुनः प्रयास करें!</string>
+    <string name="content_description_google_signin">Google साइन इन</string>
+</resources>

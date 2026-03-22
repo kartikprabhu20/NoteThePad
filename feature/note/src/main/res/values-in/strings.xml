@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">Tambah catatan</string>
+    <string name="content_description_empty_list">daftar kosong</string>
+    <string name="content_description_sort">Urutkan</string>
+    <string name="content_description_toggle_layout">Ganti tata letak</string>
+    <string name="content_description_delete_label">Hapus label</string>
+    <string name="content_description_edit_labels">edit label</string>
+    <string name="content_description_attach">Lampirkan</string>
+    <string name="content_description_checkbox">Kotak centang</string>
+    <string name="content_description_reminders">Pengingat</string>
+    <string name="content_description_save_note">Simpan catatan</string>
+    <string name="content_description_attached_image">Gambar terlampir</string>
+    <string name="content_description_play_video">Putar Video</string>
+    <string name="content_description_images_attached">Gambar terlampir</string>
+    <string name="content_description_audio_attached">Audio terlampir</string>
+    <string name="content_description_reminder_set">Pengingat diatur</string>
+    <string name="content_description_checkboxes_available">kotak centang tersedia</string>
+    <string name="content_description_tags_available">Label tersedia</string>
+    <string name="content_description_pin_note">Sematkan catatan sebagai widget</string>
+    <string name="content_description_delete_note">Hapus catatan</string>
+    <string name="content_description_remove_audio">Hapus audio</string>
+    <string name="content_description_checkbox_state">kotak centang</string>
+
+    <string name="search_hint">Cari catatan…</string>
+    <string name="enter_title_hint">Masukkan judul…</string>
+    <string name="enter_content_hint">Masukkan beberapa konten…</string>
+
+    <string name="btn_auto_tag">Auto-Tag</string>
+    <string name="msg_saving_note">Menyimpan catatan…</string>
+    <string name="title_ai_suggestions">Saran tag AI</string>
+    <string name="label_more_items">+ %1$d lagi</string>
+    <string name="msg_note_deleted">Catatan dihapus</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">Label</string>
+    <string name="drawer_create_new_label">Buat label baru</string>
+    <string name="content_description_appdrawer_logo">Logo laci aplikasi</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">Gambar</string>
+    <string name="option_video">Video</string>
+    <string name="option_audio">Audio</string>
+    <string name="option_choose_date_time">Pilih tanggal &amp; waktu</string>
+    <string name="option_pin_widget">Sematkan sebagai widget</string>
+    <string name="option_add_label">Tambah label</string>
+    <string name="option_delete">Hapus</string>
+    <string name="option_make_copy">Buat salinan</string>
+    <string name="option_camera">Kamera</string>
+    <string name="option_gallery">Galeri</string>
+    <string name="option_video_recorder">Perekam video</string>
+    <string name="option_audio_recorder">Perekam audio</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">Perekam Audio</string>
+    <string name="btn_stop_recording">Hentikan perekaman</string>
+    <string name="btn_start_recording">Mulai perekaman</string>
+
+    <!-- Order Section -->
+    <string name="order_title">Judul</string>
+    <string name="order_date">Tanggal</string>
+    <string name="order_color">Warna</string>
+    <string name="order_ascending">Menaik</string>
+    <string name="order_descending">Menurun</string>
+</resources>

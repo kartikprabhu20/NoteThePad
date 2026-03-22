@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">メモを追加</string>
+    <string name="content_description_empty_list">空のリスト</string>
+    <string name="content_description_sort">並べ替え</string>
+    <string name="content_description_toggle_layout">レイアウトを切り替え</string>
+    <string name="content_description_delete_label">ラベルを削除</string>
+    <string name="content_description_edit_labels">ラベルを編集</string>
+    <string name="content_description_attach">添付</string>
+    <string name="content_description_checkbox">チェックボックス</string>
+    <string name="content_description_reminders">リマインダー</string>
+    <string name="content_description_save_note">メモを保存</string>
+    <string name="content_description_attached_image">添付された画像</string>
+    <string name="content_description_play_video">動画を再生</string>
+    <string name="content_description_images_attached">画像が添付されています</string>
+    <string name="content_description_audio_attached">音声が添付されています</string>
+    <string name="content_description_reminder_set">リマインダーが設定されています</string>
+    <string name="content_description_checkboxes_available">チェックボックスが利用可能</string>
+    <string name="content_description_tags_available">ラベルが利用可能</string>
+    <string name="content_description_pin_note">メモをウィジェットとして固定</string>
+    <string name="content_description_delete_note">メモを削除</string>
+    <string name="content_description_remove_audio">音声を削除</string>
+    <string name="content_description_checkbox_state">チェックボックス</string>
+
+    <string name="search_hint">メモを検索…</string>
+    <string name="enter_title_hint">タイトルを入力…</string>
+    <string name="enter_content_hint">内容を入力…</string>
+
+    <string name="btn_auto_tag">自動タグ</string>
+    <string name="msg_saving_note">メモを保存中…</string>
+    <string name="title_ai_suggestions">AIタグの提案</string>
+    <string name="label_more_items">+ さらに%1$d件</string>
+    <string name="msg_note_deleted">メモが削除されました</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">ラベル</string>
+    <string name="drawer_create_new_label">新しいラベルを作成</string>
+    <string name="content_description_appdrawer_logo">アプリドロワーのロゴ</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">画像</string>
+    <string name="option_video">動画</string>
+    <string name="option_audio">音声</string>
+    <string name="option_choose_date_time">日時を選択</string>
+    <string name="option_pin_widget">ウィジェットとして固定</string>
+    <string name="option_add_label">ラベルを追加</string>
+    <string name="option_delete">削除</string>
+    <string name="option_make_copy">コピーを作成</string>
+    <string name="option_camera">カメラ</string>
+    <string name="option_gallery">ギャラリー</string>
+    <string name="option_video_recorder">動画録画</string>
+    <string name="option_audio_recorder">音声録音</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">音声レコーダー</string>
+    <string name="btn_stop_recording">録音を停止</string>
+    <string name="btn_start_recording">録音を開始</string>
+
+    <!-- Order Section -->
+    <string name="order_title">タイトル</string>
+    <string name="order_date">日付</string>
+    <string name="order_color">色</string>
+    <string name="order_ascending">昇順</string>
+    <string name="order_descending">降順</string>
+</resources>

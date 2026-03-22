@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">Add note</string>
+    <string name="content_description_empty_list">empty list</string>
+    <string name="content_description_sort">Sort</string>
+    <string name="content_description_toggle_layout">Toggle Layout</string>
+    <string name="content_description_delete_label">Delete Label</string>
+    <string name="content_description_edit_labels">edit labels</string>
+    <string name="content_description_attach">Attach</string>
+    <string name="content_description_checkbox">CheckBox</string>
+    <string name="content_description_reminders">Reminders</string>
+    <string name="content_description_save_note">Save Note</string>
+    <string name="content_description_attached_image">Attached image</string>
+    <string name="content_description_play_video">Play Video</string>
+    <string name="content_description_images_attached">Images attached</string>
+    <string name="content_description_audio_attached">Audio attached</string>
+    <string name="content_description_reminder_set">Reminder set</string>
+    <string name="content_description_checkboxes_available">checkboxes available</string>
+    <string name="content_description_tags_available">Tags available</string>
+    <string name="content_description_pin_note">Pin note as widget</string>
+    <string name="content_description_delete_note">Delete note</string>
+    <string name="content_description_remove_audio">Remove Audio</string>
+    <string name="content_description_checkbox_state">checkbox</string>
+
+    <string name="search_hint">Search notes…</string>
+    <string name="enter_title_hint">Enter title…</string>
+    <string name="enter_content_hint">Enter some content…</string>
+
+    <string name="btn_auto_tag">Auto-Tag</string>
+    <string name="msg_saving_note">Saving Note…</string>
+    <string name="title_ai_suggestions">AI tag suggestions</string>
+    <string name="label_more_items">+ %1$d more</string>
+    <string name="msg_note_deleted">Note deleted</string>
+
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">Labels</string>
+    <string name="drawer_create_new_label">Create new label</string>
+    <string name="content_description_appdrawer_logo">Appdrawer logo</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">Image</string>
+    <string name="option_video">Video</string>
+    <string name="option_audio">Audio</string>
+    <string name="option_choose_date_time">Choose a date &amp; time</string>
+    <string name="option_pin_widget">Pin as widget</string>
+    <string name="option_add_label">Add label</string>
+    <string name="option_delete">Delete</string>
+    <string name="option_make_copy">Make a copy</string>
+    <string name="option_camera">Camera</string>
+    <string name="option_gallery">Gallery</string>
+    <string name="option_video_recorder">Video recorder</string>
+    <string name="option_audio_recorder">Audio recorder</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">Audio Recorder</string>
+    <string name="btn_stop_recording">Stop Recording</string>
+    <string name="btn_start_recording">Start Recording</string>
+
+    <!-- Order Section -->
+    <string name="order_title">Title</string>
+    <string name="order_date">Date</string>
+    <string name="order_color">Colour</string>
+    <string name="order_ascending">Ascending</string>
+    <string name="order_descending">Descending</string>
+</resources>
