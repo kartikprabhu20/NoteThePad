@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_title_single_note">Note unique</string>
-    <string name="widget_description_single_note">Épingler une note spécifique sur votre écran d'accueil</string>
+    <string name="widget_description_single_note">Épingler une note spécifique sur votre écran d\'accueil</string>
     <string name="widget_title_note_collection">Collection de notes</string>
     <string name="widget_description_note_collection">Afficher les notes les plus récentes</string>
     <string name="msg_no_note_found">Aucune note trouvée</string>
-    <string name="msg_add_notes_prompt">Veuillez accéder à l'application et ajouter des notes</string>
+    <string name="msg_add_notes_prompt">Veuillez accéder à l\'application et ajouter des notes</string>
     <string name="title_recent_notes">Notes récentes</string>
     <string name="content_description_refresh_widgets">actualiser les widgets</string>
     <string name="content_description_add_note">Ajouter une note</string>
