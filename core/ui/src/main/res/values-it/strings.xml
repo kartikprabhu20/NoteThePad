@@ -9,15 +9,15 @@
 
     <!-- Permission Rationale -->
     <string name="permission_notification_title">Permesso notifiche</string>
-    <string name="permission_notification_msg">Utilizziamo le notifiche per mostrarti l'avanzamento del caricamento. Senza questo, non saprai se il backup termina correttamente mentre l'app è in background.</string>
+    <string name="permission_notification_msg">Utilizziamo le notifiche per mostrarti l\'avanzamento del caricamento. Senza questo, non saprai se il backup termina correttamente mentre l'app è in background.</string>
     <string name="permission_camera_title">Permesso fotocamera</string>
     <string name="permission_camera_msg">Utilizziamo la fotocamera per aggiungere immagini e video alle tue note. Senza questo non sarai in grado di allegare immagini/video direttamente, ma solo dalla galleria.</string>
     <string name="permission_microphone_title">Permesso microfono</string>
     <string name="permission_microphone_msg">Utilizziamo il microfono per registrare e allegare note vocali. Senza questo non sarai in grado di creare note vocali.</string>
     <string name="permission_camera_denied_title">Permesso fotocamera richiesto</string>
-    <string name="permission_camera_denied_msg">Hai negato permanentemente l'accesso alla fotocamera. Per scattare foto per le tue note, abilitalo nelle impostazioni dell'app.</string>
+    <string name="permission_camera_denied_msg">Hai negato permanentemente l\'accesso alla fotocamera. Per scattare foto per le tue note, abilitalo nelle impostazioni dell'app.</string>
     <string name="permission_microphone_denied_title">Permesso microfono richiesto</string>
-    <string name="permission_microphone_denied_msg">Hai negato permanentemente l'accesso al microfono. Per registrare note vocali, abilitalo nelle impostazioni dell'app.</string>
+    <string name="permission_microphone_denied_msg">Hai negato permanentemente l\'accesso al microfono. Per registrare note vocali, abilitalo nelle impostazioni dell'app.</string>
 
     <!-- Generic Buttons/Labels -->
     <string name="btn_allow">Consenti</string>

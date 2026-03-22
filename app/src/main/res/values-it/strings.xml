@@ -49,7 +49,7 @@
     <string name="content_description_save_note">Salva nota</string>
     <string name="btn_allow">Consenti</string>
     <string name="btn_not_now">Non ora</string>
-    <string name="error_signin">Errore durante l'accesso, riprova!</string>
+    <string name="error_signin">Errore durante l\'accesso, riprova!</string>
     <string name="btn_auto_tag">Tag automatici</string>
     <string name="msg_saving_note">Salvataggio nota…</string>
     <string name="title_ai_suggestions">Suggerimenti tag AI</string>

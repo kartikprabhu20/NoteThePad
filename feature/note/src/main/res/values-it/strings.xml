@@ -35,7 +35,7 @@
     <!-- App Drawer -->
     <string name="drawer_labels_header">Etichette</string>
     <string name="drawer_create_new_label">Crea nuova etichetta</string>
-    <string name="content_description_appdrawer_logo">Logo del drawer dell'app</string>
+    <string name="content_description_appdrawer_logo">Logo del drawer dell\'app</string>
 
     <!-- Bottom Sheet Options -->
     <string name="option_image">Immagine</string>

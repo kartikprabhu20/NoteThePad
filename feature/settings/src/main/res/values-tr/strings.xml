@@ -2,20 +2,20 @@
 <resources>
     <string name="settings_title">Ayarlar</string>
     <string name="setting_backup">Yedekle</string>
-    <string name="setting_auto_backup_title">Google Drive'a otomatik yedekleme</string>
+    <string name="setting_auto_backup_title">Google Drive\'a otomatik yedekleme</string>
     <string name="msg_signin_google_backups">Yedeklemeleri etkinleştirmek için lütfen Google ile giriş yapın</string>
     <string name="setting_backup_time">Yedekleme zamanı</string>
     <string name="btn_backup_now">Şimdi Yedekle</string>
     <string name="setting_google_account">Google Hesabı</string>
     <string name="setting_theme_modes">Tema modları</string>
-    <string name="msg_uploading_to_drive">Drive'a yükleniyor: %1$d%%</string>
-    <string name="msg_uploading_to_drive_with_bytes">Drive'a yükleniyor: %1$d%% (%2$s/%3$s)</string>
-    <string name="msg_downloading_from_drive">Drive'dan indiriliyor: %1$d%%</string>
-    <string name="msg_downloading_from_drive_with_bytes">Drive'dan indiriliyor: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_uploading_to_drive">Drive\'a yükleniyor: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Drive\'a yükleniyor: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">Drive\'dan indiriliyor: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Drive\'dan indiriliyor: %1$d%% (%2$s/%3$s)</string>
     <string name="msg_checking_cloud_status">Bulut durumu kontrol ediliyor...</string>
     <string name="msg_last_cloud_backup">Son bulut yedeği: %s</string>
     <string name="btn_restore_now">Şimdi Geri Yükle</string>
-    <string name="msg_no_backups_found">Drive'da yedek bulunamadı</string>
+    <string name="msg_no_backups_found">Drive\'da yedek bulunamadı</string>
     <string name="setting_ai_assistant">Yapay Zeka Asistanı</string>
     <string name="setting_ai_model">Yapay Zeka Modeli</string>
     <string name="setting_appearance">Görünüm</string>
@@ -25,8 +25,8 @@
     <string name="dialog_download_ai_model_size">Boyut: %s</string>
     <string name="msg_downloading_model">Yapay zeka modeli indiriliyor: %1$d%%</string>
     <string name="backup_media_title">Medya yedekle (Resim, Video, Ses)</string>
-    <string name="btn_clear_backup">Yedeği Google Drive'dan sil</string>
+    <string name="btn_clear_backup">Yedeği Google Drive\'dan sil</string>
     <string name="dialog_clear_backup_title">Bulut yedeğini sil</string>
-    <string name="dialog_clear_backup_description">Tüm yedekleme verilerini Google Drive'dan silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve verileriniz kurtarılamaz.</string>
+    <string name="dialog_clear_backup_description">Tüm yedekleme verilerini Google Drive\'dan silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve verileriniz kurtarılamaz.</string>
     <string name="btn_delete">Sil</string>
 </resources>
