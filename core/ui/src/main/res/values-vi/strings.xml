@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">quay lại</string>
+    <string name="content_description_dismiss">Bỏ qua</string>
+    <string name="content_description_icon">biểu tượng</string>
+    <string name="content_description_remove">Gỡ bỏ</string>
+    <string name="content_description_menu">Menu</string>
+    <string name="content_description_clear_text">Xóa văn bản</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">Quyền thông báo</string>
+    <string name="permission_notification_msg">Chúng tôi sử dụng thông báo để hiển thị cho bạn tiến trình tải lên. Nếu không có điều này, bạn sẽ không biết liệu bản sao lưu có kết thúc thành công hay không khi ứng dụng đang ở chế độ nền.</string>
+    <string name="permission_camera_title">Quyền máy ảnh</string>
+    <string name="permission_camera_msg">Chúng tôi sử dụng máy ảnh để thêm hình ảnh và video vào ghi chú của bạn. Nếu không có điều này, bạn sẽ không thể đính kèm trực tiếp hình ảnh/video mà phải đính kèm từ thư viện.</string>
+    <string name="permission_microphone_title">Quyền micro</string>
+    <string name="permission_microphone_msg">Chúng tôi sử dụng micro để ghi âm và đính kèm các ghi chú thoại. Nếu không có điều này, bạn sẽ không thể tạo ghi chú thoại.</string>
+    <string name="permission_camera_denied_title">Yêu cầu quyền máy ảnh</string>
+    <string name="permission_camera_denied_msg">Bạn đã từ chối vĩnh viễn quyền truy cập máy ảnh. Để chụp ảnh cho ghi chú của bạn, vui lòng bật nó trong cài đặt ứng dụng.</string>
+    <string name="permission_microphone_denied_title">Yêu cầu quyền micro</string>
+    <string name="permission_microphone_denied_msg">Bạn đã từ chối vĩnh viễn quyền truy cập micro. Để ghi âm ghi chú thoại, vui lòng bật nó trong cài đặt ứng dụng.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">Cho phép</string>
+    <string name="btn_not_now">Để sau</string>
+    <string name="btn_confirm">Xác nhận</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="btn_download">Tải xuống</string>
+    <string name="loading">Đang tải...</string>
+    <string name="label_undo">Hoàn tác</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">Nhập thẻ mới</string>
+    <string name="label_tag_name">Tên thẻ</string>
+    <string name="placeholder_tag_example">ví dụ: Cá nhân</string>
+    <string name="label_existing">Hiện có:</string>
+</resources>

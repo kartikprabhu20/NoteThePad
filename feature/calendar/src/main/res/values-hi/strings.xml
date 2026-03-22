@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">कैलेंडर</string>
+    <string name="monthly">मासिक</string>
+    <string name="weekly">साप्ताहिक</string>
+    <string name="daily">दैनिक</string>
+
+    <string name="label_add">+ जोड़ें</string>
+    <string name="msg_no_reminders">इस दिन के लिए कोई रिमाइंडर नहीं है</string>
+</resources>

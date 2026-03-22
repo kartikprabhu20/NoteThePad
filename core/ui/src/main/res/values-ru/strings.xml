@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">назад</string>
+    <string name="content_description_dismiss">Закрыть</string>
+    <string name="content_description_icon">иконка</string>
+    <string name="content_description_remove">Удалить</string>
+    <string name="content_description_menu">Меню</string>
+    <string name="content_description_clear_text">Очистить текст</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">Разрешение на уведомления</string>
+    <string name="permission_notification_msg">Мы используем уведомления для отображения прогресса загрузки. Без этого вы не узнаете, завершилось ли резервное копирование успешно, когда приложение находится в фоновом режиме.</string>
+    <string name="permission_camera_title">Разрешение на камеру</string>
+    <string name="permission_camera_msg">Мы используем камеру для добавления изображений и видео в ваши заметки. Без этого вы не сможете прикреплять фото/видео напрямую, а только из галереи.</string>
+    <string name="permission_microphone_title">Разрешение на микрофон</string>
+    <string name="permission_microphone_msg">Мы используем микрофон для записи и прикрепления голосовых заметок. Без этого вы не сможете создавать голосовые заметки.</string>
+    <string name="permission_camera_denied_title">Требуется разрешение на камеру</string>
+    <string name="permission_camera_denied_msg">Вы окончательно запретили доступ к камере. Чтобы делать фотографии для заметок, включите его в настройках приложения.</string>
+    <string name="permission_microphone_denied_title">Требуется разрешение на микрофон</string>
+    <string name="permission_microphone_denied_msg">Вы окончательно запретили доступ к микрофону. Чтобы записывать голосовые заметки, включите его в настройках приложения.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">Разрешить</string>
+    <string name="btn_not_now">Не сейчас</string>
+    <string name="btn_confirm">ОК</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_download">Скачать</string>
+    <string name="loading">Загрузка…</string>
+    <string name="label_undo">Отменить</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">Введите новый ярлык</string>
+    <string name="label_tag_name">Название ярлыка</string>
+    <string name="placeholder_tag_example">напр. Личное</string>
+    <string name="label_existing">Существующие:</string>
+</resources>

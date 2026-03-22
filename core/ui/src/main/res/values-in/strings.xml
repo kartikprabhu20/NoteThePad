@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">kembali</string>
+    <string name="content_description_dismiss">Tutup</string>
+    <string name="content_description_icon">ikon</string>
+    <string name="content_description_remove">Hapus</string>
+    <string name="content_description_menu">Menu</string>
+    <string name="content_description_clear_text">Bersihkan teks</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">Izin notifikasi</string>
+    <string name="permission_notification_msg">Kami menggunakan notifikasi untuk menunjukkan progres unggahan kepada Anda. Tanpa ini, Anda tidak akan tahu apakah pencadangan selesai dengan sukses saat aplikasi berada di latar belakang.</string>
+    <string name="permission_camera_title">Izin kamera</string>
+    <string name="permission_camera_msg">Kami menggunakan kamera untuk menambahkan gambar dan video ke item catatan Anda. Tanpa ini Anda tidak akan dapat melampirkan gambar/video secara langsung, melainkan melampirkannya dari galeri</string>
+    <string name="permission_microphone_title">Izin mikrofon</string>
+    <string name="permission_microphone_msg">Kami menggunakan mikrofon untuk merekam dan melampirkan catatan suara. Tanpa ini Anda tidak akan dapat membuat catatan suara.</string>
+    <string name="permission_camera_denied_title">Izin Kamera Diperlukan</string>
+    <string name="permission_camera_denied_msg">Anda telah menolak akses kamera secara permanen. Untuk mengambil foto untuk catatan Anda, silakan aktifkan di pengaturan aplikasi.</string>
+    <string name="permission_microphone_denied_title">Izin Mikrofon Diperlukan</string>
+    <string name="permission_microphone_denied_msg">Anda telah menolak akses mikrofon secara permanen. Untuk merekam catatan suara, silakan aktifkan di pengaturan aplikasi.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">Izinkan</string>
+    <string name="btn_not_now">Nanti Saja</string>
+    <string name="btn_confirm">Konfirmasi</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="btn_download">Unduh</string>
+    <string name="loading">Memuat...</string>
+    <string name="label_undo">Urungkan</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">Masukkan Tag baru</string>
+    <string name="label_tag_name">Nama tag</string>
+    <string name="placeholder_tag_example">misal: Pribadi</string>
+    <string name="label_existing">Ada:</string>
+</resources>

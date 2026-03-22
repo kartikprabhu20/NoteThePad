@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Настройки</string>
+    <string name="setting_backup">Резервное копирование</string>
+    <string name="setting_auto_backup_title">Автокопирование на Google Диск</string>
+    <string name="msg_signin_google_backups">Войдите в Google для включения копирования</string>
+    <string name="setting_backup_time">Время копирования</string>
+    <string name="btn_backup_now">Копировать сейчас</string>
+    <string name="setting_google_account">Аккаунт Google</string>
+    <string name="setting_theme_modes">Темы оформления</string>
+    <string name="msg_uploading_to_drive">Загрузка на Диск: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Загрузка на Диск: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">Загрузка с Диска: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Загрузка с Диска: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">Проверка облачного статуса...</string>
+    <string name="msg_last_cloud_backup">Последняя копия: %s</string>
+    <string name="btn_restore_now">Восстановить сейчас</string>
+    <string name="msg_no_backups_found">Копии на Диске не найдены</string>
+    <string name="setting_ai_assistant">ИИ-ассистент</string>
+    <string name="setting_ai_model">Модель ИИ</string>
+    <string name="setting_appearance">Внешний вид</string>
+    <string name="dialog_select_ai_model_title">Выберите модель ИИ</string>
+    <string name="dialog_download_ai_model_title">Скачать модель ИИ</string>
+    <string name="dialog_download_ai_model_description">Модели требуется %s места на устройстве. Начать загрузку?</string>
+    <string name="dialog_download_ai_model_size">Размер: %s</string>
+    <string name="msg_downloading_model">Загрузка ИИ-модели: %1$d%%</string>
+    <string name="backup_media_title">Резервное копирование медиа (изображение, видео, аудио)</string>
+    <string name="btn_clear_backup">Удалить копию с Google Диска</string>
+    <string name="dialog_clear_backup_title">Удалить облачную копию</string>
+    <string name="dialog_clear_backup_description">Вы уверены, что хотите удалить все данные резервного копирования с Google Диска? Это действие нельзя отменить, и ваши данные не могут быть восстановлены.</string>
+    <string name="btn_delete">Удалить</string>
+</resources>

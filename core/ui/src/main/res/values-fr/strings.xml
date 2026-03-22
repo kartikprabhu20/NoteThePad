@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">retour</string>
+    <string name="content_description_dismiss">Ignorer</string>
+    <string name="content_description_icon">icône</string>
+    <string name="content_description_remove">Retirer</string>
+    <string name="content_description_menu">Menu</string>
+    <string name="content_description_clear_text">Effacer le texte</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">Autorisation de notification</string>
+    <string name="permission_notification_msg">Nous utilisons les notifications pour vous montrer la progression du téléchargement. Sans cela, vous ne saurez pas si la sauvegarde se termine avec succès pendant que l\'application est en arrière-plan.</string>
+    <string name="permission_camera_title">Autorisation de l\'appareil photo</string>
+    <string name="permission_camera_msg">Nous utilisons l\'appareil photo pour ajouter des images et des vidéos à vos notes. Sans cela, vous ne pourrez pas joindre de photos/vidéos directement, mais seulement depuis la galerie.</string>
+    <string name="permission_microphone_title">Autorisation du microphone</string>
+    <string name="permission_microphone_msg">Nous utilisons le microphone pour enregistrer et joindre des notes vocales. Sans cela, vous ne pourrez pas créer de notes vocales.</string>
+    <string name="permission_camera_denied_title">Autorisation de l\'appareil photo requise</string>
+    <string name="permission_camera_denied_msg">Vous avez refusé de manière permanente l\'accès à l\'appareil photo. Pour prendre des photos pour vos notes, veuillez l\'activer dans les paramètres de l\'application.</string>
+    <string name="permission_microphone_denied_title">Autorisation du microphone requise</string>
+    <string name="permission_microphone_denied_msg">Vous avez refusé de manière permanente l\'accès au microphone. Pour enregistrer des notes vocales, veuillez l\'activer dans les paramètres de l\'application.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">Autoriser</string>
+    <string name="btn_not_now">Pas maintenant</string>
+    <string name="btn_confirm">Confirmer</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_download">Télécharger</string>
+    <string name="loading">Chargement...</string>
+    <string name="label_undo">Annuler</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">Entrez le nouveau tag</string>
+    <string name="label_tag_name">Nom du tag</string>
+    <string name="placeholder_tag_example">ex. Personnel</string>
+    <string name="label_existing">Existant :</string>
+</resources>

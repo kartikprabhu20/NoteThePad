@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">ক্যালেন্ডার</string>
+    <string name="monthly">মাসিক</string>
+    <string name="weekly">সাপ্তাহিক</string>
+    <string name="daily">দৈনিক</string>
+    <string name="label_add">+ যোগ করুন</string>
+    <string name="msg_no_reminders">এই দিনের জন্য কোন রিমাইন্ডার নেই</string>
+</resources>

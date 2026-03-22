@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">التقويم</string>
+    <string name="monthly">شهري</string>
+    <string name="weekly">أسبوعي</string>
+    <string name="daily">يومي</string>
+    <string name="label_add">+ إضافة</string>
+    <string name="msg_no_reminders">لا توجد تذكيرات لهذا اليوم</string>
+</resources>

@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">geri</string>
+    <string name="content_description_dismiss">Kapat</string>
+    <string name="content_description_icon">simge</string>
+    <string name="content_description_remove">Kaldır</string>
+    <string name="content_description_menu">Menü</string>
+    <string name="content_description_clear_text">Metni temizle</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">Bildirim izni</string>
+    <string name="permission_notification_msg">Yükleme ilerlemesini size göstermek için bildirimleri kullanıyoruz. Bu olmadan, uygulama arka plandayken yedeklemenin başarıyla bitip bitmediğini bilemezsiniz.</string>
+    <string name="permission_camera_title">Kamera izni</string>
+    <string name="permission_camera_msg">Notlarınıza resim ve video eklemek için kamerayı kullanıyoruz. Bu olmadan doğrudan resim/video ekleyemezsiniz, bunun yerine galeriden eklemeniz gerekir.</string>
+    <string name="permission_microphone_title">Mikrofon izni</string>
+    <string name="permission_microphone_msg">Sesli notları kaydetmek ve eklemek için mikrofonu kullanıyoruz. Bu olmadan sesli not oluşturamazsınız.</string>
+    <string name="permission_camera_denied_title">Kamera İzni Gerekli</string>
+    <string name="permission_camera_denied_msg">Kamera erişimini kalıcı olarak reddettiniz. Notlarınız için fotoğraf çekmek için lütfen uygulama ayarlarından etkinleştirin.</string>
+    <string name="permission_microphone_denied_title">Mikrofon İzni Gerekli</string>
+    <string name="permission_microphone_denied_msg">Mikrofon erişimini kalıcı olarak reddettiniz. Sesli notları kaydetmek için lütfen uygulama ayarlarından etkinleştirin.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">İzin Ver</string>
+    <string name="btn_not_now">Şimdi Değil</string>
+    <string name="btn_confirm">Onayla</string>
+    <string name="btn_cancel">İptal</string>
+    <string name="btn_download">İndir</string>
+    <string name="loading">Yükleniyor...</string>
+    <string name="label_undo">Geri Al</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">Yeni Etiketi girin</string>
+    <string name="label_tag_name">Etiket adı</string>
+    <string name="placeholder_tag_example">ör. Kişisel</string>
+    <string name="label_existing">Mevcut:</string>
+</resources>

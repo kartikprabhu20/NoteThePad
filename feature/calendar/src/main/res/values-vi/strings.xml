@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">Lịch</string>
+    <string name="monthly">Hàng tháng</string>
+    <string name="weekly">Hàng tuần</string>
+    <string name="daily">Hàng ngày</string>
+    <string name="label_add">+ Thêm</string>
+    <string name="msg_no_reminders">Không có nhắc nhở cho ngày này</string>
+</resources>

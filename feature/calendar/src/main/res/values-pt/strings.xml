@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">Calendário</string>
+    <string name="monthly">Mensal</string>
+    <string name="weekly">Semanal</string>
+    <string name="daily">Diário</string>
+    <string name="label_add">+ Adicionar</string>
+    <string name="msg_no_reminders">Sem lembretes para este dia</string>
+</resources>

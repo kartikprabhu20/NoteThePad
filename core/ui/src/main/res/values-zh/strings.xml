@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">返回</string>
+    <string name="content_description_dismiss">忽略</string>
+    <string name="content_description_icon">图标</string>
+    <string name="content_description_remove">移除</string>
+    <string name="content_description_menu">菜单</string>
+    <string name="content_description_clear_text">清除文本</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">通知权限</string>
+    <string name="permission_notification_msg">我们使用通知向您展示上传进度。如果没有此项，当应用程序处于后台时，您将不知道备份是否成功完成。</string>
+    <string name="permission_camera_title">相机权限</string>
+    <string name="permission_camera_msg">我们使用相机向您的笔记项目添加图像和视频。如果没有此项，您将无法直接附加图像/视频，而是需要从图库附加</string>
+    <string name="permission_microphone_title">麦克风权限</string>
+    <string name="permission_microphone_msg">我们使用麦克风录制并附加语音笔记。如果没有此项，您将无法创建语音笔记。</string>
+    <string name="permission_camera_denied_title">需要相机权限</string>
+    <string name="permission_camera_denied_msg">您已永久拒绝相机访问。要为您的笔记拍照，请在应用设置中启用它。</string>
+    <string name="permission_microphone_denied_title">需要麦克风权限</string>
+    <string name="permission_microphone_denied_msg">您已永久拒绝麦克风访问。要录制语音笔记，请在应用设置中启用它。</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">允许</string>
+    <string name="btn_not_now">暂不</string>
+    <string name="btn_confirm">确认</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_download">下载</string>
+    <string name="loading">正在加载...</string>
+    <string name="label_undo">撤销</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">输入新标签</string>
+    <string name="label_tag_name">标签名称</string>
+    <string name="placeholder_tag_example">例如：个人</string>
+    <string name="label_existing">现有：</string>
+</resources>

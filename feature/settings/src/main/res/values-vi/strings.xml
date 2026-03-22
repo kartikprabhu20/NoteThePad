@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="setting_backup">Sao lưu</string>
+    <string name="setting_auto_backup_title">Tự động sao lưu trên Google Drive</string>
+    <string name="msg_signin_google_backups">Vui lòng đăng nhập bằng Google để bật sao lưu</string>
+    <string name="setting_backup_time">Thời gian sao lưu</string>
+    <string name="btn_backup_now">Sao lưu ngay</string>
+    <string name="setting_google_account">Tài khoản Google</string>
+    <string name="setting_theme_modes">Chế độ giao diện</string>
+    <string name="msg_uploading_to_drive">Đang tải lên Drive: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Đang tải lên Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">Đang tải xuống từ Drive: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Đang tải xuống từ Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">Đang kiểm tra trạng thái đám mây...</string>
+    <string name="msg_last_cloud_backup">Lần sao lưu cuối: %s</string>
+    <string name="btn_restore_now">Khôi phục ngay</string>
+    <string name="msg_no_backups_found">Không tìm thấy bản sao lưu trên Drive</string>
+    <string name="setting_ai_assistant">Trợ lý AI</string>
+    <string name="setting_ai_model">Mô hình AI</string>
+    <string name="setting_appearance">Giao diện</string>
+    <string name="dialog_select_ai_model_title">Chọn mô hình AI</string>
+    <string name="dialog_download_ai_model_title">Tải xuống mô hình AI</string>
+    <string name="dialog_download_ai_model_description">Mô hình cần %s dung lượng trên thiết bị. Bạn có muốn bắt đầu tải xuống không?</string>
+    <string name="dialog_download_ai_model_size">Kích thước: %s</string>
+    <string name="msg_downloading_model">Đang tải xuống mô hình AI: %1$d%%</string>
+    <string name="backup_media_title">Sao lưu phương tiện (Hình ảnh, Video, Âm thanh)</string>
+    <string name="btn_clear_backup">Xóa bản sao lưu khỏi Google Drive</string>
+    <string name="dialog_clear_backup_title">Xóa bản sao lưu đám mây</string>
+    <string name="dialog_clear_backup_description">Bạn có chắc chắn muốn xóa tất cả dữ liệu sao lưu khỏi Google Drive không? Hành động này không thể hoàn tác và dữ liệu của bạn không thể khôi phục được.</string>
+    <string name="btn_delete">Xóa</string>
+</resources>

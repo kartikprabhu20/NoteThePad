@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">Kalender</string>
+    <string name="monthly">Bulanan</string>
+    <string name="weekly">Mingguan</string>
+    <string name="daily">Harian</string>
+    <string name="label_add">+ Tambah</string>
+    <string name="msg_no_reminders">Tidak ada pengingat untuk hari ini</string>
+</resources>

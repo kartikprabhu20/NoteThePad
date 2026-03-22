@@ -1,0 +1,65 @@
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">إضافة ملاحظة</string>
+    <string name="content_description_empty_list">قائمة فارغة</string>
+    <string name="content_description_sort">فرز</string>
+    <string name="content_description_toggle_layout">تبديل التخطيط</string>
+    <string name="content_description_delete_label">حذف التسمية</string>
+    <string name="content_description_edit_labels">تعديل التسميات</string>
+    <string name="content_description_attach">إرفاق</string>
+    <string name="content_description_checkbox">خانة اختيار</string>
+    <string name="content_description_reminders">التذكيرات</string>
+    <string name="content_description_save_note">حفظ الملاحظة</string>
+    <string name="content_description_attached_image">صورة مرفقة</string>
+    <string name="content_description_play_video">تشغيل الفيديو</string>
+    <string name="content_description_images_attached">صور مرفقة</string>
+    <string name="content_description_audio_attached">صوت مرفق</string>
+    <string name="content_description_reminder_set">تم ضبط التذكير</string>
+    <string name="content_description_checkboxes_available">خانات الاختيار متاحة</string>
+    <string name="content_description_tags_available">التسميات متاحة</string>
+    <string name="content_description_pin_note">تثبيت الملاحظة كأداة</string>
+    <string name="content_description_delete_note">حذف الملاحظة</string>
+    <string name="content_description_remove_audio">إزالة الصوت</string>
+    <string name="content_description_checkbox_state">خانة اختيار</string>
+
+    <string name="search_hint">البحث في الملاحظات…</string>
+    <string name="enter_title_hint">أدخل العنوان…</string>
+    <string name="enter_content_hint">أدخل بعض المحتوى…</string>
+
+    <string name="btn_auto_tag">تصنيف تلقائي</string>
+    <string name="msg_saving_note">جارٍ حفظ الملاحظة…</string>
+    <string name="title_ai_suggestions">اقتراحات تصنيف الذكاء الاصطناعي</string>
+    <string name="label_more_items">+ %1$d إضافي</string>
+    <string name="msg_note_deleted">تم حذف الملاحظة</string>
+
+    <!-- App Drawer -->
+    <string name="drawer_labels_header">التسميات</string>
+    <string name="drawer_create_new_label">إنشاء تسمية جديدة</string>
+    <string name="content_description_appdrawer_logo">شعار درج التطبيق</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">صورة</string>
+    <string name="option_video">فيديو</string>
+    <string name="option_audio">صوت</string>
+    <string name="option_choose_date_time">اختر التاريخ والوقت</string>
+    <string name="option_pin_widget">تثبيت كأداة</string>
+    <string name="option_add_label">إضافة تسمية</string>
+    <string name="option_delete">حذف</string>
+    <string name="option_make_copy">إنشاء نسخة</string>
+    <string name="option_camera">الكاميرا</string>
+    <string name="option_gallery">المعرض</string>
+    <string name="option_video_recorder">مسجل الفيديو</string>
+    <string name="option_audio_recorder">مسجل الصوت</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">مسجل الصوت</string>
+    <string name="btn_stop_recording">إيقاف التسجيل</string>
+    <string name="btn_start_recording">بدء التسجيل</string>
+
+    <!-- Order Section -->
+    <string name="order_title">العنوان</string>
+    <string name="order_date">التاريخ</string>
+    <string name="order_color">اللون</string>
+    <string name="order_ascending">تصاعدي</string>
+    <string name="order_descending">تنازلي</string>
+</resources>

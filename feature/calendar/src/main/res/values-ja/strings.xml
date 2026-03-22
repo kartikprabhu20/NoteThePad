@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">カレンダー</string>
+    <string name="monthly">月間</string>
+    <string name="weekly">週間</string>
+    <string name="daily">日間</string>
+    <string name="label_add">+ 追加</string>
+    <string name="msg_no_reminders">この日のリマインダーはありません</string>
+</resources>

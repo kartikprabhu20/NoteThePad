@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">رجوع</string>
+    <string name="content_description_dismiss">تجاهل</string>
+    <string name="content_description_icon">أيقونة</string>
+    <string name="content_description_remove">إزالة</string>
+    <string name="content_description_menu">القائمة</string>
+    <string name="content_description_clear_text">مسح النص</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">إذن التنبيهات</string>
+    <string name="permission_notification_msg">نستخدم التنبيهات لنوضح لك تقدم الرفع. بدون هذا، لن تعرف ما إذا كان النسخ الاحتياطي قد انتهى بنجاح بينما يكون التطبيق في الخلفية.</string>
+    <string name="permission_camera_title">إذن الكاميرا</string>
+    <string name="permission_camera_msg">نستخدم الكاميرا لإضافة الصور والفيديو إلى ملاحظاتك. بدون هذا لن تتمكن من إرفاق الصور/الفيديو مباشرة، بل من المعرض فقط.</string>
+    <string name="permission_microphone_title">إذن الميكروفون</string>
+    <string name="permission_microphone_msg">نستخدم الميكروفون لتسجيل وإرفاق الملاحظات الصوتية. بدون هذا لن تتمكن من إنشاء ملاحظات صوتية.</string>
+    <string name="permission_camera_denied_title">مطلوب إذن الكاميرا</string>
+    <string name="permission_camera_denied_msg">لقد رفضت الوصول إلى الكاميرا بشكل دائم. لالتقاط صور لملاحظاتك، يرجى تمكينه في إعدادات التطبيق.</string>
+    <string name="permission_microphone_denied_title">مطلوب إذن الميكروفون</string>
+    <string name="permission_microphone_denied_msg">لقد رفضت الوصول إلى الميكروفون بشكل دائم. لتسجيل الملاحظات الصوتية، يرجى تمكينه في إعدادات التطبيق.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">السماح</string>
+    <string name="btn_not_now">ليس الآن</string>
+    <string name="btn_confirm">تأكيد</string>
+    <string name="btn_cancel">إلغاء</string>
+    <string name="btn_download">تنزيل</string>
+    <string name="loading">جارٍ التحميل...</string>
+    <string name="label_undo">تراجع</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">أدخل التسمية الجديدة</string>
+    <string name="label_tag_name">اسم التسمية</string>
+    <string name="placeholder_tag_example">مثال: شخصي</string>
+    <string name="label_existing">موجود:</string>
+</resources>

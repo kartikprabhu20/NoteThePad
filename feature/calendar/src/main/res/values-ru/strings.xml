@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">Календарь</string>
+    <string name="monthly">Месяц</string>
+    <string name="weekly">Неделя</string>
+    <string name="daily">День</string>
+    <string name="label_add">+ Добавить</string>
+    <string name="msg_no_reminders">На этот день нет напоминаний</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">달력</string>
+    <string name="monthly">월간</string>
+    <string name="weekly">주간</string>
+    <string name="daily">일간</string>
+    <string name="label_add">+ 추가</string>
+    <string name="msg_no_reminders">이 날의 알림이 없습니다</string>
+</resources>

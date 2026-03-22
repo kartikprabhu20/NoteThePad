@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">সেটিংস</string>
+    <string name="setting_backup">ব্যাকআপ</string>
+    <string name="setting_auto_backup_title">গুগল ড্রাইভে স্বয়ংক্রিয় ব্যাকআপ</string>
+    <string name="msg_signin_google_backups">ব্যাকআপ সক্ষম করতে দয়া করে গুগল দিয়ে সাইন ইন করুন</string>
+    <string name="setting_backup_time">ব্যাকআপের সময়</string>
+    <string name="btn_backup_now">এখনই ব্যাকআপ নিন</string>
+    <string name="setting_google_account">গুগল অ্যাকাউন্ট</string>
+    <string name="setting_theme_modes">থিম মোড</string>
+    <string name="msg_uploading_to_drive">ড্রাইভে আপলোড হচ্ছে: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">ড্রাইভে আপলোড হচ্ছে: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">ড্রাইভ থেকে ডাউনলোড হচ্ছে: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">ড্রাইভ থেকে ডাউনলোড হচ্ছে: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">ক্লাউড স্ট্যাটাস পরীক্ষা করা হচ্ছে...</string>
+    <string name="msg_last_cloud_backup">শেষ ক্লাউড ব্যাকআপ: %s</string>
+    <string name="btn_restore_now">এখনই রিস্টোর করুন</string>
+    <string name="msg_no_backups_found">ড্রাইভে কোন ব্যাকআপ পাওয়া যায়নি</string>
+    <string name="setting_ai_assistant">এআই সহকারী</string>
+    <string name="setting_ai_model">এআই মডেল</string>
+    <string name="setting_appearance">চেহারা</string>
+    <string name="dialog_select_ai_model_title">এআই মডেল নির্বাচন করুন</string>
+    <string name="dialog_download_ai_model_title">এআই মডেল ডাউনলোড করুন</string>
+    <string name="dialog_download_ai_model_description">মডেলটির জন্য ডিভাইসে %s স্টোরেজ প্রয়োজন। আপনি কি ডাউনলোড শুরু করতে চান?</string>
+    <string name="dialog_download_ai_model_size">আকার: %s</string>
+    <string name="msg_downloading_model">এআই মডেল ডাউনলোড চলছে: %1$d%%</string>
+    <string name="backup_media_title">মিডিয়া ব্যাকআপ (ছবি, ভিডিও, অডিও)</string>
+    <string name="btn_clear_backup">গুগল ড্রাইভ থেকে ব্যাকআপ মুছুন</string>
+    <string name="dialog_clear_backup_title">ক্লাউড ব্যাকআপ মুছুন</string>
+    <string name="dialog_clear_backup_description">আপনি কি নিশ্চিত যে আপনি গুগল ড্রাইভ থেকে সমস্ত ব্যাকআপ ডেটা মুছতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না এবং আপনার ডেটা পুনরুদ্ধার করা যাবে না।</string>
+    <string name="btn_delete">মুছুন</string>
+</resources>

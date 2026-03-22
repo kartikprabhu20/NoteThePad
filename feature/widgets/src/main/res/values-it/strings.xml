@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_single_note">Nota singola</string>
+    <string name="widget_description_single_note">Fissa una nota specifica sulla schermata home</string>
+    <string name="widget_title_note_collection">Collezione di note</string>
+    <string name="widget_description_note_collection">Visualizza le note più recenti</string>
+    <string name="msg_no_note_found">Nessuna nota trovata</string>
+    <string name="msg_add_notes_prompt">Vai all'app e aggiungi alcune note</string>
+    <string name="title_recent_notes">Note recenti</string>
+    <string name="content_description_refresh_widgets">aggiorna i widget</string>
+    <string name="content_description_add_note">Aggiungi nota</string>
+</resources>

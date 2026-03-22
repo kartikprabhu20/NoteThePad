@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Pengaturan</string>
+    <string name="setting_backup">Cadangan</string>
+    <string name="setting_auto_backup_title">Cadangan otomatis di Google Drive</string>
+    <string name="msg_signin_google_backups">Silakan masuk dengan Google untuk mengaktifkan cadangan</string>
+    <string name="setting_backup_time">Waktu cadangan</string>
+    <string name="btn_backup_now">Cadangkan Sekarang</string>
+    <string name="setting_google_account">Akun Google</string>
+    <string name="setting_theme_modes">Mode tema</string>
+    <string name="msg_uploading_to_drive">Mengunggah ke Drive: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Mengunggah ke Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">Mengunduh dari Drive: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Mengunduh dari Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">Memeriksa status cloud...</string>
+    <string name="msg_last_cloud_backup">Cadangan cloud terakhir: %s</string>
+    <string name="btn_restore_now">Pulihkan Sekarang</string>
+    <string name="msg_no_backups_found">Tidak ada cadangan ditemukan di Drive</string>
+    <string name="setting_ai_assistant">Asisten AI</string>
+    <string name="setting_ai_model">Model AI</string>
+    <string name="setting_appearance">Tampilan</string>
+    <string name="dialog_select_ai_model_title">Pilih Model AI</string>
+    <string name="dialog_download_ai_model_title">Unduh Model AI</string>
+    <string name="dialog_download_ai_model_description">Model memerlukan penyimpanan %s di perangkat. Apakah Anda ingin mulai mengunduh?</string>
+    <string name="dialog_download_ai_model_size">Ukuran: %s</string>
+    <string name="msg_downloading_model">Unduhan model AI sedang berlangsung: %1$d%%</string>
+    <string name="backup_media_title">Cadangkan media (Gambar, Video, Audio)</string>
+    <string name="btn_clear_backup">Hapus Cadangan dari Google Drive</string>
+    <string name="dialog_clear_backup_title">Hapus Cadangan Cloud</string>
+    <string name="dialog_clear_backup_description">Apakah Anda yakin ingin menghapus semua data cadangan dari Google Drive? Tindakan ini tidak dapat dibatalkan, dan data Anda tidak dapat dipulihkan.</string>
+    <string name="btn_delete">Hapus</string>
+</resources>

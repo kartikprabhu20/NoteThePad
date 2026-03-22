@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">设置</string>
+    <string name="setting_backup">备份</string>
+    <string name="setting_auto_backup_title">自动备份到 Google 云端硬盘</string>
+    <string name="msg_signin_google_backups">请登录 Google 以启用备份</string>
+    <string name="setting_backup_time">备份时间</string>
+    <string name="btn_backup_now">立即备份</string>
+    <string name="setting_google_account">Google 账号</string>
+    <string name="setting_theme_modes">主题模式</string>
+    <string name="msg_uploading_to_drive">正在上传至云端硬盘：%1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">正在上传至云端硬盘：%1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">正在从云端硬盘下载：%1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">正在从云端硬盘下载：%1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">正在检查云端状态...</string>
+    <string name="msg_last_cloud_backup">上次云端备份：%s</string>
+    <string name="btn_restore_now">立即恢复</string>
+    <string name="msg_no_backups_found">云端硬盘中未发现备份</string>
+    <string name="setting_ai_assistant">AI 助手</string>
+    <string name="setting_ai_model">AI 模型</string>
+    <string name="setting_appearance">外观</string>
+    <string name="dialog_select_ai_model_title">选择 AI 模型</string>
+    <string name="dialog_download_ai_model_title">下载 AI 模型</string>
+    <string name="dialog_download_ai_model_description">该模型需要 %s 的设备存储空间。是否开始下载？</string>
+    <string name="dialog_download_ai_model_size">大小：%s</string>
+    <string name="msg_downloading_model">正在下载 AI 模型：%1$d%%</string>
+    <string name="backup_media_title">备份媒体（图片、视频、音频）</string>
+    <string name="btn_clear_backup">从 Google 云端硬盘中清除备份</string>
+    <string name="dialog_clear_backup_title">清除云端备份</string>
+    <string name="dialog_clear_backup_description">您确定要从 Google 云端硬盘中删除所有备份数据吗？此操作无法撤销，您的数据也无法恢复。</string>
+    <string name="btn_delete">删除</string>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings -->
+    <string name="settings_title">Ajustes</string>
+    <string name="setting_backup">Copia de seguridad</string>
+    <string name="setting_auto_backup_title">Copia automática en Google Drive</string>
+    <string name="msg_signin_google_backups">Inicia sesión con Google para habilitar las copias</string>
+    <string name="setting_backup_time">Hora de la copia</string>
+    <string name="btn_backup_now">Respaldar ahora</string>
+    <string name="setting_google_account">Cuenta de Google</string>
+    <string name="setting_theme_modes">Modos de tema</string>
+    <string name="msg_uploading_to_drive">Subiendo a Drive: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Subiendo a Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">Descargando de Drive: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Descargando de Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">Comprobando estado en la nube...</string>
+    <string name="msg_last_cloud_backup">Última copia en la nube: %s</string>
+    <string name="btn_restore_now">Restaurar ahora</string>
+    <string name="msg_no_backups_found">No se encontraron copias en Drive</string>
+    <string name="setting_ai_assistant">Asistente de IA</string>
+    <string name="setting_ai_model">Modelo de IA</string>
+    <string name="setting_appearance">Apariencia</string>
+    <string name="dialog_select_ai_model_title">Seleccionar modelo de IA</string>
+    <string name="dialog_download_ai_model_title">Descargar modelo de IA</string>
+    <string name="dialog_download_ai_model_description">El modelo necesita %s de espacio. ¿Deseas iniciar la descarga?</string>
+    <string name="dialog_download_ai_model_size">Tamaño: %s</string>
+    <string name="msg_downloading_model">Descarga del modelo en progreso: %1$d%%</string>
+    <string name="backup_media_title">Copia de seguridad de medios (Imagen, Vídeo, Audio)</string>
+    <string name="btn_clear_backup">Borrar copia de seguridad de Google Drive</string>
+    <string name="dialog_clear_backup_title">Borrar copia de seguridad en la nube</string>
+    <string name="dialog_clear_backup_description">¿Estás seguro de que quieres eliminar todos los datos de la copia de seguridad de Google Drive? Esta acción no se puede deshacer y tus datos no se podrán recuperar.</string>
+    <string name="btn_delete">Eliminar</string>
+</resources>

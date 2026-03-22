@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_single_note">单条笔记</string>
+    <string name="widget_description_single_note">将特定笔记固定到主屏幕</string>
+    <string name="widget_title_note_collection">笔记集合</string>
+    <string name="widget_description_note_collection">查看最近的笔记</string>
+    <string name="msg_no_note_found">未找到笔记</string>
+    <string name="msg_add_notes_prompt">请进入应用并添加一些笔记</string>
+    <string name="title_recent_notes">最近笔记</string>
+    <string name="content_description_refresh_widgets">刷新小部件</string>
+    <string name="content_description_add_note">添加笔记</string>
+</resources>

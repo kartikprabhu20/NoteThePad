@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="widget_title_single_note">Single Note</string>
+    <string name="widget_description_single_note">Pin a specific note to your home screen</string>
+    <string name="widget_title_note_collection">Note collection</string>
+    <string name="widget_description_note_collection">View the most recent notes</string>
+
     <string name="msg_no_note_found">No note found</string>
     <string name="msg_add_notes_prompt">Please go to the app and add some notes</string>
     <string name="title_recent_notes">Recent Notes</string>

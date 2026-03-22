@@ -1,0 +1,65 @@
+<resources>
+    <!-- Note Editor -->
+    <string name="content_description_add_note">Aggiungi nota</string>
+    <string name="content_description_empty_list">elenco vuoto</string>
+    <string name="content_description_sort">Ordina</string>
+    <string name="content_description_toggle_layout">Cambia layout</string>
+    <string name="content_description_delete_label">Elimina etichetta</string>
+    <string name="content_description_edit_labels">modifica etichette</string>
+    <string name="content_description_attach">Allega</string>
+    <string name="content_description_checkbox">Casella di controllo</string>
+    <string name="content_description_reminders">Promemoria</string>
+    <string name="content_description_save_note">Salva nota</string>
+    <string name="content_description_attached_image">Immagine allegata</string>
+    <string name="content_description_play_video">Riproduci video</string>
+    <string name="content_description_images_attached">Immagini allegate</string>
+    <string name="content_description_audio_attached">Audio allegato</string>
+    <string name="content_description_reminder_set">Promemoria impostato</string>
+    <string name="content_description_checkboxes_available">caselle di controllo disponibili</string>
+    <string name="content_description_tags_available">Etichette disponibili</string>
+    <string name="content_description_pin_note">Fissa nota come widget</string>
+    <string name="content_description_delete_note">Elimina nota</string>
+    <string name="content_description_remove_audio">Rimuovi audio</string>
+    <string name="content_description_checkbox_state">casella di controllo</string>
+
+    <string name="search_hint">Cerca note…</string>
+    <string name="enter_title_hint">Inserisci titolo…</string>
+    <string name="enter_content_hint">Inserisci contenuto…</string>
+
+    <string name="btn_auto_tag">Tag automatici</string>
+    <string name="msg_saving_note">Salvataggio nota…</string>
+    <string name="title_ai_suggestions">Suggerimenti tag AI</string>
+    <string name="label_more_items">+ %1$d altri</string>
+    <string name="msg_note_deleted">Nota eliminata</string>
+
+    <!-- App Drawer -->
+    <string name="drawer_labels_header">Etichette</string>
+    <string name="drawer_create_new_label">Crea nuova etichetta</string>
+    <string name="content_description_appdrawer_logo">Logo del drawer dell'app</string>
+
+    <!-- Bottom Sheet Options -->
+    <string name="option_image">Immagine</string>
+    <string name="option_video">Video</string>
+    <string name="option_audio">Audio</string>
+    <string name="option_choose_date_time">Scegli data e ora</string>
+    <string name="option_pin_widget">Fissa come widget</string>
+    <string name="option_add_label">Aggiungi etichetta</string>
+    <string name="option_delete">Elimina</string>
+    <string name="option_make_copy">Crea una copia</string>
+    <string name="option_camera">Fotocamera</string>
+    <string name="option_gallery">Galleria</string>
+    <string name="option_video_recorder">Registratore video</string>
+    <string name="option_audio_recorder">Registratore audio</string>
+
+    <!-- Audio Recorder -->
+    <string name="title_audio_recorder">Registratore audio</string>
+    <string name="btn_stop_recording">Ferma registrazione</string>
+    <string name="btn_start_recording">Avvia registrazione</string>
+
+    <!-- Order Section -->
+    <string name="order_title">Titolo</string>
+    <string name="order_date">Data</string>
+    <string name="order_color">Colore</string>
+    <string name="order_ascending">Crescente</string>
+    <string name="order_descending">Decrescente</string>
+</resources>

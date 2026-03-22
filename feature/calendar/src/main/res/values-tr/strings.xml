@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_title">Takvim</string>
+    <string name="monthly">Aylık</string>
+    <string name="weekly">Haftalık</string>
+    <string name="daily">Günlük</string>
+    <string name="label_add">+ Ekle</string>
+    <string name="msg_no_reminders">Bu gün için hatırlatıcı yok</string>
+</resources>

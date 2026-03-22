@@ -1,108 +1,41 @@
 <resources>
-    <string name="app_name">NoteThePad</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-
-    <string name="widget_title_single_note">Single Note</string>
-    <string name="widget_description_single_note">Pin a specific note to your home screen</string>
-
-    <string name="widget_title_note_collection">Note collection</string>
-    <string name="widget_description_note_collection">View the most recent notes</string>
-
-    <!-- General UI -->
-    <string name="content_description_menu">Menu</string>
+    <!-- Note Editor -->
     <string name="content_description_add_note">Add note</string>
     <string name="content_description_empty_list">empty list</string>
-    <string name="content_description_back">back</string>
-    <string name="content_description_clear_text">Clear text</string>
     <string name="content_description_sort">Sort</string>
     <string name="content_description_toggle_layout">Toggle Layout</string>
-    <string name="content_description_profile_picture">Profile Picture</string>
     <string name="content_description_delete_label">Delete Label</string>
     <string name="content_description_edit_labels">edit labels</string>
-    <string name="content_description_dismiss">Dismiss</string>
-    <string name="content_description_icon">icon</string>
-    <string name="content_description_remove">Remove</string>
-
-    <!-- App Drawer -->
-    <string name="drawer_labels_header">Labels</string>
-    <string name="drawer_create_new_label">Create new label</string>
-    <string name="version_format">Version %1$s</string>
-    <string name="build_format">Build %1$s</string>
-    <string name="content_description_appdrawer_logo">Appdrawer logo</string>
-
-    <!-- Settings -->
-    <string name="settings_title">Settings</string>
-    <string name="setting_backup">Backup</string>
-    <string name="setting_auto_backup_title">Automatic backup on Google drive</string>
-    <string name="msg_signin_google_backups">Please sign in with Google to enable backups</string>
-    <string name="setting_backup_time">Backup time</string>
-    <string name="btn_backup_now">Backup Now</string>
-    <string name="setting_google_account">Google Account</string>
-    <string name="setting_theme_modes">Theme modes</string>
-    <string name="msg_uploading_to_drive">Uploading to Drive: %1$d</string>
-    <string name="msg_downloading_from_drive">Downloading from Drive: %1$d</string>
-    <string name="msg_checking_cloud_status">Checking cloud status...</string>
-    <string name="msg_last_cloud_backup">Last cloud backup: %s</string>
-    <string name="btn_restore_now">"Restore Now"</string>
-    <string name="msg_no_backups_found">No backups found in Drive</string>
-    <string name="setting_ai_assistant">AI Assistant</string>
-    <string name="setting_ai_model">AI Model</string>
-    <string name="setting_appearance">Appearance</string>
-    <string name="dialog_select_ai_model_title">Select AI Model</string>
-    <string name="dialog_download_ai_model_title">Download AI Model</string>
-    <string name="dialog_download_ai_model_description">The model needs %s storage on-device. Do you want to start the download?</string>
-    <string name="dialog_download_ai_model_size">Size: %s</string>
-    <string name="msg_downloading_model">Downloading Ai model in progress: %1$d%%</string>
-
-    <!-- Search Bar -->
-    <string name="search_hint">Search notes…</string>
-
-    <!-- Note Bottom App Bar -->
     <string name="content_description_attach">Attach</string>
     <string name="content_description_checkbox">CheckBox</string>
     <string name="content_description_reminders">Reminders</string>
-    <string name="content_description_settings">Settings</string>
     <string name="content_description_save_note">Save Note</string>
-
-    <!-- Permission Dialogs -->
-    <string name="btn_allow">Allow</string>
-    <string name="btn_not_now">Not Now</string>
-
-    <!-- Login -->
-    <string name="error_signin">Error occurred while signing in, try again!</string>
-    <string name="content_description_google_signin">Google Sign In</string>
-
-    <!-- Note Editor -->
-    <string name="btn_auto_tag">Auto-Tag</string>
-    <string name="toast_widget_pin_not_supported">Pinned widgets are not supported on this launcher</string>
-    <string name="msg_saving_note">Saving Note…</string>
-    <string name="title_ai_suggestions">AI tag suggestions</string>
     <string name="content_description_attached_image">Attached image</string>
     <string name="content_description_play_video">Play Video</string>
-    <string name="label_more_items">+ %1$d more</string>
+    <string name="content_description_images_attached">Images attached</string>
+    <string name="content_description_audio_attached">Audio attached</string>
+    <string name="content_description_reminder_set">Reminder set</string>
+    <string name="content_description_checkboxes_available">checkboxes available</string>
+    <string name="content_description_tags_available">Tags available</string>
+    <string name="content_description_pin_note">Pin note as widget</string>
+    <string name="content_description_delete_note">Delete note</string>
+    <string name="content_description_remove_audio">Remove Audio</string>
+    <string name="content_description_checkbox_state">checkbox</string>
+
+    <string name="search_hint">Search notes…</string>
     <string name="enter_title_hint">Enter title…</string>
     <string name="enter_content_hint">Enter some content…</string>
 
+    <string name="btn_auto_tag">Auto-Tag</string>
+    <string name="msg_saving_note">Saving Note…</string>
+    <string name="title_ai_suggestions">AI tag suggestions</string>
+    <string name="label_more_items">+ %1$d more</string>
+    <string name="msg_note_deleted">Note deleted</string>
 
-    <!-- Permission Rationale -->
-    <string name="permission_notification_title">Notification permission</string>
-    <string name="permission_notification_msg">We use notifications to show you the upload progress. Without this, you won’t know if the backup finishes successfully while the app is in the background.</string>
-    <string name="permission_camera_title">Camera permission</string>
-    <string name="permission_camera_msg">We use camera to add images and video to your note item. Without this you won’t be able to attach images/videos directly, instead attach it from gallery</string>
-    <string name="permission_microphone_title">Microphone permission</string>
-    <string name="permission_microphone_msg">We use microphone to record and attach voice notes. Without this you will not be able to create voice notes.</string>
-    <string name="permission_camera_denied_title">Camera Permission Required</string>
-    <string name="permission_camera_denied_msg">You have permanently denied camera access. To take photos for your notes, please enable it in the app settings.</string>
-    <string name="permission_microphone_denied_title">Microphone Permission Required</string>
-    <string name="permission_microphone_denied_msg">You have permanently denied microphone access. To record voice notes, please enable it in the app settings.</string>
+    <!-- App Drawer (Specific to Note feature navigation) -->
+    <string name="drawer_labels_header">Labels</string>
+    <string name="drawer_create_new_label">Create new label</string>
+    <string name="content_description_appdrawer_logo">Appdrawer logo</string>
 
     <!-- Bottom Sheet Options -->
     <string name="option_image">Image</string>
@@ -118,36 +51,10 @@
     <string name="option_video_recorder">Video recorder</string>
     <string name="option_audio_recorder">Audio recorder</string>
 
-    <!-- Edit Text Dialog -->
-    <string name="dialog_title_new_tag">Enter the new Tag</string>
-    <string name="label_tag_name">Tag name</string>
-    <string name="placeholder_tag_example">e.g. Personal</string>
-    <string name="label_existing">Existing:</string>
-    <string name="btn_confirm">Confirm</string>
-    <string name="btn_cancel">Cancel</string>
-    <string name="btn_download">Download</string>
-
-    <!-- Note Item -->
-    <string name="content_description_images_attached">Images attached</string>
-    <string name="content_description_audio_attached">Audio attached</string>
-    <string name="content_description_reminder_set">Reminder set</string>
-    <string name="content_description_checkboxes_available">checkboxes available</string>
-    <string name="content_description_tags_available">Tags available</string>
-    <string name="content_description_pin_note">Pin note as widget</string>
-    <string name="content_description_delete_note">Delete note</string>
-    <string name="content_description_remove_audio">Remove Audio</string>
-
-
     <!-- Audio Recorder -->
     <string name="title_audio_recorder">Audio Recorder</string>
     <string name="btn_stop_recording">Stop Recording</string>
     <string name="btn_start_recording">Start Recording</string>
-
-    <!-- Widget -->
-    <string name="msg_no_note_found">No note found</string>
-    <string name="msg_add_notes_prompt">Please go to the app and add some notes</string>
-    <string name="title_recent_notes">Recent Notes</string>
-    <string name="content_description_refresh_widgets">refresh widgets</string>
 
     <!-- Order Section -->
     <string name="order_title">Title</string>
@@ -155,13 +62,4 @@
     <string name="order_color">Color</string>
     <string name="order_ascending">Ascending</string>
     <string name="order_descending">Descending</string>
-
-    <!-- Checkbox -->
-    <string name="content_description_checkbox_state">checkbox</string>
-
-    <!-- Note Events -->
-    <string name="msg_note_deleted">Note deleted</string>
-    <string name="label_undo">Undo</string>
-    <string name="loading">Loading...</string>
-
 </resources>

@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">atrás</string>
+    <string name="content_description_dismiss">Descartar</string>
+    <string name="content_description_icon">icono</string>
+    <string name="content_description_remove">Eliminar</string>
+    <string name="content_description_menu">Menú</string>
+    <string name="content_description_clear_text">Borrar texto</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">Permiso de notificación</string>
+    <string name="permission_notification_msg">Usamos notificaciones para mostrarte el progreso de la carga. Sin esto, no sabrás si la copia de seguridad finaliza con éxito mientras la aplicación está en segundo plano.</string>
+    <string name="permission_camera_title">Permiso de cámara</string>
+    <string name="permission_camera_msg">Usamos la cámara para añadir imágenes y vídeos a tus notas. Sin esto, no podrás adjuntar fotos/vídeos directamente, sino desde la galería.</string>
+    <string name="permission_microphone_title">Permiso de micrófono</string>
+    <string name="permission_microphone_msg">Usamos el micrófono para grabar y adjuntar notas de voz. Sin esto, no podrás crear notas de voz.</string>
+    <string name="permission_camera_denied_title">Se requiere permiso de cámara</string>
+    <string name="permission_camera_denied_msg">Has denegado permanentemente el acceso a la cámara. Para tomar fotos para tus notas, por favor actívalo en los ajustes de la aplicación.</string>
+    <string name="permission_microphone_denied_title">Se requiere permiso de micrófono</string>
+    <string name="permission_microphone_denied_msg">Has denegado permanentemente el acceso al micrófono. Para grabar notas de voz, por favor actívalo en los ajustes de la aplicación.</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">Permitir</string>
+    <string name="btn_not_now">Ahora no</string>
+    <string name="btn_confirm">Confirmar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_download">Descargar</string>
+    <string name="loading">Cargando...</string>
+    <string name="label_undo">Deshacer</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">Introduce la nueva etiqueta</string>
+    <string name="label_tag_name">Nombre de la etiqueta</string>
+    <string name="placeholder_tag_example">ej. Personal</string>
+    <string name="label_existing">Existente:</string>
+</resources>

@@ -1,0 +1,36 @@
+<resources>
+    <!-- General UI -->
+    <string name="content_description_back">पीछे</string>
+    <string name="content_description_dismiss">खारिज करें</string>
+    <string name="content_description_icon">आइकन</string>
+    <string name="content_description_remove">हटाएं</string>
+    <string name="content_description_menu">मेनू</string>
+    <string name="content_description_clear_text">टेक्स्ट साफ़ करें</string>
+
+    <!-- Permission Rationale -->
+    <string name="permission_notification_title">सूचना अनुमति</string>
+    <string name="permission_notification_msg">हम आपको अपलोड प्रगति दिखाने के लिए सूचनाओं का उपयोग करते हैं। इसके बिना, आपको पता नहीं चलेगा कि बैकअप सफलतापूर्वक समाप्त हुआ है या नहीं।</string>
+    <string name="permission_camera_title">कैमरा अनुमति</string>
+    <string name="permission_camera_msg">हम आपके नोट में चित्र और वीडियो जोड़ने के लिए कैमरे का उपयोग करते हैं। इसके बिना आप सीधे चित्र/वीडियो संलग्न नहीं कर पाएंगे।</string>
+    <string name="permission_microphone_title">माइक्रोफोन अनुमति</string>
+    <string name="permission_microphone_msg">हम वॉयस नोट्स रिकॉर्ड करने और संलग्न करने के लिए माइक्रोफ़ोन का उपयोग करते हैं। इसके बिना आप वॉयस नोट्स नहीं बना पाएंगे।</string>
+    <string name="permission_camera_denied_title">कैमरा अनुमति आवश्यक</string>
+    <string name="permission_camera_denied_msg">आपने कैमरा एक्सेस को स्थायी रूप से अस्वीकार कर दिया है। कृपया इसे ऐप सेटिंग्स में सक्षम करें।</string>
+    <string name="permission_microphone_denied_title">माइक्रोफोन अनुमति आवश्यक</string>
+    <string name="permission_microphone_denied_msg">आपने माइक्रोफ़ोन एक्सेस को स्थायी रूप से अस्वीकार कर दिया है। कृपया इसे ऐप सेटिंग्स में सक्षम करें।</string>
+
+    <!-- Generic Buttons/Labels -->
+    <string name="btn_allow">अनुमति दें</string>
+    <string name="btn_not_now">अभी नहीं</string>
+    <string name="btn_confirm">पुष्टि करें</string>
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="btn_download">डाउनलोड करें</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="label_undo">पूर्ववत करें</string>
+
+    <!-- Edit Text Dialog -->
+    <string name="dialog_title_new_tag">नया टैग दर्ज करें</string>
+    <string name="label_tag_name">टैग नाम</string>
+    <string name="placeholder_tag_example">जैसे: व्यक्तिगत</string>
+    <string name="label_existing">मौजूदा:</string>
+</resources>

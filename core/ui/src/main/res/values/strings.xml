@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- General UI -->
+    <string name="content_description_back">back</string>
+    <string name="content_description_dismiss">Dismiss</string>
+    <string name="content_description_icon">icon</string>
+    <string name="content_description_remove">Remove</string>
+    <string name="content_description_menu">Menu</string>
+    <string name="content_description_clear_text">Clear text</string>
+
     <!-- Permission Rationale -->
     <string name="permission_notification_title">Notification permission</string>
     <string name="permission_notification_msg">We use notifications to show you the upload progress. Without this, you won’t know if the backup finishes successfully while the app is in the background.</string>
@@ -12,7 +19,18 @@
     <string name="permission_microphone_denied_title">Microphone Permission Required</string>
     <string name="permission_microphone_denied_msg">You have permanently denied microphone access. To record voice notes, please enable it in the app settings.</string>
 
-    <!-- Permission Dialogs -->
+    <!-- Generic Buttons/Labels -->
     <string name="btn_allow">Allow</string>
     <string name="btn_not_now">Not Now</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_download">Download</string>
+    <string name="loading">Loading...</string>
+    <string name="label_undo">Undo</string>
+
+    <!-- Edit Text Dialog (Commonly used across features) -->
+    <string name="dialog_title_new_tag">Enter the new Tag</string>
+    <string name="label_tag_name">Tag name</string>
+    <string name="placeholder_tag_example">e.g. Personal</string>
+    <string name="label_existing">Existing:</string>
 </resources>

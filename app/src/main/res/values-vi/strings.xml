@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">NoteThePad</string>
+    <string name="action_settings">Cài đặt</string>
+    <string name="next">Tiếp theo</string>
+    <string name="previous">Trước đó</string>
+    <string name="content_description_profile_picture">Ảnh hồ sơ</string>
+    <string name="version_format">Phiên bản %1$s</string>
+    <string name="build_format">Bản dựng %1$s</string>
+    <string name="error_signin">Đã xảy ra lỗi khi đăng nhập, vui lòng thử lại!</string>
+    <string name="content_description_google_signin">Đăng nhập Google</string>
+    <string name="toast_widget_pin_not_supported">Widget ghim không được hỗ trợ trên trình khởi chạy này</string>
+</resources>

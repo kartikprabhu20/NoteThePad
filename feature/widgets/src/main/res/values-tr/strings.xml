@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_single_note">Tek Not</string>
+    <string name="widget_description_single_note">Giriş ekranınıza belirli bir notu sabitleyin</string>
+    <string name="widget_title_note_collection">Not Koleksiyonu</string>
+    <string name="widget_description_note_collection">En son notları görüntüle</string>
+    <string name="msg_no_note_found">Not bulunamadı</string>
+    <string name="msg_add_notes_prompt">Lütfen uygulamaya gidin ve birkaç not ekleyin</string>
+    <string name="title_recent_notes">Son Notlar</string>
+    <string name="content_description_refresh_widgets">widgetları yenile</string>
+    <string name="content_description_add_note">Not ekle</string>
+</resources>

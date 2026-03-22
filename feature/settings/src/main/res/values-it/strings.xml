@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings -->
+    <string name="settings_title">Impostazioni</string>
+    <string name="setting_backup">Backup</string>
+    <string name="setting_auto_backup_title">Backup automatico su Google Drive</string>
+    <string name="msg_signin_google_backups">Accedi con Google per abilitare i backup</string>
+    <string name="setting_backup_time">Ora del backup</string>
+    <string name="btn_backup_now">Esegui backup ora</string>
+    <string name="setting_google_account">Account Google</string>
+    <string name="setting_theme_modes">Modalità tema</string>
+    <string name="msg_uploading_to_drive">Caricamento su Drive: %1$d%%</string>
+    <string name="msg_uploading_to_drive_with_bytes">Caricamento su Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_downloading_from_drive">Download da Drive: %1$d%%</string>
+    <string name="msg_downloading_from_drive_with_bytes">Download da Drive: %1$d%% (%2$s/%3$s)</string>
+    <string name="msg_checking_cloud_status">Controllo stato cloud...</string>
+    <string name="msg_last_cloud_backup">Ultimo backup cloud: %s</string>
+    <string name="btn_restore_now">Ripristina ora</string>
+    <string name="msg_no_backups_found">Nessun backup trovato su Drive</string>
+    <string name="setting_ai_assistant">Assistente AI</string>
+    <string name="setting_ai_model">Modello AI</string>
+    <string name="setting_appearance">Aspetto</string>
+    <string name="dialog_select_ai_model_title">Seleziona modello AI</string>
+    <string name="dialog_download_ai_model_title">Scarica modello AI</string>
+    <string name="dialog_download_ai_model_description">Il modello richiede %s di spazio sul dispositivo. Vuoi avviare il download?</string>
+    <string name="dialog_download_ai_model_size">Dimensione: %s</string>
+    <string name="msg_downloading_model">Download modello AI in corso: %1$d%%</string>
+    <string name="backup_media_title">Backup media (Immagini, Video, Audio)</string>
+    <string name="btn_clear_backup">Cancella backup da Google Drive</string>
+    <string name="dialog_clear_backup_title">Cancella backup cloud</string>
+    <string name="dialog_clear_backup_description">Sei sicuro di voler eliminare tutti i dati di backup da Google Drive? Questa azione non può essere annullata e i tuoi dati non potranno essere recuperati.</string>
+    <string name="btn_delete">Elimina</string>
+</resources>

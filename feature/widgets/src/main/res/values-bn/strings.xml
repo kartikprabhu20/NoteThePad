@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_title_single_note">একটি নোট</string>
+    <string name="widget_description_single_note">আপনার হোম স্ক্রিনে একটি নির্দিষ্ট নোট পিন করুন</string>
+    <string name="widget_title_note_collection">নোট সংগ্রহ</string>
+    <string name="widget_description_note_collection">সাম্প্রতিক নোটগুলি দেখুন</string>
+    <string name="msg_no_note_found">কোনো নোট পাওয়া যায়নি</string>
+    <string name="msg_add_notes_prompt">দয়া করে অ্যাপে যান এবং কিছু নোট যোগ করুন</string>
+    <string name="title_recent_notes">সাম্প্রতিক নোট</string>
+    <string name="content_description_refresh_widgets">উইজেট রিফ্রেশ করুন</string>
+    <string name="content_description_add_note">নোট যোগ করুন</string>
+</resources>
