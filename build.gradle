@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.tasks.BundleToApkTask
-
 // Top-level build file
 plugins {
     id 'com.android.application' version '8.6.1' apply false
@@ -17,7 +15,7 @@ tasks.register('clean', Delete) {
 }
 
 subprojects {
-    tasks.withType(BundleToApkTask::class.java).configureEach {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {
             freeCompilerArgs += [
                     "-P",
