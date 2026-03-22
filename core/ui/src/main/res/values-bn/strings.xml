@@ -1,36 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- General UI -->
+    <string name="btn_allow">অনুমতি দিন</string>
+    <string name="btn_cancel">বাতিল করুন</string>
+    <string name="btn_confirm">নিশ্চিত করুন</string>
+    <string name="btn_download">ডাউনলোড</string>
+    <string name="btn_not_now">এখন না</string>
     <string name="content_description_back">ফিরে যান</string>
+    <string name="content_description_clear_text">টেক্সট মুছে ফেলুন</string>
     <string name="content_description_dismiss">বাতিল করুন</string>
     <string name="content_description_icon">আইকন</string>
-    <string name="content_description_remove">সরান</string>
     <string name="content_description_menu">মেনু</string>
-    <string name="content_description_clear_text">টেক্সট মুছে ফেলুন</string>
-
-    <!-- Permission Rationale -->
-    <string name="permission_notification_title">নোটিফিকেশন অনুমতি</string>
-    <string name="permission_notification_msg">আমরা আপনাকে আপলোডের অগ্রগতি দেখাতে বিজ্ঞপ্তিগুলি ব্যবহার করি। এটি ছাড়া, অ্যাপটি ব্যাকগ্রাউন্ডে থাকাকালীন ব্যাকআপ সফলভাবে শেষ হয়েছে কিনা তা আপনি জানতে পারবেন না।</string>
-    <string name="permission_camera_title">ক্যামেরা অনুমতি</string>
-    <string name="permission_camera_msg">আমরা আপনার নোট আইটেমে ছবি এবং ভিডিও যোগ করতে ক্যামেরা ব্যবহার করি। এটি ছাড়া আপনি সরাসরি ছবি/ভিডিও সংযুক্ত করতে পারবেন না, পরিবর্তে গ্যালারি থেকে সংযুক্ত করতে হবে।</string>
-    <string name="permission_microphone_title">মাইক্রোফোন অনুমতি</string>
-    <string name="permission_microphone_msg">আমরা ভয়েস নোট রেকর্ড করতে এবং সংযুক্ত করতে মাইক্রোফোন ব্যবহার করি। এটি ছাড়া আপনি ভয়েস নোট তৈরি করতে পারবেন না।</string>
-    <string name="permission_camera_denied_title">ক্যামেরা অনুমতি প্রয়োজন</string>
-    <string name="permission_camera_denied_msg">আপনি স্থায়ীভাবে ক্যামেরা অ্যাক্সেস অস্বীকার করেছেন। আপনার নোটের জন্য ফটো তুলতে, দয়া করে এটি অ্যাপ সেটিংসে সক্ষম করুন।</string>
-    <string name="permission_microphone_denied_title">মাইক্রোফোন অনুমতি প্রয়োজন</string>
-    <string name="permission_microphone_denied_msg">আপনি স্থায়ীভাবে মাইক্রোফোন অ্যাক্সেস অস্বীকার করেছেন। ভয়েস নোট রেকর্ড করতে, দয়া করে এটি অ্যাপ সেটিংসে সক্ষম করুন।</string>
-
-    <!-- Generic Buttons/Labels -->
-    <string name="btn_allow">অনুমতি দিন</string>
-    <string name="btn_not_now">এখন না</string>
-    <string name="btn_confirm">নিশ্চিত করুন</string>
-    <string name="btn_cancel">বাতিল করুন</string>
-    <string name="btn_download">ডাউনলোড</string>
-    <string name="loading">লোড হচ্ছে...</string>
-    <string name="label_undo">পূর্বাবস্থায় ফেরান</string>
-
-    <!-- Edit Text Dialog -->
+    <string name="content_description_remove">সরান</string>
     <string name="dialog_title_new_tag">নতুন ট্যাগ লিখুন</string>
-    <string name="label_tag_name">ট্যাগ নাম</string>
-    <string name="placeholder_tag_example">যেমন: ব্যক্তিগত</string>
     <string name="label_existing">বিদ্যমান:</string>
+    <string name="label_tag_name">ট্যাগ নাম</string>
+    <string name="label_undo">পূর্বাবস্থায় ফেরান</string>
+    <string name="loading">লোড হচ্ছে...</string>
+    <string name="permission_camera_denied_msg">আপনি স্থায়ীভাবে ক্যামেরা অ্যাক্সেস অস্বীকার করেছেন। আপনার নোটের জন্য ফটো তুলতে, দয়া করে এটি অ্যাপ সেটিংসে সক্ষম করুন।</string>
+    <string name="permission_camera_denied_title">ক্যামেরা অনুমতি প্রয়োজন</string>
+    <string name="permission_camera_msg">আমরা আপনার নোট আইটেমে ছবি এবং ভিডিও যোগ করতে ক্যামেরা ব্যবহার করি। এটি ছাড়া আপনি সরাসরি ছবি/ভিডিও সংযুক্ত করতে পারবেন না, পরিবর্তে গ্যালারি থেকে সংযুক্ত করতে হবে।</string>
+    <string name="permission_camera_title">ক্যামেরা অনুমতি</string>
+    <string name="permission_microphone_denied_msg">আপনি স্থায়ীভাবে মাইক্রোফোন অ্যাক্সেস অস্বীকার করেছেন। ভয়েস নোট রেকর্ড করতে, দয়া করে এটি অ্যাপ সেটিংসে সক্ষম করুন।</string>
+    <string name="permission_microphone_denied_title">মাইক্রোফোন অনুমতি প্রয়োজন</string>
+    <string name="permission_microphone_msg">আমরা ভয়েস নোট রেকর্ড করতে এবং সংযুক্ত করতে মাইক্রোফোন ব্যবহার করি। এটি ছাড়া আপনি ভয়েস নোট তৈরি করতে পারবেন না।</string>
+    <string name="permission_microphone_title">মাইক্রোফোন অনুমতি</string>
+    <string name="permission_notification_msg">আমরা আপনাকে আপলোডের অগ্রগতি দেখাতে বিজ্ঞপ্তিগুলি ব্যবহার করি। এটি ছাড়া, অ্যাপটি ব্যাকগ্রাউন্ডে থাকাকালীন ব্যাকআপ সফলভাবে শেষ হয়েছে কিনা তা আপনি জানতে পারবেন না।</string>
+    <string name="permission_notification_title">নোটিফিকেশন অনুমতি</string>
+    <string name="placeholder_tag_example">যেমন: ব্যক্তিগত</string>
 </resources>

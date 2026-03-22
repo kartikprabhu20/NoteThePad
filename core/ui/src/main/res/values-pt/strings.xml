@@ -1,36 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- General UI -->
+    <string name="btn_allow">Permitir</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_confirm">Confirmar</string>
+    <string name="btn_download">Baixar</string>
+    <string name="btn_not_now">Agora não</string>
     <string name="content_description_back">voltar</string>
+    <string name="content_description_clear_text">Limpar texto</string>
     <string name="content_description_dismiss">Descartar</string>
     <string name="content_description_icon">ícone</string>
-    <string name="content_description_remove">Remover</string>
     <string name="content_description_menu">Menu</string>
-    <string name="content_description_clear_text">Limpar texto</string>
-
-    <!-- Permission Rationale -->
-    <string name="permission_notification_title">Permissão de notificação</string>
-    <string name="permission_notification_msg">Usamos notificações para mostrar o progresso do upload. Sem isso, você não saberá se o backup terminou com sucesso enquanto o aplicativo está em segundo plano.</string>
-    <string name="permission_camera_title">Permissão de câmera</string>
-    <string name="permission_camera_msg">Usamos a câmera para adicionar imagens e vídeos às suas notas. Sem isso, você não poderá anexar fotos/vídeos diretamente, apenas da galeria.</string>
-    <string name="permission_microphone_title">Permissão de microfone</string>
-    <string name="permission_microphone_msg">Usamos o microfone para gravar e anexar notas de voz. Sem isso, você não poderá criar notas de voz.</string>
-    <string name="permission_camera_denied_title">Permissão de câmera necessária</string>
-    <string name="permission_camera_denied_msg">Você negou permanentemente o acesso à câmera. Para tirar fotos para suas notas, ative-o nas configurações do aplicativo.</string>
-    <string name="permission_microphone_denied_title">Permissão de microfone necessária</string>
-    <string name="permission_microphone_denied_msg">Você negou permanentemente o acesso ao microfone. Para gravar notas de voz, ative-o nas configurações do aplicativo.</string>
-
-    <!-- Generic Buttons/Labels -->
-    <string name="btn_allow">Permitir</string>
-    <string name="btn_not_now">Agora não</string>
-    <string name="btn_confirm">Confirmar</string>
-    <string name="btn_cancel">Cancelar</string>
-    <string name="btn_download">Baixar</string>
-    <string name="loading">Carregando...</string>
-    <string name="label_undo">Desfazer</string>
-
-    <!-- Edit Text Dialog -->
+    <string name="content_description_remove">Remover</string>
     <string name="dialog_title_new_tag">Digite a nova etiqueta</string>
-    <string name="label_tag_name">Nome da etiqueta</string>
-    <string name="placeholder_tag_example">ex: Pessoal</string>
     <string name="label_existing">Existente:</string>
+    <string name="label_tag_name">Nome da etiqueta</string>
+    <string name="label_undo">Desfazer</string>
+    <string name="loading">Carregando...</string>
+    <string name="permission_camera_denied_msg">Você negou permanentemente o acesso à câmera. Para tirar fotos para suas notas, ative-o nas configurações do aplicativo.</string>
+    <string name="permission_camera_denied_title">Permissão de câmera necessária</string>
+    <string name="permission_camera_msg">Usamos a câmera para adicionar imagens e vídeos às suas notas. Sem isso, você não poderá anexar fotos/vídeos diretamente, apenas da galeria.</string>
+    <string name="permission_camera_title">Permissão de câmera</string>
+    <string name="permission_microphone_denied_msg">Você negou permanentemente o acesso ao microfone. Para gravar notas de voz, ative-o nas configurações do aplicativo.</string>
+    <string name="permission_microphone_denied_title">Permissão de microfone necessária</string>
+    <string name="permission_microphone_msg">Usamos o microfone para gravar e anexar notas de voz. Sem isso, você não poderá criar notas de voz.</string>
+    <string name="permission_microphone_title">Permissão de microfone</string>
+    <string name="permission_notification_msg">Usamos notificações para mostrar o progresso do upload. Sem isso, você não saberá se o backup terminou com sucesso enquanto o aplicativo está em segundo plano.</string>
+    <string name="permission_notification_title">Permissão de notificação</string>
+    <string name="placeholder_tag_example">ex: Pessoal</string>
 </resources>

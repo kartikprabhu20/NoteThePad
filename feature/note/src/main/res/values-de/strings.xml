@@ -1,65 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Note Editor -->
-    <string name="content_description_add_note">Notiz hinzufügen</string>
-    <string name="content_description_empty_list">leere Liste</string>
-    <string name="content_description_sort">Sortieren</string>
-    <string name="content_description_toggle_layout">Layout umschalten</string>
-    <string name="content_description_delete_label">Label löschen</string>
-    <string name="content_description_edit_labels">Labels bearbeiten</string>
-    <string name="content_description_attach">Anhängen</string>
-    <string name="content_description_checkbox">Kontrollkästchen</string>
-    <string name="content_description_reminders">Erinnerungen</string>
-    <string name="content_description_save_note">Notiz speichern</string>
-    <string name="content_description_attached_image">Angehängtes Bild</string>
-    <string name="content_description_play_video">Video abspielen</string>
-    <string name="content_description_images_attached">Bilder angehängt</string>
-    <string name="content_description_audio_attached">Audio angehängt</string>
-    <string name="content_description_reminder_set">Erinnerung eingestellt</string>
-    <string name="content_description_checkboxes_available">Kontrollkästchen verfügbar</string>
-    <string name="content_description_tags_available">Labels verfügbar</string>
-    <string name="content_description_pin_note">Notiz als Widget fixieren</string>
-    <string name="content_description_delete_note">Notiz löschen</string>
-    <string name="content_description_remove_audio">Audio entfernen</string>
-    <string name="content_description_checkbox_state">Kontrollkästchen</string>
-
-    <string name="search_hint">Notizen suchen…</string>
-    <string name="enter_title_hint">Titel eingeben…</string>
-    <string name="enter_content_hint">Inhalt eingeben…</string>
-
+    <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">Auto-Tag</string>
-    <string name="msg_saving_note">Notiz wird gespeichert…</string>
-    <string name="title_ai_suggestions">KI-Tag-Vorschläge</string>
-    <string name="label_more_items">+ %1$d mehr</string>
-    <string name="msg_note_deleted">Notiz gelöscht</string>
-
-    <!-- App Drawer -->
-    <string name="drawer_labels_header">Labels</string>
-    <string name="drawer_create_new_label">Neues Label erstellen</string>
-    <string name="content_description_appdrawer_logo">App-Drawer-Logo</string>
-
-    <!-- Bottom Sheet Options -->
-    <string name="option_image">Bild</string>
-    <string name="option_video">Video</string>
-    <string name="option_audio">Audio</string>
-    <string name="option_choose_date_time">Datum &amp; Uhrzeit wählen</string>
-    <string name="option_pin_widget">Als Widget fixieren</string>
-    <string name="option_add_label">Label hinzufügen</string>
-    <string name="option_delete">Löschen</string>
-    <string name="option_make_copy">Kopie erstellen</string>
-    <string name="option_camera">Kamera</string>
-    <string name="option_gallery">Galerie</string>
-    <string name="option_video_recorder">Videorecorder</string>
-    <string name="option_audio_recorder">Audiorecorder</string>
-
-    <!-- Audio Recorder -->
-    <string name="title_audio_recorder">Audiorecorder</string>
-    <string name="btn_stop_recording">Aufnahme stoppen</string>
+    <string name="btn_cancel">Abbrechen</string>
+    <string name="btn_confirm">Bestätigen</string>
+    <string name="btn_download">Herunterladen</string>
     <string name="btn_start_recording">Aufnahme starten</string>
-
-    <!-- Order Section -->
-    <string name="order_title">Titel</string>
-    <string name="order_date">Datum</string>
-    <string name="order_color">Farbe</string>
+    <string name="btn_stop_recording">Aufnahme stoppen</string>
+    <string name="build_format">Build %1$s</string>
+    <string name="content_description_add_note">Notiz hinzufügen</string>
+    <string name="content_description_appdrawer_logo">App-Drawer-Logo</string>
+    <string name="content_description_attach">Anhängen</string>
+    <string name="content_description_attached_image">Angehängtes Bild</string>
+    <string name="content_description_audio_attached">Audio angehängt</string>
+    <string name="content_description_back">zurück</string>
+    <string name="content_description_checkbox">Kontrollkästchen</string>
+    <string name="content_description_checkbox_state">Kontrollkästchen</string>
+    <string name="content_description_checkboxes_available">Kontrollkästchen verfügbar</string>
+    <string name="content_description_clear_text">Text löschen</string>
+    <string name="content_description_delete_label">Label löschen</string>
+    <string name="content_description_delete_note">Notiz löschen</string>
+    <string name="content_description_dismiss">Verwerfen</string>
+    <string name="content_description_edit_labels">Labels bearbeiten</string>
+    <string name="content_description_empty_list">leere Liste</string>
+    <string name="content_description_icon">Icon</string>
+    <string name="content_description_images_attached">Bilder angehängt</string>
+    <string name="content_description_menu">Menü</string>
+    <string name="content_description_pin_note">Notiz als Widget fixieren</string>
+    <string name="content_description_play_video">Video abspielen</string>
+    <string name="content_description_profile_picture">Profilbild</string>
+    <string name="content_description_reminder_set">Erinnerung eingestellt</string>
+    <string name="content_description_reminders">Erinnerungen</string>
+    <string name="content_description_remove">Entfernen</string>
+    <string name="content_description_remove_audio">Audio entfernen</string>
+    <string name="content_description_save_note">Notiz speichern</string>
+    <string name="content_description_settings">Einstellungen</string>
+    <string name="content_description_sort">Sortieren</string>
+    <string name="content_description_tags_available">Labels verfügbar</string>
+    <string name="content_description_toggle_layout">Layout umschalten</string>
+    <string name="dialog_title_new_tag">Neues Label eingeben</string>
+    <string name="drawer_create_new_label">Neues Label erstellen</string>
+    <string name="drawer_labels_header">Labels</string>
+    <string name="enter_content_hint">Inhalt eingeben…</string>
+    <string name="enter_title_hint">Titel eingeben…</string>
+    <string name="label_existing">Existierend:</string>
+    <string name="label_more_items">+ %1$d mehr</string>
+    <string name="label_tag_name">Labelname</string>
+    <string name="label_undo">Rückgängig</string>
+    <string name="loading">Laden…</string>
+    <string name="msg_note_deleted">Notiz gelöscht</string>
+    <string name="msg_saving_note">Notiz wird gespeichert…</string>
+    <string name="option_add_label">Label hinzufügen</string>
+    <string name="option_audio">Audio</string>
+    <string name="option_audio_recorder">Audiorecorder</string>
+    <string name="option_camera">Kamera</string>
+    <string name="option_choose_date_time">Datum &amp; Uhrzeit wählen</string>
+    <string name="option_delete">Löschen</string>
+    <string name="option_gallery">Galerie</string>
+    <string name="option_image">Bild</string>
+    <string name="option_make_copy">Kopie erstellen</string>
+    <string name="option_pin_widget">Als Widget fixieren</string>
+    <string name="option_video">Video</string>
+    <string name="option_video_recorder">Videorecorder</string>
     <string name="order_ascending">Aufsteigend</string>
+    <string name="order_color">Farbe</string>
+    <string name="order_date">Datum</string>
     <string name="order_descending">Absteigend</string>
+    <string name="order_title">Titel</string>
+    <string name="placeholder_tag_example">z.B. Persönlich</string>
+    <string name="search_hint">Notizen suchen…</string>
+    <string name="title_ai_suggestions">KI-Tag-Vorschläge</string>
+    <string name="title_audio_recorder">Audiorecorder</string>
+    <string name="version_format">Version %1$s</string>
+    <string name="next">Weiter</string>
 </resources>

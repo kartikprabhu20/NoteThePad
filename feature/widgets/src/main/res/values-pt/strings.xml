@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">Nota Única</string>
+    <string name="content_description_add_note">Adicionar nota</string>
+    <string name="content_description_refresh_widgets">atualizar widgets</string>
+    <string name="msg_add_notes_prompt">Vá para a aplicação e adicione algumas notas</string>
+    <string name="msg_no_note_found">Nenhuma nota encontrada</string>
+    <string name="title_recent_notes">Notas Recentes</string>
+    <string name="widget_description_note_collection">Ver as notas mais recentes</string>
     <string name="widget_description_single_note">Fixar uma nota específica na tela inicial</string>
     <string name="widget_title_note_collection">Coleção de Notas</string>
-    <string name="widget_description_note_collection">Ver as notas mais recentes</string>
-    <string name="msg_no_note_found">Nenhuma nota encontrada</string>
-    <string name="msg_add_notes_prompt">Vá para a aplicação e adicione algumas notas</string>
-    <string name="title_recent_notes">Notas Recentes</string>
-    <string name="content_description_refresh_widgets">atualizar widgets</string>
-    <string name="content_description_add_note">Adicionar nota</string>
+    <string name="widget_title_single_note">Nota Única</string>
 </resources>

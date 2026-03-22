@@ -5,9 +5,6 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <!-- General UI -->
-    <string name="content_description_profile_picture">Profile Picture</string>
-
     <!-- App Versioning -->
     <string name="version_format">Version %1$s</string>
     <string name="build_format">Build %1$s</string>
@@ -16,6 +13,4 @@
     <string name="error_signin">Error occurred while signing in, try again!</string>
     <string name="content_description_google_signin">Google Sign In</string>
 
-    <!-- Misc -->
-    <string name="toast_widget_pin_not_supported">Pinned widgets are not supported on this launcher</string>
 </resources>

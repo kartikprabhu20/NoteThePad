@@ -1,36 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- General UI -->
+    <string name="btn_allow">許可</string>
+    <string name="btn_cancel">キャンセル</string>
+    <string name="btn_confirm">確定</string>
+    <string name="btn_download">ダウンロード</string>
+    <string name="btn_not_now">後で</string>
     <string name="content_description_back">戻る</string>
+    <string name="content_description_clear_text">テキストを消去</string>
     <string name="content_description_dismiss">閉じる</string>
     <string name="content_description_icon">アイコン</string>
-    <string name="content_description_remove">削除</string>
     <string name="content_description_menu">メニュー</string>
-    <string name="content_description_clear_text">テキストを消去</string>
-
-    <!-- Permission Rationale -->
-    <string name="permission_notification_title">通知の許可</string>
-    <string name="permission_notification_msg">アップロードの進行状況を表示するために通知を使用します。これがないと、アプリがバックグラウンドにあるときにバックアップが正常に終了したかどうかがわかりません。</string>
-    <string name="permission_camera_title">カメラの許可</string>
-    <string name="permission_camera_msg">ノートに画像や動画を追加するためにカメラを使用します。これがないと、写真を直接撮影して添付することができず、ギャラリーからのみになります。</string>
-    <string name="permission_microphone_title">マイクの許可</string>
-    <string name="permission_microphone_msg">音声メモを録音して添付するためにマイクを使用します。これがないと、音声メモを作成できません。</string>
-    <string name="permission_camera_denied_title">カメラの許可が必要です</string>
-    <string name="permission_camera_denied_msg">カメラへのアクセスを永続的に拒否しました。ノート用の写真を撮るには、アプリの設定で有効にしてください。</string>
-    <string name="permission_microphone_denied_title">マイクの許可が必要です</string>
-    <string name="permission_microphone_denied_msg">マイクへのアクセスを永続的に拒否しました。音声メモを録音するには、アプリの設定で有効にしてください。</string>
-
-    <!-- Generic Buttons/Labels -->
-    <string name="btn_allow">許可</string>
-    <string name="btn_not_now">後で</string>
-    <string name="btn_confirm">確定</string>
-    <string name="btn_cancel">キャンセル</string>
-    <string name="btn_download">ダウンロード</string>
-    <string name="loading">読み込み中…</string>
-    <string name="label_undo">元に戻す</string>
-
-    <!-- Edit Text Dialog -->
+    <string name="content_description_remove">削除</string>
     <string name="dialog_title_new_tag">新しいタグを入力してください</string>
-    <string name="label_tag_name">タグ名</string>
-    <string name="placeholder_tag_example">例：個人用</string>
     <string name="label_existing">既存：</string>
+    <string name="label_tag_name">タグ名</string>
+    <string name="label_undo">元に戻す</string>
+    <string name="loading">読み込み中…</string>
+    <string name="permission_camera_denied_msg">カメラへのアクセスを永続的に拒否しました。ノート用の写真を撮るには、アプリの設定で有効にしてください。</string>
+    <string name="permission_camera_denied_title">カメラの許可が必要です</string>
+    <string name="permission_camera_msg">ノートに画像や動画を追加するためにカメラを使用します。これがないと、写真を直接撮影して添付することができず、ギャラリーからのみになります。</string>
+    <string name="permission_camera_title">カメラの許可</string>
+    <string name="permission_microphone_denied_msg">マイクへのアクセスを永続的に拒否しました。音声メモを録音するには、アプリの設定で有効にしてください。</string>
+    <string name="permission_microphone_denied_title">マイクの許可が必要です</string>
+    <string name="permission_microphone_msg">音声メモを録音して添付するためにマイクを使用します。これがないと、音声メモを作成できません。</string>
+    <string name="permission_microphone_title">マイクの許可</string>
+    <string name="permission_notification_msg">アップロードの進行状況を表示するために通知を使用します。これがないと、アプリがバックグラウンドにあるときにバックアップが正常に終了したかどうかがわかりません。</string>
+    <string name="permission_notification_title">通知の許可</string>
+    <string name="placeholder_tag_example">例：個人用</string>
 </resources>

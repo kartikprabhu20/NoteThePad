@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">ملاحظة واحدة</string>
+    <string name="content_description_add_note">إضافة ملاحظة</string>
+    <string name="content_description_refresh_widgets">تحديث الأدوات</string>
+    <string name="msg_add_notes_prompt">يرجى الانتقال إلى التطبيق وإضافة بعض الملاحظات</string>
+    <string name="msg_no_note_found">لم يتم العثور على ملاحظة</string>
+    <string name="title_recent_notes">الملاحظات الأخيرة</string>
+    <string name="widget_description_note_collection">عرض أحدث الملاحظات</string>
     <string name="widget_description_single_note">تثبيت ملاحظة محددة على شاشتك الرئيسية</string>
     <string name="widget_title_note_collection">مجموعة الملاحظات</string>
-    <string name="widget_description_note_collection">عرض أحدث الملاحظات</string>
-    <string name="msg_no_note_found">لم يتم العثور على ملاحظة</string>
-    <string name="msg_add_notes_prompt">يرجى الانتقال إلى التطبيق وإضافة بعض الملاحظات</string>
-    <string name="title_recent_notes">الملاحظات الأخيرة</string>
-    <string name="content_description_refresh_widgets">تحديث الأدوات</string>
-    <string name="content_description_add_note">إضافة ملاحظة</string>
+    <string name="widget_title_single_note">ملاحظة واحدة</string>
 </resources>

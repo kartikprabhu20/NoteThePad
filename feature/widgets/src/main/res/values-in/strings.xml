@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">Catatan Tunggal</string>
+    <string name="content_description_add_note">Tambah catatan</string>
+    <string name="content_description_refresh_widgets">segarkan widget</string>
+    <string name="msg_add_notes_prompt">Silakan buka aplikasi dan tambahkan beberapa catatan</string>
+    <string name="msg_no_note_found">Catatan tidak ditemukan</string>
+    <string name="title_recent_notes">Catatan Terbaru</string>
+    <string name="widget_description_note_collection">Lihat catatan terbaru</string>
     <string name="widget_description_single_note">Sematkan catatan tertentu ke layar beranda</string>
     <string name="widget_title_note_collection">Koleksi catatan</string>
-    <string name="widget_description_note_collection">Lihat catatan terbaru</string>
-    <string name="msg_no_note_found">Catatan tidak ditemukan</string>
-    <string name="msg_add_notes_prompt">Silakan buka aplikasi dan tambahkan beberapa catatan</string>
-    <string name="title_recent_notes">Catatan Terbaru</string>
-    <string name="content_description_refresh_widgets">segarkan widget</string>
-    <string name="content_description_add_note">Tambah catatan</string>
+    <string name="widget_title_single_note">Catatan Tunggal</string>
 </resources>

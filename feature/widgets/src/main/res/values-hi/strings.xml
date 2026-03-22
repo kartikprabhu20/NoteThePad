@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">एकल नोट</string>
+    <string name="content_description_add_note">नोट जोड़ें</string>
+    <string name="content_description_refresh_widgets">विजेट ताज़ा करें</string>
+    <string name="msg_add_notes_prompt">कृपया ऐप पर जाएं और कुछ नोट जोड़ें</string>
+    <string name="msg_no_note_found">कोई नोट नहीं मिला</string>
+    <string name="title_recent_notes">हाल के नोट</string>
+    <string name="widget_description_note_collection">हाल के नोट देखें</string>
     <string name="widget_description_single_note">होम स्क्रीन पर एक विशिष्ट नोट पिन करें</string>
     <string name="widget_title_note_collection">नोट संग्रह</string>
-    <string name="widget_description_note_collection">हाल के नोट देखें</string>
-    <string name="msg_no_note_found">कोई नोट नहीं मिला</string>
-    <string name="msg_add_notes_prompt">कृपया ऐप पर जाएं और कुछ नोट जोड़ें</string>
-    <string name="title_recent_notes">हाल के नोट</string>
-    <string name="content_description_refresh_widgets">विजेट ताज़ा करें</string>
-    <string name="content_description_add_note">नोट जोड़ें</string>
+    <string name="widget_title_single_note">एकल नोट</string>
 </resources>

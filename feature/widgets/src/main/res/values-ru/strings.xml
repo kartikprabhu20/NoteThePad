@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">Одна заметка</string>
+    <string name="content_description_add_note">Добавить заметку</string>
+    <string name="content_description_refresh_widgets">обновить виджеты</string>
+    <string name="msg_add_notes_prompt">Перейдите в приложение и добавьте несколько заметок</string>
+    <string name="msg_no_note_found">Заметка не найдена</string>
+    <string name="title_recent_notes">Последние заметки</string>
+    <string name="widget_description_note_collection">Просмотр последних заметок</string>
     <string name="widget_description_single_note">Закрепить выбранную заметку на главном экране</string>
     <string name="widget_title_note_collection">Коллекция заметок</string>
-    <string name="widget_description_note_collection">Просмотр последних заметок</string>
-    <string name="msg_no_note_found">Заметка не найдена</string>
-    <string name="msg_add_notes_prompt">Перейдите в приложение и добавьте несколько заметок</string>
-    <string name="title_recent_notes">Последние заметки</string>
-    <string name="content_description_refresh_widgets">обновить виджеты</string>
-    <string name="content_description_add_note">Добавить заметку</string>
+    <string name="widget_title_single_note">Одна заметка</string>
 </resources>

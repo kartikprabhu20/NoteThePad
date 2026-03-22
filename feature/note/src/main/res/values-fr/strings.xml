@@ -1,66 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Note Editor -->
-    <string name="content_description_add_note">Ajouter une note</string>
-    <string name="content_description_empty_list">liste vide</string>
-    <string name="content_description_sort">Trier</string>
-    <string name="content_description_toggle_layout">Changer la disposition</string>
-    <string name="content_description_delete_label">Supprimer l\'étiquette</string>
-    <string name="content_description_edit_labels">modifier les étiquettes</string>
-    <string name="content_description_attach">Joindre</string>
-    <string name="content_description_checkbox">Case à cocher</string>
-    <string name="content_description_reminders">Rappels</string>
-    <string name="content_description_save_note">Enregistrer la note</string>
-    <string name="content_description_attached_image">Image jointe</string>
-    <string name="content_description_play_video">Lire la vidéo</string>
-    <string name="content_description_images_attached">Images jointes</string>
-    <string name="content_description_audio_attached">Audio joint</string>
-    <string name="content_description_reminder_set">Rappel défini</string>
-    <string name="content_description_checkboxes_available">cases à cocher disponibles</string>
-    <string name="content_description_tags_available">Étiquettes disponibles</string>
-    <string name="content_description_pin_note">Épingler la note comme widget</string>
-    <string name="content_description_delete_note">Supprimer la note</string>
-    <string name="content_description_remove_audio">Supprimer l\'audio</string>
-    <string name="content_description_checkbox_state">case à cocher</string>
-
-    <string name="search_hint">Rechercher des notes…</string>
-    <string name="enter_title_hint">Entrer le titre…</string>
-    <string name="enter_content_hint">Entrer du contenu…</string>
-
+    <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">Étiquetage auto</string>
-    <string name="msg_saving_note">Enregistrement de la note…</string>
-    <string name="title_ai_suggestions">Suggestions d\'étiquettes IA</string>
-    <string name="label_more_items">+ %1$d de plus</string>
-    <string name="msg_note_deleted">Note supprimée</string>
-
-    <!-- App Drawer (Specific to Note feature navigation) -->
-    <string name="drawer_labels_header">Étiquettes</string>
-    <string name="drawer_create_new_label">Créer une nouvelle étiquette</string>
-    <string name="content_description_appdrawer_logo">Logo du tiroir d\'application</string>
-
-    <!-- Bottom Sheet Options -->
-    <string name="option_image">Image</string>
-    <string name="option_video">Vidéo</string>
-    <string name="option_audio">Audio</string>
-    <string name="option_choose_date_time">Choisir une date &amp; heure</string>
-    <string name="option_pin_widget">Épingler comme widget</string>
-    <string name="option_add_label">Ajouter une étiquette</string>
-    <string name="option_delete">Supprimer</string>
-    <string name="option_make_copy">Faire une copie</string>
-    <string name="option_camera">Caméra</string>
-    <string name="option_gallery">Galerie</string>
-    <string name="option_video_recorder">Enregistreur vidéo</string>
-    <string name="option_audio_recorder">Enregistreur audio</string>
-
-    <!-- Audio Recorder -->
-    <string name="title_audio_recorder">Enregistreur audio</string>
-    <string name="btn_stop_recording">Arrêter l\'enregistrement</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_confirm">Confirmer</string>
+    <string name="btn_download">Télécharger</string>
     <string name="btn_start_recording">Démarrer l\'enregistrement</string>
-
-    <!-- Order Section -->
-    <string name="order_title">Titre</string>
-    <string name="order_date">Date</string>
-    <string name="order_color">Couleur</string>
+    <string name="btn_stop_recording">Arrêter l\'enregistrement</string>
+    <string name="build_format">Build %1$s</string>
+    <string name="content_description_add_note">Ajouter une note</string>
+    <string name="content_description_appdrawer_logo">Logo du tiroir d\'application</string>
+    <string name="content_description_attach">Joindre</string>
+    <string name="content_description_attached_image">Image jointe</string>
+    <string name="content_description_audio_attached">Audio joint</string>
+    <string name="content_description_back">retour</string>
+    <string name="content_description_checkbox">Case à cocher</string>
+    <string name="content_description_checkbox_state">case à cocher</string>
+    <string name="content_description_checkboxes_available">cases à cocher disponibles</string>
+    <string name="content_description_clear_text">Effacer le texte</string>
+    <string name="content_description_delete_label">Supprimer l\'étiquette</string>
+    <string name="content_description_delete_note">Supprimer la note</string>
+    <string name="content_description_dismiss">Ignorer</string>
+    <string name="content_description_edit_labels">modifier les étiquettes</string>
+    <string name="content_description_empty_list">liste vide</string>
+    <string name="content_description_icon">icône</string>
+    <string name="content_description_images_attached">Images jointes</string>
+    <string name="content_description_menu">Menu</string>
+    <string name="content_description_pin_note">Épingler la note comme widget</string>
+    <string name="content_description_play_video">Lire la vidéo</string>
+    <string name="content_description_profile_picture">Photo de profil</string>
+    <string name="content_description_reminder_set">Rappel défini</string>
+    <string name="content_description_reminders">Rappels</string>
+    <string name="content_description_remove">Retirer</string>
+    <string name="content_description_remove_audio">Supprimer l\'audio</string>
+    <string name="content_description_save_note">Enregistrer la note</string>
+    <string name="content_description_settings">Paramètres</string>
+    <string name="content_description_sort">Trier</string>
+    <string name="content_description_tags_available">Étiquettes disponibles</string>
+    <string name="content_description_toggle_layout">Changer la disposition</string>
+    <string name="dialog_title_new_tag">Entrez le nouveau tag</string>
+    <string name="drawer_create_new_label">Créer une nouvelle étiquette</string>
+    <string name="drawer_labels_header">Étiquettes</string>
+    <string name="enter_content_hint">Entrer du contenu…</string>
+    <string name="enter_title_hint">Entrer le titre…</string>
+    <string name="label_existing">Existant :</string>
+    <string name="label_more_items">+ %1$d de plus</string>
+    <string name="label_tag_name">Nom du tag</string>
+    <string name="label_undo">Annuler</string>
+    <string name="loading">Chargement...</string>
+    <string name="msg_note_deleted">Note supprimée</string>
+    <string name="msg_saving_note">Enregistrement de la note…</string>
+    <string name="option_add_label">Ajouter une étiquette</string>
+    <string name="option_audio">Audio</string>
+    <string name="option_audio_recorder">Enregistreur audio</string>
+    <string name="option_camera">Caméra</string>
+    <string name="option_choose_date_time">Choisir une date &amp; heure</string>
+    <string name="option_delete">Supprimer</string>
+    <string name="option_gallery">Galerie</string>
+    <string name="option_image">Image</string>
+    <string name="option_make_copy">Faire une copie</string>
+    <string name="option_pin_widget">Épingler comme widget</string>
+    <string name="option_video">Vidéo</string>
+    <string name="option_video_recorder">Enregistreur vidéo</string>
     <string name="order_ascending">Croissant</string>
+    <string name="order_color">Couleur</string>
+    <string name="order_date">Date</string>
     <string name="order_descending">Décroissant</string>
+    <string name="order_title">Titre</string>
+    <string name="placeholder_tag_example">ex. Personnel</string>
+    <string name="search_hint">Rechercher des notes…</string>
+    <string name="title_ai_suggestions">Suggestions d\'étiquettes IA</string>
+    <string name="title_audio_recorder">Enregistreur audio</string>
+    <string name="version_format">Version %1$s</string>
+    <string name="next">Suivant</string>
 </resources>

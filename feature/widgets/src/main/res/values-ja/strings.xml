@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">単一のメモ</string>
+    <string name="content_description_add_note">メモを追加</string>
+    <string name="content_description_refresh_widgets">ウィジェットを更新</string>
+    <string name="msg_add_notes_prompt">アプリに移動してメモを追加してください</string>
+    <string name="msg_no_note_found">メモが見つかりません</string>
+    <string name="title_recent_notes">最近のメモ</string>
+    <string name="widget_description_note_collection">最新のメモを表示する</string>
     <string name="widget_description_single_note">特定のメモをホーム画面に固定する</string>
     <string name="widget_title_note_collection">メモコレクション</string>
-    <string name="widget_description_note_collection">最新のメモを表示する</string>
-    <string name="msg_no_note_found">メモが見つかりません</string>
-    <string name="msg_add_notes_prompt">アプリに移動してメモを追加してください</string>
-    <string name="title_recent_notes">最近のメモ</string>
-    <string name="content_description_refresh_widgets">ウィジェットを更新</string>
-    <string name="content_description_add_note">メモを追加</string>
+    <string name="widget_title_single_note">単一のメモ</string>
 </resources>

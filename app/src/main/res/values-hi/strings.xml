@@ -1,12 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NoteThePad</string>
     <string name="action_settings">सेटिंग्स</string>
+    <string name="app_name">NoteThePad</string>
+    <string name="build_format">बिल्ड %1$s</string>
+    <string name="content_description_google_signin">गूगल साइन इन</string>
+    <string name="error_signin">साइन इन करते समय त्रुटि हुई, पुन: प्रयास करें!</string>
     <string name="next">अगला</string>
     <string name="previous">पिछला</string>
-    <string name="content_description_profile_picture">प्रोफ़ाइल चित्र</string>
     <string name="version_format">संस्करण %1$s</string>
-    <string name="build_format">बिल्ड %1$s</string>
-    <string name="error_signin">साइन इन करते समय त्रुटि हुई, पुन: प्रयास करें!</string>
-    <string name="content_description_google_signin">गूगल साइन इन</string>
-    <string name="toast_widget_pin_not_supported">इस लॉन्चर पर पिन किए गए विजेट समर्थित नहीं हैं</string>
 </resources>

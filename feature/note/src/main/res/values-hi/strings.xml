@@ -1,65 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Note Editor -->
-    <string name="content_description_add_note">नोट जोड़ें</string>
-    <string name="content_description_empty_list">खाली सूची</string>
-    <string name="content_description_sort">क्रमबद्ध करें</string>
-    <string name="content_description_toggle_layout">लेआउट बदलें</string>
-    <string name="content_description_delete_label">लेबल हटाएं</string>
-    <string name="content_description_edit_labels">लेबल संपादित करें</string>
-    <string name="content_description_attach">संलग्न करें</string>
-    <string name="content_description_checkbox">चेकबॉक्स</string>
-    <string name="content_description_reminders">रिमाइंडर</string>
-    <string name="content_description_save_note">नोट सहेजें</string>
-    <string name="content_description_attached_image">संलग्न छवि</string>
-    <string name="content_description_play_video">वीडियो चलाएं</string>
-    <string name="content_description_images_attached">छवियां संलग्न</string>
-    <string name="content_description_audio_attached">ऑडियो संलग्न</string>
-    <string name="content_description_reminder_set">रिमाइंडर सेट</string>
-    <string name="content_description_checkboxes_available">चेकबॉक्स उपलब्ध</string>
-    <string name="content_description_tags_available">टैग उपलब्ध</string>
-    <string name="content_description_pin_note">नोट को विजेट के रूप में पिन करें</string>
-    <string name="content_description_delete_note">नोट हटाएं</string>
-    <string name="content_description_remove_audio">ऑडियो हटाएं</string>
-    <string name="content_description_checkbox_state">चेकबॉक्स</string>
-
-    <string name="search_hint">नोट्स खोजें…</string>
-    <string name="enter_title_hint">शीर्षक दर्ज करें…</string>
-    <string name="enter_content_hint">कुछ सामग्री दर्ज करें…</string>
-
+    <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">ऑटो-टैग</string>
-    <string name="msg_saving_note">नोट सहेजा जा रहा है…</string>
-    <string name="title_ai_suggestions">एआई टैग सुझाव</string>
-    <string name="label_more_items">+ %1$d और</string>
-    <string name="msg_note_deleted">नोट हटा दिया गया</string>
-
-    <!-- App Drawer (Specific to Note feature navigation) -->
-    <string name="drawer_labels_header">लेबल</string>
-    <string name="drawer_create_new_label">नया लेबल बनाएं</string>
-    <string name="content_description_appdrawer_logo">एपड्रॉवर लोगो</string>
-
-    <!-- Bottom Sheet Options -->
-    <string name="option_image">छवि</string>
-    <string name="option_video">वीडियो</string>
-    <string name="option_audio">ऑडियो</string>
-    <string name="option_choose_date_time">दिनांक और समय चुनें</string>
-    <string name="option_pin_widget">विजेट के रूप में पिन करें</string>
-    <string name="option_add_label">लेबल जोड़ें</string>
-    <string name="option_delete">हटाएं</string>
-    <string name="option_make_copy">एक प्रति बनाएं</string>
-    <string name="option_camera">कैमरा</string>
-    <string name="option_gallery">गैलरी</string>
-    <string name="option_video_recorder">वीडियो रिकॉर्डर</string>
-    <string name="option_audio_recorder">ऑडियो रिकॉर्डर</string>
-
-    <!-- Audio Recorder -->
-    <string name="title_audio_recorder">ऑडियो रिकॉर्डर</string>
-    <string name="btn_stop_recording">रिकॉर्डिंग बंद करें</string>
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="btn_confirm">पुष्टि करें</string>
+    <string name="btn_download">डाउनलोड करें</string>
     <string name="btn_start_recording">रिकॉर्डिंग शुरू करें</string>
-
-    <!-- Order Section -->
-    <string name="order_title">शीर्षक</string>
-    <string name="order_date">तारीख</string>
-    <string name="order_color">रंग</string>
+    <string name="btn_stop_recording">रिकॉर्डिंग बंद करें</string>
+    <string name="build_format">बिल्ड %1$s</string>
+    <string name="content_description_add_note">नोट जोड़ें</string>
+    <string name="content_description_appdrawer_logo">एपड्रॉवर लोगो</string>
+    <string name="content_description_attach">संलग्न करें</string>
+    <string name="content_description_attached_image">संलग्न छवि</string>
+    <string name="content_description_audio_attached">ऑडियो संलग्न</string>
+    <string name="content_description_back">पीछे</string>
+    <string name="content_description_checkbox">चेकबॉक्स</string>
+    <string name="content_description_checkbox_state">चेकबॉक्स</string>
+    <string name="content_description_checkboxes_available">चेकबॉक्स उपलब्ध</string>
+    <string name="content_description_clear_text">टेक्स्ट साफ़ करें</string>
+    <string name="content_description_delete_label">लेबल हटाएं</string>
+    <string name="content_description_delete_note">नोट हटाएं</string>
+    <string name="content_description_dismiss">खारिज करें</string>
+    <string name="content_description_edit_labels">लेबल संपादित करें</string>
+    <string name="content_description_empty_list">खाली सूची</string>
+    <string name="content_description_icon">आइकन</string>
+    <string name="content_description_images_attached">छवियां संलग्न</string>
+    <string name="content_description_menu">मेनू</string>
+    <string name="content_description_pin_note">नोट को विजेट के रूप में पिन करें</string>
+    <string name="content_description_play_video">वीडियो चलाएं</string>
+    <string name="content_description_profile_picture">प्रोफ़ाइल चित्र</string>
+    <string name="content_description_reminder_set">रिमाइंडर सेट</string>
+    <string name="content_description_reminders">रिमाइंडर</string>
+    <string name="content_description_remove">हटाएं</string>
+    <string name="content_description_remove_audio">ऑडियो हटाएं</string>
+    <string name="content_description_save_note">नोट सहेजें</string>
+    <string name="content_description_settings">सेटिंग्स</string>
+    <string name="content_description_sort">क्रमबद्ध करें</string>
+    <string name="content_description_tags_available">टैग उपलब्ध</string>
+    <string name="content_description_toggle_layout">लेआउट बदलें</string>
+    <string name="dialog_title_new_tag">नया टैग दर्ज करें</string>
+    <string name="drawer_create_new_label">नया लेबल बनाएं</string>
+    <string name="drawer_labels_header">लेबल</string>
+    <string name="enter_content_hint">कुछ सामग्री दर्ज करें…</string>
+    <string name="enter_title_hint">शीर्षक दर्ज करें…</string>
+    <string name="label_existing">मौजूदा:</string>
+    <string name="label_more_items">+ %1$d और</string>
+    <string name="label_tag_name">टैग नाम</string>
+    <string name="label_undo">पूर्ववत करें</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="msg_note_deleted">नोट हटा दिया गया</string>
+    <string name="msg_saving_note">नोट सहेजा जा रहा है…</string>
+    <string name="option_add_label">लेबल जोड़ें</string>
+    <string name="option_audio">ऑडियो</string>
+    <string name="option_audio_recorder">ऑडियो रिकॉर्डर</string>
+    <string name="option_camera">कैमरा</string>
+    <string name="option_choose_date_time">दिनांक और समय चुनें</string>
+    <string name="option_delete">हटाएं</string>
+    <string name="option_gallery">गैलरी</string>
+    <string name="option_image">छवि</string>
+    <string name="option_make_copy">एक प्रति बनाएं</string>
+    <string name="option_pin_widget">विजेट के रूप में पिन करें</string>
+    <string name="option_video">वीडियो</string>
+    <string name="option_video_recorder">वीडियो रिकॉर्डर</string>
     <string name="order_ascending">आरोही</string>
+    <string name="order_color">रंग</string>
+    <string name="order_date">तारीख</string>
     <string name="order_descending">अवरोही</string>
+    <string name="order_title">शीर्षक</string>
+    <string name="placeholder_tag_example">जैसे: व्यक्तिगत</string>
+    <string name="search_hint">नोट्स खोजें…</string>
+    <string name="title_ai_suggestions">एआई टैग सुझाव</string>
+    <string name="title_audio_recorder">ऑडियो रिकॉर्डर</string>
+    <string name="version_format">संस्करण %1$s</string>
+    <string name="next">अगला</string>
 </resources>

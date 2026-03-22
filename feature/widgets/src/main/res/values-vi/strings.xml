@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="msg_no_note_found">Không tìm thấy ghi chú</string>
-    <string name="msg_add_notes_prompt">Vui lòng truy cập ứng dụng và thêm một số ghi chú</string>
-    <string name="title_recent_notes">Ghi chú gần đây</string>
-    <string name="content_description_refresh_widgets">làm mới widget</string>
     <string name="content_description_add_note">Thêm ghi chú</string>
+    <string name="content_description_refresh_widgets">làm mới widget</string>
+    <string name="msg_add_notes_prompt">Vui lòng truy cập ứng dụng và thêm một số ghi chú</string>
+    <string name="msg_no_note_found">Không tìm thấy ghi chú</string>
+    <string name="title_recent_notes">Ghi chú gần đây</string>
+    <string name="widget_description_note_collection">Xem các ghi chú gần đây nhất</string>
+    <string name="widget_description_single_note">Ghim một ghi chú cụ thể vào màn hình chính</string>
+    <string name="widget_title_note_collection">Bộ sưu tập ghi chú</string>
+    <string name="widget_title_single_note">Ghi chú đơn</string>
 </resources>

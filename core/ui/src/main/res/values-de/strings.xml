@@ -1,36 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- General UI -->
+    <string name="btn_allow">Zulassen</string>
+    <string name="btn_cancel">Abbrechen</string>
+    <string name="btn_confirm">Bestätigen</string>
+    <string name="btn_download">Herunterladen</string>
+    <string name="btn_not_now">Jetzt nicht</string>
     <string name="content_description_back">zurück</string>
+    <string name="content_description_clear_text">Text löschen</string>
     <string name="content_description_dismiss">Verwerfen</string>
     <string name="content_description_icon">Icon</string>
-    <string name="content_description_remove">Entfernen</string>
     <string name="content_description_menu">Menü</string>
-    <string name="content_description_clear_text">Text löschen</string>
-
-    <!-- Permission Rationale -->
-    <string name="permission_notification_title">Benachrichtigungsberechtigung</string>
-    <string name="permission_notification_msg">Wir verwenden Benachrichtigungen, um Ihnen den Upload-Fortschritt anzuzeigen. Ohne diese wissen Sie nicht, ob die Sicherung erfolgreich abgeschlossen wurde, während die App im Hintergrund läuft.</string>
-    <string name="permission_camera_title">Kameraberechtigung</string>
-    <string name="permission_camera_msg">Wir verwenden die Kamera, um Bilder und Videos zu Ihren Notizen hinzuzufügen. Ohne diese können Sie Fotos/Videos nicht direkt anhängen, sondern nur aus der Galerie.</string>
-    <string name="permission_microphone_title">Mikrofonberechtigung</string>
-    <string name="permission_microphone_msg">Wir verwenden das Mikrofon, um Sprachnotizen aufzunehmen und anzuhängen. Ohne diese können Sie keine Sprachnotizen erstellen.</string>
-    <string name="permission_camera_denied_title">Kameraberechtigung erforderlich</string>
-    <string name="permission_camera_denied_msg">Sie haben den Kamerazugriff dauerhaft verweigert. Um Fotos für Ihre Notizen aufzunehmen, aktivieren Sie diesen bitte in den App-Einstellungen.</string>
-    <string name="permission_microphone_denied_title">Mikrofonberechtigung erforderlich</string>
-    <string name="permission_microphone_denied_msg">Sie haben den Mikrofonzugriff dauerhaft verweigert. Um Sprachnotizen aufzunehmen, aktivieren Sie diesen bitte in den App-Einstellungen.</string>
-
-    <!-- Generic Buttons/Labels -->
-    <string name="btn_allow">Zulassen</string>
-    <string name="btn_not_now">Jetzt nicht</string>
-    <string name="btn_confirm">Bestätigen</string>
-    <string name="btn_cancel">Abbrechen</string>
-    <string name="btn_download">Herunterladen</string>
-    <string name="loading">Laden…</string>
-    <string name="label_undo">Rückgängig</string>
-
-    <!-- Edit Text Dialog -->
+    <string name="content_description_remove">Entfernen</string>
     <string name="dialog_title_new_tag">Neues Label eingeben</string>
-    <string name="label_tag_name">Labelname</string>
-    <string name="placeholder_tag_example">z.B. Persönlich</string>
     <string name="label_existing">Existierend:</string>
+    <string name="label_tag_name">Labelname</string>
+    <string name="label_undo">Rückgängig</string>
+    <string name="loading">Laden…</string>
+    <string name="permission_camera_denied_msg">Sie haben den Kamerazugriff dauerhaft verweigert. Um Fotos für Ihre Notizen aufzunehmen, aktivieren Sie diesen bitte in den App-Einstellungen.</string>
+    <string name="permission_camera_denied_title">Kameraberechtigung erforderlich</string>
+    <string name="permission_camera_msg">Wir verwenden die Kamera, um Bilder und Videos zu Ihren Notizen hinzuzufügen. Ohne diese können Sie Fotos/Videos nicht direkt anhängen, sondern nur aus der Galerie.</string>
+    <string name="permission_camera_title">Kameraberechtigung</string>
+    <string name="permission_microphone_denied_msg">Sie haben den Mikrofonzugriff dauerhaft verweigert. Um Sprachnotizen aufzunehmen, aktivieren Sie diesen bitte in den App-Einstellungen.</string>
+    <string name="permission_microphone_denied_title">Mikrofonberechtigung erforderlich</string>
+    <string name="permission_microphone_msg">Wir verwenden das Mikrofon, um Sprachnotizen aufzunehmen und anzuhängen. Ohne diese können Sie keine Sprachnotizen erstellen.</string>
+    <string name="permission_microphone_title">Mikrofonberechtigung</string>
+    <string name="permission_notification_msg">Wir verwenden Benachrichtigungen, um Ihnen den Upload-Fortschritt anzuzeigen. Ohne diese wissen Sie nicht, ob die Sicherung erfolgreich abgeschlossen wurde, während die App im Hintergrund läuft.</string>
+    <string name="permission_notification_title">Benachrichtigungsberechtigung</string>
+    <string name="placeholder_tag_example">z.B. Persönlich</string>
 </resources>

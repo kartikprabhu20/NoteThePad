@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_title_single_note">Einzelne Notiz</string>
+    <string name="content_description_add_note">Notiz hinzufügen</string>
+    <string name="content_description_refresh_widgets">Widgets aktualisieren</string>
+    <string name="msg_add_notes_prompt">Bitte gehen Sie zur App und fügen Sie einige Notizen hinzu</string>
+    <string name="msg_no_note_found">Keine Notiz gefunden</string>
+    <string name="title_recent_notes">Zuletzt verwendete Notizen</string>
+    <string name="widget_description_note_collection">Zuletzt verwendete Notizen anzeigen</string>
     <string name="widget_description_single_note">Fixieren Sie eine bestimmte Notiz auf Ihrem Startbildschirm</string>
     <string name="widget_title_note_collection">Notizsammlung</string>
-    <string name="widget_description_note_collection">Zuletzt verwendete Notizen anzeigen</string>
-    <string name="msg_no_note_found">Keine Notiz gefunden</string>
-    <string name="msg_add_notes_prompt">Bitte gehen Sie zur App und fügen Sie einige Notizen hinzu</string>
-    <string name="title_recent_notes">Zuletzt verwendete Notizen</string>
-    <string name="content_description_refresh_widgets">Widgets aktualisieren</string>
-    <string name="content_description_add_note">Notiz hinzufügen</string>
+    <string name="widget_title_single_note">Einzelne Notiz</string>
 </resources>

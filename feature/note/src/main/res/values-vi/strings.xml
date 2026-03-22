@@ -1,65 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Note Editor -->
-    <string name="content_description_add_note">Thêm ghi chú</string>
-    <string name="content_description_empty_list">danh sách trống</string>
-    <string name="content_description_sort">Sắp xếp</string>
-    <string name="content_description_toggle_layout">Chuyển đổi bố cục</string>
-    <string name="content_description_delete_label">Xóa nhãn</string>
-    <string name="content_description_edit_labels">chỉnh sửa nhãn</string>
-    <string name="content_description_attach">Đính kèm</string>
-    <string name="content_description_checkbox">Ô đánh dấu</string>
-    <string name="content_description_reminders">Nhắc nhở</string>
-    <string name="content_description_save_note">Lưu ghi chú</string>
-    <string name="content_description_attached_image">Hình ảnh đính kèm</string>
-    <string name="content_description_play_video">Phát Video</string>
-    <string name="content_description_images_attached">Hình ảnh được đính kèm</string>
-    <string name="content_description_audio_attached">Âm thanh được đính kèm</string>
-    <string name="content_description_reminder_set">Đã đặt nhắc nhở</string>
-    <string name="content_description_checkboxes_available">có sẵn ô đánh dấu</string>
-    <string name="content_description_tags_available">có sẵn thẻ</string>
-    <string name="content_description_pin_note">Ghim ghi chú làm widget</string>
-    <string name="content_description_delete_note">Xóa ghi chú</string>
-    <string name="content_description_remove_audio">Gỡ bỏ âm thanh</string>
-    <string name="content_description_checkbox_state">ô đánh dấu</string>
-
-    <string name="search_hint">Tìm kiếm ghi chú…</string>
-    <string name="enter_title_hint">Nhập tiêu đề…</string>
-    <string name="enter_content_hint">Nhập nội dung…</string>
-
+    <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">Tự động gắn thẻ</string>
-    <string name="msg_saving_note">Đang lưu ghi chú…</string>
-    <string name="title_ai_suggestions">Gợi ý thẻ từ AI</string>
-    <string name="label_more_items">+ %1$d mục khác</string>
-    <string name="msg_note_deleted">Ghi chú đã bị xóa</string>
-
-    <!-- App Drawer -->
-    <string name="drawer_labels_header">Nhãn</string>
-    <string name="drawer_create_new_label">Tạo nhãn mới</string>
-    <string name="content_description_appdrawer_logo">Logo ngăn kéo ứng dụng</string>
-
-    <!-- Bottom Sheet Options -->
-    <string name="option_image">Hình ảnh</string>
-    <string name="option_video">Video</string>
-    <string name="option_audio">Âm thanh</string>
-    <string name="option_choose_date_time">Chọn ngày và giờ</string>
-    <string name="option_pin_widget">Ghim làm widget</string>
-    <string name="option_add_label">Thêm nhãn</string>
-    <string name="option_delete">Xóa</string>
-    <string name="option_make_copy">Tạo bản sao</string>
-    <string name="option_camera">Máy ảnh</string>
-    <string name="option_gallery">Thư viện</string>
-    <string name="option_video_recorder">Trình ghi video</string>
-    <string name="option_audio_recorder">Trình ghi âm</string>
-
-    <!-- Audio Recorder -->
-    <string name="title_audio_recorder">Trình ghi âm</string>
-    <string name="btn_stop_recording">Dừng ghi âm</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="btn_confirm">Xác nhận</string>
+    <string name="btn_download">Tải xuống</string>
     <string name="btn_start_recording">Bắt đầu ghi âm</string>
-
-    <!-- Order Section -->
-    <string name="order_title">Tiêu đề</string>
-    <string name="order_date">Ngày</string>
-    <string name="order_color">Màu sắc</string>
+    <string name="btn_stop_recording">Dừng ghi âm</string>
+    <string name="build_format">Bản dựng %1$s</string>
+    <string name="content_description_add_note">Thêm ghi chú</string>
+    <string name="content_description_appdrawer_logo">Logo ngăn kéo ứng dụng</string>
+    <string name="content_description_attach">Đính kèm</string>
+    <string name="content_description_attached_image">Hình ảnh đính kèm</string>
+    <string name="content_description_audio_attached">Âm thanh được đính kèm</string>
+    <string name="content_description_back">quay lại</string>
+    <string name="content_description_checkbox">Ô đánh dấu</string>
+    <string name="content_description_checkbox_state">ô đánh dấu</string>
+    <string name="content_description_checkboxes_available">có sẵn ô đánh dấu</string>
+    <string name="content_description_clear_text">Xóa văn bản</string>
+    <string name="content_description_delete_label">Xóa nhãn</string>
+    <string name="content_description_delete_note">Xóa ghi chú</string>
+    <string name="content_description_dismiss">Bỏ qua</string>
+    <string name="content_description_edit_labels">chỉnh sửa nhãn</string>
+    <string name="content_description_empty_list">danh sách trống</string>
+    <string name="content_description_icon">biểu tượng</string>
+    <string name="content_description_images_attached">Hình ảnh được đính kèm</string>
+    <string name="content_description_menu">Menu</string>
+    <string name="content_description_pin_note">Ghim ghi chú làm widget</string>
+    <string name="content_description_play_video">Phát Video</string>
+    <string name="content_description_profile_picture">Ảnh hồ sơ</string>
+    <string name="content_description_reminder_set">Đã đặt nhắc nhở</string>
+    <string name="content_description_reminders">Nhắc nhở</string>
+    <string name="content_description_remove">Gỡ bỏ</string>
+    <string name="content_description_remove_audio">Gỡ bỏ âm thanh</string>
+    <string name="content_description_save_note">Lưu ghi chú</string>
+    <string name="content_description_settings">Cài đặt</string>
+    <string name="content_description_sort">Sắp xếp</string>
+    <string name="content_description_tags_available">có sẵn thẻ</string>
+    <string name="content_description_toggle_layout">Chuyển đổi bố cục</string>
+    <string name="dialog_title_new_tag">Nhập thẻ mới</string>
+    <string name="drawer_create_new_label">Tạo nhãn mới</string>
+    <string name="drawer_labels_header">Nhãn</string>
+    <string name="enter_content_hint">Nhập nội dung…</string>
+    <string name="enter_title_hint">Nhập tiêu đề…</string>
+    <string name="label_existing">Hiện có:</string>
+    <string name="label_more_items">+ %1$d mục khác</string>
+    <string name="label_tag_name">Tên thẻ</string>
+    <string name="label_undo">Hoàn tác</string>
+    <string name="loading">Đang tải...</string>
+    <string name="msg_note_deleted">Ghi chú đã bị xóa</string>
+    <string name="msg_saving_note">Đang lưu ghi chú…</string>
+    <string name="option_add_label">Thêm nhãn</string>
+    <string name="option_audio">Âm thanh</string>
+    <string name="option_audio_recorder">Trình ghi âm</string>
+    <string name="option_camera">Máy ảnh</string>
+    <string name="option_choose_date_time">Chọn ngày và giờ</string>
+    <string name="option_delete">Xóa</string>
+    <string name="option_gallery">Thư viện</string>
+    <string name="option_image">Hình ảnh</string>
+    <string name="option_make_copy">Tạo bản sao</string>
+    <string name="option_pin_widget">Ghim làm widget</string>
+    <string name="option_video">Video</string>
+    <string name="option_video_recorder">Trình ghi video</string>
     <string name="order_ascending">Tăng dần</string>
+    <string name="order_color">Màu sắc</string>
+    <string name="order_date">Ngày</string>
     <string name="order_descending">Giảm dần</string>
+    <string name="order_title">Tiêu đề</string>
+    <string name="placeholder_tag_example">ví dụ: Cá nhân</string>
+    <string name="search_hint">Tìm kiếm ghi chú…</string>
+    <string name="title_ai_suggestions">Gợi ý thẻ từ AI</string>
+    <string name="title_audio_recorder">Trình ghi âm</string>
+    <string name="version_format">Phiên bản %1$s</string>
+    <string name="next">Tiếp theo</string>
 </resources>

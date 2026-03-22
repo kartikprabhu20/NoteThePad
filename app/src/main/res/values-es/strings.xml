@@ -1,12 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NoteThePad</string>
     <string name="action_settings">Ajustes</string>
+    <string name="app_name">NoteThePad</string>
+    <string name="build_format">Compilación %1$s</string>
+    <string name="content_description_google_signin">Inicio de sesión con Google</string>
+    <string name="error_signin">Error al iniciar sesión, ¡inténtalo de nuevo!</string>
     <string name="next">Siguiente</string>
     <string name="previous">Anterior</string>
-    <string name="content_description_profile_picture">Foto de perfil</string>
     <string name="version_format">Versión %1$s</string>
-    <string name="build_format">Compilación %1$s</string>
-    <string name="error_signin">Error al iniciar sesión, ¡inténtalo de nuevo!</string>
-    <string name="content_description_google_signin">Inicio de sesión con Google</string>
-    <string name="toast_widget_pin_not_supported">Los widgets anclados no son compatibles con este lanzador</string>
 </resources>
