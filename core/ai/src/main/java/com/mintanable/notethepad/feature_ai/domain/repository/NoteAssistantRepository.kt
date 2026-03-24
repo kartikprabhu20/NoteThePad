@@ -12,4 +12,9 @@ interface NoteAssistantRepository {
     ): List<String>
 
     suspend fun checkLocalStatus(modelName: String): Flow<AiModelDownloadStatus>
+    suspend fun startLiveTranscription(onTranscription: (String) -> Unit)
+    suspend fun stopLiveTranscription()
+
+    suspend fun checkAudioTransciberStatus(modelName: String): Flow<AiModelDownloadStatus>
+
 }

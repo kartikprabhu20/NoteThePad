@@ -64,7 +64,9 @@ dependencies {
     implementation("com.google.mlkit:common:18.11.0")
     implementation("com.google.mlkit:genai-prompt:1.0.0-beta1")
     implementation("com.google.ai.edge.litertlm:litertlm-android:latest.release")
-    
+    implementation("com.google.mediapipe:tasks-genai:0.10.33")
+    implementation("com.google.mlkit:genai-speech-recognition:1.0.0-alpha1")
+
     // WorkManager
     implementation 'androidx.work:work-runtime-ktx:2.11.1'
 }

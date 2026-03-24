@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
@@ -90,5 +92,18 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         } else {
             gemmaLocalDataSource.checkLocalStatus(aiModelRepository.getModelByName(modelName))
         }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    override suspend fun startLiveTranscription(onTranscription: (String) -> Unit) {
+        return geminiNanoDataSource.startTranscriptionStream(onTranscription)
+    }
+
+    override suspend fun stopLiveTranscription() {
+        return geminiNanoDataSource.stopTranscription()
+    }
+
+    override suspend fun checkAudioTransciberStatus(modelName: String): Flow<AiModelDownloadStatus> {
+        return geminiNanoDataSource.checkAudioRecognizerStatus()
+    }
 
 }
