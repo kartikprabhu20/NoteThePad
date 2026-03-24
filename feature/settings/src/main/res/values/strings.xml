@@ -44,4 +44,14 @@
     <string name="content_description_back">back</string>
     <string name="loading">Loading...</string>
 
+    <!-- Audio Transcriber -->
+    <string name="setting_audio_transcriber">Audio Transcriber</string>
+    <string name="audio_transcriber_status_ready">Downloaded</string>
+    <string name="audio_transcriber_status_downloading">Downloading…</string>
+    <string name="audio_transcriber_status_downloadable">Tap to download</string>
+    <string name="audio_transcriber_status_unavailable">Not available on this device</string>
+    <string name="dialog_download_audio_transcriber_title">Download Audio Transcriber</string>
+    <string name="dialog_download_audio_transcriber_description">This will download the on-device audio transcriber model over Wi-Fi. Do you want to continue?</string>
+    <string name="msg_downloading_audio_model">Downloading Audio Ai model in progress: %1$d%%</string>
+
 </resources>

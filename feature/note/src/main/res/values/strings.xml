@@ -89,4 +89,6 @@
     <string name="version_format">Version %1$s</string>
     <string name="build_format">Build %1$s</string>
     <string name="next">Next</string>
+
+    <string name="hint_audio_to_text">Audio to text transcription...</string>
 </resources>

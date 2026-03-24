@@ -11,10 +11,12 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetDefaults
@@ -239,7 +241,7 @@ fun AddEditNoteScreen(
             }
 
             uiState.currentSheetType != BottomSheetType.NONE && uiState.isRecording -> {
-                viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
+                viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(false))
             }
 
             uiState.currentSheetType != BottomSheetType.NONE -> {
@@ -374,23 +376,33 @@ fun AddEditNoteScreen(
             onDismissRequest =
                 {
                     if (uiState.isRecording) {
-                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
+                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(false))
                     }
                     viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                 },
             sheetState = sheetState,
             dragHandle = if (uiState.isRecording) null else {
                 { BottomSheetDefaults.DragHandle() }
-            }) {
+            }
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+
+            }
             if (uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER) {
                 AudioRecorderUI(
                     isRecording = uiState.isRecording,
                     onStartRecordingClicked = {
-                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
+                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(it))
                     },
                     onStopRecordingClicked = {
-                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording)
-                    }
+                        viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(it))
+                    },
+                    transcriptionText = uiState.liveTranscription
                 )
             } else {
                 BottomSheetContent(
