@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.mintanable.notethepad.core.model.ai.AiModel
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.core.model.backup.LoadStatus
@@ -17,6 +18,8 @@ import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
 import com.mintanable.notethepad.feature_ai.domain.use_cases.DownloadAiModelUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_cases.DownloadGeminiAudioTranscriberUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAudioTranscriberStatus
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetSupportedAiModels
 import com.mintanable.notethepad.feature_backup.domain.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
@@ -32,16 +35,20 @@ import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsState
 import com.mintanable.notethepad.feature_settings.presentation.getLoadStatusFLow
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.feature_ai.data.GeminiAudioModelDownloadWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -68,7 +75,9 @@ class SettingsViewModel @Inject constructor(
     private val networkMonitor: NetworkMonitor,
     private val downloadAiModelUseCase: DownloadAiModelUseCase,
     private val getSupportedAiModels: GetSupportedAiModels,
-    private val clearAppDataUseCase: ClearAppDataUseCase
+    private val clearAppDataUseCase: ClearAppDataUseCase,
+    private val getAudioTranscriberStatus: GetAudioTranscriberStatus,
+    private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase
 ) : ViewModel() {
 
     companion object {
@@ -90,6 +99,11 @@ class SettingsViewModel @Inject constructor(
         type = LoadType.DOWNLOAD
     )
 
+    private val _audioDownloadStatus = workManager.getLoadStatusFLow(
+        workName = GeminiAudioModelDownloadWorker.AUDIO_MODEL_DOWNLOAD_TASK,
+        type = LoadType.DOWNLOAD
+    )
+
     private val _isAuthorisingBackup = MutableStateFlow(false)
 
     private val _aiModelDownloadStatus = workManager.getLoadStatusFLow(
@@ -98,6 +112,12 @@ class SettingsViewModel @Inject constructor(
     )
 
     private val _downloadDialogModel = MutableStateFlow<AiModel?>(null)
+
+    private val _showDownloadAudioTranscriberDialog = MutableStateFlow(false)
+
+    private val _audioTranscriberStatusFlow: Flow<AiModelDownloadStatus> = flow {
+        emitAll(getAudioTranscriberStatus(""))
+    }.catch { emit(AiModelDownloadStatus.Unavailable) }
 
     private val _dataStoreSettings : StateFlow<Settings> = combine(
         authRepository.getSignedInFirebaseUser(),
@@ -145,8 +165,11 @@ class SettingsViewModel @Inject constructor(
         _aiModelDownloadStatus,
         getSupportedAiModels(),
         _isAuthorisingBackup,
-        _downloadDialogModel
-    ) { args: Array<Any?> ->
+        _downloadDialogModel,
+        _audioTranscriberStatusFlow,
+        _showDownloadAudioTranscriberDialog,
+        _audioDownloadStatus
+        ) { args: Array<Any?> ->
         val settings = args[0] as Settings
         val metadata = args[1] as BackupUiState
         val upload = args[2] as LoadStatus
@@ -155,6 +178,9 @@ class SettingsViewModel @Inject constructor(
         val models = args[5] as List<AiModel>
         val isAuthorising = args[6] as Boolean
         val downloadDialogModel = args[7] as AiModel?
+        val audioTranscriberStatus = args[8] as AiModelDownloadStatus
+        val showAudioTranscriberDialog = args[9] as Boolean
+        val audioModelStatus = args[4] as LoadStatus
 
         val activeTransferStatus = when {
             download is LoadStatus.Progress -> download
@@ -170,7 +196,10 @@ class SettingsViewModel @Inject constructor(
             aiModels = models,
             aiModelDownloadStatus = aiStatus,
             isAuthorisingBackup = isAuthorising,
-            showDownloadModelDialog = downloadDialogModel
+            showDownloadModelDialog = downloadDialogModel,
+            audioTranscriberStatus = audioTranscriberStatus,
+            showDownloadAudioTranscriberDialog = showAudioTranscriberDialog,
+            audioModelStatus = audioModelStatus
         )
     }.stateIn(
         scope = viewModelScope,
@@ -195,6 +224,9 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.DismissDownloadDialog -> _downloadDialogModel.value = null
             SettingsEvent.SignOut -> signOut()
             is SettingsEvent.ClearAppData -> clearAppData(event.onFailure)
+            SettingsEvent.RequestDownloadAudioTranscriber -> _showDownloadAudioTranscriberDialog.value = true
+            SettingsEvent.ConfirmDownloadAudioTranscriber -> confirmDownloadAudioTranscriber()
+            SettingsEvent.DismissDownloadAudioTranscriberDialog -> _showDownloadAudioTranscriberDialog.value = false
         }
     }
 
@@ -397,6 +429,11 @@ class SettingsViewModel @Inject constructor(
             downloadBackup()
         }
 
+    }
+
+    private fun confirmDownloadAudioTranscriber() {
+        _showDownloadAudioTranscriberDialog.value = false
+        downloadGeminiAudioTranscriberUseCase("", "")
     }
 
     private suspend fun canPerformNetworkTask(

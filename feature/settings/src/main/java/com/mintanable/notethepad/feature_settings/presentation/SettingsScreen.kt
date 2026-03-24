@@ -48,6 +48,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.core.common.humanReadableSize
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
@@ -279,6 +280,34 @@ fun SettingsScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
+
+                val audioTranscriberSubtitle = when (state.audioTranscriberStatus) {
+                    AiModelDownloadStatus.Ready -> stringResource(R.string.audio_transcriber_status_ready)
+                    AiModelDownloadStatus.Downloading -> stringResource(R.string.audio_transcriber_status_downloading)
+                    AiModelDownloadStatus.Downloadable -> stringResource(R.string.audio_transcriber_status_downloadable)
+                    AiModelDownloadStatus.Unavailable -> stringResource(R.string.audio_transcriber_status_unavailable)
+                }
+                SettingItem(
+                    title = stringResource(R.string.setting_audio_transcriber),
+                    subtitle = audioTranscriberSubtitle,
+                    onClick = {
+                        if (state.audioTranscriberStatus == AiModelDownloadStatus.Downloadable) {
+                            onEvent(SettingsEvent.RequestDownloadAudioTranscriber)
+                        }
+                    }
+                )
+                if (state.audioModelStatus is LoadStatus.Progress) {
+                    Text(stringResource(R.string.msg_downloading_model, state.audioModelStatus.percentage),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    )
+                    LinearProgressIndicator(
+                        progress = { state.audioModelStatus.percentage / 100f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
             }
 
             item {
@@ -359,6 +388,24 @@ fun SettingsScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { onEvent(SettingsEvent.DismissDownloadDialog) }) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
+            )
+        }
+
+        if (state.showDownloadAudioTranscriberDialog) {
+            AlertDialog(
+                onDismissRequest = { onEvent(SettingsEvent.DismissDownloadAudioTranscriberDialog) },
+                title = { Text(stringResource(R.string.dialog_download_audio_transcriber_title)) },
+                text = { Text(stringResource(R.string.dialog_download_audio_transcriber_description)) },
+                confirmButton = {
+                    TextButton(onClick = { onEvent(SettingsEvent.ConfirmDownloadAudioTranscriber) }) {
+                        Text(stringResource(R.string.btn_download))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onEvent(SettingsEvent.DismissDownloadAudioTranscriberDialog) }) {
                         Text(stringResource(R.string.btn_cancel))
                     }
                 }
