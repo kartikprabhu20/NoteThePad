@@ -241,6 +241,7 @@ fun AddEditNoteScreen(
             }
 
             uiState.currentSheetType != BottomSheetType.NONE && uiState.isRecording -> {
+                viewModel.onEvent(AddEditNoteEvent.AttachTranscript(uiState.liveTranscription))
                 viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(false))
             }
 

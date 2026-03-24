@@ -38,48 +38,56 @@ class GeminiAudioModelDownloadWorker @AssistedInject constructor(
         const val DOWNLOAD_ID_EXTRA = "DOWNLOAD_ID_EXTRA"
     }
 
-    val options = SpeechRecognizerOptions.builder().apply {
+    private val options = SpeechRecognizerOptions.builder().apply {
         locale = Locale.US
         preferredMode = SpeechRecognizerOptions.Mode.MODE_ADVANCED
     }.build()
 
-    val speechRecognizer = SpeechRecognition.getClient(options)
-
     @SuppressLint("Range", "RestrictedApi")
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        var totalBytestToDownload = 0L
-
+        val speechRecognizer = SpeechRecognition.getClient(options)
+        var totalBytesToDownload = 0L
         var result: Result = Result.success()
-        speechRecognizer.download().collect { downloadStatus ->
-            when (downloadStatus) {
-                is DownloadStatus.DownloadStarted -> {
-                    totalBytestToDownload = downloadStatus.bytesToDownload
-                }
 
-                is DownloadStatus.DownloadProgress -> {
-                    val progress = 100 * downloadStatus.totalBytesDownloaded / totalBytestToDownload
-                    setProgress(workDataOf("percent" to progress))
-                    setForeground(
-                        createForegroundInfo(
-                            downloadId = DOWNLOAD_ID,
-                            progress.toInt(),
-                            "Gemini Nano Audio Model"
+        try {
+            speechRecognizer.download().collect { downloadStatus ->
+                when (downloadStatus) {
+                    is DownloadStatus.DownloadStarted -> {
+                        totalBytesToDownload = downloadStatus.bytesToDownload
+                    }
+
+                    is DownloadStatus.DownloadProgress -> {
+                        val progress = if (totalBytesToDownload > 0) {
+                            100 * downloadStatus.totalBytesDownloaded / totalBytesToDownload
+                        } else 0
+                        setProgress(workDataOf("percent" to progress))
+                        setForeground(
+                            createForegroundInfo(
+                                downloadId = DOWNLOAD_ID,
+                                progress.toInt(),
+                                "Gemini Nano Audio Model"
+                            )
                         )
-                    )
-                    Log.d("kptest", "Downloading audio model: $progress%")
-                }
+                        Log.d("kptest", "Downloading audio model: $progress%")
+                    }
 
-                is DownloadStatus.DownloadCompleted -> {
-                    setProgress(workDataOf("percent" to 100))
-                    Log.d("kptest", "Download complete. You can now call startRecognition().")
-                }
+                    is DownloadStatus.DownloadCompleted -> {
+                        setProgress(workDataOf("percent" to 100))
+                        Log.d("kptest", "Download complete. You can now call startRecognition().")
+                    }
 
-                is DownloadStatus.DownloadFailed -> {
-                    val error = downloadStatus.e
-                    Log.d("kptest", "Audio model Download failed: ${error.message}")
-                    result = Result.failure()
+                    is DownloadStatus.DownloadFailed -> {
+                        val error = downloadStatus.e
+                        Log.d("kptest", "Audio model Download failed: ${error.message}")
+                        result = Result.failure()
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("GeminiAudioModelWorker", "Error during download", e)
+            result = Result.failure()
+        } finally {
+            speechRecognizer.close()
         }
         return@withContext result
     }

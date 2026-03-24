@@ -483,6 +483,12 @@ class AddEditNoteViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         mediaPlayer.stop()
+        if (uiState.value.isRecording) {
+            viewModelScope.launch {
+                stopLiveTransctiptions()
+                audioRecorder.stopRecording()
+            }
+        }
     }
 
     sealed class UiEvent{

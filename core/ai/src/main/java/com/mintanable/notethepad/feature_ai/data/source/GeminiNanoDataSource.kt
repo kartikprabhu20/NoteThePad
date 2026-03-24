@@ -7,15 +7,13 @@ import com.google.mlkit.genai.common.FeatureStatus
 import com.google.mlkit.genai.common.audio.AudioSource
 import com.google.mlkit.genai.prompt.Generation
 import com.google.mlkit.genai.speechrecognition.SpeechRecognition
+import com.google.mlkit.genai.speechrecognition.SpeechRecognizer
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerOptions
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerRequest
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerResponse
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 
@@ -23,13 +21,15 @@ import javax.inject.Inject
 class GeminiNanoDataSource @Inject constructor() {
     private val client = Generation.getClient()
 
-    val options = SpeechRecognizerOptions.builder().apply {
+    private val options = SpeechRecognizerOptions.builder().apply {
         locale = Locale.US
         preferredMode = SpeechRecognizerOptions.Mode.MODE_ADVANCED
     }.build()
 
-    val speechRecognizer get() = SpeechRecognition.getClient(options)
-    val scope = CoroutineScope(Dispatchers.Main)
+    private var _speechRecognizer: SpeechRecognizer? = null
+    private fun getRecognizer(): SpeechRecognizer {
+        return _speechRecognizer ?: SpeechRecognition.getClient(options).also { _speechRecognizer = it }
+    }
 
     suspend fun generateTags(prompt: String): String? {
         return try {
@@ -45,57 +45,71 @@ class GeminiNanoDataSource @Inject constructor() {
     }
 
     private fun Int.toAIModelDownloadStatus(): AiModelDownloadStatus {
-        val mappedStatus = when (this) {
+        return when (this) {
             FeatureStatus.AVAILABLE -> AiModelDownloadStatus.Ready
             FeatureStatus.DOWNLOADING -> AiModelDownloadStatus.Downloading
             FeatureStatus.DOWNLOADABLE -> AiModelDownloadStatus.Downloadable
             else -> AiModelDownloadStatus.Unavailable
         }
-        return mappedStatus
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
     suspend fun startTranscriptionStream(onTranscription: (String) -> Unit) {
+        val recognizer = getRecognizer()
+        try {
+            val status = recognizer.checkStatus()
+            if (status != FeatureStatus.AVAILABLE) {
+                Log.e("kptest", "SODA Engine not available. Status: $status")
+                return
+            }
 
-        val status = speechRecognizer.checkStatus()
-        if (status != FeatureStatus.AVAILABLE) {
-            Log.e("kptest", "SODA Engine not available. Status: $status")
-            return
+            val request = SpeechRecognizerRequest.builder().apply {
+                audioSource = AudioSource.fromMic()
+            }.build()
+
+            recognizer.startRecognition(request).collect { response ->
+                when (response) {
+                    is SpeechRecognizerResponse.FinalTextResponse -> {
+                        Log.d("kptest", "FinalTextResponse: ${response.text}")
+                        onTranscription(response.text)
+                    }
+                    is SpeechRecognizerResponse.PartialTextResponse -> {
+                        Log.d("kptest", "PartialTextResponse: ${response.text}")
+                    }
+                    is SpeechRecognizerResponse.ErrorResponse -> {
+                        Log.e("kptest", "Error: ${response.e}")
+                        return@collect
+                    }
+                    else -> {}
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("kptest", "Transcription stream error", e)
+        } finally {
+            stopTranscription()
         }
+    }
 
-        val request = SpeechRecognizerRequest.builder().apply {
-            audioSource =  AudioSource.fromMic()
-        }.build()
+    suspend fun stopTranscription() {
+        val recognizer = _speechRecognizer ?: return
+        try {
+            recognizer.stopRecognition()
+            recognizer.close()
+        } catch (e: Exception) {
+            Log.e("kptes", "Error closing recognizer", e)
+        } finally {
+            _speechRecognizer = null
+        }
+    }
 
-        speechRecognizer.startRecognition(request).collect { response ->
-
-            when(response){
-                is SpeechRecognizerResponse.FinalTextResponse -> {
-                    Log.d("kptest", "FinalTextResponse: ${response.text}")
-                    onTranscription(response.text)
-                }
-                is SpeechRecognizerResponse.PartialTextResponse -> {
-                    Log.d("kptest", "PartialTextResponse: ${response.text}")
-//                    onTranscription(response.text)
-                }
-                is SpeechRecognizerResponse.ErrorResponse -> {
-                    Log.d("kptest", "Error: ${response.e}")
-                    stopTranscription()
-                }
-
-                else -> {}
+    fun checkAudioRecognizerStatus(): Flow<AiModelDownloadStatus> = flow {
+        val recognizer = _speechRecognizer ?: SpeechRecognition.getClient(options)
+        try {
+            emit(recognizer.checkStatus().toAIModelDownloadStatus())
+        } finally {
+            if (recognizer != _speechRecognizer) {
+                recognizer.close()
             }
         }
-    }
-
-    fun stopTranscription() {
-        scope.launch {
-            speechRecognizer.stopRecognition()
-            speechRecognizer.close()
-        }
-    }
-
-     fun checkAudioRecognizerStatus(): Flow<AiModelDownloadStatus> =  flow {
-       emit(speechRecognizer.checkStatus().toAIModelDownloadStatus())
     }
 }
