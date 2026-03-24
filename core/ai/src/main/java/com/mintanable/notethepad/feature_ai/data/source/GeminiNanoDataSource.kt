@@ -76,11 +76,11 @@ class GeminiNanoDataSource @Inject constructor() {
                 }
                 is SpeechRecognizerResponse.PartialTextResponse -> {
                     Log.d("kptest", "PartialTextResponse: ${response.text}")
-                    onTranscription(response.text)
+//                    onTranscription(response.text)
                 }
                 is SpeechRecognizerResponse.ErrorResponse -> {
                     Log.d("kptest", "Error: ${response.e}")
-                    speechRecognizer.close()
+                    stopTranscription()
                 }
 
                 else -> {}

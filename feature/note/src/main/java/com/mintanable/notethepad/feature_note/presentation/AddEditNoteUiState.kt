@@ -20,6 +20,7 @@ data class AddEditNoteUiState(
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
     val tagEntities: List<TagEntity> = emptyList(),
+    val liveTranscription: String = "",
 
     val isRecording: Boolean = false,
     val isSaving: Boolean = false,

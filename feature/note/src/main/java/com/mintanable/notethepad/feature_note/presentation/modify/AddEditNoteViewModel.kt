@@ -16,6 +16,8 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_cases.StartLiveTransctiption
+import com.mintanable.notethepad.feature_ai.domain.use_cases.StopLiveTranscription
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
@@ -50,7 +52,9 @@ class AddEditNoteViewModel @Inject constructor(
     private val audioMetadataProvider: AudioMetadataProvider,
     private val reminderScheduler: ReminderScheduler,
     private val tagUseCases: TagUseCases,
-    private val getAutoTagsUseCase: GetAutoTagsUseCase
+    private val getAutoTagsUseCase: GetAutoTagsUseCase,
+    private val startLiveTransctiption: StartLiveTransctiption,
+    private val stopLiveTransctiptions: StopLiveTranscription
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
@@ -226,7 +230,7 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
             is AddEditNoteEvent.ToggleAudioRecording -> {
-                handleRecording()
+                handleRecording(event.enableLiveTranscription)
             }
             is AddEditNoteEvent.DismissDialogs -> {
                 _uiState.update { it.copy(
@@ -352,6 +356,10 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ClearSuggestions -> {
                 _uiState.update { it.copy(suggestedTags = emptyList()) }
             }
+
+            is AddEditNoteEvent.AttachTranscript -> {
+                _uiState.update { it.copy(contentState = it.contentState.copy(text = it.contentState.text + "\n" + event.transcript)) }
+            }
         }
     }
 
@@ -364,24 +372,39 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private fun handleRecording() {
+    private fun handleRecording(enableLiveTranscription: Boolean) {
         viewModelScope.launch {
             if (uiState.value.isRecording) {
-                audioRecorder.stopRecording()
                 _uiState.update { it.copy(isRecording = false) }
-                currentRecordingFile?.let { file ->
-                    val uri = Uri.fromFile(file)
-                    val duration = audioMetadataProvider.getDuration(uri)
-                    _uiState.update { it.copy(
-                        attachedAudios = it.attachedAudios + Attachment(uri.toString(), duration)
-                    )}
+
+                if(enableLiveTranscription) {
+                    stopLiveTransctiptions()
+                    _uiState.update { it.copy(contentState = it.contentState.copy(text = it.contentState.text + "\n" + it.liveTranscription)) }
+                    _uiState.update { it.copy(liveTranscription = "") }
+                } else {
+                    audioRecorder.stopRecording()
+                    currentRecordingFile?.let { file ->
+                        val uri = Uri.fromFile(file)
+                        val duration = audioMetadataProvider.getDuration(uri)
+                        _uiState.update { it.copy(
+                            attachedAudios = it.attachedAudios + Attachment(uri.toString(), duration)
+                        )}
+                    }
                 }
             } else {
-                val file = fileIOUseCases.createFile(AttachmentType.AUDIO.extension, AttachmentType.AUDIO.name.lowercase())
-                currentRecordingFile = file
-                file?.let {
-                    audioRecorder.startRecording(it)
+                if(enableLiveTranscription) {
                     _uiState.update { state -> state.copy(isRecording = true) }
+                    startLiveTransctiption(onTranscription = { transcript ->
+                        Log.d("kptest", "Transcription: $transcript")
+                        _uiState.update { it.copy(liveTranscription = it.liveTranscription + " " + transcript) }
+                    })
+                }else {
+                    val file = fileIOUseCases.createFile(AttachmentType.AUDIO.extension, AttachmentType.AUDIO.name.lowercase())
+                    currentRecordingFile = file
+                    file?.let {
+                        audioRecorder.startRecording(it)
+                        _uiState.update { state -> state.copy(isRecording = true) }
+                    }
                 }
             }
         }
