@@ -91,7 +91,6 @@ fun AudioPlayerUI(
                 Box(
                     modifier = Modifier
                         .padding(12.dp)
-                        .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
@@ -153,7 +152,7 @@ fun AudioPlayerPanel(
             Text(
                 text = formatMillisToTime(totalDuration),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.wrapContentWidth(),
+                modifier = Modifier.wrapContentWidth().padding(end = 4.dp),
                 color = MaterialTheme.colorScheme.onSurface
             )
 
@@ -171,7 +170,7 @@ fun AudioPlayerPanel(
 
             IconButton(
                 onClick = onDelete,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp).padding(end = 4.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
