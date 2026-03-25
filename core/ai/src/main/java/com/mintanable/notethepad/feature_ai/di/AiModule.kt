@@ -44,12 +44,14 @@ object AiModule {
     @Provides
     @Singleton
     fun provideNoteAssistantRepository(
+        @ApplicationContext context: Context,
         geminiDataSource: GeminiDataSource,
         gemmaLocalDataSource: GemmaLocalDataSource,
         geminiNanoDataSource: GeminiNanoDataSource,
         aiModelRepository: AiModelRepository
     ): NoteAssistantRepository {
         return NoteAssistantRepositoryImpl(
+            context,
             geminiDataSource,
             gemmaLocalDataSource,
             geminiNanoDataSource,

@@ -1,195 +1,233 @@
 package com.mintanable.notethepad.feature_ai.data.source
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Content
 import com.google.ai.edge.litertlm.Contents
+import com.google.ai.edge.litertlm.Conversation
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
+import com.google.ai.edge.litertlm.ExperimentalApi
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.MessageCallback
 import com.google.ai.edge.litertlm.SamplerConfig
-import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
-import com.mintanable.notethepad.core.common.utils.genByteArrayForWav
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.io.File
-import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 class GemmaLocalDataSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private var engine: Engine? = null
-    private var currentModelPath: String? = null
+    private data class ActiveInstance(
+        val engine: Engine,
+        var conversation: Conversation
+    )
+
+    private var activeInstance: ActiveInstance? = null
     private val mutex = Mutex()
-
-    private suspend fun getOrInitializeEngine(fileName: String): Engine = mutex.withLock {
-        val modelFile = File(context.getExternalFilesDir(null), fileName)
-        val newPath = modelFile.absolutePath
-
-        if (engine == null || currentModelPath != newPath) {
-            Log.d("kptest", "Initializing Gemma Engine with model: $fileName")
-            engine?.close()
-
-            val config = EngineConfig(
-                modelPath = newPath,
-                backend = Backend.GPU(), // Gemma 3 optimization
-                cacheDir = context.cacheDir.path,
-                visionBackend = Backend.GPU(),
-                audioBackend = Backend.CPU(),
-                maxNumTokens = 2048, // Increased for longer notes
-            )
-
-            engine = Engine(config).apply { initialize() }
-            currentModelPath = newPath
-        }
-        return engine!!
-    }
-
-    suspend fun generateTags(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
-        mutex.withLock {
-            try {
-                withTimeout(20000L) { //20seconds
-                    val activeEngine = getOrInitializeEngine(fileName)
-
-                    //Configure the "One-Shot" Conversation
-                    val conversationConfig = ConversationConfig(
-                        systemInstruction = Contents.of(
-                            text = """
-                                You are an expert organizational assistant for the app "NoteThePad".
-                                TASK: Analyze the note and suggest 3-5 relevant one-word tags.
-        
-                                CRITICAL RULES:
-                                 1. Use EXACT names from 'Existing Tags' if they match semantically.
-                                 2. Return ONLY a comma-separated list of words.
-                                 3. No hashtags, no explanations, no conversational filler.
-        
-                                Example Output: Work, Finance, Urgent
-                            """.trimIndent()
-                        ),
-                        samplerConfig = SamplerConfig(
-                            temperature = 0.2,
-                            topK = 40,
-                            topP = 0.9,
-                            seed = 101
-                        )
-                    )
-
-                    // Inference
-                    activeEngine.createConversation(conversationConfig)?.use { conversation ->
-                        var textResponse = ""
-                        conversation.sendMessageAsync(prompt)
-                            .catch { Log.e("kptest", "Inference failed: ${it.message}") }
-                            .collect {
-                                textResponse = it.toString()
-                            }
-                        textResponse.trim()
-                    }
-                }
-            } catch (e: TimeoutCancellationException) {
-                Log.e("kptest", "Inference timed out after 20 seconds: $e")
-                engine?.close()
-                engine = null
-                null
-            } catch (e: Exception) {
-                Log.e("kptest", "LiteRT-LM Error: ${e}")
-                engine?.close()
-                engine = null
-                null
-            }
-        }
-    }
+    private var currentModelPath: String? = null
 
     fun checkLocalStatus(selectedModel: AiModel?): Flow<AiModelDownloadStatus> = flow {
-        if (selectedModel != null) {
-            val file = File(context.getExternalFilesDir(null), selectedModel.downloadFileName)
-            if (file.exists()) {
-                emit(AiModelDownloadStatus.Ready)
-            } else {
-                emit(AiModelDownloadStatus.Downloadable)
-            }
-        } else {
+        if (selectedModel == null) {
             emit(AiModelDownloadStatus.Unavailable)
+            return@flow
+        }
+
+        val file = File(context.getExternalFilesDir(null), selectedModel.downloadFileName)
+        if (file.exists() && file.length() > 0) {
+            emit(AiModelDownloadStatus.Ready)
+        } else {
+            emit(AiModelDownloadStatus.Downloadable)
         }
     }
 
-    suspend fun summarizeNote(content: String, fileName: String): String? = withContext(Dispatchers.IO) {
-        try {
-            val activeEngine = getOrInitializeEngine(fileName)
-            activeEngine.createConversation(
-                ConversationConfig(systemInstruction = Contents.of(text = "Summarize this note in 2 sentences."))
-            ).use { conversation ->
-                var summary = ""
-                conversation.sendMessageAsync(content).collect { summary += it.toString() }
-                summary
+    @OptIn(ExperimentalApi::class)
+    suspend fun initializeEngine(fileName: String, systemInstruction: String? = null) =
+        mutex.withLock {
+            val modelFile = File(context.getExternalFilesDir(null), fileName)
+            val newPath = modelFile.absolutePath
+
+            if (activeInstance != null && currentModelPath == newPath) {
+                activeInstance?.conversation?.close()
+                activeInstance?.conversation =
+                    createNewConversation(activeInstance!!.engine, systemInstruction)
+                return@withLock
             }
-        } catch (e: Exception) {
-            Log.e("kptest", "SummarizeNote error $e")
-            engine?.close()
-            engine = null
-            null
+
+            //Clean up old engine before starting new one (Crucial for SIGSEGV prevention)
+            closeActiveInstance()
+
+            try {
+                val engineConfig = EngineConfig(
+                    modelPath = newPath,
+                    backend = Backend.GPU(), // Primary for Gemma 3
+                    visionBackend = Backend.GPU(),
+                    audioBackend = Backend.CPU(), // Audio MUST be CPU in LiteRT
+                    maxNumTokens = 1024,
+                    cacheDir = context.cacheDir.path
+                )
+
+                // Essential for Pixel NPU stability
+                Backend.NPU(nativeLibraryDir = context.applicationInfo.nativeLibraryDir)
+
+                val engine = Engine(engineConfig)
+                engine.initialize()
+
+                val conversation = createNewConversation(engine, systemInstruction)
+
+                activeInstance = ActiveInstance(engine, conversation)
+                currentModelPath = newPath
+                Log.d("kptest", "Gemma Engine Initialized Successfully")
+            } catch (e: Exception) {
+                Log.e("kptest", "Failed to initialize: ${e.message}")
+                closeActiveInstance()
+                throw e
+            }
         }
+
+    private fun createNewConversation(engine: Engine, systemInstruction: String?): Conversation {
+        return engine.createConversation(
+            ConversationConfig(
+                samplerConfig = SamplerConfig(
+                    topK = 40,
+                    topP = 0.9,
+                    temperature = 0.2
+                ),
+                systemInstruction = systemInstruction?.let { Contents.of(it) }
+            )
+        )
     }
 
-    suspend fun transcribeAudioFile(uri: Uri, fileName: String, onTranscription: (String) -> Unit): String? = withContext(Dispatchers.IO) {
+    @OptIn(ExperimentalApi::class)
+    suspend fun generateTags(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
         try {
-            val activeEngine = getOrInitializeEngine(fileName)
-
-            //Prepare the audio input
-            val audioData = convertWavToMonoWithMaxSeconds(context, uri)
-            val audioContent = audioData?.let { Content.AudioBytes(it.genByteArrayForWav()) }
-
-            //Create a one-shot conversation for transcription
-            val config = ConversationConfig(
-                systemInstruction = Contents.of(
-                    text = "You are a high-accuracy speech-to-text engine. Transcribe the provided audio exactly as heard. Do not add commentary."
-                )
+            //Ensure the engine is warm with the specific "Tagging" system instruction
+            initializeEngine(
+                fileName = fileName,
+                systemInstruction = """
+                You are an expert organizational assistant for the app "NoteThePad".
+                TASK: Analyze the note and suggest 3-5 relevant one-word tags.
+                CRITICAL RULES:
+                 1. Use EXACT names from 'Existing Tags' if they match semantically.
+                 2. Return ONLY a comma-separated list of words.
+                 3. No hashtags, no explanations, no conversational filler.
+                Example Output: Work, Finance, Urgent
+            """.trimIndent()
             )
 
-            activeEngine.createConversation(config).use { conversation ->
-                audioContent?.let {
-                    conversation.sendMessageAsync(
-                        Contents.of(it),
-                        object : MessageCallback {
-                            override fun onMessage(message: Message) {
-                                Log.i("kptest", "transcribeAudioFile: message= $message")
-                                onTranscription(message.toString())
-                            }
-
-                            override fun onDone() {
-                                Log.i("kptest", "transcribeAudioFile completed")
-                            }
-
-                            override fun onError(throwable: Throwable) {
-                                if (throwable is CancellationException) {
-                                    Log.i("kptest", "The inference is cancelled.")
-                                } else {
-                                    Log.e("kptest", "onError", throwable)
-                                }
-                            }
-                        },
-                    )
+            // Use the managed runInference pipe
+            var textResponse = ""
+            withTimeout(20000L) {
+                runInference(prompt).collect { chunk ->
+                    textResponse += chunk
                 }
             }
-            ""
+            textResponse.trim()
+        } catch (e: TimeoutCancellationException) {
+            Log.e("kptest", "Tag inference timed out")
+            null
         } catch (e: Exception) {
-            Log.e("kptest", "Gemma Audio Error: ${e.message}")
+            Log.e("kptest", "Tag generation failed: ${e.message}")
             null
         }
     }
 
+    suspend fun transcribeAudioFile(selectedModel: AiModel, processedAudio: ByteArray?, onTranscription: (String) -> Unit) {
+        initializeEngine(
+            fileName = selectedModel.downloadFileName,
+            systemInstruction = "You are a transcription assistant. Transcribe the audio precisely."
+        )
+
+        // Run inference using the ByteArray
+        runInference(
+            prompt = "Transcribe this audio:",
+            audioData = processedAudio
+        ).collect { chunk ->
+            onTranscription(chunk)
+        }
+    }
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun summarizeNote(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
+        try {
+            initializeEngine(
+                fileName = fileName,
+                systemInstruction = "Summarize this note in 2 sentences."
+            )
+
+            var summary = ""
+            runInference(prompt).collect { chunk ->
+                summary += chunk
+            }
+            summary.trim()
+        } catch (e: Exception) {
+            Log.e("kptest", "Summarization failed: ${e.message}")
+            null
+        }
+    }
+
+    fun runInference(prompt: String, audioData: ByteArray? = null): Flow<String> = flow {
+        val instance = activeInstance ?: throw IllegalStateException("Engine not initialized")
+
+        val contents = mutableListOf<Content>()
+
+        // Pass the raw bytes directly to the native multimodal encoder
+        audioData?.let {
+            contents.add(Content.AudioBytes(it))
+        }
+
+        contents.add(Content.Text(prompt))
+
+        val responseChannel = Channel<String>(Channel.UNLIMITED)
+
+        instance.conversation.sendMessageAsync(
+            Contents.of(contents),
+            object : MessageCallback {
+                override fun onMessage(message: Message) {
+                    responseChannel.trySend(message.toString())
+                }
+                override fun onDone() {
+                    responseChannel.close()
+                }
+                override fun onError(throwable: Throwable) {
+                    // This captures the native SIGSEGV or JNI errors
+                    Log.e("kptest", "Inference Error", throwable)
+                    responseChannel.close(throwable)
+                }
+            }
+        )
+
+        for (text in responseChannel) {
+            emit(text)
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun closeActiveInstance() {
+        activeInstance?.apply {
+            try {
+                conversation.close()
+            } catch (e: Exception) {
+            }
+            try {
+                engine.close()
+            } catch (e: Exception) {
+            }
+        }
+        activeInstance = null
+        currentModelPath = null
+    }
 }

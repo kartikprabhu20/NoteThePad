@@ -1,20 +1,24 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
+import com.mintanable.notethepad.core.common.utils.genByteArrayForWav
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import java.io.File
 import javax.inject.Inject
 
 class NoteAssistantRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val geminiDataSource: GeminiDataSource,
     private val gemmaLocalDataSource: GemmaLocalDataSource,
     private val geminiNanoDataSource: GeminiNanoDataSource,
@@ -113,18 +117,31 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         modelName: String,
         onTranscription: (String) -> Unit
     ) {
-
         when (modelName) {
-            "Gemini 3 Flash (Cloud)" -> { }
             "Gemini Nano (System)" -> {
                 geminiNanoDataSource.transcribeAudioFile(uri, onTranscription)
             }
+
+            "Gemini 3 Flash (Cloud)" -> { /* Handle Cloud if needed */ }
+
             "None" -> { }
+
             else -> {
+                // Gemma models
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
-                if (selectedModel != null && selectedModel.url.isNotEmpty()) {
-                    gemmaLocalDataSource.transcribeAudioFile(uri, selectedModel.downloadFileName, onTranscription)
+
+                if (selectedModel != null) {
+                    // Convert URI to clean PCM ByteArray (Gemma requirement)
+                    val processedAudio = convertWavToMonoWithMaxSeconds(
+                        context = context,
+                        stereoUri = uri,
+                        maxSeconds = 60 // Gemma 3n handles 60s well
+                    )?.genByteArrayForWav()
+
+                    if (processedAudio != null) {
+                        gemmaLocalDataSource.transcribeAudioFile(selectedModel, processedAudio, onTranscription)
+                    }
                 }
             }
         }
