@@ -69,6 +69,7 @@ fun NoteEditorContent(
     checkListItems: List<CheckboxItem>,
     attachedAudios: List<Attachment>,
     mediaState: MediaState?,
+    transcribingUri: String?,
     reminderTime: Long,
     tagEntities: List<TagEntity> = emptyList(),
     suggestedTags: List<String> = emptyList(),
@@ -290,6 +291,7 @@ fun NoteEditorContent(
                     audioAttachmentSection(
                         attachedAudios = attachedAudios,
                         mediaState = mediaState,
+                        transcribingUri = transcribingUri,
                         onDelete = { deletedUri -> onEvent(AddEditNoteEvent.RemoveAudio(deletedUri)) },
                         onPlayPause = { uri -> onEvent(AddEditNoteEvent.UpdateNowPlaying(uri)) },
                         onTranscribe = { uri -> onEvent(AddEditNoteEvent.TranscribeAttachedAudio(uri)) }

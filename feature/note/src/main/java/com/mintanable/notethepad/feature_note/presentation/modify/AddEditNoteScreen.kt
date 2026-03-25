@@ -269,6 +269,7 @@ fun AddEditNoteScreen(
             checkListItems = uiState.checkListItems,
             attachedAudios = uiState.attachedAudios,
             mediaState = uiState.mediaState,
+            transcribingUri = uiState.transcribingUri,
             reminderTime = uiState.reminderTime,
             tagEntities = uiState.tagEntities,
             suggestedTags = uiState.suggestedTags,

@@ -13,6 +13,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Aud
 fun LazyListScope.audioAttachmentSection(
     attachedAudios: List<Attachment>,
     mediaState: MediaState?,
+    transcribingUri: String?,
     onDelete: (String) -> Unit,
     onPlayPause: (String) -> Unit,
     onTranscribe: (String) -> Unit
@@ -26,6 +27,7 @@ fun LazyListScope.audioAttachmentSection(
                     AudioPlayerUI(
                         attachment = audioUri,
                         playbackState = mediaState,
+                        isTranscribing = audioUri.uri == transcribingUri,
                         onDelete = onDelete,
                         onPlayPause = onPlayPause,
                         onTranscribe = onTranscribe

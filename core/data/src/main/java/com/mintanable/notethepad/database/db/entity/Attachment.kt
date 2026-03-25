@@ -11,5 +11,6 @@ enum class AttachmentType(val extension: String) {
 @Immutable
 data class Attachment(
     val uri: String,
-    val duration: Long = 0L
+    val duration: Long = 0L,
+    val transcription: String = ""
 )

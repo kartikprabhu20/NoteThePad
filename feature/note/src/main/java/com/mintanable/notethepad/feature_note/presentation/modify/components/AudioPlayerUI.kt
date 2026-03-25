@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -45,13 +46,14 @@ fun AudioPlayerUI(
     onDelete: (String) -> Unit,
     onPlayPause: (String) -> Unit,
     onTranscribe: (String) -> Unit,
-    transcriptionText: String = ""
+    isTranscribing: Boolean = false
 ) {
 
     val uri = attachment.uri
     val isPlaying = playbackState?.currentUri == uri && playbackState.isPlaying
     val totalDuration = attachment.duration
     val progress = if (playbackState?.currentUri == uri) playbackState.progress else 0f
+    val transcriptionText = attachment.transcription
 
     Column(
         modifier = Modifier
@@ -66,6 +68,10 @@ fun AudioPlayerUI(
             onDelete = { onDelete(uri) },
             onTranscribe = { onTranscribe(uri) }
         )
+
+        if (isTranscribing) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
 
         if(transcriptionText.isNotEmpty()) {
             OutlinedCard(
@@ -216,7 +222,8 @@ fun PreviewAudioPlayerUI() {
             // Mocking the attachment data
             val mockAttachment = Attachment(
                 uri = "content://media/audio/1",
-                duration = 125000L // 2 minutes 5 seconds
+                duration = 125000L, // 02:05
+                transcription = "This is a live transcription of the audio note being played back by the Gemini Nano engine..."
             )
 
             // Mocking a playing state at 40% progress
@@ -230,8 +237,7 @@ fun PreviewAudioPlayerUI() {
                 playbackState = mockPlaybackState,
                 onDelete = {},
                 onPlayPause = {},
-                onTranscribe = {},
-                transcriptionText = "This is a live transcription of the audio note being played back by the Gemini Nano engine..."
+                onTranscribe = {}
             )
 
         }
@@ -250,8 +256,7 @@ fun PreviewAudioPlayerUIEmpty() {
                 playbackState = null,
                 onDelete = {},
                 onPlayPause = {},
-                onTranscribe = {},
-                transcriptionText = ""
+                onTranscribe = {}
             )
         }
     }
