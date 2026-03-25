@@ -11,11 +11,17 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import javax.inject.Inject
+import kotlin.math.abs
+import kotlin.math.max
 
 class AndroidAudioRecorder @Inject constructor(
     @ApplicationContext private val context: Context
@@ -23,6 +29,9 @@ class AndroidAudioRecorder @Inject constructor(
     private var audioRecord: AudioRecord? = null
     private var recordingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO)
+
+    private val _amplitude = MutableStateFlow(0)
+    override val amplitude: StateFlow<Int> = _amplitude
 
     // AI Requirements: 16kHz, Mono, 16-bit PCM
     private val SAMPLE_RATE = 16000
@@ -51,9 +60,13 @@ class AndroidAudioRecorder @Inject constructor(
                 val buffer = ByteArray(BUFFER_SIZE)
                 while (isActive && audioRecord?.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
                     val read = audioRecord?.read(buffer, 0, buffer.size) ?: 0
-                    if (read > 0) out.write(buffer, 0, read)
+                    if (read > 0) {
+                        out.write(buffer, 0, read)
+                        _amplitude.value = computeMaxAmplitude(buffer, read)
+                    }
                 }
 
+                _amplitude.value = 0
                 // Once stopped, go back and write the proper WAV header
                 writeWavHeader(outputFile)
             }
@@ -80,6 +93,18 @@ class AndroidAudioRecorder @Inject constructor(
             release()
         }
         audioRecord = null
+        _amplitude.value = 0
+    }
+
+    private fun computeMaxAmplitude(buffer: ByteArray, bytesRead: Int): Int {
+        val shortBuffer = ByteBuffer.wrap(buffer, 0, bytesRead)
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .asShortBuffer()
+        var maxAmp = 0
+        while (shortBuffer.hasRemaining()) {
+            maxAmp = max(maxAmp, abs(shortBuffer.get().toInt()))
+        }
+        return maxAmp
     }
 
     private fun createWavHeader(audioLen: Long, dataLen: Long, sampleRate: Int, channels: Int, byteRate: Int): ByteArray {

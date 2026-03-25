@@ -46,6 +46,7 @@ import com.mintanable.notethepad.theme.ThemePreviews
 @Composable
 fun AudioRecorderUI(
     isRecording: Boolean,
+    amplitude: Int = 0,
     onStartRecordingClicked: (Boolean) -> Unit,
     onStopRecordingClicked: (Boolean) -> Unit,
     transcriptionText: String = ""
@@ -136,11 +137,13 @@ fun AudioRecorderUI(
             }
         }
 
-        // Visual indicator (The ECG line we built earlier or a pulse)
-//        AudioWaveform(
-//            isPlaying = isRecording,
-//            modifier = Modifier.fillMaxWidth().height(100.dp)
-//        )
+        if (!isTranscribeEnabled) {
+            CircularAudioAnimation(
+                bgColor = MaterialTheme.colorScheme.surface,
+                amplitude = amplitude,
+                modifier = Modifier.size(160.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -185,7 +188,7 @@ fun PreviewAudioRecorderUI(){
 fun PreviewAudioRecorderUINotRecording(){
     NoteThePadTheme {
         Box(modifier = Modifier.fillMaxSize()) {
-            AudioRecorderUI(isRecording = false, {}, {})
+            AudioRecorderUI(isRecording = false, onStartRecordingClicked = {}, onStopRecordingClicked = {})
         }
     }
 }

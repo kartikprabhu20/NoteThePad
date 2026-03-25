@@ -398,6 +398,7 @@ fun AddEditNoteScreen(
             if (uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER) {
                 AudioRecorderUI(
                     isRecording = uiState.isRecording,
+                    amplitude = uiState.recordingAmplitude,
                     onStartRecordingClicked = {
                         viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(it))
                     },

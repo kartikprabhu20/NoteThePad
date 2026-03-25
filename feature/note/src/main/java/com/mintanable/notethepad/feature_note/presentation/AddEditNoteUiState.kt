@@ -23,6 +23,7 @@ data class AddEditNoteUiState(
     val liveTranscription: String = "",
 
     val isRecording: Boolean = false,
+    val recordingAmplitude: Int = 0,
     val transcribingUri: String? = null,
     val isSaving: Boolean = false,
     val currentSheetType: BottomSheetType = BottomSheetType.NONE,

@@ -74,9 +74,10 @@ class AddEditNoteViewModel @Inject constructor(
     )
     val uiState: StateFlow<AddEditNoteUiState> = combine(
         _uiState,
-        mediaPlayer.mediaState
-    ) { state, mediaState ->
-        state.copy(mediaState = mediaState)
+        mediaPlayer.mediaState,
+        audioRecorder.amplitude
+    ) { state, mediaState, amplitude ->
+        state.copy(mediaState = mediaState, recordingAmplitude = amplitude)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
