@@ -1,7 +1,7 @@
 package com.mintanable.notethepad.feature_ai.data.source
 
 import android.content.Context
-import android.os.ParcelFileDescriptor
+import android.net.Uri
 import android.util.Log
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Content
@@ -12,6 +12,8 @@ import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.MessageCallback
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
+import com.mintanable.notethepad.core.common.utils.genByteArrayForWav
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -19,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -144,13 +145,13 @@ class GemmaLocalDataSource @Inject constructor(
         }
     }
 
-    suspend fun transcribeAudioFile(audioFile: File, fileName: String): String? = withContext(Dispatchers.IO) {
+    suspend fun transcribeAudioFile(uri: Uri, fileName: String, onTranscription: (String) -> Unit): String? = withContext(Dispatchers.IO) {
         try {
             val activeEngine = getOrInitializeEngine(fileName)
 
             //Prepare the audio input
-            val pfd = ParcelFileDescriptor.open(audioFile, ParcelFileDescriptor.MODE_READ_ONLY)
-            val audioContent = Content.AudioFile(audioFile.absolutePath)
+            val audioData = convertWavToMonoWithMaxSeconds(context, uri)
+            val audioContent = audioData?.let { Content.AudioBytes(it.genByteArrayForWav()) }
 
             //Create a one-shot conversation for transcription
             val config = ConversationConfig(
@@ -160,26 +161,29 @@ class GemmaLocalDataSource @Inject constructor(
             )
 
             activeEngine.createConversation(config).use { conversation ->
-                conversation.sendMessageAsync(
-                    Contents.of(audioContent),
-                    object : MessageCallback {
-                        override fun onMessage(message: Message) {
-                            Log.i("kptest", "transcribeAudioFile: message= $message")
-                        }
-
-                        override fun onDone() {
-                            Log.i("kptest", "transcribeAudioFile completed")
-                        }
-
-                        override fun onError(throwable: Throwable) {
-                            if (throwable is CancellationException) {
-                                Log.i("kptest", "The inference is cancelled.")
-                            } else {
-                                Log.e("kptest", "onError", throwable)
+                audioContent?.let {
+                    conversation.sendMessageAsync(
+                        Contents.of(it),
+                        object : MessageCallback {
+                            override fun onMessage(message: Message) {
+                                Log.i("kptest", "transcribeAudioFile: message= $message")
+                                onTranscription(message.toString())
                             }
-                        }
-                    },
-                )
+
+                            override fun onDone() {
+                                Log.i("kptest", "transcribeAudioFile completed")
+                            }
+
+                            override fun onError(throwable: Throwable) {
+                                if (throwable is CancellationException) {
+                                    Log.i("kptest", "The inference is cancelled.")
+                                } else {
+                                    Log.e("kptest", "onError", throwable)
+                                }
+                            }
+                        },
+                    )
+                }
             }
             ""
         } catch (e: Exception) {
@@ -187,4 +191,5 @@ class GemmaLocalDataSource @Inject constructor(
             null
         }
     }
+
 }
