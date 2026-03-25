@@ -136,7 +136,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                     val processedAudio = convertWavToMonoWithMaxSeconds(
                         context = context,
                         stereoUri = uri,
-                        maxSeconds = 60 // Gemma 3n handles 60s well
+                        maxSeconds = 30
                     )?.genByteArrayForWav()
 
                     if (processedAudio != null) {

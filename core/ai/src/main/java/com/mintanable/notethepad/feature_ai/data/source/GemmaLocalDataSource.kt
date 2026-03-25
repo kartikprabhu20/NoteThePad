@@ -56,48 +56,54 @@ class GemmaLocalDataSource @Inject constructor(
     }
 
     @OptIn(ExperimentalApi::class)
-    suspend fun initializeEngine(fileName: String, systemInstruction: String? = null) =
-        mutex.withLock {
-            val modelFile = File(context.getExternalFilesDir(null), fileName)
-            val newPath = modelFile.absolutePath
+    suspend fun initializeEngine(
+        fileName: String,
+        systemInstruction: String? = null,
+        supportAudio: Boolean = true,
+        supportImage: Boolean = false,
+    ) = mutex.withLock {
+        val modelFile = File(context.getExternalFilesDir(null), fileName)
+        val newPath = modelFile.absolutePath
 
-            if (activeInstance != null && currentModelPath == newPath) {
-                activeInstance?.conversation?.close()
-                activeInstance?.conversation =
-                    createNewConversation(activeInstance!!.engine, systemInstruction)
-                return@withLock
-            }
-
-            //Clean up old engine before starting new one (Crucial for SIGSEGV prevention)
-            closeActiveInstance()
-
-            try {
-                val engineConfig = EngineConfig(
-                    modelPath = newPath,
-                    backend = Backend.GPU(), // Primary for Gemma 3
-                    visionBackend = Backend.GPU(),
-                    audioBackend = Backend.CPU(), // Audio MUST be CPU in LiteRT
-                    maxNumTokens = 1024,
-                    cacheDir = context.cacheDir.path
-                )
-
-                // Essential for Pixel NPU stability
-                Backend.NPU(nativeLibraryDir = context.applicationInfo.nativeLibraryDir)
-
-                val engine = Engine(engineConfig)
-                engine.initialize()
-
-                val conversation = createNewConversation(engine, systemInstruction)
-
-                activeInstance = ActiveInstance(engine, conversation)
-                currentModelPath = newPath
-                Log.d("kptest", "Gemma Engine Initialized Successfully")
-            } catch (e: Exception) {
-                Log.e("kptest", "Failed to initialize: ${e.message}")
-                closeActiveInstance()
-                throw e
-            }
+        if (activeInstance != null && currentModelPath == newPath) {
+            activeInstance?.conversation?.close()
+            activeInstance?.conversation =
+                createNewConversation(activeInstance!!.engine, systemInstruction)
+            return@withLock
         }
+
+        //Clean up old engine before starting new one (Crucial for SIGSEGV prevention)
+        closeActiveInstance()
+
+        try {
+            val engineConfig = EngineConfig(
+                modelPath = newPath,
+                backend = Backend.GPU(),
+                visionBackend = if (supportImage) Backend.GPU() else null, // Only load the vision encoder when images are actually needed.
+
+                audioBackend = if (supportAudio) Backend.CPU() else null, // Audio encoder must run on CPU for Gemma 3n.
+                maxNumTokens = 1024,
+                // Pass null for models stored in external files dir (normal production path).
+                // Passing context.cacheDir.path for every model forces LiteRT to write KV
+                // cache to internal storage which has tighter space limits.
+                cacheDir = if (newPath.startsWith("/data/local/tmp"))
+                    context.getExternalFilesDir(null)?.absolutePath else null,
+            )
+
+            val engine = Engine(engineConfig)
+            engine.initialize()
+
+            val conversation = createNewConversation(engine, systemInstruction)
+
+            activeInstance = ActiveInstance(engine, conversation)
+            currentModelPath = newPath
+            Log.d("kptest", "Gemma Engine Initialized Successfully")
+        } catch (e: Exception) {
+            Log.e("kptest", "Failed to initialize: ${e.message}")
+            closeActiveInstance()
+            throw e
+        }
+    }
 
     private fun createNewConversation(engine: Engine, systemInstruction: String?): Conversation {
         return engine.createConversation(
@@ -118,6 +124,8 @@ class GemmaLocalDataSource @Inject constructor(
             //Ensure the engine is warm with the specific "Tagging" system instruction
             initializeEngine(
                 fileName = fileName,
+                supportAudio = false,
+                supportImage = false,
                 systemInstruction = """
                 You are an expert organizational assistant for the app "NoteThePad".
                 TASK: Analyze the note and suggest 3-5 relevant one-word tags.
@@ -149,7 +157,8 @@ class GemmaLocalDataSource @Inject constructor(
     suspend fun transcribeAudioFile(selectedModel: AiModel, processedAudio: ByteArray?, onTranscription: (String) -> Unit) {
         initializeEngine(
             fileName = selectedModel.downloadFileName,
-            systemInstruction = "You are a transcription assistant. Transcribe the audio precisely."
+            supportAudio = true,
+            supportImage = false
         )
 
         // Run inference using the ByteArray
@@ -166,6 +175,8 @@ class GemmaLocalDataSource @Inject constructor(
         try {
             initializeEngine(
                 fileName = fileName,
+                supportAudio = false,
+                supportImage = false,
                 systemInstruction = "Summarize this note in 2 sentences."
             )
 
@@ -198,9 +209,12 @@ class GemmaLocalDataSource @Inject constructor(
             Contents.of(contents),
             object : MessageCallback {
                 override fun onMessage(message: Message) {
+                    Log.e("kptest", "runInference: message: ${message.toString()}")
+
                     responseChannel.trySend(message.toString())
                 }
                 override fun onDone() {
+                    Log.e("kptest", "runInference: onDone")
                     responseChannel.close()
                 }
                 override fun onError(throwable: Throwable) {
