@@ -1,4 +1,4 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components.audioanimation
 
 
 import android.graphics.RuntimeShader
@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.theme.ThemePreviews
+import kotlinx.coroutines.delay
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -147,7 +148,7 @@ fun PreviewCircularAnimation() {
             // Stronger oscillation to show the "Expansion" effect clearly
             mockAmplitude = (10000 + sin(time) * 15000).toInt()
             time += 0.15f
-            kotlinx.coroutines.delay(50)
+            delay(50)
         }
     }
 

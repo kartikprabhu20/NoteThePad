@@ -36,6 +36,7 @@ import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.modify.components.audioanimation.AmplitudeBarGraph
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 import kotlin.random.Random

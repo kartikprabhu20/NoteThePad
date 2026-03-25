@@ -375,7 +375,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         attachedAudios = state.attachedAudios.map {
-                            if (it.uri == uriString) it.copy(transcription = transcript) else it
+                            if (it.uri == uriString) it.copy(transcription = it.transcription + transcript) else it
                         }
                     )
                 }

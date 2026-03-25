@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.modify.components.audioanimation.AudioWaveAnimation
+import com.mintanable.notethepad.feature_note.presentation.modify.components.audioanimation.CircularAudioAnimation
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 
@@ -138,10 +141,9 @@ fun AudioRecorderUI(
         }
 
         if (!isTranscribeEnabled) {
-            CircularAudioAnimation(
-                bgColor = MaterialTheme.colorScheme.surface,
+            AudioWaveAnimation(
                 amplitude = amplitude,
-                modifier = Modifier.size(160.dp)
+                modifier = Modifier.fillMaxHeight(0.25f)
             )
         }
 
@@ -173,13 +175,15 @@ fun AudioRecorderUI(
 @ThemePreviews
 @Composable
 fun PreviewAudioRecorderUI(){
-    Box(modifier = Modifier.fillMaxSize()) {
-        AudioRecorderUI(
-            isRecording = true,
-            onStartRecordingClicked = {},
-            onStopRecordingClicked = {},
-            transcriptionText = "This is a test of the Gemini Nano live transcription feature..."
-        )
+    NoteThePadTheme {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+            AudioRecorderUI(
+                isRecording = true,
+                onStartRecordingClicked = {},
+                onStopRecordingClicked = {},
+                transcriptionText = "This is a test of the Gemini Nano live transcription feature..."
+            )
+        }
     }
 }
 
@@ -187,7 +191,7 @@ fun PreviewAudioRecorderUI(){
 @Composable
 fun PreviewAudioRecorderUINotRecording(){
     NoteThePadTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
             AudioRecorderUI(isRecording = false, onStartRecordingClicked = {}, onStopRecordingClicked = {})
         }
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components.audioanimation
 
 import android.graphics.RuntimeShader
 import android.os.Build
@@ -24,8 +24,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,8 +36,8 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.theme.ThemePreviews
+import kotlinx.coroutines.delay
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.random.Random
@@ -207,7 +205,7 @@ fun PreviewWaveAnimation() {
       // Oscillates between 5000 and 25000 to show wave distortion
       mockAmplitude = (15000 + sin(time) * 10000).toInt()
       time += 0.2f
-      kotlinx.coroutines.delay(60)
+      delay(60)
     }
   }
 

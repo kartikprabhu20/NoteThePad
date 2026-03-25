@@ -1,7 +1,6 @@
-package com.mintanable.notethepad.feature_note.presentation.modify.components
+package com.mintanable.notethepad.feature_note.presentation.modify.components.audioanimation
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,12 +8,11 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.unit.dp
-import com.mintanable.notethepad.theme.NoteThePadTheme
 
 val BAR_SPACE: Int =  2
 
@@ -34,7 +32,7 @@ fun AmplitudeBarGraph(
         // Use drawIntoCanvas for advanced blend mode operations
         drawIntoCanvas { canvas ->
 
-            canvas.saveLayer(size.toRect(), androidx.compose.ui.graphics.Paint())
+            canvas.saveLayer(size.toRect(), Paint())
 
             amplitudeLevels.forEachIndexed { index, level ->
                 val barHeight = (level * size.height).coerceAtLeast(1.5f)
