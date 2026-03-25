@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -75,7 +76,7 @@ fun AudioPlayerUI(
 
         if(transcriptionText.isNotEmpty()) {
             OutlinedCard(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp),
                 shape = RoundedCornerShape(
                     topStart = 0.dp,
                     topEnd = 0.dp,
