@@ -108,6 +108,18 @@ fun AudioPlayer(
             )
 
             IconButton(
+                onClick = onTranscribe,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.speech_to_text_24px),
+                    contentDescription = stringResource(R.string.content_description_trascribe_audio),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            IconButton(
                 onClick = onDelete,
                 modifier = Modifier.size(32.dp)
             ) {
