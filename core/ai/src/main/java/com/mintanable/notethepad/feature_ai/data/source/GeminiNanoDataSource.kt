@@ -116,13 +116,15 @@ class GeminiNanoDataSource @Inject constructor() {
     }
 
     suspend fun transcribeAudioFile(audioFile: File, onTranscription: (String) -> Unit) {
+        if (audioFile.length() == 0L) {
+            Log.e("kptest", "File is empty!")
+            return
+        }
         val pfd = ParcelFileDescriptor.open(audioFile, ParcelFileDescriptor.MODE_READ_ONLY)
-
         val request = SpeechRecognizerRequest.builder().apply {
             audioSource = AudioSource.fromPfd(pfd)
         }.build()
         val recognizer = getRecognizer()
-
         try {
             recognizer.startRecognition(request).collect { response ->
                 when (response) {
@@ -131,7 +133,7 @@ class GeminiNanoDataSource @Inject constructor() {
                     }
                     is SpeechRecognizerResponse.FinalTextResponse -> {
                         onTranscription(response.text)
-                        // You can close the PFD once the final result is received
+                        Log.e("kptest", "File transcription FinalTextResponse: ${response.text}")
                         pfd.close()
                     }
                     is SpeechRecognizerResponse.ErrorResponse -> {
@@ -142,8 +144,9 @@ class GeminiNanoDataSource @Inject constructor() {
                 }
             }
         } catch (e: Exception) {
-            pfd.close()
             Log.e("kptest", "Failed to process file: ${e.message}")
+        } finally {
+            pfd.close()
         }
     }
 }
