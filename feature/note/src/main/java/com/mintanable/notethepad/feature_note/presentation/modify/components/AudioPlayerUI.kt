@@ -243,7 +243,7 @@ fun PreviewAudioPlayerUI() {
 fun PreviewAudioPlayerUIEmpty() {
     NoteThePadTheme {
         Box(modifier = Modifier
-            .background(NoteColors.colors[2])
+            .background(NoteColors.colors[0])
             .padding(8.dp)) {
             AudioPlayerUI(
                 attachment = Attachment(uri = "", duration = 60000L),

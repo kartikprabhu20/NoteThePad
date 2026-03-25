@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_ai.data.source
 
 import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.mlkit.genai.common.FeatureStatus
@@ -14,6 +15,7 @@ import com.google.mlkit.genai.speechrecognition.SpeechRecognizerResponse
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 
@@ -110,6 +112,38 @@ class GeminiNanoDataSource @Inject constructor() {
             if (recognizer != _speechRecognizer) {
                 recognizer.close()
             }
+        }
+    }
+
+    suspend fun transcribeAudioFile(audioFile: File, onTranscription: (String) -> Unit) {
+        val pfd = ParcelFileDescriptor.open(audioFile, ParcelFileDescriptor.MODE_READ_ONLY)
+
+        val request = SpeechRecognizerRequest.builder().apply {
+            audioSource = AudioSource.fromPfd(pfd)
+        }.build()
+        val recognizer = getRecognizer()
+
+        try {
+            recognizer.startRecognition(request).collect { response ->
+                when (response) {
+                    is SpeechRecognizerResponse.PartialTextResponse -> {
+                        onTranscription(response.text)
+                    }
+                    is SpeechRecognizerResponse.FinalTextResponse -> {
+                        onTranscription(response.text)
+                        // You can close the PFD once the final result is received
+                        pfd.close()
+                    }
+                    is SpeechRecognizerResponse.ErrorResponse -> {
+                        Log.e("kptest", "File transcription error: ${response.e}")
+                        pfd.close()
+                    }
+                    else -> {}
+                }
+            }
+        } catch (e: Exception) {
+            pfd.close()
+            Log.e("kptest", "Failed to process file: ${e.message}")
         }
     }
 }
