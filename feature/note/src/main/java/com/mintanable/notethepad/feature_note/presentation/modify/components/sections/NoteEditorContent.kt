@@ -291,7 +291,8 @@ fun NoteEditorContent(
                         attachedAudios = attachedAudios,
                         mediaState = mediaState,
                         onDelete = { deletedUri -> onEvent(AddEditNoteEvent.RemoveAudio(deletedUri)) },
-                        onPlayPause = { uri -> onEvent(AddEditNoteEvent.UpdateNowPlaying(uri)) }
+                        onPlayPause = { uri -> onEvent(AddEditNoteEvent.UpdateNowPlaying(uri)) },
+                        onTranscribe = { uri -> onEvent(AddEditNoteEvent.TranscribeAttachedAudio(uri)) }
                     )
 
                     reminderAttachmentSection(

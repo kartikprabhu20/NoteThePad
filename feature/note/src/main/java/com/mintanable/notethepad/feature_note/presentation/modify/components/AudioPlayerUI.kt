@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -21,7 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.database.db.entity.Attachment
@@ -30,7 +31,6 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
-import kotlin.math.sin
 import kotlin.random.Random
 
 @Composable
@@ -38,7 +38,9 @@ fun AudioPlayerUI(
     attachment: Attachment,
     playbackState: MediaState?,
     onDelete: (String) -> Unit,
-    onPlayPause: (String) -> Unit) {
+    onPlayPause: (String) -> Unit,
+    onTranscribe: (String) -> Unit
+) {
 
     val uri = attachment.uri
     val isPlaying = playbackState?.currentUri == uri && playbackState.isPlaying
@@ -51,6 +53,7 @@ fun AudioPlayerUI(
         totalDuration = totalDuration,
         onPlayPause = { onPlayPause(uri) },
         onDelete = { onDelete(uri) },
+        onTranscribe = { onTranscribe(uri) }
     )
 }
 
@@ -60,7 +63,8 @@ fun AudioPlayer(
     progress: Float,
     totalDuration: Long,
     onPlayPause: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onTranscribe: () -> Unit
 ) {
 
     val mockAmplitudes = remember {
@@ -99,21 +103,35 @@ fun AudioPlayer(
             Text(
                 text = formatMillisToTime(totalDuration),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.widthIn(min = 45.dp),
+                modifier = Modifier.wrapContentWidth(),
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-
-            IconButton(onClick = onDelete) {
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(32.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(R.string.content_description_remove_audio),
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            IconButton(
+                onClick = onTranscribe,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.speech_to_text_24px),
+                    contentDescription = stringResource(R.string.content_description_trascribe_audio),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
     }
-
 }
 
 @ThemePreviews
@@ -121,7 +139,7 @@ fun AudioPlayer(
 fun PreviewAudioPlayer(){
     NoteThePadTheme {
         Box(modifier = Modifier.background(NoteColors.colors[2]).padding(8.dp)){
-            AudioPlayer(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {})
+            AudioPlayer(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {}, {})
 
         }
     }

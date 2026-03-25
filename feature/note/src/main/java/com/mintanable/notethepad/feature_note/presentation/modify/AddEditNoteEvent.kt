@@ -38,4 +38,5 @@ sealed class AddEditNoteEvent {
     data class DeleteLabel(val tagName: String) : AddEditNoteEvent()
     data object ShowSuggestions : AddEditNoteEvent()
     data object ClearSuggestions : AddEditNoteEvent()
+    data class TranscribeAttachedAudio(val uri: String) : AddEditNoteEvent()
 }

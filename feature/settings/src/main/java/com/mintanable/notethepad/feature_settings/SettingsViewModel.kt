@@ -180,7 +180,7 @@ class SettingsViewModel @Inject constructor(
         val downloadDialogModel = args[7] as AiModel?
         val audioTranscriberStatus = args[8] as AiModelDownloadStatus
         val showAudioTranscriberDialog = args[9] as Boolean
-        val audioModelStatus = args[4] as LoadStatus
+        val audioModelStatus = args[10] as LoadStatus
 
         val activeTransferStatus = when {
             download is LoadStatus.Progress -> download

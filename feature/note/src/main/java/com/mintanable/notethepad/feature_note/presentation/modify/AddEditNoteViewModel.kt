@@ -360,6 +360,10 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.AttachTranscript -> {
                 _uiState.update { it.copy(contentState = it.contentState.copy(text = it.contentState.text + "\n" + event.transcript)) }
             }
+
+            is AddEditNoteEvent.TranscribeAttachedAudio -> {
+
+            }
         }
     }
 
