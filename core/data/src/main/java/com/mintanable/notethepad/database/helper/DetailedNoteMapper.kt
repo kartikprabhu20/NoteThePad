@@ -12,6 +12,7 @@ import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import javax.inject.Inject
 
 class DetailedNoteMapper @Inject constructor(
@@ -23,6 +24,11 @@ class DetailedNoteMapper @Inject constructor(
 
     suspend fun toDetailedNote(noteEntity: NoteEntity, tagEntities: List<TagEntity> = emptyList()): DetailedNote = withContext(dispatchers.default) {
 
+        val transcriptionMap: Map<String, String> = runCatching {
+            val json = JSONObject(noteEntity.audioTranscriptions)
+            json.keys().asSequence().associateWith { json.getString(it) }
+        }.getOrDefault(emptyMap())
+
         val audioAttachments = if (noteEntity.audioUris.isEmpty()) {
             emptyList()
         } else {
@@ -33,7 +39,7 @@ class DetailedNoteMapper @Inject constructor(
                         duration = audioMetadataProvider.getDuration(uriString.toUri())
                         durationCache.put(uriString, duration)
                     }
-                    Attachment(uriString, duration)
+                    Attachment(uriString, duration, transcriptionMap[uriString] ?: "")
                 }
             }.awaitAll()
         }

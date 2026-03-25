@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.database.db.entity
 
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import org.json.JSONObject
 
 data class DetailedNote (
     val id: Long = 0L,
@@ -16,6 +17,10 @@ data class DetailedNote (
     val tagEntities: List<TagEntity> = emptyList()
 ){
     fun toNote(): NoteEntity{
+        val json = JSONObject()
+        audioAttachments
+            .filter { it.transcription.isNotEmpty() }
+            .forEach { json.put(it.uri, it.transcription) }
         return NoteEntity(
             id = id,
             title = title,
@@ -25,6 +30,7 @@ data class DetailedNote (
             imageUris = imageUris,
             audioUris = audioAttachments.map { it.uri },
             reminderTime = reminderTime,
+            audioTranscriptions = json.toString()
         )
     }
 }

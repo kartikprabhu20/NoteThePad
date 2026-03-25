@@ -9,6 +9,7 @@ import com.mintanable.notethepad.database.db.entity.InvalidNoteException
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
+import org.json.JSONObject
 
 class SaveNoteWithAttachments(
     private val repository: NoteRepository,
@@ -31,6 +32,7 @@ class SaveNoteWithAttachments(
         color: Int,
         imageUris: List<Uri> = emptyList(),
         audioUris: List<Uri> = emptyList(),
+        audioTranscriptions: List<String> = emptyList(),
         reminderTime: Long,
         checkboxItems: List<CheckboxItem>,
         tagEntities: List<TagEntity> = emptyList()
@@ -53,6 +55,13 @@ class SaveNoteWithAttachments(
             }
 
            Log.d("kptest", "SaveNoteWithAttachments save: ${imageUriList+audioUriList}")
+           val transcriptionsJson = run {
+               val json = JSONObject()
+               audioUriList.zip(audioTranscriptions).forEach { (savedUri, transcript) ->
+                   if (transcript.isNotEmpty()) json.put(savedUri, transcript)
+               }
+               json.toString()
+           }
            val newNoteEntityId = repository.insertNote(
                 NoteEntity(
                     id = id,
@@ -62,7 +71,8 @@ class SaveNoteWithAttachments(
                     color = color,
                     imageUris = imageUriList,
                     audioUris = audioUriList,
-                    reminderTime = reminderTime
+                    reminderTime = reminderTime,
+                    audioTranscriptions = transcriptionsJson
                 ),
                 tagEntities
             )
