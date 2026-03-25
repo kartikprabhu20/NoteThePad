@@ -18,6 +18,7 @@ import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.StartLiveTransctiption
 import com.mintanable.notethepad.feature_ai.domain.use_cases.StopLiveTranscription
+import com.mintanable.notethepad.feature_ai.domain.use_cases.TranscribeAudioFileUseCase
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
@@ -54,7 +55,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val tagUseCases: TagUseCases,
     private val getAutoTagsUseCase: GetAutoTagsUseCase,
     private val startLiveTransctiption: StartLiveTransctiption,
-    private val stopLiveTransctiptions: StopLiveTranscription
+    private val stopLiveTransctiptions: StopLiveTranscription,
+    private val transcribeAudioFileUseCase: TranscribeAudioFileUseCase
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
@@ -361,9 +363,28 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(contentState = it.contentState.copy(text = it.contentState.text + "\n" + event.transcript)) }
             }
 
-            is AddEditNoteEvent.TranscribeAttachedAudio -> {
+            is AddEditNoteEvent.TranscribeAttachedAudio -> transcribeAttachedAudio(event.uri)
+        }
+    }
 
+    private fun transcribeAttachedAudio(uri: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(transcribingUri = uri) }
+            val path = Uri.parse(uri).path
+            if (path == null) {
+                _uiState.update { it.copy(transcribingUri = null) }
+                return@launch
             }
+            transcribeAudioFileUseCase(File(path)) { transcript ->
+                _uiState.update { state ->
+                    state.copy(
+                        attachedAudios = state.attachedAudios.map {
+                            if (it.uri == uri) it.copy(transcription = transcript) else it
+                        }
+                    )
+                }
+            }
+            _uiState.update { it.copy(transcribingUri = null) }
         }
     }
 
@@ -424,6 +445,7 @@ class AddEditNoteViewModel @Inject constructor(
                 color = state.noteColor,
                 imageUris = state.attachedImages,
                 audioUris = state.attachedAudios.map { it.uri.toUri() },
+                audioTranscriptions = state.attachedAudios.map { it.transcription },
                 reminderTime = state.reminderTime,
                 checkboxItems = state.checkListItems,
                 tagEntities = state.tagEntities

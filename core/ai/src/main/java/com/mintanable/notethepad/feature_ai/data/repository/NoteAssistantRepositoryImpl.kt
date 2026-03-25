@@ -10,6 +10,7 @@ import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import java.io.File
 import javax.inject.Inject
 
 class NoteAssistantRepositoryImpl @Inject constructor(
@@ -106,4 +107,25 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         return geminiNanoDataSource.checkAudioRecognizerStatus()
     }
 
+    override suspend fun transcribeAudioFile(
+        audioFile: File,
+        modelName: String,
+        onTranscription: (String) -> Unit
+    ) {
+
+        when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> { }
+            "Gemini Nano (System)" -> {
+                geminiNanoDataSource.transcribeAudioFile(audioFile, onTranscription)
+            }
+            "None" -> { }
+            else -> {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.url.isNotEmpty()) {
+                    gemmaLocalDataSource.transcribeAudioFile(audioFile, selectedModel.downloadFileName, onTranscription)
+                }
+            }
+        }
+    }
 }

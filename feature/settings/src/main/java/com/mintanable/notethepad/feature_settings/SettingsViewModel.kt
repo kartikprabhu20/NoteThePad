@@ -19,7 +19,7 @@ import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
 import com.mintanable.notethepad.feature_ai.domain.use_cases.DownloadAiModelUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.DownloadGeminiAudioTranscriberUseCase
-import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAudioTranscriberStatus
+import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAudioModelStatus
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetSupportedAiModels
 import com.mintanable.notethepad.feature_backup.domain.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
@@ -76,7 +76,7 @@ class SettingsViewModel @Inject constructor(
     private val downloadAiModelUseCase: DownloadAiModelUseCase,
     private val getSupportedAiModels: GetSupportedAiModels,
     private val clearAppDataUseCase: ClearAppDataUseCase,
-    private val getAudioTranscriberStatus: GetAudioTranscriberStatus,
+    private val getAudioModelStatus: GetAudioModelStatus,
     private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase
 ) : ViewModel() {
 
@@ -116,7 +116,7 @@ class SettingsViewModel @Inject constructor(
     private val _showDownloadAudioTranscriberDialog = MutableStateFlow(false)
 
     private val _audioTranscriberStatusFlow: Flow<AiModelDownloadStatus> = flow {
-        emitAll(getAudioTranscriberStatus(""))
+        emitAll(getAudioModelStatus(""))
     }.catch { emit(AiModelDownloadStatus.Unavailable) }
 
     private val _dataStoreSettings : StateFlow<Settings> = combine(

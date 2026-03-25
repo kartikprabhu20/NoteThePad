@@ -2,6 +2,7 @@ package com.mintanable.notethepad.feature_ai.domain.repository
 
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface NoteAssistantRepository {
     suspend fun suggestTags(
@@ -16,5 +17,5 @@ interface NoteAssistantRepository {
     suspend fun stopLiveTranscription()
 
     suspend fun checkAudioTransciberStatus(modelName: String): Flow<AiModelDownloadStatus>
-
+    suspend fun transcribeAudioFile(audioFile: File, modelName: String, onTranscription: (String) -> Unit)
 }
