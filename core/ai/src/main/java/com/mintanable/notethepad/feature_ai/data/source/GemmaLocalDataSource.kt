@@ -16,6 +16,7 @@ import com.google.ai.edge.litertlm.SamplerConfig
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
@@ -27,6 +28,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.io.File
+import java.util.concurrent.CancellationException
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 class GemmaLocalDataSource @Inject constructor(
@@ -43,12 +46,13 @@ class GemmaLocalDataSource @Inject constructor(
     private var currentSupportAudio: Boolean = false
     private var currentSupportImage: Boolean = false
 
+    private val activeInferenceDeferred = AtomicReference<CompletableDeferred<Unit>?>(null)
+
     fun checkLocalStatus(selectedModel: AiModel?): Flow<AiModelDownloadStatus> = flow {
         if (selectedModel == null) {
             emit(AiModelDownloadStatus.Unavailable)
             return@flow
         }
-
         val file = File(context.getExternalFilesDir(null), selectedModel.downloadFileName)
         if (file.exists() && file.length() > 0) {
             emit(AiModelDownloadStatus.Ready)
@@ -68,50 +72,54 @@ class GemmaLocalDataSource @Inject constructor(
             topP = 0.95,
             temperature = 1.0,
         ),
-    ) = mutex.withLock {
-        val modelFile = File(context.getExternalFilesDir(null), fileName)
-        val newPath = modelFile.absolutePath
+    ) {
+       withContext(Dispatchers.IO) {
+            mutex.withLock {
+                val modelFile = File(context.getExternalFilesDir(null), fileName)
+                val newPath = modelFile.absolutePath
 
-        val capabilitiesMatch = currentSupportAudio == supportAudio && currentSupportImage == supportImage
-        if (activeInstance != null && currentModelPath == newPath && capabilitiesMatch) {
-            activeInstance?.conversation?.close()
-            activeInstance?.conversation =
-                createNewConversation(activeInstance!!.engine, systemInstruction, samplerConfig)
-            return@withLock
-        }
+              val capabilitiesMatch = currentSupportAudio == supportAudio && currentSupportImage == supportImage
+                if (activeInstance != null && currentModelPath == newPath && capabilitiesMatch) {
+                   cancelAndAwaitInference(activeInstance!!.conversation)
+                    activeInstance?.conversation?.close()
+                    activeInstance?.conversation =
+                        createNewConversation(activeInstance!!.engine, systemInstruction, samplerConfig)
+                    return@withLock
+                }
 
-        //Clean up old engine before starting new one (Crucial for SIGSEGV prevention)
-        closeActiveInstance()
+                // Close existing engine (must cancel inference first).
+                closeInstanceInternal()
 
-        try {
-            val engineConfig = EngineConfig(
-                modelPath = newPath,
-                backend = Backend.GPU(),
-                visionBackend = if (supportImage) Backend.GPU() else null, // Only load the vision encoder when images are actually needed.
+                try {
+                    val engineConfig = EngineConfig(
+                        modelPath = newPath,
+                        backend = Backend.GPU(),
+                        visionBackend = if (supportImage) Backend.GPU() else null, // Only load the vision encoder when images are actually needed.
+                        audioBackend = if (supportAudio) Backend.CPU() else null, // Audio encoder must run on CPU for Gemma 3n.
+                        maxNumTokens = 1024,
+                        // Pass null for models stored in external files dir (normal production
+                        // path). Passing context.cacheDir.path forces LiteRT to write KV cache
+                        // to internal storage which has tighter space limits.
+                        cacheDir = if (newPath.startsWith("/data/local/tmp"))
+                            context.getExternalFilesDir(null)?.absolutePath else null,
+                    )
 
-                audioBackend = if (supportAudio) Backend.CPU() else null, // Audio encoder must run on CPU for Gemma 3n.
-                maxNumTokens = 1024,
-                // Pass null for models stored in external files dir (normal production path).
-                // Passing context.cacheDir.path for every model forces LiteRT to write KV
-                // cache to internal storage which has tighter space limits.
-                cacheDir = if (newPath.startsWith("/data/local/tmp"))
-                    context.getExternalFilesDir(null)?.absolutePath else null,
-            )
+                    val engine = Engine(engineConfig)
+                    engine.initialize()
 
-            val engine = Engine(engineConfig)
-            engine.initialize()
+                    val conversation = createNewConversation(engine, systemInstruction, samplerConfig)
 
-            val conversation = createNewConversation(engine, systemInstruction, samplerConfig)
-
-            activeInstance = ActiveInstance(engine, conversation)
-            currentModelPath = newPath
-            currentSupportAudio = supportAudio
-            currentSupportImage = supportImage
-            Log.d("kptest", "Gemma Engine Initialized (audio=$supportAudio, image=$supportImage)")
-        } catch (e: Exception) {
-            Log.e("kptest", "Failed to initialize: ${e.message}")
-            closeActiveInstance()
-            throw e
+                    activeInstance = ActiveInstance(engine, conversation)
+                    currentModelPath = newPath
+                    currentSupportAudio = supportAudio
+                    currentSupportImage = supportImage
+                    Log.d("kptest", "Gemma Engine Initialized (audio=$supportAudio, image=$supportImage)")
+                } catch (e: Exception) {
+                    Log.e("kptest", "Failed to initialize: ${e.message}")
+                    closeInstanceInternal()
+                    throw e
+                }
+            }
         }
     }
 
@@ -126,6 +134,45 @@ class GemmaLocalDataSource @Inject constructor(
                 systemInstruction = systemInstruction?.let { Contents.of(it) }
             )
         )
+    }
+
+    private suspend fun cancelAndAwaitInference(conversation: Conversation) {
+        val deferred = activeInferenceDeferred.get() ?: return
+        if (deferred.isCompleted) return
+        try {
+            conversation.cancelProcess()
+            // Wait at most 3 s for the native thread to acknowledge cancellation.
+            withTimeout(3_000L) { deferred.await() }
+        } catch (e: Exception) {
+            Log.w("kptest", "cancelAndAwaitInference: ${e.message}")
+        }
+    }
+
+    /**
+     * Internal close — called from within the mutex lock (by initializeEngine).
+     * Must NOT try to acquire the mutex itself.
+     */
+    private suspend fun closeInstanceInternal() {
+        val inst = activeInstance ?: return
+        cancelAndAwaitInference(inst.conversation)
+        try { inst.conversation.close() } catch (e: Exception) { }
+        try { inst.engine.close() } catch (e: Exception) { }
+        activeInstance = null
+        currentModelPath = null
+        currentSupportAudio = false
+        currentSupportImage = false
+    }
+
+    /**
+     * Public close — must be called when the owning ViewModel/repository is torn down.
+     * Dispatches to IO so it is safe to call from any thread (including Main).
+     */
+    suspend fun closeActiveInstance() {
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                closeInstanceInternal()
+            }
+        }
     }
 
     @OptIn(ExperimentalApi::class)
@@ -168,13 +215,12 @@ class GemmaLocalDataSource @Inject constructor(
         processedAudio: ByteArray?,
         onTranscription: (String) -> Unit,
     ) {
-
         initializeEngine(
             fileName = selectedModel.downloadFileName,
             systemInstruction = null,
             supportAudio = true,
             supportImage = false,
-            samplerConfig = SamplerConfig(topK = 40, topP = 0.95, temperature = 0.2),
+            samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
         )
 
         try {
@@ -217,28 +263,39 @@ class GemmaLocalDataSource @Inject constructor(
         val instance = activeInstance ?: throw IllegalStateException("Engine not initialized")
 
         val contents = mutableListOf<Content>()
-
-        audioData?.let {
-            contents.add(Content.AudioBytes(it))
-        }
+        audioData?.let { contents.add(Content.AudioBytes(it)) }
         contents.add(Content.Text(prompt))
 
         val responseChannel = Channel<String>(Channel.UNLIMITED)
+        val deferred = CompletableDeferred<Unit>()
+        activeInferenceDeferred.set(deferred)
 
         instance.conversation.sendMessageAsync(
             Contents.of(contents),
             object : MessageCallback {
                 override fun onMessage(message: Message) {
-                    Log.e("kptest", "runInference: message: ${message.toString()}")
-
-                    responseChannel.trySend(message.toString())
+                    val text = message.toString()
+                    // Filter Gemma control tokens (e.g. "<ctrl99>").
+                    // The gallery's ViewModel does the same — these appear as onMessage
+                    // callbacks before onDone() and must not be forwarded to the caller.
+                    if (!text.startsWith("<ctrl")) {
+                        responseChannel.trySend(text)
+                    }
                 }
+
                 override fun onDone() {
+                    deferred.complete(Unit)
                     responseChannel.close()
                 }
+
                 override fun onError(throwable: Throwable) {
-                    Log.e("kptest", "Inference Error", throwable)
-                    responseChannel.close(throwable)
+                    deferred.complete(Unit)
+                    if (throwable is CancellationException) {
+                        responseChannel.close()
+                    } else {
+                        Log.e("kptest", "Inference Error", throwable)
+                        responseChannel.close(throwable)
+                    }
                 }
             }
         )
@@ -247,15 +304,4 @@ class GemmaLocalDataSource @Inject constructor(
             emit(text)
         }
     }.flowOn(Dispatchers.IO)
-
-    fun closeActiveInstance() {
-        activeInstance?.apply {
-            try { conversation.close() } catch (e: Exception) { }
-            try { engine.close() } catch (e: Exception) { }
-        }
-        activeInstance = null
-        currentModelPath = null
-        currentSupportAudio = false
-        currentSupportImage = false
-    }
 }
