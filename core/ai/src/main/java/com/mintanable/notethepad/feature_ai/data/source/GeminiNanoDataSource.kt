@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_ai.data.source
 
+import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.util.Log
@@ -115,7 +116,8 @@ class GeminiNanoDataSource @Inject constructor() {
         }
     }
 
-    suspend fun transcribeAudioFile(audioFile: File, onTranscription: (String) -> Unit) {
+    suspend fun transcribeAudioFile(uri: Uri, onTranscription: (String) -> Unit) {
+        val audioFile = File(uri.path!!)
         if (audioFile.length() == 0L) {
             Log.e("kptest", "File is empty!")
             return

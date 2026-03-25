@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_ai.domain.use_cases
 
+import android.net.Uri
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import kotlinx.coroutines.flow.first
@@ -10,8 +11,8 @@ class TranscribeAudioFileUseCase @Inject constructor(
     private val noteAssistantRepository: NoteAssistantRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
-    suspend operator fun invoke(audioFile: File, onTranscription: (String) -> Unit){
+    suspend operator fun invoke(uri: Uri, onTranscription: (String) -> Unit){
         val settings = userPreferencesRepository.settingsFlow.first()
-        noteAssistantRepository.transcribeAudioFile(audioFile, settings.aiModelName, onTranscription)
+        noteAssistantRepository.transcribeAudioFile(uri, settings.aiModelName, onTranscription)
     }
 }

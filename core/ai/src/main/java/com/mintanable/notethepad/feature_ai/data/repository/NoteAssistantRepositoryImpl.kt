@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
@@ -108,7 +109,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     override suspend fun transcribeAudioFile(
-        audioFile: File,
+        uri: Uri,
         modelName: String,
         onTranscription: (String) -> Unit
     ) {
@@ -116,14 +117,14 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         when (modelName) {
             "Gemini 3 Flash (Cloud)" -> { }
             "Gemini Nano (System)" -> {
-                geminiNanoDataSource.transcribeAudioFile(audioFile, onTranscription)
+                geminiNanoDataSource.transcribeAudioFile(uri, onTranscription)
             }
             "None" -> { }
             else -> {
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.url.isNotEmpty()) {
-                    gemmaLocalDataSource.transcribeAudioFile(audioFile, selectedModel.downloadFileName, onTranscription)
+                    gemmaLocalDataSource.transcribeAudioFile(uri, selectedModel.downloadFileName, onTranscription)
                 }
             }
         }
