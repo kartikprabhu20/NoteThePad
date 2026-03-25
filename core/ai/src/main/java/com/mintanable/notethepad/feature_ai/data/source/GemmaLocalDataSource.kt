@@ -40,6 +40,8 @@ class GemmaLocalDataSource @Inject constructor(
     private var activeInstance: ActiveInstance? = null
     private val mutex = Mutex()
     private var currentModelPath: String? = null
+    private var currentSupportAudio: Boolean = false
+    private var currentSupportImage: Boolean = false
 
     fun checkLocalStatus(selectedModel: AiModel?): Flow<AiModelDownloadStatus> = flow {
         if (selectedModel == null) {
@@ -61,14 +63,20 @@ class GemmaLocalDataSource @Inject constructor(
         systemInstruction: String? = null,
         supportAudio: Boolean = true,
         supportImage: Boolean = false,
+        samplerConfig: SamplerConfig = SamplerConfig(
+            topK = 64,
+            topP = 0.95,
+            temperature = 1.0,
+        ),
     ) = mutex.withLock {
         val modelFile = File(context.getExternalFilesDir(null), fileName)
         val newPath = modelFile.absolutePath
 
-        if (activeInstance != null && currentModelPath == newPath) {
+        val capabilitiesMatch = currentSupportAudio == supportAudio && currentSupportImage == supportImage
+        if (activeInstance != null && currentModelPath == newPath && capabilitiesMatch) {
             activeInstance?.conversation?.close()
             activeInstance?.conversation =
-                createNewConversation(activeInstance!!.engine, systemInstruction)
+                createNewConversation(activeInstance!!.engine, systemInstruction, samplerConfig)
             return@withLock
         }
 
@@ -93,11 +101,13 @@ class GemmaLocalDataSource @Inject constructor(
             val engine = Engine(engineConfig)
             engine.initialize()
 
-            val conversation = createNewConversation(engine, systemInstruction)
+            val conversation = createNewConversation(engine, systemInstruction, samplerConfig)
 
             activeInstance = ActiveInstance(engine, conversation)
             currentModelPath = newPath
-            Log.d("kptest", "Gemma Engine Initialized Successfully")
+            currentSupportAudio = supportAudio
+            currentSupportImage = supportImage
+            Log.d("kptest", "Gemma Engine Initialized (audio=$supportAudio, image=$supportImage)")
         } catch (e: Exception) {
             Log.e("kptest", "Failed to initialize: ${e.message}")
             closeActiveInstance()
@@ -105,14 +115,14 @@ class GemmaLocalDataSource @Inject constructor(
         }
     }
 
-    private fun createNewConversation(engine: Engine, systemInstruction: String?): Conversation {
+    private fun createNewConversation(
+        engine: Engine,
+        systemInstruction: String?,
+        samplerConfig: SamplerConfig,
+    ): Conversation {
         return engine.createConversation(
             ConversationConfig(
-                samplerConfig = SamplerConfig(
-                    topK = 40,
-                    topP = 0.9,
-                    temperature = 0.2
-                ),
+                samplerConfig = samplerConfig,
                 systemInstruction = systemInstruction?.let { Contents.of(it) }
             )
         )
@@ -121,11 +131,11 @@ class GemmaLocalDataSource @Inject constructor(
     @OptIn(ExperimentalApi::class)
     suspend fun generateTags(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
         try {
-            //Ensure the engine is warm with the specific "Tagging" system instruction
             initializeEngine(
                 fileName = fileName,
                 supportAudio = false,
                 supportImage = false,
+                samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
                 systemInstruction = """
                 You are an expert organizational assistant for the app "NoteThePad".
                 TASK: Analyze the note and suggest 3-5 relevant one-word tags.
@@ -137,7 +147,6 @@ class GemmaLocalDataSource @Inject constructor(
             """.trimIndent()
             )
 
-            // Use the managed runInference pipe
             var textResponse = ""
             withTimeout(20000L) {
                 runInference(prompt).collect { chunk ->
@@ -154,19 +163,31 @@ class GemmaLocalDataSource @Inject constructor(
         }
     }
 
-    suspend fun transcribeAudioFile(selectedModel: AiModel, processedAudio: ByteArray?, onTranscription: (String) -> Unit) {
+    suspend fun transcribeAudioFile(
+        selectedModel: AiModel,
+        processedAudio: ByteArray?,
+        onTranscription: (String) -> Unit,
+    ) {
+
         initializeEngine(
             fileName = selectedModel.downloadFileName,
+            systemInstruction = null,
             supportAudio = true,
-            supportImage = false
+            supportImage = false,
+            samplerConfig = SamplerConfig(topK = 40, topP = 0.95, temperature = 0.2),
         )
 
-        // Run inference using the ByteArray
-        runInference(
-            prompt = "Transcribe this audio:",
-            audioData = processedAudio
-        ).collect { chunk ->
-            onTranscription(chunk)
+        try {
+            withTimeout(60_000L) {
+                runInference(
+                    prompt = "Transcribe this audio:",
+                    audioData = processedAudio
+                ).collect { chunk ->
+                    onTranscription(chunk)
+                }
+            }
+        } catch (e: TimeoutCancellationException) {
+            Log.e("kptest", "Audio transcription timed out")
         }
     }
 
@@ -177,6 +198,7 @@ class GemmaLocalDataSource @Inject constructor(
                 fileName = fileName,
                 supportAudio = false,
                 supportImage = false,
+                samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
                 systemInstruction = "Summarize this note in 2 sentences."
             )
 
@@ -196,11 +218,9 @@ class GemmaLocalDataSource @Inject constructor(
 
         val contents = mutableListOf<Content>()
 
-        // Pass the raw bytes directly to the native multimodal encoder
         audioData?.let {
             contents.add(Content.AudioBytes(it))
         }
-
         contents.add(Content.Text(prompt))
 
         val responseChannel = Channel<String>(Channel.UNLIMITED)
@@ -214,11 +234,9 @@ class GemmaLocalDataSource @Inject constructor(
                     responseChannel.trySend(message.toString())
                 }
                 override fun onDone() {
-                    Log.e("kptest", "runInference: onDone")
                     responseChannel.close()
                 }
                 override fun onError(throwable: Throwable) {
-                    // This captures the native SIGSEGV or JNI errors
                     Log.e("kptest", "Inference Error", throwable)
                     responseChannel.close(throwable)
                 }
@@ -232,16 +250,12 @@ class GemmaLocalDataSource @Inject constructor(
 
     fun closeActiveInstance() {
         activeInstance?.apply {
-            try {
-                conversation.close()
-            } catch (e: Exception) {
-            }
-            try {
-                engine.close()
-            } catch (e: Exception) {
-            }
+            try { conversation.close() } catch (e: Exception) { }
+            try { engine.close() } catch (e: Exception) { }
         }
         activeInstance = null
         currentModelPath = null
+        currentSupportAudio = false
+        currentSupportImage = false
     }
 }
