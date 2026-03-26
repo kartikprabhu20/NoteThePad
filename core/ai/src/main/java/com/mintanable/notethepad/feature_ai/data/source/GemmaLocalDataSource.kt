@@ -92,10 +92,14 @@ class GemmaLocalDataSource @Inject constructor(
                 // Close existing engine (must cancel inference first).
                 closeInstanceInternal()
 
-                // When switching capabilities (especially to vision), give GPU driver time to reclaim memory from the previous engine.
+                // Aggressively reclaim native memory before allocating the vision engine.
+                // Vision backend + GPU model weights need a large contiguous block.
+                System.gc()
+                Runtime.getRuntime().gc()
                 if (supportImage) {
-                    System.gc()
-                    delay(500)
+                    delay(800)// Extra delay for vision — GPU driver needs time to release resources.
+                } else {
+                    delay(200)
                 }
 
                 try {
@@ -177,6 +181,21 @@ class GemmaLocalDataSource @Inject constructor(
             mutex.withLock {
                 closeInstanceInternal()
             }
+        }
+    }
+
+    /**
+     * Release the current engine and reclaim native memory.
+     * Call this BEFORE heavy bitmap work (image decode/resize) so that
+     * the GPU/CPU memory held by the previous engine is freed first.
+     */
+    suspend fun releaseEngineForMemory() {
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                closeInstanceInternal()
+            }
+            System.gc()
+            delay(300)
         }
     }
 

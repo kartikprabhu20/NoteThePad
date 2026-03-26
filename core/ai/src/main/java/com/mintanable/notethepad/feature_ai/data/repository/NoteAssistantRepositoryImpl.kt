@@ -158,6 +158,8 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             "Gemini Nano (System)" -> emptyList() // Nano doesn't support images
             "None" -> emptyList()
             else -> {
+                gemmaLocalDataSource.releaseEngineForMemory()
+
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.llmSupportImage) {

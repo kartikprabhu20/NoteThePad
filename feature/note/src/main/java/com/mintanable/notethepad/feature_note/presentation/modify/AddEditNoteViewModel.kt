@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.core.common.CheckboxConvertors
-import com.mintanable.notethepad.core.common.utils.downscaleImage
+import com.mintanable.notethepad.core.common.utils.readAndProcessImage
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -44,7 +44,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -58,7 +60,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val mediaPlayer: MediaPlayer,
     private val audioMetadataProvider: AudioMetadataProvider,
     private val reminderScheduler: ReminderScheduler,
-    private val tagUseCases: TagUseCases,
+    tagUseCases: TagUseCases,
     private val getAutoTagsUseCase: GetAutoTagsUseCase,
     private val startLiveTransctiption: StartLiveTransctiption,
     private val stopLiveTransctiptions: StopLiveTranscription,
@@ -420,14 +422,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private fun readUriBytes(uri: Uri): ByteArray? {
-        val rawBytes = if (uri.scheme == "content") {
-            appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-        } else {
-            val path = uri.path ?: uri.toString()
-            File(path).takeIf { it.exists() }?.readBytes()
-        } ?: return null
-
-        return rawBytes.downscaleImage(maxDimension = 512)
+        return readAndProcessImage(appContext, uri, maxDimension = 384)
     }
 
     private fun analyzeImage(uri: Uri) {
@@ -435,7 +430,9 @@ class AddEditNoteViewModel @Inject constructor(
         val cached = imageSuggestionsCache[cacheKey]
         if (cached != null) {
             if (cachedImageBytes == null) {
-                cachedImageBytes = readUriBytes(uri)
+                viewModelScope.launch {
+                    cachedImageBytes = withContext(Dispatchers.IO) { readUriBytes(uri) }
+                }
             }
             _uiState.update { it.copy(imageSuggestions = cached, isAnalyzingImage = false) }
             return
@@ -444,7 +441,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isAnalyzingImage = true, imageSuggestions = emptyList(), imageQueryResult = "") }
             try {
-                val imageBytes = readUriBytes(uri)
+                val imageBytes = withContext(Dispatchers.IO) { readUriBytes(uri) }
                 if (imageBytes == null) {
                     _uiState.update { it.copy(isAnalyzingImage = false) }
                     return@launch
