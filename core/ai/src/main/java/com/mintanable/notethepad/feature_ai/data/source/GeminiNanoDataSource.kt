@@ -116,8 +116,8 @@ class GeminiNanoDataSource @Inject constructor() {
         }
     }
 
-    suspend fun transcribeAudioFile(uri: Uri, onTranscription: (String) -> Unit) {
-        val audioFile = File(uri.path!!)
+    suspend fun transcribeAudioFile(audioFile: File, onTranscription: (String) -> Unit) {
+
         if (audioFile.length() == 0L) {
             Log.e("kptest", "File is empty!")
             return

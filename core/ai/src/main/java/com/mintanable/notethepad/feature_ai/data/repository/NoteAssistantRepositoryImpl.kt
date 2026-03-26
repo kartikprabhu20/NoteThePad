@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
 import com.mintanable.notethepad.core.common.utils.genByteArrayForWav
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
@@ -15,6 +16,7 @@ import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepos
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import java.io.File
 import javax.inject.Inject
 
 class NoteAssistantRepositoryImpl @Inject constructor(
@@ -113,13 +115,14 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     override suspend fun transcribeAudioFile(
-        uri: Uri,
+        uri: String,
         modelName: String,
         onTranscription: (String) -> Unit
     ) {
         when (modelName) {
             "Gemini Nano (System)" -> {
-                geminiNanoDataSource.transcribeAudioFile(uri, onTranscription)
+                val path = Uri.parse(uri)?.path ?: return
+                geminiNanoDataSource.transcribeAudioFile(File(path), onTranscription)
             }
 
             "Gemini 3 Flash (Cloud)" -> { /* Handle Cloud if needed */ }
@@ -135,7 +138,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                     // Convert URI to clean PCM ByteArray (Gemma requirement)
                     val processedAudio = convertWavToMonoWithMaxSeconds(
                         context = context,
-                        stereoUri = uri,
+                        stereoUri = uri.toUri(),
                         maxSeconds = 30
                     )?.genByteArrayForWav()
 

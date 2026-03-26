@@ -371,7 +371,7 @@ class AddEditNoteViewModel @Inject constructor(
     private fun transcribeAttachedAudio(uriString: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(transcribingUri = uriString) }
-            transcribeAudioFileUseCase(uriString.toUri()) { transcript ->
+            transcribeAudioFileUseCase(uriString) { transcript ->
                 _uiState.update { state ->
                     state.copy(
                         attachedAudios = state.attachedAudios.map {
