@@ -37,5 +37,10 @@ data class AddEditNoteUiState(
     val showAddNewTagDialog: Boolean = false,
 
     val isTagSuggestionLoading: Boolean = false,
-    val suggestedTags: List<String> = emptyList()
+    val suggestedTags: List<String> = emptyList(),
+
+    val imageSuggestions: List<String> = emptyList(),
+    val isAnalyzingImage: Boolean = false,
+    val imageQueryResult: String = "",
+    val isImageQueryLoading: Boolean = false
 )

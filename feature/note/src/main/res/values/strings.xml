@@ -90,6 +90,10 @@
     <string name="build_format">Build %1$s</string>
     <string name="next">Next</string>
 
+    //Audio Analysis
     <string name="hint_audio_to_text">Audio to text transcription...</string>
     <string name="content_description_trascribe_audio">Transcribe Audio</string>
+
+    <!-- Image Analysis -->
+    <string name="btn_add_to_note">Add to note</string>
 </resources>

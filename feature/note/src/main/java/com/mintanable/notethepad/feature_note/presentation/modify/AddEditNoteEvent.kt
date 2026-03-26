@@ -39,4 +39,7 @@ sealed class AddEditNoteEvent {
     data object ShowSuggestions : AddEditNoteEvent()
     data object ClearSuggestions : AddEditNoteEvent()
     data class TranscribeAttachedAudio(val uri: String) : AddEditNoteEvent()
+    data class AnalyzeImage(val uri: Uri) : AddEditNoteEvent()
+    data class ExecuteImageQuery(val query: String) : AddEditNoteEvent()
+    data object ClearImageSuggestions : AddEditNoteEvent()
 }

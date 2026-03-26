@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
@@ -18,6 +19,8 @@ import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.StartLiveTransctiption
 import com.mintanable.notethepad.feature_ai.domain.use_cases.StopLiveTranscription
+import com.mintanable.notethepad.feature_ai.domain.use_cases.AnalyzeImageUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_cases.QueryImageUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.TranscribeAudioFileUseCase
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
@@ -27,8 +30,10 @@ import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
+import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.permissions.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,7 +61,10 @@ class AddEditNoteViewModel @Inject constructor(
     private val getAutoTagsUseCase: GetAutoTagsUseCase,
     private val startLiveTransctiption: StartLiveTransctiption,
     private val stopLiveTransctiptions: StopLiveTranscription,
-    private val transcribeAudioFileUseCase: TranscribeAudioFileUseCase
+    private val transcribeAudioFileUseCase: TranscribeAudioFileUseCase,
+    private val analyzeImageUseCase: AnalyzeImageUseCase,
+    private val queryImageUseCase: QueryImageUseCase,
+    @ApplicationContext private val appContext: Context
 ): ViewModel(){
 
     private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
@@ -65,6 +73,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val isEditMode = passedNoteId != -1L
     private var currentNoteId: Long = 0L
     private var currentRecordingFile: File? = null
+    private val imageSuggestionsCache = mutableMapOf<String, List<String>>()
+    private var cachedImageBytes: ByteArray? = null
 
     private val _uiState = MutableStateFlow(
         AddEditNoteUiState(
@@ -249,13 +259,24 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ToggleZoom -> {
                 mediaPlayer.playPause(event.uri)
                 _uiState.update { it.copy(zoomedImageUri = event.uri) }
+
+                val attachmentType = AttachmentHelper.getAttachmentType(appContext, event.uri)
+                if (attachmentType != AttachmentType.VIDEO) {
+                    analyzeImage(event.uri)
+                }
             }
             is AddEditNoteEvent.UpdateNowPlaying -> {
                 mediaPlayer.playPause(event.uri.toUri())
             }
             is AddEditNoteEvent.StopMedia -> {
                 mediaPlayer.stop()
-                _uiState.update { it.copy(zoomedImageUri = null) }
+                _uiState.update { it.copy(
+                    zoomedImageUri = null,
+                    imageSuggestions = emptyList(),
+                    imageQueryResult = "",
+                    isImageQueryLoading = false,
+                    isAnalyzingImage = false
+                ) }
             }
             is AddEditNoteEvent.SetReminder -> {
                 _uiState.update { it.copy(reminderTime = event.timestamp, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
@@ -365,6 +386,11 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.TranscribeAttachedAudio -> transcribeAttachedAudio(event.uri)
+            is AddEditNoteEvent.AnalyzeImage -> analyzeImage(event.uri)
+            is AddEditNoteEvent.ExecuteImageQuery -> executeImageQuery(event.query)
+            is AddEditNoteEvent.ClearImageSuggestions -> _uiState.update {
+                it.copy(imageSuggestions = emptyList(), imageQueryResult = "", isImageQueryLoading = false, isAnalyzingImage = false)
+            }
         }
     }
 
@@ -381,6 +407,53 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
             _uiState.update { it.copy(transcribingUri = null) }
+        }
+    }
+
+    private fun analyzeImage(uri: Uri) {
+        val cacheKey = uri.toString()
+        val cached = imageSuggestionsCache[cacheKey]
+        if (cached != null) {
+            // Load image bytes for potential query later
+            if (cachedImageBytes == null) {
+                cachedImageBytes = appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }
+            _uiState.update { it.copy(imageSuggestions = cached, isAnalyzingImage = false) }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAnalyzingImage = true, imageSuggestions = emptyList(), imageQueryResult = "") }
+            try {
+                val imageBytes = appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                if (imageBytes == null) {
+                    _uiState.update { it.copy(isAnalyzingImage = false) }
+                    return@launch
+                }
+                cachedImageBytes = imageBytes
+                val suggestions = analyzeImageUseCase(imageBytes).take(3)
+                imageSuggestionsCache[cacheKey] = suggestions
+                _uiState.update { it.copy(imageSuggestions = suggestions, isAnalyzingImage = false) }
+            } catch (e: Exception) {
+                Log.e("AddEditNoteViewModel", "Image analysis failed: ${e.message}")
+                _uiState.update { it.copy(isAnalyzingImage = false) }
+            }
+        }
+    }
+
+    private fun executeImageQuery(query: String) {
+        val imageBytes = cachedImageBytes ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isImageQueryLoading = true, imageSuggestions = emptyList(), imageQueryResult = "") }
+            try {
+                queryImageUseCase(imageBytes, query).collect { chunk ->
+                    _uiState.update { it.copy(imageQueryResult = it.imageQueryResult + chunk) }
+                }
+                _uiState.update { it.copy(isImageQueryLoading = false) }
+            } catch (e: Exception) {
+                Log.e("AddEditNoteViewModel", "Image query failed: ${e.message}")
+                _uiState.update { it.copy(isImageQueryLoading = false) }
+            }
         }
     }
 

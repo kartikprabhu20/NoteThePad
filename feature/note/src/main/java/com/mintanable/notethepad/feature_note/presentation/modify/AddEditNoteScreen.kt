@@ -294,6 +294,16 @@ fun AddEditNoteScreen(
                 uri = uiState.zoomedImageUri!!,
                 playerEngine = viewModel.videoPlayerEngine,
                 onClick = { viewModel.onEvent(AddEditNoteEvent.StopMedia) },
+                imageSuggestions = uiState.imageSuggestions,
+                isAnalyzingImage = uiState.isAnalyzingImage,
+                imageQueryResult = uiState.imageQueryResult,
+                isImageQueryLoading = uiState.isImageQueryLoading,
+                onSuggestionClicked = { viewModel.onEvent(AddEditNoteEvent.ExecuteImageQuery(it)) },
+                onAppendToNote = { result ->
+                    viewModel.onEvent(AddEditNoteEvent.EnteredContent(
+                        uiState.contentState.text + "\n" + result
+                    ))
+                },
                 transitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope
             )
