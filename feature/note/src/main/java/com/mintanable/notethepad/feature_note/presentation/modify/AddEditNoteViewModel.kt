@@ -411,11 +411,11 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private fun readUriBytes(uri: Uri): ByteArray? {
-        return if (uri.scheme == "file") {
-            val path = uri.path ?: return null
-            File(path).takeIf { it.exists() }?.readBytes()
-        } else {
+        return if (uri.scheme == "content") {
             appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } else {
+            val path = uri.path ?: uri.toString()
+            File(path).takeIf { it.exists() }?.readBytes()
         }
     }
 
