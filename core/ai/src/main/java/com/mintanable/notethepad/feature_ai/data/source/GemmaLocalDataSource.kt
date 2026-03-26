@@ -76,7 +76,7 @@ class GemmaLocalDataSource @Inject constructor(
         fileName: String,
         supportAudio: Boolean,
         supportImage: Boolean,
-        maxNumTokens: Int = 4096,
+        maxNumTokens: Int = 1024,
         samplerConfig: SamplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 1.0),
         systemInstruction: String? = null,
     ) {
@@ -325,23 +325,23 @@ class GemmaLocalDataSource @Inject constructor(
                 fileName = fileName,
                 supportAudio = false,
                 supportImage = true,
-                maxNumTokens = 1024,
+                maxNumTokens = 4096,
                 samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 1.00),
-//                systemInstruction = """
-//                    Analyze images and suggest exactly 3 short action phrases the user might want to do with it.
-//                    Rules:
-//                    - Each suggestion must be 2-5 words
-//                    - Return ONLY a comma-separated list of exactly 3 items
-//                    - Match these categories when applicable:
-//                      * Text/handwriting: "Convert to text"
-//                      * Food/recipe: "Give me recipe"
-//                      * Recognizable place: "Plan trip to this place"
-//                      * Actionable items: "Create checklist"
-//                      * Document/form: "Summarize document"
-//                      * Code/technical: "Explain this code"
-//                      * Nature/animal: "Identify this"
-//                    Example output: Convert to text, Create checklist, Summarize document
-//                """.trimIndent()
+                systemInstruction = """
+                    Analyze images and suggest exactly 3 short action phrases the user might want to do with it.
+                    Rules:
+                    - Each suggestion must be 2-5 words
+                    - Return ONLY a comma-separated list of exactly 3 items
+                    - Match these categories when applicable:
+                      * Text/handwriting: "Convert to text"
+                      * Food/recipe: "Give me recipe"
+                      * Recognizable place: "Plan trip to this place"
+                      * Actionable items: "Create checklist"
+                      * Document/form: "Summarize document"
+                      * Code/technical: "Explain this code"
+                      * Nature/animal: "Identify this"
+                    Example output: Convert to text, Create checklist, Summarize document
+                """.trimIndent()
             )
 
             var response = ""
@@ -377,7 +377,7 @@ class GemmaLocalDataSource @Inject constructor(
             fileName = fileName,
             supportAudio = false,
             supportImage = true,
-            maxNumTokens = 1024,
+            maxNumTokens = 4096,
             samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 1.00),
         )
         return runInference(prompt = query, imageData = imageBytes)
