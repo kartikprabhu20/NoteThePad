@@ -24,7 +24,7 @@ import kotlin.math.roundToInt
  *  - JPEG output (5-10x smaller than PNG)
  *  - Immediate recycle of every intermediate bitmap
  */
-fun readAndProcessImage(context: Context, uri: Uri, maxDimension: Int = 384): ByteArray? {
+fun readAndProcessImage(context: Context, uri: Uri, maxDimension: Int = 1024): ByteArray? {
     val orientation = try {
         openUriStream(context, uri)?.use { stream ->
             ExifInterface(stream).getAttributeInt(
@@ -44,7 +44,8 @@ fun readAndProcessImage(context: Context, uri: Uri, maxDimension: Int = 384): By
     val sampleSize = calculateInSampleSize(boundsOptions, maxDimension, maxDimension)
     val decodeOptions = BitmapFactory.Options().apply {
         inSampleSize = sampleSize
-        inPreferredConfig = Bitmap.Config.RGB_565   // 2 bytes/pixel instead of 4
+        // ARGB_8888 (default) — required by LiteRT Content.ImageBytes (PNG).
+        // Do NOT use RGB_565: it drops the alpha channel and can cause native decode failures.
     }
     var bitmap = openUriStream(context, uri)?.use {
         BitmapFactory.decodeStream(it, null, decodeOptions)
@@ -53,7 +54,8 @@ fun readAndProcessImage(context: Context, uri: Uri, maxDimension: Int = 384): By
     bitmap = rotateBitmap(bitmap, orientation)
     bitmap = resizeBitmap(bitmap, maxDimension)
     val out = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
+    // PNG format required — LiteRT Content.ImageBytes expects PNG
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
     bitmap.recycle()
     return out.toByteArray()
 }

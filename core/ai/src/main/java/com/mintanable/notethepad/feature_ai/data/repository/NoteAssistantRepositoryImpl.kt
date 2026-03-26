@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
 import java.io.File
 import javax.inject.Inject
 
@@ -63,19 +64,19 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     private fun createTagPrompt(title: String, content: String, existingTags: List<String>): String {
         return """
             You are an expert organizational assistant for the app "NoteThePad".
-            
+
             TASK: Analyze the note below and suggest 3-5 relevant one-word tags.
-            
+
             CONTEXT:
             - Note Title: $title
             - Note Content: $content
             - User's Existing Tags: ${existingTags.joinToString(", ")}
-            
+
             CRITICAL RULES:
             1. If a suggested tag matches an 'Existing Tag' semantically, use the EXACT name from the existing list.
             2. Return ONLY a comma-separated list of words.
             3. No hashtags, no explanations.
-            
+
             Example Output: Work, Finance, Urgent
         """.trimIndent()
     }
@@ -86,7 +87,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             - Title: $title
             - Content: $content
             - Existing Tags: ${existingTags.joinToString(", ")}
-    
+
             Tags:
             """.trimIndent()
         return prompt
@@ -158,8 +159,6 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             "Gemini Nano (System)" -> emptyList() // Nano doesn't support images
             "None" -> emptyList()
             else -> {
-                gemmaLocalDataSource.releaseEngineForMemory()
-
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.llmSupportImage) {
@@ -182,6 +181,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.llmSupportImage) {
                     gemmaLocalDataSource.queryImage(imageBytes, query, selectedModel.downloadFileName)
+                        .onCompletion { gemmaLocalDataSource.cleanup() }
                         .collect { emit(it) }
                 }
             }

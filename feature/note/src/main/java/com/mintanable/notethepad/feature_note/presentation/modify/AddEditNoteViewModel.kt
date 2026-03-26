@@ -422,7 +422,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private fun readUriBytes(uri: Uri): ByteArray? {
-        return readAndProcessImage(appContext, uri, maxDimension = 384)
+        return readAndProcessImage(appContext, uri, maxDimension = 1024)
     }
 
     private fun analyzeImage(uri: Uri) {
