@@ -410,13 +410,21 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
+    private fun readUriBytes(uri: Uri): ByteArray? {
+        return if (uri.scheme == "file") {
+            val path = uri.path ?: return null
+            File(path).takeIf { it.exists() }?.readBytes()
+        } else {
+            appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        }
+    }
+
     private fun analyzeImage(uri: Uri) {
         val cacheKey = uri.toString()
         val cached = imageSuggestionsCache[cacheKey]
         if (cached != null) {
-            // Load image bytes for potential query later
             if (cachedImageBytes == null) {
-                cachedImageBytes = appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                cachedImageBytes = readUriBytes(uri)
             }
             _uiState.update { it.copy(imageSuggestions = cached, isAnalyzingImage = false) }
             return
@@ -425,7 +433,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isAnalyzingImage = true, imageSuggestions = emptyList(), imageQueryResult = "") }
             try {
-                val imageBytes = appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                val imageBytes = readUriBytes(uri)
                 if (imageBytes == null) {
                     _uiState.update { it.copy(isAnalyzingImage = false) }
                     return@launch
