@@ -303,6 +303,7 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.EnteredContent(
                         uiState.contentState.text + "\n" + result
                     ))
+                    viewModel.onEvent(AddEditNoteEvent.ClearImageQueryResult)
                 },
                 transitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope

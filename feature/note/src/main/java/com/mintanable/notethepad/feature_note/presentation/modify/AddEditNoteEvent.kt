@@ -42,4 +42,5 @@ sealed class AddEditNoteEvent {
     data class AnalyzeImage(val uri: Uri) : AddEditNoteEvent()
     data class ExecuteImageQuery(val query: String) : AddEditNoteEvent()
     data object ClearImageSuggestions : AddEditNoteEvent()
+    data object ClearImageQueryResult : AddEditNoteEvent()
 }

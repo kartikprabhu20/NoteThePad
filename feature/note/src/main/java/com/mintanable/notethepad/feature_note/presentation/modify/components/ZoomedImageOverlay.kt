@@ -14,14 +14,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -75,6 +78,7 @@ fun ZoomedImageOverlay(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.7f))
+                .windowInsetsPadding(WindowInsets.systemBars)
                 .clickable { onClick() },
             contentAlignment = Alignment.Center
         ) {
@@ -85,7 +89,10 @@ fun ZoomedImageOverlay(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .then(
+                            if (attachmentType == AttachmentType.VIDEO) Modifier.aspectRatio(1f)
+                            else Modifier
+                        )
                         .clip(RoundedCornerShape(16.dp))
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(key = "image-${uri}"),
@@ -99,8 +106,8 @@ fun ZoomedImageOverlay(
                         AsyncImage(
                             model = uri,
                             contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
+                            contentScale = ContentScale.Fit
                         )
                     }
                 }

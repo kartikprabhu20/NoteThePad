@@ -257,10 +257,12 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(currentSheetType = event.sheetType) }
             }
             is AddEditNoteEvent.ToggleZoom -> {
-                mediaPlayer.playPause(event.uri)
+                val attachmentType = AttachmentHelper.getAttachmentType(appContext, event.uri)
+                if (attachmentType == AttachmentType.VIDEO) {
+                    mediaPlayer.playPause(event.uri)
+                }
                 _uiState.update { it.copy(zoomedImageUri = event.uri) }
 
-                val attachmentType = AttachmentHelper.getAttachmentType(appContext, event.uri)
                 if (attachmentType != AttachmentType.VIDEO) {
                     analyzeImage(event.uri)
                 }
@@ -390,6 +392,12 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ExecuteImageQuery -> executeImageQuery(event.query)
             is AddEditNoteEvent.ClearImageSuggestions -> _uiState.update {
                 it.copy(imageSuggestions = emptyList(), imageQueryResult = "", isImageQueryLoading = false, isAnalyzingImage = false)
+            }
+            is AddEditNoteEvent.ClearImageQueryResult -> {
+                // Re-show cached suggestions after adding result to note
+                val cachedKey = _uiState.value.zoomedImageUri?.toString()
+                val cached = cachedKey?.let { imageSuggestionsCache[it] } ?: emptyList()
+                _uiState.update { it.copy(imageQueryResult = "", isImageQueryLoading = false, imageSuggestions = cached) }
             }
         }
     }
