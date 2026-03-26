@@ -15,7 +15,9 @@ import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import java.io.File
 import javax.inject.Inject
 
@@ -149,4 +151,39 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun analyzeImage(imageBytes: ByteArray, modelName: String): List<String> {
+        return when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> geminiDataSource.analyzeImage(imageBytes)
+            "Gemini Nano (System)" -> emptyList() // Nano doesn't support images
+            "None" -> emptyList()
+            else -> {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.llmSupportImage) {
+                    val response = gemmaLocalDataSource.analyzeImage(imageBytes, selectedModel.downloadFileName)
+                    response?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.take(3) ?: emptyList()
+                } else {
+                    emptyList()
+                }
+            }
+        }
+    }
+
+    override fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String> {
+        return when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> geminiDataSource.queryImage(imageBytes, query)
+            "Gemini Nano (System)" -> emptyFlow()
+            "None" -> emptyFlow()
+            else -> flow {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.llmSupportImage) {
+                    gemmaLocalDataSource.queryImage(imageBytes, query, selectedModel.downloadFileName)
+                        .collect { emit(it) }
+                }
+            }
+        }
+    }
+
 }

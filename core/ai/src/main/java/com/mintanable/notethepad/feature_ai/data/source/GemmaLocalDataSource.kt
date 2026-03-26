@@ -259,11 +259,67 @@ class GemmaLocalDataSource @Inject constructor(
         }
     }
 
-    fun runInference(prompt: String, audioData: ByteArray? = null): Flow<String> = flow {
+    @OptIn(ExperimentalApi::class)
+    suspend fun analyzeImage(imageBytes: ByteArray, fileName: String): String? = withContext(Dispatchers.IO) {
+        try {
+            initializeEngine(
+                fileName = fileName,
+                supportAudio = false,
+                supportImage = true,
+                samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.7),
+                systemInstruction = """
+                    Analyze images and suggest exactly 3 short action phrases the user might want to do with it.
+                    Rules:
+                    - Each suggestion must be 2-5 words
+                    - Return ONLY a comma-separated list of exactly 3 items
+                    - Match these categories when applicable:
+                      * Text/handwriting: "Convert to text"
+                      * Food/recipe: "Give me recipe"
+                      * Recognizable place: "Plan trip to this place"
+                      * Actionable items: "Create checklist"
+                      * Document/form: "Summarize document"
+                      * Code/technical: "Explain this code"
+                      * Nature/animal: "Identify this"
+                    Example output: Convert to text, Create checklist, Summarize document
+                """.trimIndent()
+            )
+
+            var response = ""
+            withTimeout(30_000L) {
+                runInference(
+                    prompt = "Analyze this image and suggest exactly 3 short action phrases:",
+                    imageData = imageBytes
+                ).collect { chunk ->
+                    response += chunk
+                }
+            }
+            response.trim()
+        } catch (e: TimeoutCancellationException) {
+            Log.e("kptest", "Image analysis timed out")
+            null
+        } catch (e: Exception) {
+            Log.e("kptest", "Image analysis failed: ${e.message}")
+            null
+        }
+    }
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun queryImage(imageBytes: ByteArray, query: String, fileName: String): Flow<String> {
+        initializeEngine(
+            fileName = fileName,
+            supportAudio = false,
+            supportImage = true,
+            samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.7),
+        )
+        return runInference(prompt = query, imageData = imageBytes)
+    }
+
+    fun runInference(prompt: String, audioData: ByteArray? = null, imageData: ByteArray? = null): Flow<String> = flow {
         val instance = activeInstance ?: throw IllegalStateException("Engine not initialized")
 
         val contents = mutableListOf<Content>()
         audioData?.let { contents.add(Content.AudioBytes(it)) }
+        imageData?.let { contents.add(Content.ImageBytes(it)) }
         contents.add(Content.Text(prompt))
 
         val responseChannel = Channel<String>(Channel.UNLIMITED)

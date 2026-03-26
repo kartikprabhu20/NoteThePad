@@ -17,4 +17,7 @@ interface NoteAssistantRepository {
 
     suspend fun checkAudioTransciberStatus(modelName: String): Flow<AiModelDownloadStatus>
     suspend fun  transcribeAudioFile(uri: String, modelName: String, onTranscription: (String) -> Unit)
+
+    suspend fun analyzeImage(imageBytes: ByteArray, modelName: String): List<String>
+    fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String>
 }
