@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import java.io.File
 import java.util.concurrent.CancellationException
@@ -67,6 +68,7 @@ class GemmaLocalDataSource @Inject constructor(
         systemInstruction: String? = null,
         supportAudio: Boolean = true,
         supportImage: Boolean = false,
+        maxNumTokens: Int = 1024,
         samplerConfig: SamplerConfig = SamplerConfig(
             topK = 64,
             topP = 0.95,
@@ -78,7 +80,7 @@ class GemmaLocalDataSource @Inject constructor(
                 val modelFile = File(context.getExternalFilesDir(null), fileName)
                 val newPath = modelFile.absolutePath
 
-              val capabilitiesMatch = currentSupportAudio == supportAudio && currentSupportImage == supportImage
+                val capabilitiesMatch = currentSupportAudio == supportAudio && currentSupportImage == supportImage
                 if (activeInstance != null && currentModelPath == newPath && capabilitiesMatch) {
                    cancelAndAwaitInference(activeInstance!!.conversation)
                     activeInstance?.conversation?.close()
@@ -90,16 +92,19 @@ class GemmaLocalDataSource @Inject constructor(
                 // Close existing engine (must cancel inference first).
                 closeInstanceInternal()
 
+                // When switching capabilities (especially to vision), give GPU driver time to reclaim memory from the previous engine.
+                if (supportImage) {
+                    System.gc()
+                    delay(500)
+                }
+
                 try {
                     val engineConfig = EngineConfig(
                         modelPath = newPath,
                         backend = Backend.GPU(),
-                        visionBackend = if (supportImage) Backend.GPU() else null, // Only load the vision encoder when images are actually needed.
-                        audioBackend = if (supportAudio) Backend.CPU() else null, // Audio encoder must run on CPU for Gemma 3n.
-                        maxNumTokens = 1024,
-                        // Pass null for models stored in external files dir (normal production
-                        // path). Passing context.cacheDir.path forces LiteRT to write KV cache
-                        // to internal storage which has tighter space limits.
+                        visionBackend = if (supportImage) Backend.GPU() else null,
+                        audioBackend = if (supportAudio) Backend.CPU() else null,
+                        maxNumTokens = maxNumTokens,
                         cacheDir = if (newPath.startsWith("/data/local/tmp"))
                             context.getExternalFilesDir(null)?.absolutePath else null,
                     )
@@ -266,6 +271,7 @@ class GemmaLocalDataSource @Inject constructor(
                 fileName = fileName,
                 supportAudio = false,
                 supportImage = true,
+                maxNumTokens = 256,
                 samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.7),
                 systemInstruction = """
                     Analyze images and suggest exactly 3 short action phrases the user might want to do with it.
@@ -309,6 +315,7 @@ class GemmaLocalDataSource @Inject constructor(
             fileName = fileName,
             supportAudio = false,
             supportImage = true,
+            maxNumTokens = 512,
             samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.7),
         )
         return runInference(prompt = query, imageData = imageBytes)

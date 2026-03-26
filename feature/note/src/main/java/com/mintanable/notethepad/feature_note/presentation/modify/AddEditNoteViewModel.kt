@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.core.common.CheckboxConvertors
+import com.mintanable.notethepad.core.common.utils.downscaleImage
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -419,12 +420,14 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private fun readUriBytes(uri: Uri): ByteArray? {
-        return if (uri.scheme == "content") {
+        val rawBytes = if (uri.scheme == "content") {
             appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
         } else {
             val path = uri.path ?: uri.toString()
             File(path).takeIf { it.exists() }?.readBytes()
-        }
+        } ?: return null
+
+        return rawBytes.downscaleImage(maxDimension = 512)
     }
 
     private fun analyzeImage(uri: Uri) {
