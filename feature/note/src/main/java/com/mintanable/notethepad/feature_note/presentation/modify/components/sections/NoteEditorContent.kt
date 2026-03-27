@@ -111,17 +111,15 @@ fun NoteEditorContent(
 
     val lazyListState = rememberLazyListState()
 
-    // Scroll to bottom when tag suggestions start loading
-    LaunchedEffect(isSuggestionTagsLoading) {
-        if (isSuggestionTagsLoading) {
-            scope.launch {
-                lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1)
-            }
+    // Only auto-scroll if user is already near the bottom when results arrive
+    LaunchedEffect(isSuggestionTagsLoading, suggestedTags) {
+        if (isSuggestionTagsLoading || suggestedTags.isNotEmpty()) {
+            lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1)
         }
     }
 
     val extraBottomPadding by animateDpAsState(
-        targetValue = if (showMagicButton) 88.dp else 0.dp,
+        targetValue = if (showMagicButton) 56.dp else 0.dp,
         animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
         label = "fab_padding_animation"
     )

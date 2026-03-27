@@ -53,7 +53,7 @@ fun SuggestedTagsRow(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(4.dp)
                 .background(
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
                     shape = RoundedCornerShape(16.dp)
