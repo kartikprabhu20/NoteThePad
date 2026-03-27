@@ -2,6 +2,8 @@ package com.mintanable.notethepad.feature_note.presentation.modify.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -32,9 +34,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,6 +48,7 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
+import kotlinx.coroutines.delay
 
 @Composable
 fun TextEditBar(
@@ -51,6 +57,26 @@ fun TextEditBar(
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val wiggleAnim = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        delay(200)
+        wiggleAnim.animateTo(
+            targetValue = 0f,
+            animationSpec = keyframes {
+                durationMillis = 500
+                0f at 0
+                -20f at 100
+                20f at 200
+                -10f at 300
+                10f at 400
+                0f at 500
+            }
+        )
+    }
+
+    val wiggleModifier = Modifier.graphicsLayer { rotationZ = wiggleAnim.value }
+
     BottomAppBar(
         modifier = modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
@@ -72,17 +98,20 @@ fun TextEditBar(
                 TextStyleButton(
                     label = "H1",
                     isSelected = SpanType.H1 in activeStyles,
-                    onClick = { onStyleClick(SpanType.H1) }
+                    onClick = { onStyleClick(SpanType.H1) },
+                    modifier = wiggleModifier
                 )
                 TextStyleButton(
                     label = "H2",
                     isSelected = SpanType.H2 in activeStyles,
-                    onClick = { onStyleClick(SpanType.H2) }
+                    onClick = { onStyleClick(SpanType.H2) },
+                    modifier = wiggleModifier
                 )
                 TextStyleButton(
                     label = "P",
                     isSelected = SpanType.PARAGRAPH in activeStyles,
-                    onClick = { onStyleClick(SpanType.PARAGRAPH) }
+                    onClick = { onStyleClick(SpanType.PARAGRAPH) },
+                    modifier = wiggleModifier
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))
@@ -92,19 +121,22 @@ fun TextEditBar(
                     icon = Icons.Default.FormatBold,
                     contentDescription = "Bold",
                     isSelected = SpanType.BOLD in activeStyles,
-                    onClick = { onStyleClick(SpanType.BOLD) }
+                    onClick = { onStyleClick(SpanType.BOLD) },
+                    modifier = wiggleModifier
                 )
                 IconStyleButton(
                     icon = Icons.Default.FormatItalic,
                     contentDescription = "Italic",
                     isSelected = SpanType.ITALIC in activeStyles,
-                    onClick = { onStyleClick(SpanType.ITALIC) }
+                    onClick = { onStyleClick(SpanType.ITALIC) },
+                    modifier = wiggleModifier
                 )
                 IconStyleButton(
                     icon = Icons.Default.FormatUnderlined,
                     contentDescription = "Underline",
                     isSelected = SpanType.UNDERLINE in activeStyles,
-                    onClick = { onStyleClick(SpanType.UNDERLINE) }
+                    onClick = { onStyleClick(SpanType.UNDERLINE) },
+                    modifier = wiggleModifier
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))
@@ -114,7 +146,8 @@ fun TextEditBar(
                     icon = Icons.AutoMirrored.Filled.FormatListBulleted,
                     contentDescription = "Bullet List",
                     isSelected = SpanType.BULLET in activeStyles,
-                    onClick = { onStyleClick(SpanType.BULLET) }
+                    onClick = { onStyleClick(SpanType.BULLET) },
+                    modifier = wiggleModifier
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
