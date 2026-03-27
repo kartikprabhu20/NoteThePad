@@ -221,7 +221,7 @@ fun NotesScreen(
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            navController.navigate(Screen.AddEditNoteScreen.route)
+                            navController.navigate(Screen.AddEditNoteScreen.passArgs())
                         },
                         containerColor = MaterialTheme.colorScheme.primary,
                         modifier = Modifier

@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         val launchEditScreen = currentIntent?.getBooleanExtra(NavigationConstants.LAUNCH_EDIT_SCREEN, false) ?: false
                         if(launchEditScreen){
-                            navController.navigate(Screen.AddEditNoteScreen.route)
+                            navController.navigate(Screen.AddEditNoteScreen.passArgs())
                             currentIntent?.removeExtra(NavigationConstants.LAUNCH_EDIT_SCREEN)
                         }
                     }
@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity() {
                                         type = NavType.LongType; defaultValue = -1L
                                     },
                                     navArgument(name = "initialTitle") {
-                                        type = NavType.StringType; defaultValue = ""
+                                        type = NavType.StringType; nullable = true; defaultValue = null
                                     }
                                 )
                             ) {

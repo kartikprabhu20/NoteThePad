@@ -5,20 +5,25 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckBox
@@ -42,6 +47,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.database.db.entity.Attachment
@@ -85,6 +91,7 @@ fun NoteEditorContent(
     val noteBackgroundAnimatable = remember {
         Animatable(if (noteColor == -1) Color.White else Color(noteColor))
     }
+
     LaunchedEffect(noteColor) {
         if (noteColor != -1) {
             scope.launch {
@@ -96,9 +103,28 @@ fun NoteEditorContent(
         }
     }
 
-    val checklistCharCount by remember(checkListItems) { derivedStateOf { checkListItems.sumOf { it.text.length } } }
+    val checklistCharCount by remember(checkListItems) {
+        derivedStateOf { checkListItems.sumOf { it.text.length } }
+    }
     val charCount = titleState.text.length + contentState.text.length + checklistCharCount
     val showMagicButton = charCount > 400 && !isSuggestionTagsLoading
+
+    val lazyListState = rememberLazyListState()
+
+    // Scroll to bottom when tag suggestions start loading
+    LaunchedEffect(isSuggestionTagsLoading) {
+        if (isSuggestionTagsLoading) {
+            scope.launch {
+                lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1)
+            }
+        }
+    }
+
+    val extraBottomPadding by animateDpAsState(
+        targetValue = if (showMagicButton) 88.dp else 0.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
+        label = "fab_padding_animation"
+    )
 
     with(sharedTransitionScope) {
         Scaffold(
@@ -127,7 +153,6 @@ fun NoteEditorContent(
                         ),
                         modifier = Modifier,
                         onActionClick = { sheetType ->
-
                             if (sheetType == BottomSheetType.CHECKBOX) {
                                 onEvent(AddEditNoteEvent.ToggleCheckbox)
                             } else {
@@ -139,7 +164,6 @@ fun NoteEditorContent(
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 }
-
             },
             modifier = Modifier.fillMaxSize(),
             floatingActionButton = {
@@ -171,41 +195,31 @@ fun NoteEditorContent(
                         },
                         resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                     )
-//                    .renderInSharedTransitionScopeOverlay(
-//                        zIndexInOverlay = if (animatedVisibilityScope.transition.isRunning) 2f else 0f
-//                    )
             ) {
-
                 val focusRequesters = remember { mutableMapOf<String, FocusRequester>() }
 
                 LazyColumn(
+                    state = lazyListState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
-                    contentPadding = paddingValue
+
+                    contentPadding = PaddingValues(
+                        top = paddingValue.calculateTopPadding(),
+                        start = paddingValue.calculateStartPadding(LayoutDirection.Ltr),
+                        end = paddingValue.calculateEndPadding(LayoutDirection.Ltr),
+                        bottom = paddingValue.calculateBottomPadding() + extraBottomPadding + 16.dp
+                    )
                 ) {
                     colorSelectorSection(
                         selectedColor = noteColor,
                         onColorClick = { colorInt -> onEvent(AddEditNoteEvent.ChangeColor(colorInt)) }
                     )
 
-                    item {
-                        SuggestedTagsRow(
-                            suggestions = suggestedTags,
-                            isLoading = isSuggestionTagsLoading,
-                            onTagAccepted = { tag -> onEvent(AddEditNoteEvent.InsertLabel(tag)) },
-                            onDismiss = { onEvent(AddEditNoteEvent.ClearSuggestions) }
-                        )
-                    }
-
                     attachedImagesSection(
                         images = attachedImages,
                         onRemoveImage = { deletedUri ->
-                            onEvent(
-                                AddEditNoteEvent.RemoveImage(
-                                    deletedUri
-                                )
-                            )
+                            onEvent(AddEditNoteEvent.RemoveImage(deletedUri))
                         },
                         onImageClick = { onEvent(AddEditNoteEvent.ToggleZoom(it)) },
                         sharedTransitionScope = sharedTransitionScope,
@@ -228,9 +242,7 @@ fun NoteEditorContent(
                                         key = "note-title-${noteId}"
                                     ),
                                     animatedVisibilityScope = animatedVisibilityScope,
-                                    boundsTransform = { _, _ ->
-                                        tween()
-                                    },
+                                    boundsTransform = { _, _ -> tween() },
                                     resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                                 ),
                         )
@@ -253,9 +265,7 @@ fun NoteEditorContent(
                                             key = "note-content-${noteId}"
                                         ),
                                         animatedVisibilityScope = animatedVisibilityScope,
-                                        boundsTransform = { _, _ ->
-                                            tween()
-                                        },
+                                        boundsTransform = { _, _ -> tween() },
                                         resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                                     )
                             )
@@ -273,18 +283,10 @@ fun NoteEditorContent(
                                 onEvent(AddEditNoteEvent.UpdateCheckList(checkListItems.map { if (it.id == updatedItem.id) updatedItem else it }))
                             },
                             onListOrderUpdated = { orderedList ->
-                                onEvent(
-                                    AddEditNoteEvent.UpdateCheckList(
-                                        orderedList
-                                    )
-                                )
+                                onEvent(AddEditNoteEvent.UpdateCheckList(orderedList))
                             },
-                            onDragStateChangedChecked = {
-                                activeDragCheckIndex = it
-                            },
-                            onDragStateChangedUnChecked = {
-                                activeDragUnCheckIndex = it
-                            }
+                            onDragStateChangedChecked = { activeDragCheckIndex = it },
+                            onDragStateChangedUnChecked = { activeDragUnCheckIndex = it }
                         )
                     }
 
@@ -307,6 +309,15 @@ fun NoteEditorContent(
                         tagEntities = tagEntities,
                         onDelete = { tagName -> onEvent(AddEditNoteEvent.DeleteLabel(tagName)) },
                     )
+
+                    item {
+                        SuggestedTagsRow(
+                            suggestions = suggestedTags,
+                            isLoading = isSuggestionTagsLoading,
+                            onTagAccepted = { tag -> onEvent(AddEditNoteEvent.InsertLabel(tag)) },
+                            onDismiss = { onEvent(AddEditNoteEvent.ClearSuggestions) }
+                        )
+                    }
                 }
             }
         }

@@ -16,10 +16,18 @@ sealed class Screen(val route:String){
         fun passArgs(
             noteId: Long? = null,
             reminderTime: Long = -1L,
-            initialTitle: String = ""
+            initialTitle: String? = null
         ): String {
-            val encodedTitle = android.net.Uri.encode(initialTitle)
-            return "add_edit_note_screen?noteId=${noteId ?: -1L}&reminderTime=$reminderTime&initialTitle=$encodedTitle"
+            val encodedTitle = if (!initialTitle.isNullOrBlank()) {
+                android.net.Uri.encode(initialTitle)
+            } else null
+
+            val baseRoute = "add_edit_note_screen?noteId=${noteId ?: -1L}&reminderTime=$reminderTime"
+            return if (encodedTitle != null) {
+                "$baseRoute&initialTitle=$encodedTitle"
+            } else {
+                baseRoute
+            }
         }
     }
 
