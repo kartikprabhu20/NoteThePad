@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.utils.readAndProcessImage
+import com.mintanable.notethepad.core.richtext.compose.RichTextAnnotator
+import com.mintanable.notethepad.core.richtext.engine.SpanAdjustmentEngine
+import com.mintanable.notethepad.core.richtext.model.RichTextDocument
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -31,6 +36,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
+import com.mintanable.notethepad.feature_note.presentation.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.permissions.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -115,7 +121,12 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(reminderTime = passedReminderTime) }
             }
             if (passedInitialTitle.isNotBlank()) {
-                _uiState.update { it.copy(titleState = it.titleState.copy(text = passedInitialTitle, isHintVisible = false)) }
+                _uiState.update { it.copy(
+                    titleState = it.titleState.copy(
+                        richText = RichTextDocument(rawText = passedInitialTitle),
+                        isHintVisible = false
+                    )
+                ) }
             }
         }
     }
@@ -124,11 +135,19 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             noteUseCases.getDetailedNote(id)?.also { detailedNote ->
                 currentNoteId = detailedNote.id
-
+                val richText = RichTextSerializer.deserialize(detailedNote.content)
+                val annotated = RichTextAnnotator.toAnnotatedString(richText)
                 _uiState.update {
                     it.copy(
-                        titleState = it.titleState.copy(text = detailedNote.title, isHintVisible = false),
-                        contentState = it.contentState.copy(text = detailedNote.content, isHintVisible = false),
+                        titleState = it.titleState.copy(
+                            richText = RichTextDocument(rawText = detailedNote.title),
+                            isHintVisible = false
+                        ),
+                        contentState = it.contentState.copy(
+                            richText = richText,
+                            isHintVisible = false
+                        ),
+                        contentTextFieldValue = TextFieldValue(annotatedString = annotated),
                         noteColor = detailedNote.color,
                         attachedImages = detailedNote.imageUris.map { imgString -> imgString.toUri() },
                         attachedAudios = detailedNote.audioAttachments,
@@ -147,27 +166,68 @@ class AddEditNoteViewModel @Inject constructor(
         when(event){
             is AddEditNoteEvent.EnteredTitle -> {
                 _uiState.update { it.copy(
-                    titleState = it.titleState.copy(text = event.value)
+                    titleState = it.titleState.copy(
+                        richText = RichTextDocument(rawText = event.value)
+                    )
                 )}
             }
             is AddEditNoteEvent.ChangeTitleFocus -> {
                 _uiState.update { it.copy(
                     titleState = it.titleState.copy(
-                        isHintVisible = !event.focusState.isFocused && it.titleState.text.isBlank()
+                        isFocused = event.focusState.isFocused,
+                        isHintVisible = !event.focusState.isFocused && it.titleState.richText.rawText.isBlank()
                     )
                 )}
             }
             is AddEditNoteEvent.EnteredContent -> {
+                val newText = event.value.text
+                val state = _uiState.value
+                val oldDoc = state.contentState.richText
+                val changeStart = findTextChangeStart(oldDoc.rawText, newText)
+                val changeEnd = findTextChangeEnd(oldDoc.rawText, newText, changeStart)
+                val newDoc = SpanAdjustmentEngine.adjustForTextChange(oldDoc, newText, changeStart, changeEnd)
+                val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                val newTFV = event.value.copy(annotatedString = annotated)
                 _uiState.update { it.copy(
-                    contentState = it.contentState.copy(text = event.value)
+                    contentState = it.contentState.copy(
+                        richText = newDoc,
+                        isHintVisible = newText.isBlank() && !it.contentState.isFocused
+                    ),
+                    contentTextFieldValue = newTFV,
+                    activeContentStyles = newDoc.activeTypesAt(newTFV.selection.start)
                 )}
             }
             is AddEditNoteEvent.ChangeContentFocus -> {
+                val focused = event.focusState.isFocused
                 _uiState.update { it.copy(
                     contentState = it.contentState.copy(
-                        isHintVisible = !event.focusState.isFocused && it.contentState.text.isBlank()
-                    )
+                        isFocused = focused,
+                        isHintVisible = !focused && it.contentState.richText.rawText.isBlank()
+                    ),
+                    isRichTextBarActive = if (!focused) false else it.isRichTextBarActive
                 )}
+            }
+            is AddEditNoteEvent.ApplyContentFormat -> {
+                val state = _uiState.value
+                val sel = state.contentTextFieldValue.selection
+                val doc = if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
+                    SpanAdjustmentEngine.applyBlockType(
+                        state.contentState.richText, event.type, sel.start, sel.end
+                    )
+                } else {
+                    SpanAdjustmentEngine.toggleSpan(
+                        state.contentState.richText, event.type, sel.start, sel.end
+                    )
+                }
+                val annotated = RichTextAnnotator.toAnnotatedString(doc)
+                _uiState.update { it.copy(
+                    contentState = it.contentState.copy(richText = doc),
+                    contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
+                    activeContentStyles = doc.activeTypesAt(sel.start)
+                )}
+            }
+            is AddEditNoteEvent.ToggleRichTextBar -> {
+                _uiState.update { it.copy(isRichTextBarActive = !it.isRichTextBarActive) }
             }
             is AddEditNoteEvent.ChangeColor -> {
                 _uiState.update { it.copy(noteColor = event.color) }
@@ -298,25 +358,27 @@ class AddEditNoteViewModel @Inject constructor(
             }
             is AddEditNoteEvent.ToggleCheckbox -> {
                 if(uiState.value.isCheckboxListAvailable) {
+                    val textContent = CheckboxConvertors.checkboxesToContentString(uiState.value.checkListItems)
+                    val richText = RichTextDocument(rawText = textContent)
+                    val annotated = RichTextAnnotator.toAnnotatedString(richText)
                     _uiState.update {
                         it.copy(
                             isCheckboxListAvailable = false,
                             checkListItems = emptyList(),
-                            contentState = it.contentState.copy(
-                                text = CheckboxConvertors.checkboxesToContentString(
-                                    uiState.value.checkListItems
-                                ), isHintVisible = false
-                            )
+                            contentState = it.contentState.copy(richText = richText, isHintVisible = false),
+                            contentTextFieldValue = TextFieldValue(annotatedString = annotated)
                         )
                     }
                 } else {
                     _uiState.update {
                         it.copy(
                             isCheckboxListAvailable = true,
-                            checkListItems = CheckboxConvertors.stringToCheckboxes(it.contentState.text),
+                            checkListItems = CheckboxConvertors.stringToCheckboxes(it.contentState.richText.rawText),
                             contentState = it.contentState.copy(
-                                text = "", isHintVisible = false
-                            )
+                                richText = RichTextDocument.EMPTY,
+                                isHintVisible = false
+                            ),
+                            contentTextFieldValue = TextFieldValue()
                         )
                     }
                 }
@@ -372,7 +434,10 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ShowSuggestions -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isTagSuggestionLoading = true) }
-                    getAutoTagsUseCase(title = uiState.value.titleState.text, content = uiState.value.contentState.text)
+                    getAutoTagsUseCase(
+                        title = uiState.value.titleState.richText.rawText,
+                        content = uiState.value.contentState.richText.rawText
+                    )
                         .onSuccess { suggestions ->
                             _uiState.update { it.copy(isTagSuggestionLoading = false, suggestedTags = suggestions) } }
                         .onFailure { exeption ->
@@ -387,7 +452,16 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.AttachTranscript -> {
-                _uiState.update { it.copy(contentState = it.contentState.copy(text = it.contentState.text + "\n" + event.transcript)) }
+                _uiState.update { state ->
+                    val currentDoc = state.contentState.richText
+                    val newRawText = currentDoc.rawText + "\n" + event.transcript
+                    val newDoc = RichTextDocument(rawText = newRawText, spans = currentDoc.spans)
+                    val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                    state.copy(
+                        contentState = state.contentState.copy(richText = newDoc),
+                        contentTextFieldValue = TextFieldValue(annotatedString = annotated)
+                    )
+                }
             }
 
             is AddEditNoteEvent.TranscribeAttachedAudio -> transcribeAttachedAudio(event.uri)
@@ -397,7 +471,6 @@ class AddEditNoteViewModel @Inject constructor(
                 it.copy(imageSuggestions = emptyList(), imageQueryResult = "", isImageQueryLoading = false, isAnalyzingImage = false)
             }
             is AddEditNoteEvent.ClearImageQueryResult -> {
-                // Re-show cached suggestions after adding result to note
                 val cachedKey = _uiState.value.zoomedImageUri?.toString()
                 val cached = cachedKey?.let { imageSuggestionsCache[it] } ?: emptyList()
                 _uiState.update { it.copy(imageQueryResult = "", isImageQueryLoading = false, imageSuggestions = cached) }
@@ -491,8 +564,17 @@ class AddEditNoteViewModel @Inject constructor(
 
                 if(enableLiveTranscription) {
                     stopLiveTransctiptions()
-                    _uiState.update { it.copy(contentState = it.contentState.copy(text = it.contentState.text + "\n" + it.liveTranscription)) }
-                    _uiState.update { it.copy(liveTranscription = "") }
+                    _uiState.update { state ->
+                        val currentDoc = state.contentState.richText
+                        val newRawText = currentDoc.rawText + "\n" + state.liveTranscription
+                        val newDoc = RichTextDocument(rawText = newRawText, spans = currentDoc.spans)
+                        val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                        state.copy(
+                            contentState = state.contentState.copy(richText = newDoc),
+                            contentTextFieldValue = TextFieldValue(annotatedString = annotated),
+                            liveTranscription = ""
+                        )
+                    }
                 } else {
                     audioRecorder.stopRecording()
                     currentRecordingFile?.let { file ->
@@ -523,20 +605,20 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private suspend fun saveNote(id:Long): Result<Long> {
-            val state = uiState.value
-            return noteUseCases.saveNoteWithAttachments.invoke(
-                id = id,
-                title = state.titleState.text,
-                content = state.contentState.text,
-                timestamp = System.currentTimeMillis(),
-                color = state.noteColor,
-                imageUris = state.attachedImages,
-                audioUris = state.attachedAudios.map { it.uri.toUri() },
-                audioTranscriptions = state.attachedAudios.map { it.transcription },
-                reminderTime = state.reminderTime,
-                checkboxItems = state.checkListItems,
-                tagEntities = state.tagEntities
-            )
+        val state = uiState.value
+        return noteUseCases.saveNoteWithAttachments.invoke(
+            id = id,
+            title = state.titleState.richText.rawText,
+            content = RichTextSerializer.serialize(state.contentState.richText),
+            timestamp = System.currentTimeMillis(),
+            color = state.noteColor,
+            imageUris = state.attachedImages,
+            audioUris = state.attachedAudios.map { it.uri.toUri() },
+            audioTranscriptions = state.attachedAudios.map { it.transcription },
+            reminderTime = state.reminderTime,
+            checkboxItems = state.checkListItems,
+            tagEntities = state.tagEntities
+        )
     }
 
     private fun rescheduleReminder(id: Long){
@@ -545,8 +627,8 @@ class AddEditNoteViewModel @Inject constructor(
         if(state.reminderTime > System.currentTimeMillis()) {
             reminderScheduler.schedule(
                 id = id,
-                title = state.titleState.text,
-                content = state.contentState.text,
+                title = state.titleState.richText.rawText,
+                content = state.contentState.richText.rawText,
                 reminderTime = state.reminderTime
             )
         }
@@ -602,6 +684,26 @@ class AddEditNoteViewModel @Inject constructor(
                 audioRecorder.stopRecording()
             }
         }
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+
+    private fun findTextChangeStart(old: String, new: String): Int {
+        val minLen = minOf(old.length, new.length)
+        for (i in 0 until minLen) {
+            if (old[i] != new[i]) return i
+        }
+        return minLen
+    }
+
+    private fun findTextChangeEnd(old: String, new: String, changeStart: Int): Int {
+        val oldLen = old.length
+        val newLen = new.length
+        val maxFromEnd = minOf(oldLen - changeStart, newLen - changeStart)
+        for (i in 1..maxFromEnd) {
+            if (old[oldLen - i] != new[newLen - i]) return oldLen - i + 1
+        }
+        return changeStart
     }
 
     sealed class UiEvent{

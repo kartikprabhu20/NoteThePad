@@ -2,6 +2,8 @@ package com.mintanable.notethepad.feature_note.presentation
 
 import android.net.Uri
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.input.TextFieldValue
+import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
@@ -13,6 +15,9 @@ import com.mintanable.notethepad.permissions.DeniedType
 data class AddEditNoteUiState(
     val titleState: NoteTextFieldState = NoteTextFieldState(hint = "Enter title..."),
     val contentState: NoteTextFieldState = NoteTextFieldState(hint = "Enter some content..."),
+    val contentTextFieldValue: TextFieldValue = TextFieldValue(),
+    val isRichTextBarActive: Boolean = false,
+    val activeContentStyles: Set<SpanType> = emptySet(),
     val noteColor: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),

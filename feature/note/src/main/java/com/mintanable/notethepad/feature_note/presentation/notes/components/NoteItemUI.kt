@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -32,12 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,9 +43,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
-import androidx.core.net.toUri
-import com.mintanable.notethepad.database.db.entity.Attachment
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.clipPath
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.richtext.compose.RichTextAnnotator
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
+import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.R
@@ -121,8 +124,11 @@ fun NoteItemUI(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if(!note.isCheckboxListAvailable){
+                    val contentAnnotated = remember(note.content) {
+                        RichTextAnnotator.toAnnotatedString(RichTextSerializer.deserialize(note.content))
+                    }
                     Text(
-                        text = note.content,
+                        text = contentAnnotated,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Black,
                         maxLines = 10,
@@ -225,7 +231,7 @@ fun NoteItemUI(
 fun NoteItemUIPreviewCheckboxes() {
     NoteThePadTheme {
         SharedTransitionLayout {
-            AnimatedContent(targetState = true, label = "preview") { isVisible ->
+            AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
                 if (isVisible) {
                     Column(
                         modifier = Modifier
@@ -265,7 +271,7 @@ fun NoteItemUIPreviewCheckboxes() {
 fun NoteItemUIPreview() {
     NoteThePadTheme {
         SharedTransitionLayout {
-            AnimatedContent(targetState = true, label = "preview") { isVisible ->
+            AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
                 if (isVisible) {
                     Column(
                         modifier = Modifier

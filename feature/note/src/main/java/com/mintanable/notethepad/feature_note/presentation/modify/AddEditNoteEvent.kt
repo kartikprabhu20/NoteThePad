@@ -2,13 +2,15 @@ package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.net.Uri
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.text.input.TextFieldValue
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 
 sealed class AddEditNoteEvent {
     data class EnteredTitle(val value: String) : AddEditNoteEvent()
     data class ChangeTitleFocus(val focusState: FocusState) : AddEditNoteEvent()
-    data class EnteredContent(val value: String) : AddEditNoteEvent()
+    data class EnteredContent(val value: TextFieldValue) : AddEditNoteEvent()
     data class ChangeContentFocus(val focusState: FocusState) : AddEditNoteEvent()
     data class ChangeColor(val color: Int) : AddEditNoteEvent()
     data object SaveNote : AddEditNoteEvent()
@@ -43,4 +45,6 @@ sealed class AddEditNoteEvent {
     data class ExecuteImageQuery(val query: String) : AddEditNoteEvent()
     data object ClearImageSuggestions : AddEditNoteEvent()
     data object ClearImageQueryResult : AddEditNoteEvent()
+    data class ApplyContentFormat(val type: SpanType) : AddEditNoteEvent()
+    data object ToggleRichTextBar : AddEditNoteEvent()
 }
