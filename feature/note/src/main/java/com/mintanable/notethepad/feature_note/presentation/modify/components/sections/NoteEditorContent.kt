@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -20,6 +21,8 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,11 +48,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
@@ -60,6 +66,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteEve
 import com.mintanable.notethepad.feature_note.presentation.modify.components.MagicButton
 import com.mintanable.notethepad.feature_note.presentation.modify.components.NoteBottomAppBar
 import com.mintanable.notethepad.feature_note.presentation.modify.components.SuggestedTagsRow
+import com.mintanable.notethepad.feature_note.presentation.modify.components.TextEditBar
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 import kotlinx.coroutines.launch
@@ -71,6 +78,9 @@ fun NoteEditorContent(
     attachedImages: List<Uri>,
     titleState: NoteTextFieldState,
     contentState: NoteTextFieldState,
+    contentTextFieldValue: TextFieldValue,
+    isRichTextBarActive: Boolean,
+    activeContentStyles: Set<SpanType>,
     isCheckboxListAvailable: Boolean,
     checkListItems: List<CheckboxItem>,
     attachedAudios: List<Attachment>,
@@ -106,12 +116,11 @@ fun NoteEditorContent(
     val checklistCharCount by remember(checkListItems) {
         derivedStateOf { checkListItems.sumOf { it.text.length } }
     }
-    val charCount = titleState.text.length + contentState.text.length + checklistCharCount
+    val charCount = titleState.richText.rawText.length + contentState.richText.rawText.length + checklistCharCount
     val showMagicButton = charCount > 400 && !isSuggestionTagsLoading
 
     val lazyListState = rememberLazyListState()
 
-    // Only auto-scroll if user is already near the bottom when results arrive
     LaunchedEffect(isSuggestionTagsLoading, suggestedTags) {
         if (isSuggestionTagsLoading || suggestedTags.isNotEmpty()) {
             lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount - 1)
@@ -124,43 +133,72 @@ fun NoteEditorContent(
         label = "fab_padding_animation"
     )
 
+    // Local TextFieldValue state for the title (plain text, no rich text)
+    var titleTFV by remember(titleState.richText.rawText) {
+        mutableStateOf(TextFieldValue(titleState.richText.rawText))
+    }
+
+    val density = LocalDensity.current
+    val imeBottom = WindowInsets.ime.getBottom(density)
+    val navBottom = WindowInsets.navigationBars.getBottom(density)
+    val keyboardPadding = with(density) {
+        (if (imeBottom > navBottom) imeBottom - navBottom else 0).toDp()
+    }
+
     with(sharedTransitionScope) {
         Scaffold(
             contentWindowInsets = WindowInsets.systemBars,
             containerColor = Color.Transparent,
             bottomBar = {
                 CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
-                    NoteBottomAppBar(
-                        utilityButtons = listOf(
-                            Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, stringResource(R.string.content_description_attach)),
-                            Triple(
-                                if (isCheckboxListAvailable) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
-                                BottomSheetType.CHECKBOX,
-                                stringResource(R.string.content_description_checkbox)
-                            ),
-                            Triple(
-                                Icons.Default.NotificationAdd,
-                                BottomSheetType.REMINDER,
-                                stringResource(R.string.content_description_reminders)
-                            ),
-                            Triple(
-                                Icons.Default.MoreHoriz,
-                                BottomSheetType.MORE_SETTINGS,
-                                stringResource(R.string.content_description_settings)
-                            )
-                        ),
-                        modifier = Modifier,
-                        onActionClick = { sheetType ->
-                            if (sheetType == BottomSheetType.CHECKBOX) {
-                                onEvent(AddEditNoteEvent.ToggleCheckbox)
+                    Box(modifier = Modifier.padding(bottom = keyboardPadding)) {
+                        AnimatedContent(
+                            targetState = isRichTextBarActive,
+                            label = "BottomBarSwitch"
+                        ) { richTextActive ->
+                            if (richTextActive) {
+                                TextEditBar(
+                                    activeStyles = activeContentStyles,
+                                    onStyleClick = { onEvent(AddEditNoteEvent.ApplyContentFormat(it)) },
+                                    onClose = { onEvent(AddEditNoteEvent.ToggleRichTextBar) }
+                                )
                             } else {
-                                onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
+                                NoteBottomAppBar(
+                                    utilityButtons = listOf(
+                                        Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, stringResource(R.string.content_description_attach)),
+                                        Triple(
+                                            if (isCheckboxListAvailable) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                                            BottomSheetType.CHECKBOX,
+                                            stringResource(R.string.content_description_checkbox)
+                                        ),
+                                        Triple(
+                                            Icons.Default.NotificationAdd,
+                                            BottomSheetType.REMINDER,
+                                            stringResource(R.string.content_description_reminders)
+                                        ),
+                                        Triple(
+                                            Icons.Default.MoreHoriz,
+                                            BottomSheetType.MORE_SETTINGS,
+                                            stringResource(R.string.content_description_settings)
+                                        )
+                                    ),
+                                    modifier = Modifier,
+                                    isRichTextEnabled = contentState.isFocused,
+                                    onActionClick = { sheetType ->
+                                        if (sheetType == BottomSheetType.CHECKBOX) {
+                                            onEvent(AddEditNoteEvent.ToggleCheckbox)
+                                        } else {
+                                            onEvent(AddEditNoteEvent.UpdateSheetType(sheetType))
+                                        }
+                                    },
+                                    onRichTextClick = { onEvent(AddEditNoteEvent.ToggleRichTextBar) },
+                                    onSaveClick = { onEvent(AddEditNoteEvent.SaveNote) },
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
                             }
-                        },
-                        onSaveClick = { onEvent(AddEditNoteEvent.SaveNote) },
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
+                        }
+                    }
                 }
             },
             modifier = Modifier.fillMaxSize(),
@@ -227,9 +265,12 @@ fun NoteEditorContent(
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
                         TransparentHintTextField(
-                            text = titleState.text,
+                            value = titleTFV,
                             hint = titleState.hint,
-                            onValueChange = { onEvent(AddEditNoteEvent.EnteredTitle(it)) },
+                            onValueChange = { v ->
+                                titleTFV = v
+                                onEvent(AddEditNoteEvent.EnteredTitle(v.text))
+                            },
                             onFocusChange = { onEvent(AddEditNoteEvent.ChangeTitleFocus(it)) },
                             isHintVisible = titleState.isHintVisible,
                             isSingleLine = true,
@@ -249,7 +290,7 @@ fun NoteEditorContent(
 
                         if (!isCheckboxListAvailable) {
                             TransparentHintTextField(
-                                text = contentState.text,
+                                value = contentTextFieldValue,
                                 hint = contentState.hint,
                                 onValueChange = { onEvent(AddEditNoteEvent.EnteredContent(it)) },
                                 onFocusChange = { onEvent(AddEditNoteEvent.ChangeContentFocus(it)) },

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -63,7 +64,9 @@ import kotlinx.coroutines.delay
 fun NoteBottomAppBar(
     utilityButtons: List<Triple<ImageVector, BottomSheetType, String>>,
     modifier: Modifier = Modifier,
+    isRichTextEnabled: Boolean = false,
     onActionClick: (BottomSheetType) -> Unit,
+    onRichTextClick: () -> Unit = {},
     onSaveClick: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -94,22 +97,16 @@ fun NoteBottomAppBar(
                 animationSpec = keyframes {
                     durationMillis = 500
                     0f at 0
-                    -20f at 100 // Rotate left
-                    20f at 200  // Rotate right
-                    -10f at 300  // Rotate left (smaller)
-                    10f at 400   // Rotate right (smaller)
-                    0f at 500   // Back to center
+                    -20f at 100
+                    20f at 200
+                    -10f at 300
+                    10f at 400
+                    0f at 500
                 }
             )
         }
 
         BottomAppBar(
-//            modifier = modifier
-//                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
-//                .graphicsLayer {
-//                    alpha = barAlpha
-//                    compositingStrategy = CompositingStrategy.Offscreen
-//                },
             modifier = modifier
                 .let {
                     if (transition.isRunning) {
@@ -123,7 +120,6 @@ fun NoteBottomAppBar(
             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
             tonalElevation = 0.dp,
             actions = {
-
                 AnimatedVisibility(
                     visible = isVisible,
                     enter = fadeIn(tween(300)) + expandHorizontally(
@@ -139,8 +135,6 @@ fun NoteBottomAppBar(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.Bottom
                     ) {
-
-
                         utilityButtons.forEachIndexed { _, (icon, type, label) ->
                             SmallFloatingActionButton(
                                 onClick = { onActionClick(type) },
@@ -151,6 +145,29 @@ fun NoteBottomAppBar(
                             ) {
                                 Icon(icon, contentDescription = label)
                             }
+                        }
+
+                        // Rich text button
+                        SmallFloatingActionButton(
+                            onClick = { if (isRichTextEnabled) onRichTextClick() },
+                            shape = RoundedCornerShape(32.dp),
+                            containerColor = if (isRichTextEnabled)
+                                MaterialTheme.colorScheme.primaryContainer
+                            else
+                                MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier.graphicsLayer {
+                                rotationZ = wiggleAnim.value
+                                alpha = if (isRichTextEnabled) 1f else 0.4f
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.TextFormat,
+                                contentDescription = "Rich Text Formatting",
+                                tint = if (isRichTextEnabled)
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
@@ -207,7 +224,9 @@ fun PreviewBottomAppBar(){
                                             "Settings"
                                         )
                                     ),
+                                    isRichTextEnabled = true,
                                     onActionClick = { },
+                                    onRichTextClick = { },
                                     onSaveClick = { },
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@AnimatedContent

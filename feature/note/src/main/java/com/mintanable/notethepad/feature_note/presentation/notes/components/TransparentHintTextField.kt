@@ -11,42 +11,42 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TransparentHintTextField(
-    text: String,
+    value: TextFieldValue,
     hint: String,
-    modifier: Modifier=Modifier,
+    modifier: Modifier = Modifier,
     isHintVisible: Boolean = true,
-    onValueChange: (String)-> Unit,
-    textStyle: TextStyle= TextStyle(),
+    onValueChange: (TextFieldValue) -> Unit,
+    textStyle: TextStyle = TextStyle(),
     isSingleLine: Boolean = false,
-    onFocusChange: (FocusState)-> Unit
+    onFocusChange: (FocusState) -> Unit
 ) {
-    Box(modifier=modifier){
+    Box(modifier = modifier) {
         BasicTextField(
-            value = text,
+            value = value,
             onValueChange = onValueChange,
             singleLine = isSingleLine,
             textStyle = textStyle,
-            modifier = Modifier.
-            fillMaxWidth().
-            onFocusChanged {  onFocusChange(it)}
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { onFocusChange(it) }
         )
-
-        if(isHintVisible){
-            Text(text=hint,style = textStyle, color = Color.DarkGray)
+        if (isHintVisible) {
+            Text(text = hint, style = textStyle, color = Color.DarkGray)
         }
     }
 }
 
 @Preview
 @Composable
-fun PreviewTransparentHintTextField(){
-    MaterialTheme{
+fun PreviewTransparentHintTextField() {
+    MaterialTheme {
         TransparentHintTextField(
-            text = "test",
+            value = TextFieldValue("test"),
             hint = "hint",
             onFocusChange = {},
             onValueChange = {}

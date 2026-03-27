@@ -265,6 +265,9 @@ fun AddEditNoteScreen(
             attachedImages = uiState.attachedImages,
             titleState = uiState.titleState,
             contentState = uiState.contentState,
+            contentTextFieldValue = uiState.contentTextFieldValue,
+            isRichTextBarActive = uiState.isRichTextBarActive,
+            activeContentStyles = uiState.activeContentStyles,
             isCheckboxListAvailable = uiState.isCheckboxListAvailable,
             checkListItems = uiState.checkListItems,
             attachedAudios = uiState.attachedAudios,
@@ -300,9 +303,7 @@ fun AddEditNoteScreen(
                 isImageQueryLoading = uiState.isImageQueryLoading,
                 onSuggestionClicked = { viewModel.onEvent(AddEditNoteEvent.ExecuteImageQuery(it)) },
                 onAppendToNote = { result ->
-                    viewModel.onEvent(AddEditNoteEvent.EnteredContent(
-                        uiState.contentState.text + "\n" + result
-                    ))
+                    viewModel.onEvent(AddEditNoteEvent.AttachTranscript(result))
                     viewModel.onEvent(AddEditNoteEvent.ClearImageQueryResult)
                 },
                 transitionScope = sharedTransitionScope,
