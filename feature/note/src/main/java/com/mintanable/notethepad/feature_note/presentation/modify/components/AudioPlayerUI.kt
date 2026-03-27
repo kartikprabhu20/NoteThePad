@@ -152,7 +152,7 @@ fun AudioPlayerPanel(
             Text(
                 text = formatMillisToTime(totalDuration),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.wrapContentWidth().padding(end = 4.dp),
+                modifier = Modifier.wrapContentWidth().padding(end = 8.dp),
                 color = MaterialTheme.colorScheme.onSurface
             )
 
