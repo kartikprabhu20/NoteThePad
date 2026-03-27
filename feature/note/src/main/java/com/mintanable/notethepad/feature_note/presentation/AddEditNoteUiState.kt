@@ -18,6 +18,7 @@ data class AddEditNoteUiState(
     val contentTextFieldValue: TextFieldValue = TextFieldValue(),
     val isRichTextBarActive: Boolean = false,
     val activeContentStyles: Set<SpanType> = emptySet(),
+    val pendingStyles: Set<SpanType> = emptySet(),
     val noteColor: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),

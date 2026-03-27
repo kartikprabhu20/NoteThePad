@@ -134,8 +134,11 @@ fun NoteEditorContent(
     )
 
     // Local TextFieldValue state for the title (plain text, no rich text)
-    var titleTFV by remember(titleState.richText.rawText) {
-        mutableStateOf(TextFieldValue(titleState.richText.rawText))
+    var titleTFV by remember { mutableStateOf(TextFieldValue(titleState.richText.rawText)) }
+    LaunchedEffect(titleState.richText.rawText) {
+        if (titleTFV.text != titleState.richText.rawText) {
+            titleTFV = TextFieldValue(titleState.richText.rawText)
+        }
     }
 
     val density = LocalDensity.current

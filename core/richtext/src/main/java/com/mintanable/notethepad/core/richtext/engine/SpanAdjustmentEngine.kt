@@ -86,9 +86,11 @@ object SpanAdjustmentEngine {
     // ── Block type apply ───────────────────────────────────────────────────
 
     /**
-     * Applies a block-level type (H1, H2, PARAGRAPH, BULLET) to every line
-     * that the selection touches. Replaces any conflicting block type on those lines.
+     * Applies a block-level type (H1, H2, PARAGRAPH, BULLET) to the selected character range.
+     * Any other block type overlapping that range is removed first (mutual exclusion per character).
      * Calling applyBlockType with the already-active type removes it (toggle behaviour).
+     * Returns [doc] unchanged when [selectionStart] >= [selectionEnd] (cursor-only — caller
+     * should handle this case via pending styles).
      */
     fun applyBlockType(
         doc: RichTextDocument,
@@ -96,23 +98,16 @@ object SpanAdjustmentEngine {
         selectionStart: Int,
         selectionEnd: Int
     ): RichTextDocument {
-        val lineRanges = getLineRanges(doc.rawText, selectionStart, selectionEnd)
-        var current = doc
-        for ((lineStart, lineEnd) in lineRanges) {
-            // Check if this type is already fully active on this line
-            val isActive = current.isActiveAt(type, lineStart, lineEnd)
-            // Remove all block types from this line
-            var spans = current.spans
-            for (blockType in BLOCK_TYPES) {
-                spans = removeSpanFromRange(spans, blockType, lineStart, lineEnd)
-            }
-            // Add the requested type unless it was already active (toggle off)
-            if (!isActive) {
-                spans = addSpanToRange(spans, type, lineStart, lineEnd)
-            }
-            current = RichTextDocument.of(current.rawText, spans)
+        if (selectionStart >= selectionEnd) return doc
+        val isActive = doc.isActiveAt(type, selectionStart, selectionEnd)
+        var spans = doc.spans
+        for (blockType in BLOCK_TYPES) {
+            spans = removeSpanFromRange(spans, blockType, selectionStart, selectionEnd)
         }
-        return current
+        if (!isActive) {
+            spans = addSpanToRange(spans, type, selectionStart, selectionEnd)
+        }
+        return RichTextDocument.of(doc.rawText, spans)
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

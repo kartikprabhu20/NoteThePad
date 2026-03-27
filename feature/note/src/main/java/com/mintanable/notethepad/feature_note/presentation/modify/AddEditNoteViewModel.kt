@@ -183,19 +183,52 @@ class AddEditNoteViewModel @Inject constructor(
                 val newText = event.value.text
                 val state = _uiState.value
                 val oldDoc = state.contentState.richText
-                val changeStart = findTextChangeStart(oldDoc.rawText, newText)
-                val changeEnd = findTextChangeEnd(oldDoc.rawText, newText, changeStart)
-                val newDoc = SpanAdjustmentEngine.adjustForTextChange(oldDoc, newText, changeStart, changeEnd)
-                val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
-                val newTFV = event.value.copy(annotatedString = annotated)
-                _uiState.update { it.copy(
-                    contentState = it.contentState.copy(
-                        richText = newDoc,
-                        isHintVisible = newText.isBlank() && !it.contentState.isFocused
-                    ),
-                    contentTextFieldValue = newTFV,
-                    activeContentStyles = newDoc.activeTypesAt(newTFV.selection.start)
-                )}
+                val newCursorPos = event.value.selection.start
+
+                if (newText == oldDoc.rawText) {
+                    // Cursor/selection moved without text change — reset pending inline styles
+                    val cursorLookup = (newCursorPos - 1).coerceAtLeast(0)
+                    val inlineAtCursor = oldDoc.activeTypesAt(cursorLookup)
+                        .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    val blockAtCursor = oldDoc.activeTypesAt(newCursorPos)
+                        .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    _uiState.update { it.copy(
+                        contentTextFieldValue = event.value.copy(annotatedString = it.contentTextFieldValue.annotatedString),
+                        activeContentStyles = blockAtCursor + inlineAtCursor,
+                        pendingStyles = inlineAtCursor
+                    )}
+                } else {
+                    val changeStart = findTextChangeStart(oldDoc.rawText, newText)
+                    val changeEnd = findTextChangeEnd(oldDoc.rawText, newText, changeStart)
+                    var newDoc = SpanAdjustmentEngine.adjustForTextChange(oldDoc, newText, changeStart, changeEnd)
+
+                    // Apply pending styles to newly inserted characters
+                    if (newText.length > oldDoc.rawText.length && state.pendingStyles.isNotEmpty()) {
+                        val insertEnd = changeStart + (newText.length - oldDoc.rawText.length)
+                        for (style in state.pendingStyles) {
+                            if (style !in SpanAdjustmentEngine.BLOCK_TYPES && !newDoc.isActiveAt(style, changeStart, insertEnd)) {
+                                newDoc = SpanAdjustmentEngine.toggleSpan(newDoc, style, changeStart, insertEnd)
+                            }
+                        }
+                        val pendingBlock = state.pendingStyles.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+                        if (pendingBlock != null) {
+                            newDoc = SpanAdjustmentEngine.applyBlockType(newDoc, pendingBlock, changeStart, changeStart + (newText.length - oldDoc.rawText.length))
+                        }
+                    }
+
+                    val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                    val newTFV = event.value.copy(annotatedString = annotated)
+                    val blockAtCursor = newDoc.activeTypesAt(newCursorPos)
+                        .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    _uiState.update { it.copy(
+                        contentState = it.contentState.copy(
+                            richText = newDoc,
+                            isHintVisible = newText.isBlank() && !it.contentState.isFocused
+                        ),
+                        contentTextFieldValue = newTFV,
+                        activeContentStyles = blockAtCursor + state.pendingStyles,
+                    )}
+                }
             }
             is AddEditNoteEvent.ChangeContentFocus -> {
                 val focused = event.focusState.isFocused
@@ -204,27 +237,71 @@ class AddEditNoteViewModel @Inject constructor(
                         isFocused = focused,
                         isHintVisible = !focused && it.contentState.richText.rawText.isBlank()
                     ),
-                    isRichTextBarActive = if (!focused) false else it.isRichTextBarActive
+                    isRichTextBarActive = if (!focused) false else it.isRichTextBarActive,
+                    pendingStyles = if (!focused) emptySet() else it.pendingStyles
                 )}
             }
             is AddEditNoteEvent.ApplyContentFormat -> {
                 val state = _uiState.value
                 val sel = state.contentTextFieldValue.selection
-                val doc = if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
-                    SpanAdjustmentEngine.applyBlockType(
+                val hasSelection = sel.start < sel.end
+
+                if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
+                    val doc = SpanAdjustmentEngine.applyBlockType(
                         state.contentState.richText, event.type, sel.start, sel.end
                     )
+                    if (doc != state.contentState.richText) {
+                        // Successfully applied to existing content
+                        val annotated = RichTextAnnotator.toAnnotatedString(doc)
+                        val blockAtCursor = doc.activeTypesAt(sel.start)
+                            .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                        val inlinePending = state.pendingStyles.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                        _uiState.update { it.copy(
+                            contentState = it.contentState.copy(richText = doc),
+                            contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
+                            activeContentStyles = blockAtCursor + inlinePending,
+                            pendingStyles = blockAtCursor + inlinePending
+                        )}
+                    } else {
+                        // Empty content — store as pending block (radio group: replace other blocks)
+                        val newPending = if (event.type in state.pendingStyles) {
+                            state.pendingStyles - event.type
+                        } else {
+                            state.pendingStyles.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet() + event.type
+                        }
+                        _uiState.update { it.copy(
+                            pendingStyles = newPending,
+                            activeContentStyles = newPending
+                        )}
+                    }
                 } else {
-                    SpanAdjustmentEngine.toggleSpan(
-                        state.contentState.richText, event.type, sel.start, sel.end
-                    )
+                    if (hasSelection) {
+                        // Selection exists: apply directly to selected range
+                        val doc = SpanAdjustmentEngine.toggleSpan(
+                            state.contentState.richText, event.type, sel.start, sel.end
+                        )
+                        val annotated = RichTextAnnotator.toAnnotatedString(doc)
+                        _uiState.update { it.copy(
+                            contentState = it.contentState.copy(richText = doc),
+                            contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
+                            activeContentStyles = doc.activeTypesAt(sel.start),
+                            pendingStyles = emptySet()
+                        )}
+                    } else {
+                        // No selection: toggle in pending styles for upcoming typed characters
+                        val newPending = if (event.type in state.pendingStyles) {
+                            state.pendingStyles - event.type
+                        } else {
+                            state.pendingStyles + event.type
+                        }
+                        val blockAtCursor = state.contentState.richText.activeTypesAt(sel.start)
+                            .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                        _uiState.update { it.copy(
+                            pendingStyles = newPending,
+                            activeContentStyles = blockAtCursor + newPending
+                        )}
+                    }
                 }
-                val annotated = RichTextAnnotator.toAnnotatedString(doc)
-                _uiState.update { it.copy(
-                    contentState = it.contentState.copy(richText = doc),
-                    contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
-                    activeContentStyles = doc.activeTypesAt(sel.start)
-                )}
             }
             is AddEditNoteEvent.ToggleRichTextBar -> {
                 _uiState.update { it.copy(isRichTextBarActive = !it.isRichTextBarActive) }
