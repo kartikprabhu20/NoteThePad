@@ -14,11 +14,14 @@ import com.mintanable.notethepad.permissions.DeniedType
 @Stable
 data class AddEditNoteUiState(
     val titleState: NoteTextFieldState = NoteTextFieldState(hint = "Enter title..."),
+
     val contentState: NoteTextFieldState = NoteTextFieldState(hint = "Enter some content..."),
     val contentTextFieldValue: TextFieldValue = TextFieldValue(),
     val isRichTextBarActive: Boolean = false,
     val activeContentStyles: Set<SpanType> = emptySet(),
-    val pendingStyles: Set<SpanType> = emptySet(),
+    val pendingBlockType: SpanType? = null,   // at most one block type (H1/H2/P/BULLET)
+    val pendingStyles: Set<SpanType> = emptySet(), // inline only (BOLD/ITALIC/UNDERLINE)
+
     val noteColor: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),

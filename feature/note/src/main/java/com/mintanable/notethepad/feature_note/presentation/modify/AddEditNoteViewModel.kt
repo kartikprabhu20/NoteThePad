@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -20,6 +21,7 @@ import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
@@ -183,50 +185,102 @@ class AddEditNoteViewModel @Inject constructor(
                 val newText = event.value.text
                 val state = _uiState.value
                 val oldDoc = state.contentState.richText
-                val newCursorPos = event.value.selection.start
+                var newCursorPos = event.value.selection.start
 
                 if (newText == oldDoc.rawText) {
-                    // Cursor/selection moved without text change — reset pending inline styles
+                    // Cursor/selection moved without text change — sync pending from char left of cursor
                     val cursorLookup = (newCursorPos - 1).coerceAtLeast(0)
-                    val inlineAtCursor = oldDoc.activeTypesAt(cursorLookup)
-                        .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
-                    val blockAtCursor = oldDoc.activeTypesAt(newCursorPos)
-                        .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    val typesAtCursor = oldDoc.activeTypesAt(cursorLookup)
+                    val newPendingBlock = typesAtCursor.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+                    val newPendingInline = typesAtCursor.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
                     _uiState.update { it.copy(
                         contentTextFieldValue = event.value.copy(annotatedString = it.contentTextFieldValue.annotatedString),
-                        activeContentStyles = blockAtCursor + inlineAtCursor,
-                        pendingStyles = inlineAtCursor
+                        pendingBlockType = newPendingBlock,
+                        pendingStyles = newPendingInline,
+                        activeContentStyles = setOfNotNull(newPendingBlock) + newPendingInline
                     )}
                 } else {
                     val changeStart = findTextChangeStart(oldDoc.rawText, newText)
                     val changeEnd = findTextChangeEnd(oldDoc.rawText, newText, changeStart)
                     var newDoc = SpanAdjustmentEngine.adjustForTextChange(oldDoc, newText, changeStart, changeEnd)
 
-                    // Apply pending styles to newly inserted characters
-                    if (newText.length > oldDoc.rawText.length && state.pendingStyles.isNotEmpty()) {
-                        val insertEnd = changeStart + (newText.length - oldDoc.rawText.length)
+                    val isInsertion = newText.length > oldDoc.rawText.length
+                    if (isInsertion) {
+                        val insertLen = newText.length - oldDoc.rawText.length
+                        val insertEnd = changeStart + insertLen
+                        val insertedText = newText.substring(changeStart, insertEnd)
+
+                        // Bullet continuation on Enter
+                        if (state.pendingBlockType == SpanType.BULLET && '\n' in insertedText) {
+                            for (i in insertedText.indices) {
+                                if (insertedText[i] == '\n') {
+                                    val newlinePos = changeStart + i
+                                    val (bulletDoc, extra) = SpanAdjustmentEngine.continueBulletAfterEnter(newDoc, newlinePos)
+                                    newDoc = bulletDoc
+                                    newCursorPos += extra
+                                }
+                            }
+                        }
+
+                        // Ensure pending block type covers the line(s) containing the insertion
+                        if (state.pendingBlockType != null) {
+                            newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, state.pendingBlockType, changeStart, changeStart + 1)
+                            // Also cover any new lines created by Enter
+                            if ('\n' in insertedText) {
+                                val allLineRanges = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, changeStart, newCursorPos)
+                                for ((ls, le) in allLineRanges) {
+                                    if (le > ls) {
+                                        newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, state.pendingBlockType, ls, le)
+                                    }
+                                }
+                            }
+                        }
+
+                        // Apply pending inline styles to the user's inserted chars
                         for (style in state.pendingStyles) {
-                            if (style !in SpanAdjustmentEngine.BLOCK_TYPES && !newDoc.isActiveAt(style, changeStart, insertEnd)) {
+                            if (!newDoc.isActiveAt(style, changeStart, insertEnd)) {
                                 newDoc = SpanAdjustmentEngine.toggleSpan(newDoc, style, changeStart, insertEnd)
                             }
                         }
-                        val pendingBlock = state.pendingStyles.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
-                        if (pendingBlock != null) {
-                            newDoc = SpanAdjustmentEngine.applyBlockType(newDoc, pendingBlock, changeStart, changeStart + (newText.length - oldDoc.rawText.length))
+                        // Remove inline styles that are active on inserted chars but NOT in pendingStyles
+                        // (handles typing inside a span after user unselected that style)
+                        val inlineTypes = listOf(SpanType.BOLD, SpanType.ITALIC, SpanType.UNDERLINE)
+                        for (style in inlineTypes) {
+                            if (style !in state.pendingStyles && newDoc.isActiveAt(style, changeStart, insertEnd)) {
+                                newDoc = SpanAdjustmentEngine.toggleSpan(newDoc, style, changeStart, insertEnd)
+                            }
                         }
                     }
 
                     val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
-                    val newTFV = event.value.copy(annotatedString = annotated)
-                    val blockAtCursor = newDoc.activeTypesAt(newCursorPos)
-                        .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    val finalCursor = newCursorPos.coerceIn(0, newDoc.rawText.length)
+                    val newTFV = TextFieldValue(
+                        annotatedString = annotated,
+                        selection = TextRange(finalCursor)
+                    )
+
+                    // After deletion, derive pending from char left of cursor; after insertion, keep existing pending
+                    val newPendingBlock: SpanType?
+                    val newPendingInline: Set<SpanType>
+                    if (!isInsertion) {
+                        val cursorLookup = (finalCursor - 1).coerceAtLeast(0)
+                        val typesAtCursor = newDoc.activeTypesAt(cursorLookup)
+                        newPendingBlock = typesAtCursor.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+                        newPendingInline = typesAtCursor.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    } else {
+                        newPendingBlock = state.pendingBlockType
+                        newPendingInline = state.pendingStyles
+                    }
+
                     _uiState.update { it.copy(
                         contentState = it.contentState.copy(
                             richText = newDoc,
-                            isHintVisible = newText.isBlank() && !it.contentState.isFocused
+                            isHintVisible = newDoc.rawText.isBlank() && !it.contentState.isFocused
                         ),
                         contentTextFieldValue = newTFV,
-                        activeContentStyles = blockAtCursor + state.pendingStyles,
+                        pendingBlockType = newPendingBlock,
+                        pendingStyles = newPendingInline,
+                        activeContentStyles = setOfNotNull(newPendingBlock) + newPendingInline
                     )}
                 }
             }
@@ -238,6 +292,7 @@ class AddEditNoteViewModel @Inject constructor(
                         isHintVisible = !focused && it.contentState.richText.rawText.isBlank()
                     ),
                     isRichTextBarActive = if (!focused) false else it.isRichTextBarActive,
+                    pendingBlockType = if (!focused) null else it.pendingBlockType,
                     pendingStyles = if (!focused) emptySet() else it.pendingStyles
                 )}
             }
@@ -247,31 +302,75 @@ class AddEditNoteViewModel @Inject constructor(
                 val hasSelection = sel.start < sel.end
 
                 if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
-                    val doc = SpanAdjustmentEngine.applyBlockType(
-                        state.contentState.richText, event.type, sel.start, sel.end
-                    )
-                    if (doc != state.contentState.richText) {
-                        // Successfully applied to existing content
-                        val annotated = RichTextAnnotator.toAnnotatedString(doc)
-                        val blockAtCursor = doc.activeTypesAt(sel.start)
-                            .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
-                        val inlinePending = state.pendingStyles.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    val doc = state.contentState.richText
+                    val lineRangesForCheck = SpanAdjustmentEngine.getLineRanges(doc.rawText, sel.start, sel.end)
+                    val isEmptyLine = doc.rawText.isEmpty() || lineRangesForCheck.all { (ls, le) -> ls == le }
+
+                    if (isEmptyLine) {
+                        // Empty content or empty line: toggle pending only (user sets style for upcoming text)
+                        val newBlock = if (event.type == state.pendingBlockType) null else event.type
                         _uiState.update { it.copy(
-                            contentState = it.contentState.copy(richText = doc),
-                            contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
-                            activeContentStyles = blockAtCursor + inlinePending,
-                            pendingStyles = blockAtCursor + inlinePending
+                            pendingBlockType = newBlock,
+                            activeContentStyles = setOfNotNull(newBlock) + it.pendingStyles
                         )}
                     } else {
-                        // Empty content — store as pending block (radio group: replace other blocks)
-                        val newPending = if (event.type in state.pendingStyles) {
-                            state.pendingStyles - event.type
-                        } else {
-                            state.pendingStyles.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet() + event.type
+                        var newDoc = doc
+                        var cursorDelta = 0
+                        val cursorPos = sel.start
+
+                        // Step 1: If currently BULLET and switching away, remove "• " prefixes
+                        val lineRanges = lineRangesForCheck
+                        val currentlyBullet = lineRanges.any { (ls, le) ->
+                            le > ls && doc.isActiveAt(SpanType.BULLET, ls, le)
                         }
+                        if (currentlyBullet && event.type != SpanType.BULLET) {
+                            val (prefixRemoved, delta) = SpanAdjustmentEngine.removeBulletPrefixes(newDoc, lineRanges, cursorPos)
+                            newDoc = prefixRemoved
+                            cursorDelta += delta
+                        }
+
+                        // Step 2: Apply block type to lines (toggle behaviour)
+                        val adjStart = (sel.start + cursorDelta).coerceAtLeast(0)
+                        val adjEnd = if (hasSelection) (sel.end + cursorDelta).coerceAtLeast(adjStart) else adjStart
+                        val beforeApply = newDoc
+                        newDoc = SpanAdjustmentEngine.applyBlockTypeToLines(newDoc, event.type, adjStart, adjEnd)
+                        val wasApplied = newDoc != beforeApply && newDoc.spans.any { it.type == event.type }
+
+                        // Step 3: If BULLET was applied, insert "• " prefixes
+                        if (event.type == SpanType.BULLET && wasApplied) {
+                            val bulletLines = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, adjStart, adjEnd)
+                            val (prefixInserted, delta) = SpanAdjustmentEngine.insertBulletPrefixes(newDoc, bulletLines, cursorPos + cursorDelta)
+                            newDoc = prefixInserted
+                            cursorDelta += delta
+                            // Re-ensure BULLET covers the prefix chars
+                            val updatedLines = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, (adjStart + delta).coerceAtLeast(0), (adjEnd + delta).coerceAtLeast(0))
+                            for ((ls, le) in updatedLines) {
+                                if (le > ls) newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, SpanType.BULLET, ls, le)
+                            }
+                        }
+
+                        // Step 4: If BULLET was toggled OFF, also remove "• " prefixes
+                        if (event.type == SpanType.BULLET && currentlyBullet && !wasApplied) {
+                            val freshLines = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, adjStart, adjEnd)
+                            val (prefixRemoved, delta) = SpanAdjustmentEngine.removeBulletPrefixes(newDoc, freshLines, cursorPos + cursorDelta)
+                            newDoc = prefixRemoved
+                            cursorDelta += delta
+                        }
+
+                        val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                        val newCursorPos = (cursorPos + cursorDelta).coerceIn(0, newDoc.rawText.length)
+                        val newSelEnd = if (hasSelection) (sel.end + cursorDelta).coerceIn(0, newDoc.rawText.length) else newCursorPos
+                        val lookupPos = (newCursorPos - 1).coerceAtLeast(0)
+                        val newBlock = newDoc.activeTypesAt(lookupPos).firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+
                         _uiState.update { it.copy(
-                            pendingStyles = newPending,
-                            activeContentStyles = newPending
+                            contentState = it.contentState.copy(richText = newDoc),
+                            contentTextFieldValue = TextFieldValue(
+                                annotatedString = annotated,
+                                selection = TextRange(newCursorPos, newSelEnd)
+                            ),
+                            pendingBlockType = newBlock,
+                            activeContentStyles = setOfNotNull(newBlock) + it.pendingStyles
                         )}
                     }
                 } else {
@@ -281,24 +380,27 @@ class AddEditNoteViewModel @Inject constructor(
                             state.contentState.richText, event.type, sel.start, sel.end
                         )
                         val annotated = RichTextAnnotator.toAnnotatedString(doc)
+                        val lookupPos = (sel.start - 1).coerceAtLeast(0)
+                        val newBlock = doc.activeTypesAt(lookupPos)
+                            .firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+                        val newInline = doc.activeTypesAt(lookupPos)
+                            .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
                         _uiState.update { it.copy(
                             contentState = it.contentState.copy(richText = doc),
                             contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
-                            activeContentStyles = doc.activeTypesAt(sel.start),
-                            pendingStyles = emptySet()
+                            pendingBlockType = newBlock,
+                            pendingStyles = newInline,
+                            activeContentStyles = setOfNotNull(newBlock) + newInline
                         )}
                     } else {
-                        // No selection: toggle in pending styles for upcoming typed characters
-                        val newPending = if (event.type in state.pendingStyles) {
+                        // No selection: toggle in pending inline styles
+                        val newInline = if (event.type in state.pendingStyles)
                             state.pendingStyles - event.type
-                        } else {
+                        else
                             state.pendingStyles + event.type
-                        }
-                        val blockAtCursor = state.contentState.richText.activeTypesAt(sel.start)
-                            .filter { it in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
                         _uiState.update { it.copy(
-                            pendingStyles = newPending,
-                            activeContentStyles = blockAtCursor + newPending
+                            pendingStyles = newInline,
+                            activeContentStyles = setOfNotNull(it.pendingBlockType) + newInline
                         )}
                     }
                 }
@@ -780,7 +882,9 @@ class AddEditNoteViewModel @Inject constructor(
         for (i in 1..maxFromEnd) {
             if (old[oldLen - i] != new[newLen - i]) return oldLen - i + 1
         }
-        return changeStart
+        // No diff found from the end: the deleted/inserted chars are all at changeStart.
+        // Return changeStart + deleted count so spans at changeStart shift correctly.
+        return changeStart + maxOf(0, oldLen - newLen)
     }
 
     sealed class UiEvent{

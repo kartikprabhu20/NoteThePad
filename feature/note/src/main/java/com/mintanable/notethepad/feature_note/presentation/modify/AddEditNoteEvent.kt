@@ -12,6 +12,7 @@ sealed class AddEditNoteEvent {
     data class ChangeTitleFocus(val focusState: FocusState) : AddEditNoteEvent()
     data class EnteredContent(val value: TextFieldValue) : AddEditNoteEvent()
     data class ChangeContentFocus(val focusState: FocusState) : AddEditNoteEvent()
+    data class ApplyContentFormat(val type: SpanType) : AddEditNoteEvent()
     data class ChangeColor(val color: Int) : AddEditNoteEvent()
     data object SaveNote : AddEditNoteEvent()
     data object MakeCopy : AddEditNoteEvent()
@@ -45,6 +46,5 @@ sealed class AddEditNoteEvent {
     data class ExecuteImageQuery(val query: String) : AddEditNoteEvent()
     data object ClearImageSuggestions : AddEditNoteEvent()
     data object ClearImageQueryResult : AddEditNoteEvent()
-    data class ApplyContentFormat(val type: SpanType) : AddEditNoteEvent()
     data object ToggleRichTextBar : AddEditNoteEvent()
 }

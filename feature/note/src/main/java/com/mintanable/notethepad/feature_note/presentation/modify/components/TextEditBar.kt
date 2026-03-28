@@ -113,6 +113,14 @@ fun TextEditBar(
                     onClick = { onStyleClick(SpanType.PARAGRAPH) },
                     modifier = wiggleModifier
                 )
+                // Bullet
+                IconStyleButton(
+                    icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                    contentDescription = "Bullet List",
+                    isSelected = SpanType.BULLET in activeStyles,
+                    onClick = { onStyleClick(SpanType.BULLET) },
+                    modifier = wiggleModifier
+                )
 
                 Spacer(modifier = Modifier.width(4.dp))
 
@@ -136,17 +144,6 @@ fun TextEditBar(
                     contentDescription = "Underline",
                     isSelected = SpanType.UNDERLINE in activeStyles,
                     onClick = { onStyleClick(SpanType.UNDERLINE) },
-                    modifier = wiggleModifier
-                )
-
-                Spacer(modifier = Modifier.width(4.dp))
-
-                // Bullet
-                IconStyleButton(
-                    icon = Icons.AutoMirrored.Filled.FormatListBulleted,
-                    contentDescription = "Bullet List",
-                    isSelected = SpanType.BULLET in activeStyles,
-                    onClick = { onStyleClick(SpanType.BULLET) },
                     modifier = wiggleModifier
                 )
 

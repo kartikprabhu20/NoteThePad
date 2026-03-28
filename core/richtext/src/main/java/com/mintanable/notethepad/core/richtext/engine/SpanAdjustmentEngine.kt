@@ -7,6 +7,8 @@ import com.mintanable.notethepad.core.richtext.model.SpanType
 object SpanAdjustmentEngine {
 
     val BLOCK_TYPES = setOf(SpanType.H1, SpanType.H2, SpanType.PARAGRAPH, SpanType.BULLET)
+    const val BULLET_PREFIX = "• "
+    private const val BULLET_PREFIX_LEN = 2
 
     // ── Text mutation ──────────────────────────────────────────────────────
 
@@ -28,7 +30,7 @@ object SpanAdjustmentEngine {
         return RichTextDocument.of(newText, adjusted)
     }
 
-    private fun adjustSpan(span: RichSpan, changeStart: Int, changeEnd: Int, delta: Int): RichSpan? {
+    internal fun adjustSpan(span: RichSpan, changeStart: Int, changeEnd: Int, delta: Int): RichSpan? {
         return when {
             // Span ends at or before the change point: unchanged
             span.end <= changeStart -> span
@@ -86,11 +88,8 @@ object SpanAdjustmentEngine {
     // ── Block type apply ───────────────────────────────────────────────────
 
     /**
-     * Applies a block-level type (H1, H2, PARAGRAPH, BULLET) to the selected character range.
-     * Any other block type overlapping that range is removed first (mutual exclusion per character).
-     * Calling applyBlockType with the already-active type removes it (toggle behaviour).
-     * Returns [doc] unchanged when [selectionStart] >= [selectionEnd] (cursor-only — caller
-     * should handle this case via pending styles).
+     * Applies a block-level type to the given range. No line expansion — raw range only.
+     * Used internally; prefer [applyBlockTypeToLines] for user-facing actions.
      */
     fun applyBlockType(
         doc: RichTextDocument,
@@ -108,6 +107,133 @@ object SpanAdjustmentEngine {
             spans = addSpanToRange(spans, type, selectionStart, selectionEnd)
         }
         return RichTextDocument.of(doc.rawText, spans)
+    }
+
+    /**
+     * Like [applyBlockType] but only adds — never toggles off.
+     * Used during typing to maintain the pending block type on the current line.
+     */
+    fun ensureBlockType(
+        doc: RichTextDocument,
+        type: SpanType,
+        selectionStart: Int,
+        selectionEnd: Int
+    ): RichTextDocument {
+        if (selectionStart >= selectionEnd) return doc
+        val ranges = getLineRanges(doc.rawText, selectionStart, selectionEnd)
+        if (ranges.isEmpty()) return doc
+        val expandedStart = ranges.first().first
+        val expandedEnd = ranges.last().second
+        if (expandedStart >= expandedEnd) return doc
+        if (doc.isActiveAt(type, expandedStart, expandedEnd)) return doc
+        var spans = doc.spans
+        for (blockType in BLOCK_TYPES) {
+            spans = removeSpanFromRange(spans, blockType, expandedStart, expandedEnd)
+        }
+        spans = addSpanToRange(spans, type, expandedStart, expandedEnd)
+        return RichTextDocument.of(doc.rawText, spans)
+    }
+
+    /**
+     * Applies a block-level type to all lines touched by [selStart]..[selEnd].
+     * Toggle behaviour: if the type is already active on ALL touched lines, it is removed.
+     */
+    fun applyBlockTypeToLines(
+        doc: RichTextDocument,
+        type: SpanType,
+        selStart: Int,
+        selEnd: Int
+    ): RichTextDocument {
+        val lineRanges = getLineRanges(doc.rawText, selStart, selEnd)
+        if (lineRanges.isEmpty()) return doc
+        val expandedStart = lineRanges.first().first
+        val expandedEnd = lineRanges.last().second
+        if (expandedStart >= expandedEnd) return doc
+
+        val allActive = lineRanges.all { (ls, le) ->
+            le > ls && doc.isActiveAt(type, ls, le)
+        }
+        var spans = doc.spans
+        for (blockType in BLOCK_TYPES) {
+            spans = removeSpanFromRange(spans, blockType, expandedStart, expandedEnd)
+        }
+        if (!allActive) {
+            spans = addSpanToRange(spans, type, expandedStart, expandedEnd)
+        }
+        return RichTextDocument.of(doc.rawText, spans)
+    }
+
+    // ── Bullet prefix management ─────────────────────────────────────────
+
+    /**
+     * Inserts "• " at the start of each line in [lineRanges] that doesn't already have it.
+     * Returns (new document, cursor delta).
+     */
+    fun insertBulletPrefixes(
+        doc: RichTextDocument,
+        lineRanges: List<Pair<Int, Int>>,
+        cursorPos: Int
+    ): Pair<RichTextDocument, Int> {
+        var text = doc.rawText
+        var spans = doc.spans
+        var cursorDelta = 0
+        var offsetAccum = 0
+
+        for ((origStart, _) in lineRanges) {
+            val pos = origStart + offsetAccum
+            if (pos <= text.length && text.substring(pos).startsWith(BULLET_PREFIX)) continue
+
+            text = text.substring(0, pos) + BULLET_PREFIX + text.substring(pos)
+            spans = spans.mapNotNull { adjustSpan(it, pos, pos, BULLET_PREFIX_LEN) }
+            if (pos <= cursorPos + cursorDelta) cursorDelta += BULLET_PREFIX_LEN
+            offsetAccum += BULLET_PREFIX_LEN
+        }
+        return Pair(RichTextDocument.of(text, spans), cursorDelta)
+    }
+
+    /**
+     * Removes "• " from the start of each line in [lineRanges] that has it.
+     * Returns (new document, cursor delta).
+     */
+    fun removeBulletPrefixes(
+        doc: RichTextDocument,
+        lineRanges: List<Pair<Int, Int>>,
+        cursorPos: Int
+    ): Pair<RichTextDocument, Int> {
+        var text = doc.rawText
+        var spans = doc.spans
+        var cursorDelta = 0
+        var offsetAccum = 0
+
+        for ((origStart, _) in lineRanges) {
+            val pos = origStart + offsetAccum
+            if (pos + BULLET_PREFIX_LEN > text.length) continue
+            if (!text.substring(pos).startsWith(BULLET_PREFIX)) continue
+
+            text = text.substring(0, pos) + text.substring(pos + BULLET_PREFIX_LEN)
+            spans = spans.mapNotNull { adjustSpan(it, pos, pos + BULLET_PREFIX_LEN, -BULLET_PREFIX_LEN) }
+            if (pos < cursorPos + cursorDelta) cursorDelta -= BULLET_PREFIX_LEN
+            offsetAccum -= BULLET_PREFIX_LEN
+        }
+        return Pair(RichTextDocument.of(text, spans), cursorDelta)
+    }
+
+    /**
+     * After a newline is typed on a bullet line, inserts "• " at the start of the new line.
+     * Returns (new document, extra chars inserted).
+     */
+    fun continueBulletAfterEnter(
+        doc: RichTextDocument,
+        newlinePos: Int
+    ): Pair<RichTextDocument, Int> {
+        val afterNewline = newlinePos + 1
+        if (afterNewline > doc.rawText.length) return doc to 0
+        if (afterNewline < doc.rawText.length && doc.rawText.substring(afterNewline).startsWith(BULLET_PREFIX)) {
+            return doc to 0
+        }
+        val newText = doc.rawText.substring(0, afterNewline) + BULLET_PREFIX + doc.rawText.substring(afterNewline)
+        val newSpans = doc.spans.mapNotNull { adjustSpan(it, afterNewline, afterNewline, BULLET_PREFIX_LEN) }
+        return RichTextDocument.of(newText, newSpans) to BULLET_PREFIX_LEN
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
@@ -151,20 +277,40 @@ object SpanAdjustmentEngine {
         return others
     }
 
+    /**
+     * Returns line ranges covering the given selection/cursor.
+     * Each range is a pair (startInclusive, endExclusive).
+     */
     fun getLineRanges(text: String, selStart: Int, selEnd: Int): List<Pair<Int, Int>> {
         if (text.isEmpty()) return listOf(0 to 0)
-        val ranges = mutableListOf<Pair<Int, Int>>()
+
+        // Build all line ranges
+        val lines = mutableListOf<Pair<Int, Int>>()
         var lineStart = 0
-        text.forEachIndexed { i, c ->
-            if (c == '\n' || i == text.lastIndex) {
-                val lineEnd = if (c == '\n') i + 1 else i + 1
-                val clampedSelEnd = if (selEnd == selStart) selStart + 1 else selEnd
-                if (lineEnd > selStart && lineStart < clampedSelEnd) {
-                    ranges.add(lineStart to lineEnd)
-                }
+        for (i in text.indices) {
+            if (text[i] == '\n' || i == text.lastIndex) {
+                lines.add(lineStart to i + 1)
                 lineStart = i + 1
             }
         }
-        return ranges
+        // Trailing empty line after final '\n'
+        if (text.endsWith('\n')) {
+            lines.add(text.length to text.length)
+        }
+
+        return if (selStart == selEnd) {
+            // Cursor mode: find the line containing the cursor position.
+            lines.filter { (ls, le) ->
+                if (ls == le) {
+                    // Empty trailing line: cursor matches if it's exactly at this position
+                    selStart == ls
+                } else {
+                    selStart in ls until le
+                }
+            }
+        } else {
+            // Selection mode: standard overlap
+            lines.filter { (ls, le) -> le > selStart && ls < selEnd }
+        }
     }
 }
