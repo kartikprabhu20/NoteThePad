@@ -328,54 +328,46 @@ class AddEditNoteViewModel @Inject constructor(
                     // Toggle: if line has bullet, turn off; if not, turn on
                     val newBulletIntent = if (isEmptyLine) !oldState.pendingBullet else !currentlyBullet
 
-                    if (isEmptyLine) {
-                        // Empty line: toggle pending only, upcoming text will get bullet
-                        _uiState.update { it.copy(
-                            pendingBullet = newBulletIntent,
-                            activeContentStyles = buildActiveStyles(it.pendingBlockType, newBulletIntent, it.pendingStyles)
-                        )}
-                    } else {
+                    // Unified path for both empty and non-empty lines
+                    run {
                         var newDoc = doc
                         var cursorDelta = 0
                         val cursorPos = sel.start
-
-                        // Use expanded line ranges for span operations
-                        val expandedStart = lineRanges.first().first
-                        val expandedEnd = lineRanges.last().second
+                        val lineStart = lineRanges.first().first
 
                         if (newBulletIntent) {
                             // ── Turning BULLET ON ──
-                            // Add BULLET span to the line(s)
-                            val spans = SpanAdjustmentEngine.addSpanToRange(
-                                newDoc.spans, SpanType.BULLET, expandedStart, expandedEnd
-                            )
-                            newDoc = RichTextDocument.of(newDoc.rawText, spans)
-
-                            // Insert "• " prefixes
+                            // Insert "• " prefix at line start (works even on empty lines)
                             val (prefixInserted, delta) = SpanAdjustmentEngine.insertBulletPrefixes(newDoc, lineRanges, cursorPos)
                             newDoc = prefixInserted
                             cursorDelta += delta
 
-                            // Re-ensure BULLET covers expanded range after prefix insertion
+                            // Add BULLET span covering the line after prefix insertion
                             val updatedLines = SpanAdjustmentEngine.getLineRanges(
-                                newDoc.rawText,
-                                (expandedStart + cursorDelta).coerceAtLeast(0),
-                                (expandedEnd + cursorDelta).coerceAtLeast(0)
+                                newDoc.rawText, lineStart, (cursorPos + cursorDelta).coerceAtLeast(lineStart + 1)
                             )
                             val uStart = updatedLines.first().first
                             val uEnd = updatedLines.last().second
                             if (uEnd > uStart) {
                                 newDoc = SpanAdjustmentEngine.ensureBullet(newDoc, uStart, uEnd)
+                                // Also ensure pending block type covers the line
+                                if (oldState.pendingBlockType != null) {
+                                    newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, oldState.pendingBlockType, uStart, uEnd)
+                                }
                             }
                         } else {
                             // ── Turning BULLET OFF ──
-                            // Remove BULLET span from the line(s)
-                            val spans = SpanAdjustmentEngine.removeSpanFromRange(
-                                newDoc.spans, SpanType.BULLET, expandedStart, expandedEnd
-                            )
-                            newDoc = RichTextDocument.of(newDoc.rawText, spans)
+                            if (!isEmptyLine) {
+                                val expandedStart = lineRanges.first().first
+                                val expandedEnd = lineRanges.last().second
+                                // Remove BULLET span
+                                val spans = SpanAdjustmentEngine.removeSpanFromRange(
+                                    newDoc.spans, SpanType.BULLET, expandedStart, expandedEnd
+                                )
+                                newDoc = RichTextDocument.of(newDoc.rawText, spans)
+                            }
 
-                            // Remove "• " prefixes
+                            // Remove "• " prefixes (safe even on empty lines — just a no-op)
                             val (prefixRemoved, delta) = SpanAdjustmentEngine.removeBulletPrefixes(newDoc, lineRanges, cursorPos)
                             newDoc = prefixRemoved
                             cursorDelta += delta
@@ -386,7 +378,10 @@ class AddEditNoteViewModel @Inject constructor(
                         val newSelEnd = if (hasSelection) (sel.end + cursorDelta).coerceIn(0, newDoc.rawText.length) else newCursorPos
 
                         _uiState.update { it.copy(
-                            contentState = it.contentState.copy(richText = newDoc),
+                            contentState = it.contentState.copy(
+                                richText = newDoc,
+                                isHintVisible = newDoc.rawText.isBlank() && !it.contentState.isFocused
+                            ),
                             contentTextFieldValue = TextFieldValue(
                                 annotatedString = annotated,
                                 selection = TextRange(newCursorPos, newSelEnd)
