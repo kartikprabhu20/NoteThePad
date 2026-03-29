@@ -299,14 +299,16 @@ object SpanAdjustmentEngine {
 
         return if (selStart == selEnd) {
             // Cursor mode: find the line containing the cursor position.
-            lines.filter { (ls, le) ->
+            val matches = lines.filter { (ls, le) ->
                 if (ls == le) {
-                    // Empty trailing line: cursor matches if it's exactly at this position
                     selStart == ls
                 } else {
-                    selStart in ls until le
+                    selStart in ls until le || (selStart == le && le == text.length)
                 }
             }
+            // If cursor lands on an empty trailing line, prefer it over the preceding line
+            val hasEmptyLine = matches.any { (ls, le) -> ls == le }
+            if (hasEmptyLine) matches.filter { (ls, le) -> ls == le } else matches
         } else {
             // Selection mode: standard overlap
             lines.filter { (ls, le) -> le > selStart && ls < selEnd }
