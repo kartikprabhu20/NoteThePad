@@ -19,7 +19,8 @@ data class AddEditNoteUiState(
     val contentTextFieldValue: TextFieldValue = TextFieldValue(),
     val isRichTextBarActive: Boolean = false,
     val activeContentStyles: Set<SpanType> = emptySet(),
-    val pendingBlockType: SpanType? = null,   // at most one block type (H1/H2/P/BULLET)
+    val pendingBlockType: SpanType? = null,   // at most one block type (H1/H2/P)
+    val pendingBullet: Boolean = false,       // BULLET is independent, combinable with any block type
     val pendingStyles: Set<SpanType> = emptySet(), // inline only (BOLD/ITALIC/UNDERLINE)
 
     val noteColor: Int = -1,

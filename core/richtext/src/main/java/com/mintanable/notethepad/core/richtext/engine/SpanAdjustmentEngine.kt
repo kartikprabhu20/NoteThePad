@@ -6,7 +6,7 @@ import com.mintanable.notethepad.core.richtext.model.SpanType
 
 object SpanAdjustmentEngine {
 
-    val BLOCK_TYPES = setOf(SpanType.H1, SpanType.H2, SpanType.PARAGRAPH, SpanType.BULLET)
+    val BLOCK_TYPES = setOf(SpanType.H1, SpanType.H2, SpanType.PARAGRAPH)
     const val BULLET_PREFIX = "• "
     private const val BULLET_PREFIX_LEN = 2
 
@@ -162,6 +162,53 @@ object SpanAdjustmentEngine {
         return RichTextDocument.of(doc.rawText, spans)
     }
 
+    // ── Bullet toggle (independent of block types) ──────────────────────
+
+    /**
+     * Toggles BULLET on the lines touched by [selStart]..[selEnd].
+     * Does NOT touch H1/H2/P — BULLET is independent.
+     */
+    fun toggleBulletOnLines(
+        doc: RichTextDocument,
+        selStart: Int,
+        selEnd: Int
+    ): RichTextDocument {
+        val lineRanges = getLineRanges(doc.rawText, selStart, selEnd)
+        if (lineRanges.isEmpty()) return doc
+        val expandedStart = lineRanges.first().first
+        val expandedEnd = lineRanges.last().second
+        if (expandedStart >= expandedEnd) return doc
+
+        val allActive = lineRanges.all { (ls, le) ->
+            le > ls && doc.isActiveAt(SpanType.BULLET, ls, le)
+        }
+        var spans = removeSpanFromRange(doc.spans, SpanType.BULLET, expandedStart, expandedEnd)
+        if (!allActive) {
+            spans = addSpanToRange(spans, SpanType.BULLET, expandedStart, expandedEnd)
+        }
+        return RichTextDocument.of(doc.rawText, spans)
+    }
+
+    /**
+     * Like [toggleBulletOnLines] but only adds — never toggles off.
+     * Used during typing to maintain BULLET on the current line.
+     */
+    fun ensureBullet(
+        doc: RichTextDocument,
+        selectionStart: Int,
+        selectionEnd: Int
+    ): RichTextDocument {
+        if (selectionStart >= selectionEnd) return doc
+        val ranges = getLineRanges(doc.rawText, selectionStart, selectionEnd)
+        if (ranges.isEmpty()) return doc
+        val expandedStart = ranges.first().first
+        val expandedEnd = ranges.last().second
+        if (expandedStart >= expandedEnd) return doc
+        if (doc.isActiveAt(SpanType.BULLET, expandedStart, expandedEnd)) return doc
+        val spans = addSpanToRange(doc.spans, SpanType.BULLET, expandedStart, expandedEnd)
+        return RichTextDocument.of(doc.rawText, spans)
+    }
+
     // ── Bullet prefix management ─────────────────────────────────────────
 
     /**
@@ -237,7 +284,7 @@ object SpanAdjustmentEngine {
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
-    private fun removeSpanFromRange(
+    fun removeSpanFromRange(
         spans: List<RichSpan>,
         type: SpanType,
         start: Int,
@@ -255,7 +302,7 @@ object SpanAdjustmentEngine {
         return result
     }
 
-    private fun addSpanToRange(
+    fun addSpanToRange(
         spans: List<RichSpan>,
         type: SpanType,
         start: Int,

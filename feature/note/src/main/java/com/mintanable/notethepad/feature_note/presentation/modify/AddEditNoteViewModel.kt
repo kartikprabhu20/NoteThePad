@@ -189,16 +189,14 @@ class AddEditNoteViewModel @Inject constructor(
                 val oldDoc = oldState.contentState.richText
 
                 if (newText == oldDoc.rawText) {
-                    // Cursor/selection moved without text change — sync pending from char left of cursor
-                    val cursorLookup = (newCursorPos - 1).coerceAtLeast(0)
-                    val typesAtCursor = oldDoc.activeTypesAt(cursorLookup)
-                    val newPendingBlock = typesAtCursor.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
-                    val newPendingInline = typesAtCursor.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                    // Cursor/selection moved without text change — sync pending from current line
+                    val derived = derivePendingFromCursor(oldDoc, newCursorPos)
                     _uiState.update { it.copy(
                         contentTextFieldValue = event.value.copy(annotatedString = it.contentTextFieldValue.annotatedString),
-                        pendingBlockType = newPendingBlock,
-                        pendingStyles = newPendingInline,
-                        activeContentStyles = setOfNotNull(newPendingBlock) + newPendingInline
+                        pendingBlockType = derived.block,
+                        pendingBullet = derived.bullet,
+                        pendingStyles = derived.inline,
+                        activeContentStyles = buildActiveStyles(derived.block, derived.bullet, derived.inline)
                     )}
                 } else {
                     val changeStart = TextUtils.findTextChangeStart(oldDoc.rawText, newText)
@@ -212,7 +210,7 @@ class AddEditNoteViewModel @Inject constructor(
                         val insertedText = newText.substring(changeStart, insertEnd)
 
                         // Bullet continuation on Enter
-                        if (oldState.pendingBlockType == SpanType.BULLET && '\n' in insertedText) {
+                        if (oldState.pendingBullet && '\n' in insertedText) {
                             for (i in insertedText.indices) {
                                 if (insertedText[i] == '\n') {
                                     val newlinePos = changeStart + i
@@ -223,10 +221,22 @@ class AddEditNoteViewModel @Inject constructor(
                             }
                         }
 
+                        // Ensure BULLET span covers the line(s) if pendingBullet is active
+                        if (oldState.pendingBullet) {
+                            newDoc = SpanAdjustmentEngine.ensureBullet(newDoc, changeStart, changeStart + 1)
+                            if ('\n' in insertedText) {
+                                val allLineRanges = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, changeStart, newCursorPos)
+                                for ((ls, le) in allLineRanges) {
+                                    if (le > ls) {
+                                        newDoc = SpanAdjustmentEngine.ensureBullet(newDoc, ls, le)
+                                    }
+                                }
+                            }
+                        }
+
                         // Ensure pending block type covers the line(s) containing the insertion
                         if (oldState.pendingBlockType != null) {
                             newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, oldState.pendingBlockType, changeStart, changeStart + 1)
-                            // Also cover any new lines created by Enter
                             if ('\n' in insertedText) {
                                 val allLineRanges = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, changeStart, newCursorPos)
                                 for ((ls, le) in allLineRanges) {
@@ -244,7 +254,6 @@ class AddEditNoteViewModel @Inject constructor(
                             }
                         }
                         // Remove inline styles that are active on inserted chars but NOT in pendingStyles
-                        // (handles typing inside a span after user unselected that style)
                         val inlineTypes = listOf(SpanType.BOLD, SpanType.ITALIC, SpanType.UNDERLINE)
                         for (style in inlineTypes) {
                             if (style !in oldState.pendingStyles && newDoc.isActiveAt(style, changeStart, insertEnd)) {
@@ -260,16 +269,18 @@ class AddEditNoteViewModel @Inject constructor(
                         selection = TextRange(finalCursor)
                     )
 
-                    // After deletion, derive pending from char left of cursor; after insertion, keep existing pending
+                    // After deletion, derive pending from current line; after insertion, keep existing pending
                     val newPendingBlock: SpanType?
+                    val newPendingBullet: Boolean
                     val newPendingInline: Set<SpanType>
                     if (!isInsertion) {
-                        val cursorLookup = (finalCursor - 1).coerceAtLeast(0)
-                        val typesAtCursor = newDoc.activeTypesAt(cursorLookup)
-                        newPendingBlock = typesAtCursor.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
-                        newPendingInline = typesAtCursor.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                        val derived = derivePendingFromCursor(newDoc, finalCursor)
+                        newPendingBlock = derived.block
+                        newPendingBullet = derived.bullet
+                        newPendingInline = derived.inline
                     } else {
                         newPendingBlock = oldState.pendingBlockType
+                        newPendingBullet = oldState.pendingBullet
                         newPendingInline = oldState.pendingStyles
                     }
 
@@ -280,8 +291,9 @@ class AddEditNoteViewModel @Inject constructor(
                         ),
                         contentTextFieldValue = newTFV,
                         pendingBlockType = newPendingBlock,
+                        pendingBullet = newPendingBullet,
                         pendingStyles = newPendingInline,
-                        activeContentStyles = setOfNotNull(newPendingBlock) + newPendingInline
+                        activeContentStyles = buildActiveStyles(newPendingBlock, newPendingBullet, newPendingInline)
                     )}
                 }
             }
@@ -294,6 +306,7 @@ class AddEditNoteViewModel @Inject constructor(
                     ),
                     isRichTextBarActive = if (!focused) false else it.isRichTextBarActive,
                     pendingBlockType = if (!focused) null else it.pendingBlockType,
+                    pendingBullet = if (!focused) false else it.pendingBullet,
                     pendingStyles = if (!focused) emptySet() else it.pendingStyles
                 )}
             }
@@ -302,58 +315,68 @@ class AddEditNoteViewModel @Inject constructor(
                 val sel = oldState.contentTextFieldValue.selection
                 val hasSelection = sel.start < sel.end
 
-                if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
+                if (event.type == SpanType.BULLET) {
+                    // ── BULLET toggle (independent of H1/H2/P) ──
                     val doc = oldState.contentState.richText
-                    val lineRangesForCheck = SpanAdjustmentEngine.getLineRanges(doc.rawText, sel.start, sel.end)
-                    val isEmptyLine = doc.rawText.isEmpty() || lineRangesForCheck.all { (ls, le) -> ls == le }
+                    val lineRanges = SpanAdjustmentEngine.getLineRanges(doc.rawText, sel.start, sel.end)
+                    val isEmptyLine = doc.rawText.isEmpty() || lineRanges.all { (ls, le) -> ls == le }
+
+                    // Check if the current line(s) already have a BULLET span
+                    val currentlyBullet = lineRanges.any { (ls, le) ->
+                        le > ls && doc.isActiveAt(SpanType.BULLET, ls, le)
+                    }
+                    // Toggle: if line has bullet, turn off; if not, turn on
+                    val newBulletIntent = if (isEmptyLine) !oldState.pendingBullet else !currentlyBullet
 
                     if (isEmptyLine) {
-                        // Empty content or empty line: toggle pending only (user sets style for upcoming text)
-                        val newBlock = if (event.type == oldState.pendingBlockType) null else event.type
+                        // Empty line: toggle pending only, upcoming text will get bullet
                         _uiState.update { it.copy(
-                            pendingBlockType = newBlock,
-                            activeContentStyles = setOfNotNull(newBlock) + it.pendingStyles
+                            pendingBullet = newBulletIntent,
+                            activeContentStyles = buildActiveStyles(it.pendingBlockType, newBulletIntent, it.pendingStyles)
                         )}
                     } else {
                         var newDoc = doc
                         var cursorDelta = 0
                         val cursorPos = sel.start
 
-                        // Step 1: If currently BULLET and switching away, remove "• " prefixes
-                        val lineRanges = lineRangesForCheck
-                        val currentlyBullet = lineRanges.any { (ls, le) ->
-                            le > ls && doc.isActiveAt(SpanType.BULLET, ls, le)
-                        }
-                        if (currentlyBullet && event.type != SpanType.BULLET) {
-                            val (prefixRemoved, delta) = SpanAdjustmentEngine.removeBulletPrefixes(newDoc, lineRanges, cursorPos)
-                            newDoc = prefixRemoved
-                            cursorDelta += delta
-                        }
+                        // Use expanded line ranges for span operations
+                        val expandedStart = lineRanges.first().first
+                        val expandedEnd = lineRanges.last().second
 
-                        // Step 2: Apply block type to lines (toggle behaviour)
-                        val adjStart = (sel.start + cursorDelta).coerceAtLeast(0)
-                        val adjEnd = if (hasSelection) (sel.end + cursorDelta).coerceAtLeast(adjStart) else adjStart
-                        val beforeApply = newDoc
-                        newDoc = SpanAdjustmentEngine.applyBlockTypeToLines(newDoc, event.type, adjStart, adjEnd)
-                        val wasApplied = newDoc != beforeApply && newDoc.spans.any { it.type == event.type }
+                        if (newBulletIntent) {
+                            // ── Turning BULLET ON ──
+                            // Add BULLET span to the line(s)
+                            val spans = SpanAdjustmentEngine.addSpanToRange(
+                                newDoc.spans, SpanType.BULLET, expandedStart, expandedEnd
+                            )
+                            newDoc = RichTextDocument.of(newDoc.rawText, spans)
 
-                        // Step 3: If BULLET was applied, insert "• " prefixes
-                        if (event.type == SpanType.BULLET && wasApplied) {
-                            val bulletLines = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, adjStart, adjEnd)
-                            val (prefixInserted, delta) = SpanAdjustmentEngine.insertBulletPrefixes(newDoc, bulletLines, cursorPos + cursorDelta)
+                            // Insert "• " prefixes
+                            val (prefixInserted, delta) = SpanAdjustmentEngine.insertBulletPrefixes(newDoc, lineRanges, cursorPos)
                             newDoc = prefixInserted
                             cursorDelta += delta
-                            // Re-ensure BULLET covers the prefix chars
-                            val updatedLines = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, (adjStart + delta).coerceAtLeast(0), (adjEnd + delta).coerceAtLeast(0))
-                            for ((ls, le) in updatedLines) {
-                                if (le > ls) newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, SpanType.BULLET, ls, le)
-                            }
-                        }
 
-                        // Step 4: If BULLET was toggled OFF, also remove "• " prefixes
-                        if (event.type == SpanType.BULLET && currentlyBullet && !wasApplied) {
-                            val freshLines = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, adjStart, adjEnd)
-                            val (prefixRemoved, delta) = SpanAdjustmentEngine.removeBulletPrefixes(newDoc, freshLines, cursorPos + cursorDelta)
+                            // Re-ensure BULLET covers expanded range after prefix insertion
+                            val updatedLines = SpanAdjustmentEngine.getLineRanges(
+                                newDoc.rawText,
+                                (expandedStart + cursorDelta).coerceAtLeast(0),
+                                (expandedEnd + cursorDelta).coerceAtLeast(0)
+                            )
+                            val uStart = updatedLines.first().first
+                            val uEnd = updatedLines.last().second
+                            if (uEnd > uStart) {
+                                newDoc = SpanAdjustmentEngine.ensureBullet(newDoc, uStart, uEnd)
+                            }
+                        } else {
+                            // ── Turning BULLET OFF ──
+                            // Remove BULLET span from the line(s)
+                            val spans = SpanAdjustmentEngine.removeSpanFromRange(
+                                newDoc.spans, SpanType.BULLET, expandedStart, expandedEnd
+                            )
+                            newDoc = RichTextDocument.of(newDoc.rawText, spans)
+
+                            // Remove "• " prefixes
+                            val (prefixRemoved, delta) = SpanAdjustmentEngine.removeBulletPrefixes(newDoc, lineRanges, cursorPos)
                             newDoc = prefixRemoved
                             cursorDelta += delta
                         }
@@ -361,8 +384,6 @@ class AddEditNoteViewModel @Inject constructor(
                         val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
                         val newCursorPos = (cursorPos + cursorDelta).coerceIn(0, newDoc.rawText.length)
                         val newSelEnd = if (hasSelection) (sel.end + cursorDelta).coerceIn(0, newDoc.rawText.length) else newCursorPos
-                        val lookupPos = (newCursorPos - 1).coerceAtLeast(0)
-                        val newBlock = newDoc.activeTypesAt(lookupPos).firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
 
                         _uiState.update { it.copy(
                             contentState = it.contentState.copy(richText = newDoc),
@@ -370,38 +391,68 @@ class AddEditNoteViewModel @Inject constructor(
                                 annotatedString = annotated,
                                 selection = TextRange(newCursorPos, newSelEnd)
                             ),
+                            pendingBullet = newBulletIntent,
+                            activeContentStyles = buildActiveStyles(it.pendingBlockType, newBulletIntent, it.pendingStyles)
+                        )}
+                    }
+                } else if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
+                    // ── Block type toggle (H1/H2/P) — does NOT touch BULLET ──
+                    val doc = oldState.contentState.richText
+                    val lineRangesForCheck = SpanAdjustmentEngine.getLineRanges(doc.rawText, sel.start, sel.end)
+                    val isEmptyLine = doc.rawText.isEmpty() || lineRangesForCheck.all { (ls, le) -> ls == le }
+
+                    if (isEmptyLine) {
+                        val newBlock = if (event.type == oldState.pendingBlockType) null else event.type
+                        _uiState.update { it.copy(
                             pendingBlockType = newBlock,
-                            activeContentStyles = setOfNotNull(newBlock) + it.pendingStyles
+                            activeContentStyles = buildActiveStyles(newBlock, it.pendingBullet, it.pendingStyles)
+                        )}
+                    } else {
+                        var newDoc = doc
+                        val adjStart = sel.start
+                        val adjEnd = if (hasSelection) sel.end else adjStart
+                        newDoc = SpanAdjustmentEngine.applyBlockTypeToLines(newDoc, event.type, adjStart, adjEnd)
+
+                        val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                        val derived = derivePendingFromCursor(newDoc, sel.start)
+
+                        _uiState.update { it.copy(
+                            contentState = it.contentState.copy(richText = newDoc),
+                            contentTextFieldValue = TextFieldValue(
+                                annotatedString = annotated,
+                                selection = sel
+                            ),
+                            pendingBlockType = derived.block,
+                            activeContentStyles = buildActiveStyles(derived.block, it.pendingBullet, it.pendingStyles)
                         )}
                     }
                 } else {
+                    // ── Inline style toggle (BOLD/ITALIC/UNDERLINE) ──
                     if (hasSelection) {
-                        // Selection exists: apply directly to selected range
                         val doc = SpanAdjustmentEngine.toggleSpan(
                             oldState.contentState.richText, event.type, sel.start, sel.end
                         )
                         val annotated = RichTextAnnotator.toAnnotatedString(doc)
-                        val lookupPos = (sel.start - 1).coerceAtLeast(0)
-                        val newBlock = doc.activeTypesAt(lookupPos)
-                            .firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
-                        val newInline = doc.activeTypesAt(lookupPos)
-                            .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
+                        val derived = derivePendingFromCursor(doc, sel.start)
+                        val newBlock = derived.block
+                        val newBullet = derived.bullet
+                        val newInline = derived.inline
                         _uiState.update { it.copy(
                             contentState = it.contentState.copy(richText = doc),
                             contentTextFieldValue = it.contentTextFieldValue.copy(annotatedString = annotated),
                             pendingBlockType = newBlock,
+                            pendingBullet = newBullet,
                             pendingStyles = newInline,
-                            activeContentStyles = setOfNotNull(newBlock) + newInline
+                            activeContentStyles = buildActiveStyles(newBlock, newBullet, newInline)
                         )}
                     } else {
-                        // No selection: toggle in pending inline styles
                         val newInline = if (event.type in oldState.pendingStyles)
                             oldState.pendingStyles - event.type
                         else
                             oldState.pendingStyles + event.type
                         _uiState.update { it.copy(
                             pendingStyles = newInline,
-                            activeContentStyles = setOfNotNull(it.pendingBlockType) + newInline
+                            activeContentStyles = buildActiveStyles(it.pendingBlockType, it.pendingBullet, newInline)
                         )}
                     }
                 }
@@ -865,6 +916,54 @@ class AddEditNoteViewModel @Inject constructor(
             }
         }
     }
+
+    private data class DerivedPending(
+        val block: SpanType?,
+        val bullet: Boolean,
+        val inline: Set<SpanType>
+    )
+
+    /**
+     * Derives pending block/bullet/inline from the cursor position.
+     * Block types and BULLET are derived from the **current line's spans**
+     * (not char-left-of-cursor) so that moving to an empty line after a
+     * bullet line doesn't inherit the previous line's bullet state.
+     * Inline styles use char-left-of-cursor for natural continuation.
+     */
+    private fun derivePendingFromCursor(doc: RichTextDocument, cursor: Int): DerivedPending {
+        // Inline styles: char left of cursor (natural typing continuation)
+        val inlineLookup = (cursor - 1).coerceAtLeast(0)
+        val inlineTypes = doc.activeTypesAt(inlineLookup)
+            .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES && it != SpanType.BULLET }
+            .toSet()
+
+        // Block/bullet: check spans covering the current line
+        val lineRanges = SpanAdjustmentEngine.getLineRanges(doc.rawText, cursor, cursor)
+        val lineStart = lineRanges.firstOrNull()?.first ?: 0
+        val lineEnd = lineRanges.lastOrNull()?.second ?: 0
+
+        val block: SpanType?
+        val bullet: Boolean
+        if (lineEnd > lineStart) {
+            val lineTypes = doc.activeTypesAt(lineStart)
+            block = lineTypes.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+            bullet = SpanType.BULLET in lineTypes
+        } else {
+            // Empty line — no spans to read, return null/false
+            block = null
+            bullet = false
+        }
+
+        return DerivedPending(block, bullet, inlineTypes)
+    }
+
+    private fun buildActiveStyles(
+        block: SpanType?,
+        bullet: Boolean,
+        inline: Set<SpanType>
+    ): Set<SpanType> = setOfNotNull(block) +
+            (if (bullet) setOf(SpanType.BULLET) else emptySet()) +
+            inline
 
     sealed class UiEvent{
         data class ShowSnackbar(val message:String):UiEvent()
