@@ -55,7 +55,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.mintanable.notethepad.core.richtext.model.SpanType
+import com.mintanable.notethepad.core.richtext.model.RichTextState
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
@@ -78,9 +78,8 @@ fun NoteEditorContent(
     attachedImages: List<Uri>,
     titleState: NoteTextFieldState,
     contentState: NoteTextFieldState,
-    contentTextFieldValue: TextFieldValue,
+    contentRichTextState: RichTextState,
     isRichTextBarActive: Boolean,
-    activeContentStyles: Set<SpanType>,
     isCheckboxListAvailable: Boolean,
     checkListItems: List<CheckboxItem>,
     attachedAudios: List<Attachment>,
@@ -116,7 +115,7 @@ fun NoteEditorContent(
     val checklistCharCount by remember(checkListItems) {
         derivedStateOf { checkListItems.sumOf { it.text.length } }
     }
-    val charCount = titleState.richText.rawText.length + contentState.richText.rawText.length + checklistCharCount
+    val charCount = titleState.richText.rawText.length + contentRichTextState.document.rawText.length + checklistCharCount
     val showMagicButton = charCount > 400 && !isSuggestionTagsLoading
 
     val lazyListState = rememberLazyListState()
@@ -161,7 +160,7 @@ fun NoteEditorContent(
                         ) { richTextActive ->
                             if (richTextActive) {
                                 TextEditBar(
-                                    activeStyles = activeContentStyles,
+                                    activeStyles = contentRichTextState.activeStyles,
                                     onStyleClick = { onEvent(AddEditNoteEvent.ApplyContentFormat(it)) },
                                     onClose = { onEvent(AddEditNoteEvent.ToggleRichTextBar) }
                                 )
@@ -293,7 +292,7 @@ fun NoteEditorContent(
 
                         if (!isCheckboxListAvailable) {
                             TransparentHintTextField(
-                                value = contentTextFieldValue,
+                                value = contentRichTextState.textFieldValue,
                                 hint = contentState.hint,
                                 onValueChange = { onEvent(AddEditNoteEvent.EnteredContent(it)) },
                                 onFocusChange = { onEvent(AddEditNoteEvent.ChangeContentFocus(it)) },
