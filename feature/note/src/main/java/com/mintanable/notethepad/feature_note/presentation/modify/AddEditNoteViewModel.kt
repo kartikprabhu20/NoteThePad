@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -188,7 +189,6 @@ class AddEditNoteViewModel @Inject constructor(
                     state.copy(
                         contentRichTextState = newState,
                         contentState = state.contentState.copy(
-                            richText = newState.document,
                             isHintVisible = newState.document.rawText.isBlank() && !state.contentState.isFocused
                         )
                     )
@@ -212,10 +212,7 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ApplyContentFormat -> {
                 _uiState.update { state ->
                     val newState = RichTextEngine.toggleFormat(state.contentRichTextState, event.type)
-                    state.copy(
-                        contentRichTextState = newState,
-                        contentState = state.contentState.copy(richText = newState.document)
-                    )
+                    state.copy(contentRichTextState = newState)
                 }
             }
             is AddEditNoteEvent.ToggleRichTextBar -> {
@@ -357,7 +354,7 @@ class AddEditNoteViewModel @Inject constructor(
                         it.copy(
                             isCheckboxListAvailable = false,
                             checkListItems = emptyList(),
-                            contentState = it.contentState.copy(richText = richText, isHintVisible = false),
+                            contentState = it.contentState.copy(isHintVisible = false),
                             contentRichTextState = it.contentRichTextState.copy(
                                 document = richText,
                                 textFieldValue = TextFieldValue(annotatedString = annotated)
@@ -369,10 +366,7 @@ class AddEditNoteViewModel @Inject constructor(
                         it.copy(
                             isCheckboxListAvailable = true,
                             checkListItems = CheckboxConvertors.stringToCheckboxes(it.contentRichTextState.document.rawText),
-                            contentState = it.contentState.copy(
-                                richText = RichTextDocument.EMPTY,
-                                isHintVisible = false
-                            ),
+                            contentState = it.contentState.copy(isHintVisible = false),
                             contentRichTextState = RichTextState.EMPTY
                         )
                     }
@@ -448,16 +442,18 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.AttachTranscript -> {
                 _uiState.update { state ->
-                    val currentDoc = state.contentRichTextState.document
-                    val newRawText = currentDoc.rawText + "\n" + event.transcript
-                    val newDoc = RichTextDocument(rawText = newRawText, spans = currentDoc.spans)
-                    val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                    val oldState = state.contentRichTextState
+                    val currentText = oldState.document.rawText
+                    val appendedText = if (currentText.isEmpty()) event.transcript else "\n" + event.transcript
+                    val newText = currentText + appendedText
+                    val newTfv = TextFieldValue(
+                        text = newText,
+                        selection = TextRange(newText.length)
+                    )
+                    val newRichState = RichTextEngine.onValueChanged(oldState, newTfv)
                     state.copy(
-                        contentRichTextState = state.contentRichTextState.copy(
-                            document = newDoc,
-                            textFieldValue = TextFieldValue(annotatedString = annotated)
-                        ),
-                        contentState = state.contentState.copy(richText = newDoc)
+                        contentRichTextState = newRichState,
+                        contentState = state.contentState.copy(isHintVisible = false)
                     )
                 }
             }
@@ -563,16 +559,18 @@ class AddEditNoteViewModel @Inject constructor(
                 if(enableLiveTranscription) {
                     stopLiveTransctiptions()
                     _uiState.update { state ->
-                        val currentDoc = state.contentRichTextState.document
-                        val newRawText = currentDoc.rawText + "\n" + state.liveTranscription
-                        val newDoc = RichTextDocument(rawText = newRawText, spans = currentDoc.spans)
-                        val annotated = RichTextAnnotator.toAnnotatedString(newDoc)
+                        val oldState = state.contentRichTextState
+                        val currentText = oldState.document.rawText
+                        val appendedText = if (currentText.isEmpty()) state.liveTranscription else "\n" + state.liveTranscription
+                        val newText = currentText + appendedText
+                        val newTfv = TextFieldValue(
+                            text = newText,
+                            selection = TextRange(newText.length)
+                        )
+                        val newRichState = RichTextEngine.onValueChanged(oldState, newTfv)
                         state.copy(
-                            contentRichTextState = state.contentRichTextState.copy(
-                                document = newDoc,
-                                textFieldValue = TextFieldValue(annotatedString = annotated)
-                            ),
-                            contentState = state.contentState.copy(richText = newDoc),
+                            contentRichTextState = newRichState,
+                            contentState = state.contentState.copy(isHintVisible = false),
                             liveTranscription = ""
                         )
                     }

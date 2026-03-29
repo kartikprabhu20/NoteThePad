@@ -216,11 +216,14 @@ object RichTextEngine {
 
     private fun deriveStateFromCursor(doc: RichTextDocument, tfv: TextFieldValue): RichTextState {
         val cursor = tfv.selection.start
-        // Inline styles: char left of cursor
-        val inlineLookup = (cursor - 1).coerceAtLeast(0)
-        val inlineTypes = doc.activeTypesAt(inlineLookup)
-            .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES && it != SpanType.BULLET }
-            .toSet()
+        // Inline styles: char left of cursor (empty set when cursor is at position 0)
+        val inlineTypes = if (cursor > 0) {
+            doc.activeTypesAt(cursor - 1)
+                .filter { it !in SpanAdjustmentEngine.BLOCK_TYPES && it != SpanType.BULLET }
+                .toSet()
+        } else {
+            emptySet()
+        }
 
         // Block/bullet: current line spans
         val lineRanges = SpanAdjustmentEngine.getLineRanges(doc.rawText, cursor, cursor)
@@ -234,16 +237,49 @@ object RichTextEngine {
             block = lineTypes.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
             bullet = SpanType.BULLET in lineTypes
         } else {
-            block = null
-            bullet = false
+            // Empty line: inherit block/bullet from the previous line
+            val prevLineBlock = findPreviousLineBlockAndBullet(doc, cursor)
+            block = prevLineBlock.first
+            bullet = prevLineBlock.second
         }
+
+        // Rebuild the TextFieldValue with the annotated string from the document,
+        // preserving the selection/composition from the incoming value.
+        // This is critical because Compose's BasicTextField passes plain-text
+        // TextFieldValues in onValueChange — without this, styles would be lost
+        // on focus gain or cursor movement.
+        val annotated = RichTextAnnotator.toAnnotatedString(doc)
+        val rebuiltTfv = TextFieldValue(
+            annotatedString = annotated,
+            selection = tfv.selection,
+            composition = tfv.composition
+        )
 
         return RichTextState(
             document = doc,
-            textFieldValue = tfv,
+            textFieldValue = rebuiltTfv,
             pendingBlockType = block,
             pendingBullet = bullet,
             pendingStyles = inlineTypes
         )
+    }
+
+    /**
+     * Finds the block type and bullet state of the line immediately before [cursor].
+     * Returns (blockType, isBullet). If there is no previous line, returns (null, false).
+     */
+    private fun findPreviousLineBlockAndBullet(doc: RichTextDocument, cursor: Int): Pair<SpanType?, Boolean> {
+        if (cursor == 0 || doc.rawText.isEmpty()) return null to false
+        // The previous line ends just before the current line starts.
+        // Look at the character before cursor (which should be '\n') and find its line.
+        val prevCursor = (cursor - 1).coerceAtLeast(0)
+        val prevLineRanges = SpanAdjustmentEngine.getLineRanges(doc.rawText, prevCursor, prevCursor)
+        val prevStart = prevLineRanges.firstOrNull()?.first ?: return null to false
+        val prevEnd = prevLineRanges.lastOrNull()?.second ?: return null to false
+        if (prevEnd <= prevStart) return null to false
+        val prevTypes = doc.activeTypesAt(prevStart)
+        val block = prevTypes.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
+        val bullet = SpanType.BULLET in prevTypes
+        return block to bullet
     }
 }
