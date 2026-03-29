@@ -48,15 +48,14 @@ object SpanAdjustmentEngine {
             }
 
             // Span overlaps only the left part of the change region
-            span.start < changeStart && span.end <= changeEnd -> {
-                if (changeStart <= span.start) null else span.copy(end = changeStart)
+            span.start < changeStart -> {
+                span.copy(end = changeStart)
             }
 
             // Span overlaps only the right part of the change region
-            span.start >= changeStart && span.start < changeEnd -> {
-                val newStart = changeStart + if (changeStart == changeEnd) delta else 0
+            span.start < changeEnd -> {
                 val newEnd = span.end + delta
-                if (newEnd <= newStart) null else span.copy(start = newStart, end = newEnd)
+                if (newEnd <= changeStart) null else span.copy(start = changeStart, end = newEnd)
             }
 
             else -> span

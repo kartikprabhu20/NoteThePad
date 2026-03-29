@@ -22,6 +22,7 @@ import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.richtext.model.SpanType
+import com.mintanable.notethepad.core.richtext.utils.TextUtils
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
@@ -38,7 +39,6 @@ import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
-import com.mintanable.notethepad.feature_note.presentation.NoteTextFieldState
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import com.mintanable.notethepad.permissions.DeniedType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -183,9 +183,10 @@ class AddEditNoteViewModel @Inject constructor(
             }
             is AddEditNoteEvent.EnteredContent -> {
                 val newText = event.value.text
-                val state = _uiState.value
-                val oldDoc = state.contentState.richText
                 var newCursorPos = event.value.selection.start
+
+                val oldState = _uiState.value
+                val oldDoc = oldState.contentState.richText
 
                 if (newText == oldDoc.rawText) {
                     // Cursor/selection moved without text change — sync pending from char left of cursor
@@ -200,8 +201,8 @@ class AddEditNoteViewModel @Inject constructor(
                         activeContentStyles = setOfNotNull(newPendingBlock) + newPendingInline
                     )}
                 } else {
-                    val changeStart = findTextChangeStart(oldDoc.rawText, newText)
-                    val changeEnd = findTextChangeEnd(oldDoc.rawText, newText, changeStart)
+                    val changeStart = TextUtils.findTextChangeStart(oldDoc.rawText, newText)
+                    val changeEnd = TextUtils.findTextChangeEnd(oldDoc.rawText, newText, changeStart)
                     var newDoc = SpanAdjustmentEngine.adjustForTextChange(oldDoc, newText, changeStart, changeEnd)
 
                     val isInsertion = newText.length > oldDoc.rawText.length
@@ -211,7 +212,7 @@ class AddEditNoteViewModel @Inject constructor(
                         val insertedText = newText.substring(changeStart, insertEnd)
 
                         // Bullet continuation on Enter
-                        if (state.pendingBlockType == SpanType.BULLET && '\n' in insertedText) {
+                        if (oldState.pendingBlockType == SpanType.BULLET && '\n' in insertedText) {
                             for (i in insertedText.indices) {
                                 if (insertedText[i] == '\n') {
                                     val newlinePos = changeStart + i
@@ -223,21 +224,21 @@ class AddEditNoteViewModel @Inject constructor(
                         }
 
                         // Ensure pending block type covers the line(s) containing the insertion
-                        if (state.pendingBlockType != null) {
-                            newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, state.pendingBlockType, changeStart, changeStart + 1)
+                        if (oldState.pendingBlockType != null) {
+                            newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, oldState.pendingBlockType, changeStart, changeStart + 1)
                             // Also cover any new lines created by Enter
                             if ('\n' in insertedText) {
                                 val allLineRanges = SpanAdjustmentEngine.getLineRanges(newDoc.rawText, changeStart, newCursorPos)
                                 for ((ls, le) in allLineRanges) {
                                     if (le > ls) {
-                                        newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, state.pendingBlockType, ls, le)
+                                        newDoc = SpanAdjustmentEngine.ensureBlockType(newDoc, oldState.pendingBlockType, ls, le)
                                     }
                                 }
                             }
                         }
 
                         // Apply pending inline styles to the user's inserted chars
-                        for (style in state.pendingStyles) {
+                        for (style in oldState.pendingStyles) {
                             if (!newDoc.isActiveAt(style, changeStart, insertEnd)) {
                                 newDoc = SpanAdjustmentEngine.toggleSpan(newDoc, style, changeStart, insertEnd)
                             }
@@ -246,7 +247,7 @@ class AddEditNoteViewModel @Inject constructor(
                         // (handles typing inside a span after user unselected that style)
                         val inlineTypes = listOf(SpanType.BOLD, SpanType.ITALIC, SpanType.UNDERLINE)
                         for (style in inlineTypes) {
-                            if (style !in state.pendingStyles && newDoc.isActiveAt(style, changeStart, insertEnd)) {
+                            if (style !in oldState.pendingStyles && newDoc.isActiveAt(style, changeStart, insertEnd)) {
                                 newDoc = SpanAdjustmentEngine.toggleSpan(newDoc, style, changeStart, insertEnd)
                             }
                         }
@@ -268,8 +269,8 @@ class AddEditNoteViewModel @Inject constructor(
                         newPendingBlock = typesAtCursor.firstOrNull { it in SpanAdjustmentEngine.BLOCK_TYPES }
                         newPendingInline = typesAtCursor.filter { it !in SpanAdjustmentEngine.BLOCK_TYPES }.toSet()
                     } else {
-                        newPendingBlock = state.pendingBlockType
-                        newPendingInline = state.pendingStyles
+                        newPendingBlock = oldState.pendingBlockType
+                        newPendingInline = oldState.pendingStyles
                     }
 
                     _uiState.update { it.copy(
@@ -297,18 +298,18 @@ class AddEditNoteViewModel @Inject constructor(
                 )}
             }
             is AddEditNoteEvent.ApplyContentFormat -> {
-                val state = _uiState.value
-                val sel = state.contentTextFieldValue.selection
+                val oldState = _uiState.value
+                val sel = oldState.contentTextFieldValue.selection
                 val hasSelection = sel.start < sel.end
 
                 if (event.type in SpanAdjustmentEngine.BLOCK_TYPES) {
-                    val doc = state.contentState.richText
+                    val doc = oldState.contentState.richText
                     val lineRangesForCheck = SpanAdjustmentEngine.getLineRanges(doc.rawText, sel.start, sel.end)
                     val isEmptyLine = doc.rawText.isEmpty() || lineRangesForCheck.all { (ls, le) -> ls == le }
 
                     if (isEmptyLine) {
                         // Empty content or empty line: toggle pending only (user sets style for upcoming text)
-                        val newBlock = if (event.type == state.pendingBlockType) null else event.type
+                        val newBlock = if (event.type == oldState.pendingBlockType) null else event.type
                         _uiState.update { it.copy(
                             pendingBlockType = newBlock,
                             activeContentStyles = setOfNotNull(newBlock) + it.pendingStyles
@@ -377,7 +378,7 @@ class AddEditNoteViewModel @Inject constructor(
                     if (hasSelection) {
                         // Selection exists: apply directly to selected range
                         val doc = SpanAdjustmentEngine.toggleSpan(
-                            state.contentState.richText, event.type, sel.start, sel.end
+                            oldState.contentState.richText, event.type, sel.start, sel.end
                         )
                         val annotated = RichTextAnnotator.toAnnotatedString(doc)
                         val lookupPos = (sel.start - 1).coerceAtLeast(0)
@@ -394,10 +395,10 @@ class AddEditNoteViewModel @Inject constructor(
                         )}
                     } else {
                         // No selection: toggle in pending inline styles
-                        val newInline = if (event.type in state.pendingStyles)
-                            state.pendingStyles - event.type
+                        val newInline = if (event.type in oldState.pendingStyles)
+                            oldState.pendingStyles - event.type
                         else
-                            state.pendingStyles + event.type
+                            oldState.pendingStyles + event.type
                         _uiState.update { it.copy(
                             pendingStyles = newInline,
                             activeContentStyles = setOfNotNull(it.pendingBlockType) + newInline
@@ -863,28 +864,6 @@ class AddEditNoteViewModel @Inject constructor(
                 audioRecorder.stopRecording()
             }
         }
-    }
-
-    // ── Helpers ────────────────────────────────────────────────────────────
-
-    private fun findTextChangeStart(old: String, new: String): Int {
-        val minLen = minOf(old.length, new.length)
-        for (i in 0 until minLen) {
-            if (old[i] != new[i]) return i
-        }
-        return minLen
-    }
-
-    private fun findTextChangeEnd(old: String, new: String, changeStart: Int): Int {
-        val oldLen = old.length
-        val newLen = new.length
-        val maxFromEnd = minOf(oldLen - changeStart, newLen - changeStart)
-        for (i in 1..maxFromEnd) {
-            if (old[oldLen - i] != new[newLen - i]) return oldLen - i + 1
-        }
-        // No diff found from the end: the deleted/inserted chars are all at changeStart.
-        // Return changeStart + deleted count so spans at changeStart shift correctly.
-        return changeStart + maxOf(0, oldLen - newLen)
     }
 
     sealed class UiEvent{
