@@ -35,7 +35,8 @@ class SaveNoteWithAttachments(
         audioTranscriptions: List<String> = emptyList(),
         reminderTime: Long,
         checkboxItems: List<CheckboxItem>,
-        tagEntities: List<TagEntity> = emptyList()
+        tagEntities: List<TagEntity> = emptyList(),
+        backgroundImage: Int = -1
     ) : Result<Long> {
 
         Log.d("kptest", "SaveNoteWithAttachments invoke: ${imageUris+audioUris}")
@@ -72,7 +73,8 @@ class SaveNoteWithAttachments(
                     imageUris = imageUriList,
                     audioUris = audioUriList,
                     reminderTime = reminderTime,
-                    audioTranscriptions = transcriptionsJson
+                    audioTranscriptions = transcriptionsJson,
+                    backgroundImage = backgroundImage
                 ),
                 tagEntities
             )

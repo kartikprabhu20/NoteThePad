@@ -24,7 +24,8 @@ data class NoteEntity(
     val imageUris: List<String> = emptyList(),
     val audioUris: List<String> = emptyList(),
     val reminderTime: Long = -1,
-    val audioTranscriptions: String = ""
+    val audioTranscriptions: String = "",
+    val backgroundImage: Int = -1
 )
 
 class InvalidNoteException(message: String): Exception(message)

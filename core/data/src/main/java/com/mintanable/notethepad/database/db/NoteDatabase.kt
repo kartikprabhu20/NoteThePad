@@ -18,7 +18,7 @@ import com.mintanable.notethepad.database.db.util.NoteConverters
         TagEntity::class,
         NoteTagCrossRef::class
     ],
-    version = 11
+    version = 12
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase : RoomDatabase() {
@@ -31,6 +31,12 @@ abstract class NoteDatabase : RoomDatabase() {
         val MIGRATION_10_11 = object : Migration(10, 11) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE NoteEntity ADD COLUMN audioTranscriptions TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE NoteEntity ADD COLUMN backgroundImage INTEGER NOT NULL DEFAULT -1")
             }
         }
     }

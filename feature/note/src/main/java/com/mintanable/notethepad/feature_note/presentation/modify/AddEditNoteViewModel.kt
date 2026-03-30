@@ -153,6 +153,7 @@ class AddEditNoteViewModel @Inject constructor(
                             textFieldValue = TextFieldValue(annotatedString = annotated)
                         ),
                         noteColor = detailedNote.color,
+                        backgroundImage = detailedNote.backgroundImage,
                         attachedImages = detailedNote.imageUris.map { imgString -> imgString.toUri() },
                         attachedAudios = detailedNote.audioAttachments,
                         reminderTime = detailedNote.reminderTime,
@@ -219,7 +220,10 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(isRichTextBarActive = !it.isRichTextBarActive) }
             }
             is AddEditNoteEvent.ChangeColor -> {
-                _uiState.update { it.copy(noteColor = event.color) }
+                _uiState.update { it.copy(noteColor = event.color, backgroundImage = -1) }
+            }
+            is AddEditNoteEvent.ChangeBackgroundImage -> {
+                _uiState.update { it.copy(backgroundImage = event.index, noteColor = -1) }
             }
             is AddEditNoteEvent.SaveNote -> {
                 viewModelScope.launch {
@@ -616,7 +620,8 @@ class AddEditNoteViewModel @Inject constructor(
             audioTranscriptions = state.attachedAudios.map { it.transcription },
             reminderTime = state.reminderTime,
             checkboxItems = state.checkListItems,
-            tagEntities = state.tagEntities
+            tagEntities = state.tagEntities,
+            backgroundImage = state.backgroundImage
         )
     }
 

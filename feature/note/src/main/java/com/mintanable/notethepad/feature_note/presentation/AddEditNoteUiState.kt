@@ -19,6 +19,7 @@ data class AddEditNoteUiState(
     val isRichTextBarActive: Boolean = false,
 
     val noteColor: Int = -1,
+    val backgroundImage: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),
     val reminderTime: Long = -1L,

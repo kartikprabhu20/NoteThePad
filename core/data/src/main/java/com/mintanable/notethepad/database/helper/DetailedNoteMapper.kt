@@ -57,7 +57,8 @@ class DetailedNoteMapper @Inject constructor(
             reminderTime = noteEntity.reminderTime,
             checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(noteEntity.content) else emptyList(),
             isCheckboxListAvailable = isCheckbox,
-            tagEntities = tagEntities
+            tagEntities = tagEntities,
+            backgroundImage = noteEntity.backgroundImage
         )
     }
 }

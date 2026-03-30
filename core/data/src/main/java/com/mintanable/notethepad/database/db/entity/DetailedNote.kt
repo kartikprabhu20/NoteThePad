@@ -14,7 +14,8 @@ data class DetailedNote (
     val reminderTime: Long = -1,
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
-    val tagEntities: List<TagEntity> = emptyList()
+    val tagEntities: List<TagEntity> = emptyList(),
+    val backgroundImage: Int = -1
 ){
     fun toNote(): NoteEntity{
         val json = JSONObject()
@@ -30,7 +31,8 @@ data class DetailedNote (
             imageUris = imageUris,
             audioUris = audioAttachments.map { it.uri },
             reminderTime = reminderTime,
-            audioTranscriptions = json.toString()
+            audioTranscriptions = json.toString(),
+            backgroundImage = backgroundImage
         )
     }
 }

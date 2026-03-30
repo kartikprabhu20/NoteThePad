@@ -14,6 +14,7 @@ sealed class AddEditNoteEvent {
     data class ChangeContentFocus(val focusState: FocusState) : AddEditNoteEvent()
     data class ApplyContentFormat(val type: SpanType) : AddEditNoteEvent()
     data class ChangeColor(val color: Int) : AddEditNoteEvent()
+    data class ChangeBackgroundImage(val index: Int) : AddEditNoteEvent()
     data object SaveNote : AddEditNoteEvent()
     data object MakeCopy : AddEditNoteEvent()
     data object DeleteNote : AddEditNoteEvent()
