@@ -51,6 +51,15 @@ class NotesViewModel @Inject constructor(
     private val widgetRefresher: WidgetRefresher
 ) : ViewModel() {
 
+    companion object {
+        var shouldShowLogoAnimation = true
+            private set
+
+        fun markAnimationShown() {
+            shouldShowLogoAnimation = false
+        }
+    }
+
     private val _filterState = MutableStateFlow(
         DataQuery(
             filter = savedStateHandle.get<String>("filterType") ?: NotesFilterType.ALL.filter,

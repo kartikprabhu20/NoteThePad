@@ -114,6 +114,7 @@ fun NotesScreen(
         notesViewModel.refreshWidget()
     }
     val snackBarHostState = remember { SnackbarHostState() }
+    var showLogoAnimation by remember { mutableStateOf(NotesViewModel.shouldShowLogoAnimation) }
     EvenHandler(snackBarHostState = snackBarHostState, onPinWidget = onPinWidget)
 
     if (showLabelDialog) {
@@ -187,6 +188,11 @@ fun NotesScreen(
                             TopSearchBar(
                                 searchQuery,
                                 isGridView = isGridView,
+                                showLogoAnimation = showLogoAnimation,
+                                onLogoAnimationComplete = {
+                                    NotesViewModel.markAnimationShown()
+                                    showLogoAnimation = false
+                                },
                                 onToogleGridView = {
                                     notesViewModel.toggleGridView(it)
                                 },
@@ -264,43 +270,49 @@ fun NotesScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (state.notes.isNotEmpty()) {
-                        StaggeredNotesList(
-                            notes = state.notes,
-                            isGridView = isGridView,
-                            noteShape = noteShape,
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            onNoteClicked = onNoteClick,
-                            onDeleteClicked = { note ->
-                                notesViewModel.onEvent(
-                                    NotesEvent.DeleteNote(note)
-                                )
-                            },
-                            onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) },
-                            isDarkTheme = isDarkTheme
-                        )
-                    } else {
-                        val resource =
-                            if (isDarkTheme) {
-                                if (searchQuery.isNotEmpty())
-                                    R.drawable.search_female_dark
-                                else
-                                    R.drawable.empty_male_dark
-                            } else {
-                                if (searchQuery.isNotEmpty())
-                                    R.drawable.search_female_pastel
-                                else
-                                    R.drawable.empty_male_pastel
-                            }
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(resource),
-                                contentDescription = stringResource(R.string.content_description_empty_list)
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = !showLogoAnimation,
+                        enter = fadeIn(tween(300)),
+                        exit = fadeOut(tween(0))
+                    ) {
+                        if (state.notes.isNotEmpty()) {
+                            StaggeredNotesList(
+                                notes = state.notes,
+                                isGridView = isGridView,
+                                noteShape = noteShape,
+                                sharedTransitionScope = sharedTransitionScope,
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                onNoteClicked = onNoteClick,
+                                onDeleteClicked = { note ->
+                                    notesViewModel.onEvent(
+                                        NotesEvent.DeleteNote(note)
+                                    )
+                                },
+                                onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) },
+                                isDarkTheme = isDarkTheme
                             )
+                        } else {
+                            val resource =
+                                if (isDarkTheme) {
+                                    if (searchQuery.isNotEmpty())
+                                        R.drawable.search_female_dark
+                                    else
+                                        R.drawable.empty_male_dark
+                                } else {
+                                    if (searchQuery.isNotEmpty())
+                                        R.drawable.search_female_pastel
+                                    else
+                                        R.drawable.empty_male_pastel
+                                }
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(resource),
+                                    contentDescription = stringResource(R.string.content_description_empty_list)
+                                )
+                            }
                         }
                     }
                 }

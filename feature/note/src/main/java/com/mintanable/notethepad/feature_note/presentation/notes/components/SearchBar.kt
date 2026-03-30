@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.notes.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -134,6 +136,8 @@ fun PreviewSearchBar(modifier: Modifier = Modifier) {
 fun TopSearchBar(
     searchQuery: String,
     isGridView: Boolean,
+    showLogoAnimation: Boolean = false,
+    onLogoAnimationComplete: () -> Unit = {},
     onToogleGridView: (Boolean) -> Unit,
     onValueChange: (String) -> Unit,
     onFocusChanged: (FocusState) -> Unit,
@@ -145,13 +149,27 @@ fun TopSearchBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        SearchBar(
-            text = searchQuery,
+        AnimatedContent(
+            targetState = showLogoAnimation,
             modifier = Modifier.weight(1f),
-            onValueChange = onValueChange,
-            onFocusChanged = onFocusChanged,
-            onClearClicked = onClearClicked
-        )
+            transitionSpec = {
+                fadeIn(tween(500)) togetherWith fadeOut(tween(500))
+            },
+            label = "LogoToSearchBar"
+        ) { showLogo ->
+            if (showLogo) {
+                LogoRevealAnimation(
+                    onAnimationComplete = onLogoAnimationComplete
+                )
+            } else {
+                SearchBar(
+                    text = searchQuery,
+                    onValueChange = onValueChange,
+                    onFocusChanged = onFocusChanged,
+                    onClearClicked = onClearClicked
+                )
+            }
+        }
         IconButton(
             onClick = onExpandClicked
         ) {
