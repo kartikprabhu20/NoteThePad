@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@composable,
                                     user = user,
-                                    isDarkTheme = settingsState.settings.themeMode == ThemeMode.DARK,
+                                    isDarkTheme = isDarkTheme,
                                     appVersionProvider = AndroidAppVersionProvider(),
                                     onPinWidget = { note ->
                                         val appWidgetManager =
@@ -203,6 +203,7 @@ class MainActivity : AppCompatActivity() {
                             ) {
                                 AddEditNoteScreen(
                                     noteId = it.arguments?.getLong("noteId") ?: 0L,
+                                    isDarkTheme = isDarkTheme,
                                     navController = navController,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@composable,
