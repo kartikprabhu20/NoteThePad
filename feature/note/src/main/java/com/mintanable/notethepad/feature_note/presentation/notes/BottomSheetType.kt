@@ -24,7 +24,8 @@ enum class BottomSheetType {
     AUDIO_SOURCES,
     AUDIO_RECORDER,
     CHECKBOX,
-    LABEL
+    LABEL,
+    COLOR_SELECTOR
 }
 
 interface AdditionalOption {

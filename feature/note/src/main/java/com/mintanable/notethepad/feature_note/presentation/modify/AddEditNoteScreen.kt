@@ -54,6 +54,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Bot
 import com.mintanable.notethepad.feature_note.presentation.modify.components.DateAndTimePicker
 import com.mintanable.notethepad.feature_note.presentation.modify.components.SavingOverlay
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
+import com.mintanable.notethepad.feature_note.presentation.modify.components.sections.ColorSelectorBottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.sections.NoteEditorContent
 import com.mintanable.notethepad.feature_note.presentation.notes.AttachmentOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.AudioSourceOptions
@@ -75,6 +76,7 @@ fun AddEditNoteScreen(
     navController: NavController,
     noteId: Long,
     viewModel: AddEditNoteViewModel = hiltViewModel(),
+    isDarkTheme: Boolean,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
     onPinWidget: (Long) -> Unit = {}
@@ -278,7 +280,8 @@ fun AddEditNoteScreen(
             isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
             onEvent = onEvent,
             sharedTransitionScope = sharedTransitionScope,
-            animatedVisibilityScope = animatedVisibilityScope
+            animatedVisibilityScope = animatedVisibilityScope,
+            isDarkTheme = isDarkTheme
         )
 
         val navigationBarHeight =
@@ -406,7 +409,15 @@ fun AddEditNoteScreen(
             ) {
 
             }
-            if (uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER) {
+            if (uiState.currentSheetType == BottomSheetType.COLOR_SELECTOR) {
+                ColorSelectorBottomSheetContent(
+                    selectedColor = uiState.noteColor,
+                    selectedBackgroundImage = uiState.backgroundImage,
+                    isDarkTheme = isDarkTheme,
+                    onColorClick = { viewModel.onEvent(AddEditNoteEvent.ChangeColor(it)) },
+                    onBackgroundImageClick = { viewModel.onEvent(AddEditNoteEvent.ChangeBackgroundImage(it)) }
+                )
+            } else if (uiState.currentSheetType == BottomSheetType.AUDIO_RECORDER) {
                 AudioRecorderUI(
                     isRecording = uiState.isRecording,
                     amplitude = uiState.recordingAmplitude,

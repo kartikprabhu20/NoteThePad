@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Save
@@ -72,7 +73,7 @@ fun NoteBottomAppBar(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     with(sharedTransitionScope) {
-        var isVisible by remember { mutableStateOf(false) }
+        var isVisible by remember { mutableStateOf(true) }
         val wiggleAnim = remember { Animatable(0f) }
 
         val transition = animatedVisibilityScope.transition
@@ -132,7 +133,7 @@ fun NoteBottomAppBar(
                     exit = fadeOut()
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.Bottom
                     ) {
                         utilityButtons.forEachIndexed { _, (icon, type, label) ->
@@ -207,6 +208,11 @@ fun PreviewBottomAppBar(){
                                             Icons.Default.AttachFile,
                                             BottomSheetType.ATTACH,
                                             "Attach"
+                                        ),
+                                        Triple(
+                                            Icons.Default.FormatPaint,
+                                            BottomSheetType.ATTACH,
+                                            "Color"
                                         ),
                                         Triple(
                                             Icons.Default.CheckBox,
