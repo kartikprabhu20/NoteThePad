@@ -2,6 +2,7 @@ package com.mintanable.notethepad
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.mintanable.notethepad.core.ui.R
 
 data class NoteColorPair(val light: Color, val dark: Color)
 
@@ -28,17 +29,19 @@ object NoteColors {
 
     // 10 background image slots (placeholder - 0 means no resource yet)
     val backgroundImages = listOf(
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-        NoteBackgroundImage(lightRes = 0, darkRes = 0),
-    )
+        NoteBackgroundImage(lightRes = R.drawable.pizza_light, darkRes = R.drawable.pizza_dark),
+        NoteBackgroundImage(lightRes = R.drawable.roller_light, darkRes = R.drawable.roller_dark),
+        NoteBackgroundImage(lightRes = R.drawable.blueprint_light, darkRes = R.drawable.blueprint_dark),
+        NoteBackgroundImage(lightRes = R.drawable.topography_light, darkRes = R.drawable.topography_dark),
+        NoteBackgroundImage(lightRes = R.drawable.shell_light, darkRes = R.drawable.shell_dark),
+        NoteBackgroundImage(lightRes = R.drawable.paper_light, darkRes = R.drawable.paper_dark),
+        NoteBackgroundImage(lightRes = R.drawable.mountain_light, darkRes = R.drawable.mountain_dark),
+        NoteBackgroundImage(lightRes = R.drawable.frosted_light, darkRes = R.drawable.frosted_dark),
+        NoteBackgroundImage(lightRes = R.drawable.map_light, darkRes = R.drawable.map_dark),
+        NoteBackgroundImage(lightRes = R.drawable.office_light, darkRes = R.drawable.office_dark),
+        NoteBackgroundImage(lightRes = R.drawable.bubble_light, darkRes = R.drawable.bubble_dark),
+        NoteBackgroundImage(lightRes = R.drawable.linen_light, darkRes = R.drawable.linen_dark),
+        )
 
     private val lightToColorPairMap: Map<Int, NoteColorPair> by lazy {
         colorPairs.associateBy { it.light.toArgb() }
