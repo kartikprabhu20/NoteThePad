@@ -30,6 +30,8 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.components.drawNoteShape
 import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.feature_settings.R
+import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.ThemePreviews
 
 @Composable
 fun NoteShapePickerDialog(
@@ -116,7 +118,7 @@ private fun NoteShapePreviewItem(
             text = noteShapeDisplayName(shape),
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .fillMaxWidth()
@@ -140,4 +142,28 @@ fun noteShapeDisplayName(shape: NoteShape): String = when (shape) {
     NoteShape.STAPLED_CORNER -> stringResource(R.string.note_shape_stapled_corner)
     NoteShape.PINNED_NOTE -> stringResource(R.string.note_shape_pinned_note)
     NoteShape.SUN_BLEACHED_FADE -> stringResource(R.string.note_shape_sun_bleached_fade)
+}
+
+@ThemePreviews
+@Composable
+fun NoteShapePickerDialogPreview() {
+    NoteThePadTheme {
+        NoteShapePickerDialog(
+            currentShape = NoteShape.DEFAULT,
+            onShapeSelected = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun NoteShapePreviewItemPreview() {
+    NoteThePadTheme {
+        NoteShapePreviewItem(
+            shape = NoteShape.DEFAULT,
+            isSelected = true,
+            onClick = {}
+        )
+    }
 }
