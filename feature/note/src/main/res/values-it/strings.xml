@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">Trascrizione da audio a testo...</string>
     <string name="content_description_trascribe_audio">Trascrivi audio</string>
     <string name="btn_add_to_note">Aggiungi alla nota</string>
+    <string name="content_description_color_selector">Selettore colore</string>
+    <string name="title_color_selection">Aspetto della nota</string>
+    <string name="subtitle_background_colors">Colori di sfondo</string>
+    <string name="subtitle_background_images">Immagini di sfondo</string>
+    <string name="transparent">Trasparente</string>
 </resources>

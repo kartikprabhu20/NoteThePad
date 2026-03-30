@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">音频转文字转录…</string>
     <string name="content_description_trascribe_audio">转录音频</string>
     <string name="btn_add_to_note">添加到笔记</string>
+    <string name="content_description_color_selector">颜色选择器</string>
+    <string name="title_color_selection">笔记外观</string>
+    <string name="subtitle_background_colors">背景颜色</string>
+    <string name="subtitle_background_images">背景图片</string>
+    <string name="transparent">透明</string>
 </resources>

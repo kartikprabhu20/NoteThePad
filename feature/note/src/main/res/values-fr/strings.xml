@@ -18,6 +18,7 @@
     <string name="content_description_checkbox_state">case à cocher</string>
     <string name="content_description_checkboxes_available">cases à cocher disponibles</string>
     <string name="content_description_clear_text">Effacer le texte</string>
+    <string name="content_description_color_selector">Sélecteur de couleur</string>
     <string name="content_description_delete_label">Supprimer l\'étiquette</string>
     <string name="content_description_delete_note">Supprimer la note</string>
     <string name="content_description_dismiss">Ignorer</string>
@@ -26,7 +27,7 @@
     <string name="content_description_icon">icône</string>
     <string name="content_description_images_attached">Images jointes</string>
     <string name="content_description_menu">Menu</string>
-    <string name="content_description_pin_note">Épingler la note comme widget</string>
+    <string name="content_description_pin_note">Épingler la note como widget</string>
     <string name="content_description_play_video">Lire la vidéo</string>
     <string name="content_description_profile_picture">Photo de profil</string>
     <string name="content_description_reminder_set">Rappel défini</string>
@@ -76,4 +77,8 @@
     <string name="hint_audio_to_text">Transcription audio en texte...</string>
     <string name="content_description_trascribe_audio">Transcrire l\'audio</string>
     <string name="btn_add_to_note">Ajouter à la note</string>
+    <string name="title_color_selection">Apparence de la note</string>
+    <string name="subtitle_background_colors">Couleurs d\'arrière-plan</string>
+    <string name="subtitle_background_images">Images d\'arrière-plan</string>
+    <string name="transparent">Transparent</string>
 </resources>

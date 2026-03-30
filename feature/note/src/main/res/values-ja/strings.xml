@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">音声からテキストへの書き起こし...</string>
     <string name="content_description_trascribe_audio">音声を書き起こす</string>
     <string name="btn_add_to_note">メモに追加</string>
+    <string name="content_description_color_selector">カラーセレクター</string>
+    <string name="title_color_selection">ノートの外観</string>
+    <string name="subtitle_background_colors">背景色</string>
+    <string name="subtitle_background_images">背景画像</string>
+    <string name="transparent">透明</string>
 </resources>

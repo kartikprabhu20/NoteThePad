@@ -71,9 +71,14 @@
     <string name="search_hint">Search notes…</string>
     <string name="title_ai_suggestions">AI tag suggestions</string>
     <string name="title_audio_recorder">Audio Recorder</string>
+    <string name="title_color_selection">Note Appearance</string>
+    <string name="transparent">Transparent</string>
     <string name="version_format">Version %1$s</string>
     <string name="next">Next</string>
     <string name="hint_audio_to_text">Audio to text transcription…</string>
     <string name="content_description_trascribe_audio">Transcribe Audio</string>
     <string name="btn_add_to_note">Add to note</string>
+    <string name="content_description_color_selector">Colour selector</string>
+    <string name="subtitle_background_colors">Background Colours</string>
+    <string name="subtitle_background_images">Background Images</string>
 </resources>

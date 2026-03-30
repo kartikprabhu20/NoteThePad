@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">Sesten metne dönüştürme…</string>
     <string name="content_description_trascribe_audio">Sesi Yazıya Dök</string>
     <string name="btn_add_to_note">Nota ekle</string>
+    <string name="content_description_color_selector">Renk seçici</string>
+    <string name="title_color_selection">Not Görünümü</string>
+    <string name="subtitle_background_colors">Arka Plan Renkleri</string>
+    <string name="subtitle_background_images">Arka Plan Görüntüleri</string>
+    <string name="transparent">Şeffaf</string>
 </resources>

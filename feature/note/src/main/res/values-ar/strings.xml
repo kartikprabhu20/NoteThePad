@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">تحويل الصوت إلى نص...</string>
     <string name="content_description_trascribe_audio">نسخ الصوت</string>
     <string name="btn_add_to_note">إضافة إلى الملاحظة</string>
+    <string name="content_description_color_selector">محدد الألوان</string>
+    <string name="title_color_selection">مظهر الملاحظة</string>
+    <string name="subtitle_background_colors">ألوان الخلفية</string>
+    <string name="subtitle_background_images">صور الخلفية</string>
+    <string name="transparent">شفاف</string>
 </resources>

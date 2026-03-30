@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">오디오를 텍스트로 변환 중...</string>
     <string name="content_description_trascribe_audio">오디오 받아쓰기</string>
     <string name="btn_add_to_note">노트에 추가</string>
+    <string name="content_description_color_selector">색상 선택기</string>
+    <string name="title_color_selection">노트 디자인</string>
+    <string name="subtitle_background_colors">배경색</string>
+    <string name="subtitle_background_images">배경 이미지</string>
+    <string name="transparent">투명</string>
 </resources>

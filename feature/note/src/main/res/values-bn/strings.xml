@@ -3,7 +3,7 @@
     <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">স্বয়ংক্রিয় ট্যাগ</string>
     <string name="btn_cancel">বাতিল করুন</string>
-    <string name="btn_confirm">নিশ্চিত করুন</string>
+    <string name="btn_confirm">নিশ্চیت করুন</string>
     <string name="btn_download">ডাউনলোড</string>
     <string name="btn_start_recording">রেকর্ডিং শুরু করুন</string>
     <string name="btn_stop_recording">রেকর্ডিং বন্ধ করুন</string>
@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">অডিও থেকে টেক্সট ট্রান্সক্রিপশন...</string>
     <string name="content_description_trascribe_audio">অডিও ট্রান্সক্রাইব করুন</string>
     <string name="btn_add_to_note">নোটে যোগ করুন</string>
+    <string name="content_description_color_selector">রঙ নির্বাচনকারী</string>
+    <string name="title_color_selection">নোটের উপস্থিতি</string>
+    <string name="subtitle_background_colors">পটভূমির রং</string>
+    <string name="subtitle_background_images">পটভূমির ছবি</string>
+    <string name="transparent">স্বচ্ছ</string>
 </resources>

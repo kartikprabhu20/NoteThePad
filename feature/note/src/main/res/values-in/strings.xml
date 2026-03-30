@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">Transkripsi audio ke teks...</string>
     <string name="content_description_trascribe_audio">Transkripsi Audio</string>
     <string name="btn_add_to_note">Tambah ke catatan</string>
+    <string name="content_description_color_selector">Pemilih warna</string>
+    <string name="title_color_selection">Tampilan Catatan</string>
+    <string name="subtitle_background_colors">Warna Latar Belakang</string>
+    <string name="subtitle_background_images">Gambar Latar Belakang</string>
+    <string name="transparent">Transparan</string>
 </resources>

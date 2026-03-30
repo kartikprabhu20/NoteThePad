@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">ऑडियो से टेक्स्ट ट्रांसक्रिप्शन...</string>
     <string name="content_description_trascribe_audio">ऑडियो ट्रांसक्राइब करें</string>
     <string name="btn_add_to_note">नोट में जोड़ें</string>
+    <string name="content_description_color_selector">रंग चयनकर्ता</string>
+    <string name="title_color_selection">नोट का स्वरूप</string>
+    <string name="subtitle_background_colors">पृष्ठभूमि के रंग</string>
+    <string name="subtitle_background_images">पृष्ठभूमि छवियां</string>
+    <string name="transparent">पारदर्शी</string>
 </resources>

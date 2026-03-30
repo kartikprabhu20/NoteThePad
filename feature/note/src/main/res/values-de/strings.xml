@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">Audio-zu-Text-Transkription...</string>
     <string name="content_description_trascribe_audio">Audio transkribieren</string>
     <string name="btn_add_to_note">Zur Notiz hinzufügen</string>
+    <string name="content_description_color_selector">Farbauswahl</string>
+    <string name="title_color_selection">Notiz-Erscheinungsbild</string>
+    <string name="subtitle_background_colors">Hintergrundfarben</string>
+    <string name="subtitle_background_images">Hintergrundbilder</string>
+    <string name="transparent">Transparent</string>
 </resources>

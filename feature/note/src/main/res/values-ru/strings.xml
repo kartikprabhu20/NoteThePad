@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">Транскрипция аудио в текст…</string>
     <string name="content_description_trascribe_audio">Транскрибировать аудио</string>
     <string name="btn_add_to_note">Добавить в заметку</string>
+    <string name="content_description_color_selector">Выбор цвета</string>
+    <string name="title_color_selection">Внешний вид заметки</string>
+    <string name="subtitle_background_colors">Цвета фона</string>
+    <string name="subtitle_background_images">Фоновые изображения</string>
+    <string name="transparent">Прозрачный</string>
 </resources>

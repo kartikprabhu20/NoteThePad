@@ -76,4 +76,9 @@
     <string name="hint_audio_to_text">Chuyển âm thanh thành văn bản...</string>
     <string name="content_description_trascribe_audio">Chuyển soạn âm thanh</string>
     <string name="btn_add_to_note">Thêm vào ghi chú</string>
+    <string name="content_description_color_selector">Bộ chọn màu</string>
+    <string name="title_color_selection">Giao diện ghi chú</string>
+    <string name="subtitle_background_colors">Màu Nền</string>
+    <string name="subtitle_background_images">Hình Nền</string>
+    <string name="transparent">Trong suốt</string>
 </resources>
