@@ -7,10 +7,12 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -49,7 +51,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -77,6 +82,7 @@ import kotlinx.coroutines.launch
 fun NoteEditorContent(
     noteId: Long,
     noteColor: Int,
+    backgroundImage: Int,
     attachedImages: List<Uri>,
     titleState: NoteTextFieldState,
     contentState: NoteTextFieldState,
@@ -102,19 +108,20 @@ fun NoteEditorContent(
     val scope = rememberCoroutineScope()
     val resolvedColor = NoteColors.resolveDisplayColor(noteColor, isDarkTheme)
     val noteBackgroundAnimatable = remember {
-        Animatable(if (noteColor == -1) Color.White else resolvedColor)
+        Animatable(if (noteColor == -1) Color.Transparent else resolvedColor)
+    }
+    LaunchedEffect(noteColor, isDarkTheme) {
+        val target = if (noteColor == -1) Color.Transparent else resolvedColor
+        noteBackgroundAnimatable.animateTo(target, tween(500))
     }
 
-    LaunchedEffect(noteColor, isDarkTheme) {
-        if (noteColor != -1) {
-            scope.launch {
-                noteBackgroundAnimatable.animateTo(
-                    targetValue = NoteColors.resolveDisplayColor(noteColor, isDarkTheme),
-                    animationSpec = tween(500)
-                )
-            }
-        }
-    }
+    val resolvedBackgroundRes = NoteColors.resolveBackgroundImage(backgroundImage, isDarkTheme)
+    val hasBackgroundImage = backgroundImage != -1
+    val imageAlpha by animateFloatAsState(
+        targetValue = if (hasBackgroundImage) 1f else 0f,
+        animationSpec = tween(500),
+        label = "image_fade"
+    )
 
     val checklistCharCount by remember(checkListItems) {
         derivedStateOf { checkListItems.sumOf { it.text.length } }
@@ -231,6 +238,17 @@ fun NoteEditorContent(
                         resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                     )
             ) {
+
+                if (hasBackgroundImage) {
+                    Image(
+                        painter = painterResource(id = resolvedBackgroundRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer(alpha = imageAlpha)
+                    )
+                }
                 val focusRequesters = remember { mutableMapOf<String, FocusRequester>() }
 
                 LazyColumn(

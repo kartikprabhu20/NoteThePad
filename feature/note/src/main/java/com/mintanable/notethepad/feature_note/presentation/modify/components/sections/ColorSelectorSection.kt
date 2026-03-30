@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.NoteColors
@@ -95,8 +99,12 @@ fun ColorSelectorBottomSheetContent(
             itemsIndexed(
                 items = NoteColors.backgroundImages,
                 key = { index, _ -> "bg_$index" }
-            ) { index, _ ->
+            ) { index, backgroundImage ->
+
+                val backgroundImageRes = if (isDarkTheme) backgroundImage.darkRes else backgroundImage.lightRes
+
                 BackgroundImageCircle(
+                    imageRes = backgroundImageRes,
                     isSelected = selectedBackgroundImage == index,
                     onClick = { onBackgroundImageClick(index) }
                 )
@@ -151,6 +159,7 @@ private fun ColorCircle(
 
 @Composable
 private fun BackgroundImageCircle(
+    imageRes: Int,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
@@ -175,6 +184,13 @@ private fun BackgroundImageCircle(
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
         if (isSelected) {
             Icon(
                 imageVector = Icons.Default.Check,

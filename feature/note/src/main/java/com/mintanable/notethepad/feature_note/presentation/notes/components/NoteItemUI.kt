@@ -6,6 +6,7 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -35,12 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.components.drawNoteShape
+import com.mintanable.notethepad.components.drawNoteWithImage
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.core.richtext.compose.RichTextAnnotator
@@ -69,9 +72,22 @@ fun NoteItemUI(
         modifier=modifier.height(IntrinsicSize.Min)
     ){
         val resolvedColor = NoteColors.resolveDisplayColor(note.color, isDarkTheme).toArgb()
-        Canvas(modifier = Modifier.matchParentSize()) {
-            drawNoteShape(noteShape, resolvedColor)
+        val resolvedBackgroundRes = NoteColors.resolveBackgroundImage(note.backgroundImage, isDarkTheme)
+        val hasBackgroundImage = note.backgroundImage != -1
+        val imagePainter = if (hasBackgroundImage) {
+            painterResource(id = resolvedBackgroundRes)
+        } else {
+            null
         }
+
+        Canvas(modifier = Modifier.matchParentSize()) {
+            if (hasBackgroundImage) {
+                drawNoteWithImage(noteShape, noteColorInt = resolvedColor, imagePainter = imagePainter, isDarkTheme=isDarkTheme)
+            } else {
+                drawNoteShape(noteShape, resolvedColor)
+            }
+        }
+
 
         Column(
             modifier = Modifier
@@ -204,7 +220,8 @@ fun NoteItemUI(
 @ThemePreviews
 @Composable
 fun NoteItemUIPreviewCheckboxes() {
-    NoteThePadTheme {
+    val isDark = isSystemInDarkTheme()
+    NoteThePadTheme(darkTheme = isDark) {
         SharedTransitionLayout {
             AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
                 if (isVisible) {
@@ -231,7 +248,8 @@ fun NoteItemUIPreviewCheckboxes() {
                             onDeleteClick = {},
                             onPinClick = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
-                            animatedVisibilityScope = this@AnimatedContent
+                            animatedVisibilityScope = this@AnimatedContent,
+                            isDarkTheme = isDark
                         )
                     }
                 }
@@ -244,7 +262,8 @@ fun NoteItemUIPreviewCheckboxes() {
 @ThemePreviews
 @Composable
 fun NoteItemUIPreview() {
-    NoteThePadTheme {
+    val isDark = isSystemInDarkTheme()
+    NoteThePadTheme(darkTheme = isDark) {
         SharedTransitionLayout {
             AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
                 if (isVisible) {
@@ -269,7 +288,49 @@ fun NoteItemUIPreview() {
                             onDeleteClick = {},
                             onPinClick = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
-                            animatedVisibilityScope = this@AnimatedContent
+                            animatedVisibilityScope = this@AnimatedContent,
+                            isDarkTheme = isDark
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@ThemePreviews
+@Composable
+fun NoteItemUIBackgrroundImagePreview() {
+    val isDark = isSystemInDarkTheme()
+    NoteThePadTheme(darkTheme = isDark) {
+        SharedTransitionLayout {
+            AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
+                if (isVisible) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        NoteItemUI(
+                            note = DetailedNote(
+                                title = "Meeting Notes",
+                                content = "Discuss the new architecture for the platform.",
+                                timestamp = System.currentTimeMillis(),
+                                color = -1,
+                                id = 1,
+                                imageUris = listOf("image"),
+                                audioAttachments = listOf(Attachment("x",123)),
+                                reminderTime = 1,
+                                tagEntities = listOf(TagEntity("abc")),
+                                backgroundImage = 2
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            onDeleteClick = {},
+                            onPinClick = {},
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this@AnimatedContent,
+                            isDarkTheme = isDark
                         )
                     }
                 }

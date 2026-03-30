@@ -1,9 +1,9 @@
 package com.mintanable.notethepad.feature_settings.presentation
 
 import android.Manifest
-import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -39,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -47,28 +46,28 @@ import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.mintanable.notethepad.components.PermissionRationaleDialog
+import com.mintanable.notethepad.components.TimePickerDialog
 import com.mintanable.notethepad.core.common.humanReadableSize
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
-import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
-import com.mintanable.notethepad.core.model.settings.NoteShape
+import com.mintanable.notethepad.core.model.settings.BackupFrequency
+import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.R
 import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
-import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.NoteShapePickerDialog
-import com.mintanable.notethepad.feature_settings.presentation.components.noteShapeDisplayName
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
-import com.mintanable.notethepad.components.TimePickerDialog
-import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingSwitchItem
+import com.mintanable.notethepad.feature_settings.presentation.components.noteShapeDisplayName
 import com.mintanable.notethepad.permissions.PermissionRationaleType
 import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.ThemePreviews
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -451,7 +450,8 @@ fun SettingsScreen(
             NoteShapePickerDialog(
                 currentShape = currentSettings.noteShape,
                 onShapeSelected = { shape -> onEvent(SettingsEvent.UpdateNoteShape(shape)) },
-                onDismiss = { showNoteShapeDialog = false }
+                onDismiss = { showNoteShapeDialog = false },
+                isDarkTheme = if (state.settings.themeMode == ThemeMode.SYSTEM) isSystemInDarkTheme() else state.settings.themeMode == ThemeMode.DARK
             )
         }
 
@@ -481,11 +481,7 @@ fun SettingsScreen(
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@Preview(name = "Light Mode", showBackground = true)
-@Preview(
-    name = "Dark Mode",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES)
+@ThemePreviews
 @Composable
 fun PreviewSettingsScreen() {
     NoteThePadTheme {

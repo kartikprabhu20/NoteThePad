@@ -264,6 +264,7 @@ fun AddEditNoteScreen(
         NoteEditorContent(
             noteId = noteId,
             noteColor = uiState.noteColor,
+            backgroundImage = uiState.backgroundImage,
             attachedImages = uiState.attachedImages,
             titleState = uiState.titleState,
             contentState = uiState.contentState,
