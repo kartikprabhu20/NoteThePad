@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.settings.BackupSettings
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 
 sealed class SettingsEvent {
@@ -31,4 +32,5 @@ sealed class SettingsEvent {
     data object RequestDownloadAudioTranscriber : SettingsEvent()
     data object ConfirmDownloadAudioTranscriber : SettingsEvent()
     data object DismissDownloadAudioTranscriberDialog : SettingsEvent()
+    data class UpdateNoteShape(val noteShape: NoteShape) : SettingsEvent()
 }

@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
@@ -42,6 +44,7 @@ class NotesViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     private val tagUseCases: TagUseCases,
     getLayoutSettings: GetLayoutSettings,
+    getNoteShapeSettings: GetNoteShapeSettings,
     private val toggleLayoutSettings: ToggleLayoutSettings,
     private val fileIOUseCases: FileIOUseCases,
     private val dispatchers: DispatcherProvider,
@@ -109,6 +112,13 @@ class NotesViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
+        )
+
+    val noteShape: StateFlow<NoteShape> = getNoteShapeSettings()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NoteShape.DEFAULT
         )
 
     fun updateFilter(filter: String, tagId: Long = -1L, tagName: String = "") {

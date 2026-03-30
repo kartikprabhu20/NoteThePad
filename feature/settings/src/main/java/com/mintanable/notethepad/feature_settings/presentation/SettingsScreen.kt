@@ -52,12 +52,15 @@ import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.R
 import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
 import com.mintanable.notethepad.components.PermissionRationaleDialog
+import com.mintanable.notethepad.feature_settings.presentation.components.NoteShapePickerDialog
+import com.mintanable.notethepad.feature_settings.presentation.components.noteShapeDisplayName
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingItem
 import com.mintanable.notethepad.feature_settings.presentation.components.SettingRadioGroup
@@ -83,6 +86,7 @@ fun SettingsScreen(
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
     var showClearBackupDialog by rememberSaveable { mutableStateOf(false) }
+    var showNoteShapeDialog by rememberSaveable { mutableStateOf(false) }
 
     val currentSettings = state.settings
     val isGoogleLinked = currentSettings.googleAccount?.isNotBlank() == true
@@ -324,6 +328,11 @@ fun SettingsScreen(
                     onOptionSelected = { onEvent(SettingsEvent.UpdateTheme(it)) },
                     entries = ThemeMode.entries
                 )
+                SettingItem(
+                    title = stringResource(R.string.setting_note_shape),
+                    subtitle = noteShapeDisplayName(currentSettings.noteShape),
+                    onClick = { showNoteShapeDialog = true }
+                )
             }
         }
 
@@ -435,6 +444,14 @@ fun SettingsScreen(
                     notificationPermissionState.launchPermissionRequest()
                 },
                 onDismissRequest = { showRationaleDialog = false }
+            )
+        }
+
+        if (showNoteShapeDialog) {
+            NoteShapePickerDialog(
+                currentShape = currentSettings.noteShape,
+                onShapeSelected = { shape -> onEvent(SettingsEvent.UpdateNoteShape(shape)) },
+                onDismiss = { showNoteShapeDialog = false }
             )
         }
 

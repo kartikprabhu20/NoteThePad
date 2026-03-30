@@ -33,21 +33,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.ColorUtils
 import androidx.compose.runtime.remember
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.clipPath
+import com.mintanable.notethepad.components.drawNoteShape
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.core.richtext.compose.RichTextAnnotator
 import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.database.db.entity.Attachment
@@ -62,8 +58,7 @@ import com.mintanable.notethepad.theme.ThemePreviews
 fun NoteItemUI(
     note: DetailedNote,
     modifier:Modifier=Modifier,
-    cornerRadius: Dp = 10.dp,
-    cutCornerSize : Dp = 30.dp,
+    noteShape: NoteShape = NoteShape.DEFAULT,
     enableDeleteIcon: Boolean = true,
     onDeleteClick: () -> Unit,
     onPinClick: () -> Unit,
@@ -73,30 +68,9 @@ fun NoteItemUI(
     Box(
         modifier=modifier.height(IntrinsicSize.Min)
     ){
-       Canvas(modifier = Modifier.matchParentSize()){
-           val clipPath = Path().apply{
-               lineTo(size.width-cutCornerSize.toPx(),0f)
-               lineTo(size.width, cutCornerSize.toPx())
-               lineTo(size.width, size.height)
-               lineTo(0f,size.height)
-               close()
-           }
-           clipPath(clipPath){
-                drawRoundRect(
-                    color = Color(note.color),
-                    size = size,
-                    cornerRadius = CornerRadius(cornerRadius.toPx())
-                )
-
-               drawRoundRect(
-                   color = Color(ColorUtils.blendARGB(note.color,0x000000, 0.2f)
-                   ),
-                   topLeft = Offset(size.width-cutCornerSize.toPx(), -100f),
-                   size = Size(cutCornerSize.toPx()+100f,cutCornerSize.toPx()+100f),
-                   cornerRadius = CornerRadius(cornerRadius.toPx())
-               )
-           }
-       }
+        Canvas(modifier = Modifier.matchParentSize()) {
+            drawNoteShape(noteShape, note.color)
+        }
 
         Column(
             modifier = Modifier

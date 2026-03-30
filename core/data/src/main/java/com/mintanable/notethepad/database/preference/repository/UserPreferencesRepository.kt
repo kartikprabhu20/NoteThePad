@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.settings.BackupSettings
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,6 +35,7 @@ class UserPreferencesRepository @Inject constructor(
         val BACKUP_TIME_MINUTE = intPreferencesKey("backup_time_minute")
         val AI_MODEL_NAME = stringPreferencesKey("ai_model_name")
         val BACKUP_MEDIA = booleanPreferencesKey("backup_media")
+        val NOTE_SHAPE = stringPreferencesKey("note_shape")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -50,6 +52,7 @@ class UserPreferencesRepository @Inject constructor(
             val backupTimeMinutes = preferences[PreferencesKeys.BACKUP_TIME_MINUTE] ?: 0
             val aiModelName = preferences[PreferencesKeys.AI_MODEL_NAME] ?: "None"
             val backupMedia = preferences[PreferencesKeys.BACKUP_MEDIA] ?: false
+            val noteShape = preferences[PreferencesKeys.NOTE_SHAPE] ?: NoteShape.DEFAULT.name
 
             Settings(
                 backupEnabled = backupEnabled,
@@ -62,7 +65,8 @@ class UserPreferencesRepository @Inject constructor(
                     backupTimeMinutes = backupTimeMinutes,
                     backupMedia = backupMedia
                 ),
-                aiModelName = aiModelName
+                aiModelName = aiModelName,
+                noteShape = NoteShape.valueOf(noteShape)
             )
         }
 
@@ -115,6 +119,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun updateAiModel(type: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.AI_MODEL_NAME] = type
+        }
+    }
+
+    suspend fun updateNoteShape(shape: NoteShape) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.NOTE_SHAPE] = shape.name
         }
     }
 }

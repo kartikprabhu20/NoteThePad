@@ -15,12 +15,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 
 @Composable
 fun StaggeredNotesList(
     notes: List<DetailedNote>,
     isGridView: Boolean,
+    noteShape: NoteShape = NoteShape.DEFAULT,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
     onNoteClicked: (DetailedNote) -> Unit,
@@ -44,6 +46,7 @@ fun StaggeredNotesList(
             ) { note ->
                 NoteItemUI(
                     note = note,
+                    noteShape = noteShape,
                     enableDeleteIcon = enableDeletion,
                     modifier = Modifier
                         .fillMaxWidth()

@@ -14,6 +14,7 @@ import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.core.model.backup.LoadStatus
 import com.mintanable.notethepad.core.model.backup.LoadType
+import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.MODEL_DOWNLOAD_TASK
@@ -227,6 +228,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.RequestDownloadAudioTranscriber -> _showDownloadAudioTranscriberDialog.value = true
             SettingsEvent.ConfirmDownloadAudioTranscriber -> confirmDownloadAudioTranscriber()
             SettingsEvent.DismissDownloadAudioTranscriberDialog -> _showDownloadAudioTranscriberDialog.value = false
+            is SettingsEvent.UpdateNoteShape -> updateNoteShape(event.noteShape)
         }
     }
 
@@ -282,6 +284,10 @@ class SettingsViewModel @Inject constructor(
 
     private fun updateTheme(mode: ThemeMode) {
         viewModelScope.launch { dataStore.updateTheme(mode) }
+    }
+
+    private fun updateNoteShape(shape: NoteShape) {
+        viewModelScope.launch { dataStore.updateNoteShape(shape) }
     }
 
     private fun signOut() {

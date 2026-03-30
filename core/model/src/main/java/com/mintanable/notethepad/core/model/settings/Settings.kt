@@ -7,7 +7,8 @@ data class Settings(
     val isGridViewSelected: Boolean = false,
     val googleAccount: String? = null,
     val backupSettings: BackupSettings = BackupSettings(),
-    val aiModelName: String = "None"
+    val aiModelName: String = "None",
+    val noteShape: NoteShape = NoteShape.DEFAULT
 )
 
 data class BackupSettings(

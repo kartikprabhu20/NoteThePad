@@ -16,6 +16,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCa
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
 import io.mockk.coVerify
 import io.mockk.every
@@ -42,6 +43,7 @@ import org.robolectric.RobolectricTestRunner
 class NotesViewModelTest {
     private val noteUseCases = mockk<NoteUseCases>(relaxed = true)
     private val getLayoutSettings = mockk<GetLayoutSettings>(relaxed = true)
+    private val getNoteShapeSettings = mockk<GetNoteShapeSettings>(relaxed = true)
     private val toggleLayoutSettings = mockk<ToggleLayoutSettings>(relaxed = true)
     private val fileIOUseCases = mockk<FileIOUseCases>(relaxed = true)
     private val tagUseCases = mockk<TagUseCases>(relaxed = true)
@@ -58,11 +60,13 @@ class NotesViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         every { getLayoutSettings() } returns flowOf(true)
+        every { getNoteShapeSettings() } returns flowOf(com.mintanable.notethepad.core.model.settings.NoteShape.DEFAULT)
         viewModel = NotesViewModel(
             savedStateHandle = savedStateHandle,
             noteUseCases = noteUseCases,
             tagUseCases = tagUseCases,
             getLayoutSettings = getLayoutSettings,
+            getNoteShapeSettings = getNoteShapeSettings,
             toggleLayoutSettings = toggleLayoutSettings,
             fileIOUseCases = fileIOUseCases,
             dispatchers = testDispatcherProvider,

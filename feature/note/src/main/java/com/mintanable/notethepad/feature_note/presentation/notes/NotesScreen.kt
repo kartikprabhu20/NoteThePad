@@ -88,6 +88,7 @@ fun NotesScreen(
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery by notesViewModel.searchInputText.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
+    val noteShape by notesViewModel.noteShape.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
      val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
     val filterState by notesViewModel.filterState.collectAsStateWithLifecycle()
@@ -267,6 +268,7 @@ fun NotesScreen(
                         StaggeredNotesList(
                             notes = state.notes,
                             isGridView = isGridView,
+                            noteShape = noteShape,
                             sharedTransitionScope = sharedTransitionScope,
                             animatedVisibilityScope = animatedVisibilityScope,
                             onNoteClicked = onNoteClick,
