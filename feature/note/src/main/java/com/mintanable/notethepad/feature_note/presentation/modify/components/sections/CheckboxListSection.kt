@@ -83,7 +83,10 @@ fun LazyListScope.checkboxListSection(
 
     if (uncheckedList.isNotEmpty() && checkedList.isNotEmpty()) {
         item(key = "divider") {
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
     checkboxGroup(
@@ -136,7 +139,7 @@ fun CheckboxRow(
             Icon(
                 imageVector = Icons.Default.DragIndicator,
                 contentDescription = "Drag to reorder",
-                tint = Color.Black,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
             )
         }
@@ -145,8 +148,8 @@ fun CheckboxRow(
             checked = item.isChecked,
             onCheckedChange = { onItemChanged(item.copy(isChecked = !item.isChecked)) },
             colors = CheckboxDefaults.colors().copy(
-                checkedBorderColor = Color.Black,
-                uncheckedBorderColor = Color.Black,
+                checkedBorderColor = MaterialTheme.colorScheme.onSurface,
+                uncheckedBorderColor = MaterialTheme.colorScheme.onSurface,
                 checkedBoxColor = MaterialTheme.colorScheme.onSurface
             )
         )
@@ -155,7 +158,7 @@ fun CheckboxRow(
             value = item.text,
             onValueChange = { onItemChanged(item.copy(text = it)) },
             singleLine = isSingleLine,
-            textStyle = textStyle,
+            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
             modifier = Modifier
                 .padding(top = 14.dp, bottom = 8.dp)
                 .padding(horizontal = 4.dp)
@@ -176,8 +179,9 @@ fun CheckboxRow(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(R.string.option_delete),
-                tint = Color.Black
-            )
+                tint = MaterialTheme.colorScheme.onSurface,
+
+                )
         }
     }
 }
@@ -191,7 +195,7 @@ fun LazyListScope.checkboxGroup(
     onEnterPressed: (CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
     onDeletePressed: (Int) -> Unit,
-    onDragStateChanged: (String?) -> Unit
+    onDragStateChanged: (String?) -> Unit,
 ) {
     itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
         val requester = focusRequesters.getOrPut(item.id) { FocusRequester() }
@@ -271,13 +275,15 @@ fun Modifier.dragHandler(
 @Composable
 fun PreviewCheckboxListSection(){
     NoteThePadTheme {
-        Box(modifier = Modifier.background(NoteColors.colors.get(0))) {
+        Box(modifier = Modifier.background(NoteColors.colors.get(1))) {
 
             val id = UUID.randomUUID().toString()
             val focusRequesters = remember { mutableMapOf<String, FocusRequester>() }
 
             LazyColumn {
                 checkboxListSection(
+                    activeDragCheckIndex = id,
+                    activeDragUnCheckIndex = null,
                     items = listOf(
                         CheckboxItem(
                             text = "test1 i hope this line extends beyond the limits, so i can test how multiple lines are displayed in the row. But unfortunately seems like i need to make some changes",
@@ -306,8 +312,6 @@ fun PreviewCheckboxListSection(){
                     onEnterPressed = {},
                     onItemChanged = {},
                     onListOrderUpdated = {},
-                    activeDragCheckIndex = id,
-                    activeDragUnCheckIndex = null,
                     onDragStateChangedChecked = {},
                     onDragStateChangedUnChecked = { },
                 )

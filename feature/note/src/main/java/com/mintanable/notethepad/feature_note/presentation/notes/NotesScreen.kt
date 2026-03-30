@@ -277,7 +277,8 @@ fun NotesScreen(
                                     NotesEvent.DeleteNote(note)
                                 )
                             },
-                            onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) }
+                            onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) },
+                            isDarkTheme = isDarkTheme
                         )
                     } else {
                         val resource =

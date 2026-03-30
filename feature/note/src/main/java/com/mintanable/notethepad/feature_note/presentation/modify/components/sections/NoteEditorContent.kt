@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.LocalAbsoluteTonalElevation
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.richtext.model.RichTextState
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -91,21 +93,23 @@ fun NoteEditorContent(
     isSuggestionTagsLoading: Boolean = false,
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    isDarkTheme: Boolean = false
 ) {
     var activeDragUnCheckIndex by remember { mutableStateOf<String?>(null) }
     var activeDragCheckIndex by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
+    val resolvedColor = NoteColors.resolveDisplayColor(noteColor, isDarkTheme)
     val noteBackgroundAnimatable = remember {
-        Animatable(if (noteColor == -1) Color.White else Color(noteColor))
+        Animatable(if (noteColor == -1) Color.White else resolvedColor)
     }
 
-    LaunchedEffect(noteColor) {
+    LaunchedEffect(noteColor, isDarkTheme) {
         if (noteColor != -1) {
             scope.launch {
                 noteBackgroundAnimatable.animateTo(
-                    targetValue = Color(noteColor),
+                    targetValue = NoteColors.resolveDisplayColor(noteColor, isDarkTheme),
                     animationSpec = tween(500)
                 )
             }
@@ -168,21 +172,14 @@ fun NoteEditorContent(
                                 NoteBottomAppBar(
                                     utilityButtons = listOf(
                                         Triple(Icons.Default.AttachFile, BottomSheetType.ATTACH, stringResource(R.string.content_description_attach)),
+                                        Triple(Icons.Default.FormatPaint, BottomSheetType.COLOR_SELECTOR, stringResource(R.string.content_description_color_selector)),
                                         Triple(
                                             if (isCheckboxListAvailable) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
                                             BottomSheetType.CHECKBOX,
                                             stringResource(R.string.content_description_checkbox)
                                         ),
-                                        Triple(
-                                            Icons.Default.NotificationAdd,
-                                            BottomSheetType.REMINDER,
-                                            stringResource(R.string.content_description_reminders)
-                                        ),
-                                        Triple(
-                                            Icons.Default.MoreHoriz,
-                                            BottomSheetType.MORE_SETTINGS,
-                                            stringResource(R.string.content_description_settings)
-                                        )
+                                        Triple(Icons.Default.NotificationAdd, BottomSheetType.REMINDER, stringResource(R.string.content_description_reminders)),
+                                        Triple(Icons.Default.MoreHoriz, BottomSheetType.MORE_SETTINGS, stringResource(R.string.content_description_settings))
                                     ),
                                     modifier = Modifier,
                                     isRichTextEnabled = contentState.isFocused,
@@ -249,11 +246,6 @@ fun NoteEditorContent(
                         bottom = paddingValue.calculateBottomPadding() + extraBottomPadding + 16.dp
                     )
                 ) {
-                    colorSelectorSection(
-                        selectedColor = noteColor,
-                        onColorClick = { colorInt -> onEvent(AddEditNoteEvent.ChangeColor(colorInt)) }
-                    )
-
                     attachedImagesSection(
                         images = attachedImages,
                         onRemoveImage = { deletedUri ->
@@ -294,11 +286,6 @@ fun NoteEditorContent(
                             TransparentHintTextField(
                                 value = contentRichTextState.textFieldValue,
                                 hint = contentState.hint,
-                                onValueChange = { onEvent(AddEditNoteEvent.EnteredContent(it)) },
-                                onFocusChange = { onEvent(AddEditNoteEvent.ChangeContentFocus(it)) },
-                                isHintVisible = contentState.isHintVisible,
-                                isSingleLine = false,
-                                textStyle = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .sharedBounds(
@@ -308,7 +295,11 @@ fun NoteEditorContent(
                                         animatedVisibilityScope = animatedVisibilityScope,
                                         boundsTransform = { _, _ -> tween() },
                                         resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                                    )
+                                    ),
+                                isHintVisible = contentState.isHintVisible,
+                                onValueChange = { onEvent(AddEditNoteEvent.EnteredContent(it)) },
+                                textStyle = MaterialTheme.typography.bodyLarge,
+                                onFocusChange = { onEvent(AddEditNoteEvent.ChangeContentFocus(it)) },
                             )
                         }
                     }

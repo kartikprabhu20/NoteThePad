@@ -30,17 +30,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.remember
+import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.components.drawNoteShape
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.settings.NoteShape
@@ -63,13 +62,15 @@ fun NoteItemUI(
     onDeleteClick: () -> Unit,
     onPinClick: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedContentScope
+    animatedVisibilityScope: AnimatedContentScope,
+    isDarkTheme: Boolean = false
 ) {
     Box(
         modifier=modifier.height(IntrinsicSize.Min)
     ){
+        val resolvedColor = NoteColors.resolveDisplayColor(note.color, isDarkTheme).toArgb()
         Canvas(modifier = Modifier.matchParentSize()) {
-            drawNoteShape(noteShape, note.color)
+            drawNoteShape(noteShape, resolvedColor)
         }
 
         Column(
@@ -84,7 +85,7 @@ fun NoteItemUI(
                 Text(
                     text = note.title,
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -104,7 +105,7 @@ fun NoteItemUI(
                     Text(
                         text = contentAnnotated,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 10,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -127,7 +128,7 @@ fun NoteItemUI(
                             imageVector = Icons.Default.Collections,
                             contentDescription = stringResource(R.string.content_description_images_attached),
                             modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
                     if(note.audioAttachments.isNotEmpty()){
@@ -135,7 +136,7 @@ fun NoteItemUI(
                             imageVector = Icons.Default.Mic,
                             contentDescription = stringResource(R.string.content_description_audio_attached),
                             modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
                     if(note.reminderTime > -1){
@@ -146,7 +147,7 @@ fun NoteItemUI(
                                 Icons.Default.NotificationsOff,
                             contentDescription = stringResource(R.string.content_description_reminder_set),
                             modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
 
@@ -155,7 +156,7 @@ fun NoteItemUI(
                             imageVector = Icons.Default.Checklist,
                             contentDescription = stringResource(R.string.content_description_checkboxes_available),
                             modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
 
@@ -164,7 +165,7 @@ fun NoteItemUI(
                             imageVector = Icons.AutoMirrored.Filled.Label,
                             contentDescription = stringResource(R.string.content_description_tags_available),
                             modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = Color.Black
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
 
@@ -178,7 +179,7 @@ fun NoteItemUI(
                             Icon(
                                 imageVector = Icons.Default.PushPin,
                                 contentDescription = stringResource(R.string.content_description_pin_note),
-                                tint = Color.Black
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
@@ -189,7 +190,7 @@ fun NoteItemUI(
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = stringResource(R.string.content_description_delete_note),
-                                tint = Color.Black
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }

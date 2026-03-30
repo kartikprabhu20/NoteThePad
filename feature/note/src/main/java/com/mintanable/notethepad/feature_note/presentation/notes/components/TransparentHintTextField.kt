@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
+import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.ThemePreviews
 
 @Composable
 fun TransparentHintTextField(
@@ -30,24 +30,25 @@ fun TransparentHintTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = isSingleLine,
-            textStyle = textStyle,
+            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { onFocusChange(it) }
         )
         if (isHintVisible) {
-            Text(text = hint, style = textStyle, color = Color.DarkGray)
+            Text(text = hint, style = textStyle, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
 
-@Preview
+@ThemePreviews
 @Composable
 fun PreviewTransparentHintTextField() {
-    MaterialTheme {
+    NoteThePadTheme {
         TransparentHintTextField(
-            value = TextFieldValue("test"),
+            value = TextFieldValue(""),
             hint = "hint",
+            isHintVisible = true,
             onFocusChange = {},
             onValueChange = {}
         )

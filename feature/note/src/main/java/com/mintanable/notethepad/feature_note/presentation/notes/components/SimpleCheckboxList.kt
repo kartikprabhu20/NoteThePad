@@ -9,11 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,7 +45,7 @@ fun SimpleCheckbox(itemText: String, isChecked: Boolean, modifier: Modifier = Mo
         Icon(
             imageVector = if(isChecked)Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
             contentDescription = stringResource(R.string.content_description_checkbox_state),
-            tint = if(isChecked) Color.Gray else Color.Black
+            tint = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = itemText,
@@ -53,7 +53,7 @@ fun SimpleCheckbox(itemText: String, isChecked: Boolean, modifier: Modifier = Mo
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textDecoration = if (isChecked) TextDecoration.LineThrough else TextDecoration.None,
-            color = if (isChecked) Color.Gray else Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
