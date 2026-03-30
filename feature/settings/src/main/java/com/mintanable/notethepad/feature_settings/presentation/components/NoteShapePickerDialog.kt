@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_settings.presentation.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +38,8 @@ import com.mintanable.notethepad.theme.ThemePreviews
 fun NoteShapePickerDialog(
     currentShape: NoteShape,
     onShapeSelected: (NoteShape) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isDarkTheme: Boolean = false
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -55,7 +57,8 @@ fun NoteShapePickerDialog(
                         onClick = {
                             onShapeSelected(shape)
                             onDismiss()
-                        }
+                        },
+                        isDarkTheme = isDarkTheme
                     )
                 }
             }
@@ -72,9 +75,11 @@ fun NoteShapePickerDialog(
 private fun NoteShapePreviewItem(
     shape: NoteShape,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isDarkTheme: Boolean = false
 ) {
-    val sampleColor = NoteColors.colors.random().toArgb()
+    val sampleColorPair = NoteColors.colorPairs.random()
+    val sampleColor = if(isDarkTheme) sampleColorPair.dark.toArgb() else sampleColorPair.light.toArgb()
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     val borderWidth = if (isSelected) 3.dp else 0.dp
 
@@ -101,14 +106,14 @@ private fun NoteShapePreviewItem(
                     text = "Title",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "Sample content",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.Black.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -147,11 +152,13 @@ fun noteShapeDisplayName(shape: NoteShape): String = when (shape) {
 @ThemePreviews
 @Composable
 fun NoteShapePickerDialogPreview() {
-    NoteThePadTheme {
+    val isDark = isSystemInDarkTheme()
+    NoteThePadTheme(darkTheme = isDark) {
         NoteShapePickerDialog(
             currentShape = NoteShape.DEFAULT,
             onShapeSelected = {},
-            onDismiss = {}
+            onDismiss = {},
+            isDarkTheme = isDark
         )
     }
 }
@@ -159,11 +166,13 @@ fun NoteShapePickerDialogPreview() {
 @ThemePreviews
 @Composable
 private fun NoteShapePreviewItemPreview() {
-    NoteThePadTheme {
+    val isDark = isSystemInDarkTheme()
+    NoteThePadTheme(darkTheme = isDark) {
         NoteShapePreviewItem(
             shape = NoteShape.DEFAULT,
             isSelected = true,
-            onClick = {}
+            onClick = {},
+            isDarkTheme = isDark
         )
     }
 }

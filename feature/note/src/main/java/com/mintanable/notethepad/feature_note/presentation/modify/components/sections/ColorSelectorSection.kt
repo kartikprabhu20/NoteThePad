@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -189,11 +189,13 @@ private fun BackgroundImageCircle(
 @ThemePreviews
 @Composable
 fun ColorSelectorBottomSheetContentPreview() {
-    NoteThePadTheme {
+    val isDark = isSystemInDarkTheme()
+
+    NoteThePadTheme(darkTheme = isDark) {
         ColorSelectorBottomSheetContent(
             selectedColor = NoteColors.colors[1].toArgb(),
             selectedBackgroundImage = -1,
-            isDarkTheme = true,
+            isDarkTheme = isDark,
             onColorClick = {},
             onBackgroundImageClick = {}
         )
