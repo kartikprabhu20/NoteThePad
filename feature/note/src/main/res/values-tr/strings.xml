@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">Ses Kaydedici</string>
     <string name="version_format">Versiyon %1$s</string>
     <string name="next">Sonraki</string>
+    <string name="hint_audio_to_text">Sesten metne dönüştürme…</string>
+    <string name="content_description_trascribe_audio">Sesi Yazıya Dök</string>
+    <string name="btn_add_to_note">Nota ekle</string>
 </resources>

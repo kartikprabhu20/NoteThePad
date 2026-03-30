@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">অডিও রেকর্ডার</string>
     <string name="version_format">সংস্করণ %1$s</string>
     <string name="next">পরবর্তী</string>
+    <string name="hint_audio_to_text">অডিও থেকে টেক্সট ট্রান্সক্রিপশন...</string>
+    <string name="content_description_trascribe_audio">অডিও ট্রান্সক্রাইব করুন</string>
+    <string name="btn_add_to_note">নোটে যোগ করুন</string>
 </resources>

@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">Registratore audio</string>
     <string name="version_format">Versione %1$s</string>
     <string name="next">Avanti</string>
+    <string name="hint_audio_to_text">Trascrizione da audio a testo...</string>
+    <string name="content_description_trascribe_audio">Trascrivi audio</string>
+    <string name="btn_add_to_note">Aggiungi alla nota</string>
 </resources>

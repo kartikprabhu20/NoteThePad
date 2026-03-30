@@ -38,4 +38,27 @@
     <string name="setting_google_account">حساب Google</string>
     <string name="setting_theme_modes">أوضاع السمة</string>
     <string name="settings_title">الإعدادات</string>
+    <string name="setting_note_shape">شكل الملاحظة</string>
+    <string name="dialog_select_note_shape_title">اختر شكل الملاحظة</string>
+    <string name="note_shape_default">افتراضي</string>
+    <string name="note_shape_sticky_clipped">ملصق مقصوص</string>
+    <string name="note_shape_perforated_paper">ورق مثقب</string>
+    <string name="note_shape_frosted_glass">زجاج بلوري</string>
+    <string name="note_shape_taped_note">ملاحظة ملصقة</string>
+    <string name="note_shape_blueprint_grid">شبكة مخطط</string>
+    <string name="note_shape_scalloped_edge">حافة مسننة</string>
+    <string name="note_shape_sticky_corner_curl">زاوية ملتفة</string>
+    <string name="note_shape_crushed_paper">ورق مجعد</string>
+    <string name="note_shape_washi_tape_top">شريط واشي</string>
+    <string name="note_shape_stapled_corner">زاوية مدبسة</string>
+    <string name="note_shape_pinned_note">ملاحظة مثبتة</string>
+    <string name="note_shape_sun_bleached_fade">تلاشي شمسي</string>
+    <string name="setting_audio_transcriber">ناسخ الصوت</string>
+    <string name="audio_transcriber_status_ready">تم التنزيل</string>
+    <string name="audio_transcriber_status_downloading">جارٍ التنزيل…</string>
+    <string name="audio_transcriber_status_downloadable">انقر للتنزيل</string>
+    <string name="audio_transcriber_status_unavailable">غير متاح على هذا الجهاز</string>
+    <string name="dialog_download_audio_transcriber_title">تنزيل ناسخ الصوت</string>
+    <string name="dialog_download_audio_transcriber_description">سيتم تنزيل نموذج ناسخ الصوت على الجهاز عبر Wi-Fi. هل تريد المتابعة؟</string>
+    <string name="msg_downloading_audio_model">جارٍ تنزيل نموذج الذكاء الاصطناعي الصوتي: %1$d%%</string>
 </resources>

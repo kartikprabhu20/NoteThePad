@@ -38,4 +38,27 @@
     <string name="setting_google_account">Akun Google</string>
     <string name="setting_theme_modes">Mode tema</string>
     <string name="settings_title">Pengaturan</string>
+    <string name="setting_note_shape">Bentuk catatan</string>
+    <string name="dialog_select_note_shape_title">Pilih bentuk catatan</string>
+    <string name="note_shape_default">Bawaan</string>
+    <string name="note_shape_sticky_clipped">Tempel terpotong</string>
+    <string name="note_shape_perforated_paper">Kertas berlubang</string>
+    <string name="note_shape_frosted_glass">Kaca buram</string>
+    <string name="note_shape_taped_note">Catatan berselotip</string>
+    <string name="note_shape_blueprint_grid">Kotak cetak biru</string>
+    <string name="note_shape_scalloped_edge">Tepi bergelombang</string>
+    <string name="note_shape_sticky_corner_curl">Sudut terlipat</string>
+    <string name="note_shape_crushed_paper">Kertas kusut</string>
+    <string name="note_shape_washi_tape_top">Selotip washi</string>
+    <string name="note_shape_stapled_corner">Sudut dijepit</string>
+    <string name="note_shape_pinned_note">Catatan disematkan</string>
+    <string name="note_shape_sun_bleached_fade">Pudar terjemur</string>
+    <string name="setting_audio_transcriber">Pentranskripsi audio</string>
+    <string name="audio_transcriber_status_ready">Terunduh</string>
+    <string name="audio_transcriber_status_downloading">Mengunduh…</string>
+    <string name="audio_transcriber_status_downloadable">Ketuk untuk mengunduh</string>
+    <string name="audio_transcriber_status_unavailable">Tidak tersedia di perangkat ini</string>
+    <string name="dialog_download_audio_transcriber_title">Unduh pentranskripsi audio</string>
+    <string name="dialog_download_audio_transcriber_description">Model pentranskripsi audio akan diunduh ke perangkat melalui Wi-Fi. Apakah Anda ingin melanjutkan?</string>
+    <string name="msg_downloading_audio_model">Mengunduh model AI audio: %1$d%%</string>
 </resources>

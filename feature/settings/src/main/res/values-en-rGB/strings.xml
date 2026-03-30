@@ -38,4 +38,27 @@
     <string name="setting_google_account">Google Account</string>
     <string name="setting_theme_modes">Theme modes</string>
     <string name="settings_title">Settings</string>
+    <string name="setting_note_shape">Note Shape</string>
+    <string name="dialog_select_note_shape_title">Select Note Shape</string>
+    <string name="note_shape_default">Default</string>
+    <string name="note_shape_sticky_clipped">Sticky Clipped</string>
+    <string name="note_shape_perforated_paper">Perforated Paper</string>
+    <string name="note_shape_frosted_glass">Frosted Glass</string>
+    <string name="note_shape_taped_note">Taped Note</string>
+    <string name="note_shape_blueprint_grid">Blueprint Grid</string>
+    <string name="note_shape_scalloped_edge">Scalloped Edge</string>
+    <string name="note_shape_sticky_corner_curl">Sticky Corner Curl</string>
+    <string name="note_shape_crushed_paper">Crushed Paper</string>
+    <string name="note_shape_washi_tape_top">Washi Tape Top</string>
+    <string name="note_shape_stapled_corner">Stapled Corner</string>
+    <string name="note_shape_pinned_note">Pinned Note</string>
+    <string name="note_shape_sun_bleached_fade">Sun Bleached Fade</string>
+    <string name="setting_audio_transcriber">Audio Transcriber</string>
+    <string name="audio_transcriber_status_ready">Downloaded</string>
+    <string name="audio_transcriber_status_downloading">Downloading…</string>
+    <string name="audio_transcriber_status_downloadable">Tap to download</string>
+    <string name="audio_transcriber_status_unavailable">Not available on this device</string>
+    <string name="dialog_download_audio_transcriber_title">Download Audio Transcriber</string>
+    <string name="dialog_download_audio_transcriber_description">This will download the on-device audio transcriber model over Wi-Fi. Do you want to continue?</string>
+    <string name="msg_downloading_audio_model">Downloading Audio AI model in progress: %1$d%%</string>
 </resources>

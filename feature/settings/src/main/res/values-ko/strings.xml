@@ -38,4 +38,27 @@
     <string name="setting_google_account">Google 계정</string>
     <string name="setting_theme_modes">테마 모드</string>
     <string name="settings_title">설정</string>
+    <string name="setting_note_shape">노트 모양</string>
+    <string name="dialog_select_note_shape_title">노트 모양 선택</string>
+    <string name="note_shape_default">기본</string>
+    <string name="note_shape_sticky_clipped">스티키 클립</string>
+    <string name="note_shape_perforated_paper">천공 용지</string>
+    <string name="note_shape_frosted_glass">반투명 유리</string>
+    <string name="note_shape_taped_note">테이프 메모</string>
+    <string name="note_shape_blueprint_grid">설계도 격자</string>
+    <string name="note_shape_scalloped_edge">물결 가장자리</string>
+    <string name="note_shape_sticky_corner_curl">접힌 모서리</string>
+    <string name="note_shape_crushed_paper">구겨진 종이</string>
+    <string name="note_shape_washi_tape_top">마스킹 테이프</string>
+    <string name="note_shape_stapled_corner">스테이플러 모서리</string>
+    <string name="note_shape_pinned_note">고정된 메모</string>
+    <string name="note_shape_sun_bleached_fade">햇빛 바랜</string>
+    <string name="setting_audio_transcriber">오디오 변환기</string>
+    <string name="audio_transcriber_status_ready">다운로드됨</string>
+    <string name="audio_transcriber_status_downloading">다운로드 중…</string>
+    <string name="audio_transcriber_status_downloadable">탭하여 다운로드</string>
+    <string name="audio_transcriber_status_unavailable">이 기기에서 사용할 수 없음</string>
+    <string name="dialog_download_audio_transcriber_title">오디오 변환기 다운로드</string>
+    <string name="dialog_download_audio_transcriber_description">Wi-Fi를 통해 기기에 오디오 변환 모델을 다운로드합니다. 계속하시겠습니까?</string>
+    <string name="msg_downloading_audio_model">오디오 AI 모델 다운로드 중: %1$d%%</string>
 </resources>

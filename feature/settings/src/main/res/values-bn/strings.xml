@@ -38,4 +38,27 @@
     <string name="setting_google_account">গুগল অ্যাকাউন্ট</string>
     <string name="setting_theme_modes">থিম মোড</string>
     <string name="settings_title">সেটিংস</string>
+    <string name="setting_note_shape">নোটের আকৃতি</string>
+    <string name="dialog_select_note_shape_title">নোটের আকৃতি নির্বাচন করুন</string>
+    <string name="note_shape_default">ডিফল্ট</string>
+    <string name="note_shape_sticky_clipped">স্টিকি ক্লিপড</string>
+    <string name="note_shape_perforated_paper">ছিদ্রযুক্ত কাগজ</string>
+    <string name="note_shape_frosted_glass">ফ্রস্টেড গ্লাস</string>
+    <string name="note_shape_taped_note">টেপ করা নোট</string>
+    <string name="note_shape_blueprint_grid">ব্লুপ্রিন্ট গ্রিড</string>
+    <string name="note_shape_scalloped_edge">ঢেউখেলানো কিনারা</string>
+    <string name="note_shape_sticky_corner_curl">আঠালো কোণা বাঁক</string>
+    <string name="note_shape_crushed_paper">কুঁচকানো কাগজ</string>
+    <string name="note_shape_washi_tape_top">ওয়াশি টেপ</string>
+    <string name="note_shape_stapled_corner">স্ট্যাপল করা কোণা</string>
+    <string name="note_shape_pinned_note">পিন করা নোট</string>
+    <string name="note_shape_sun_bleached_fade">রোদে বিবর্ণ</string>
+    <string name="setting_audio_transcriber">অডিও ট্রান্সক্রাইবার</string>
+    <string name="audio_transcriber_status_ready">ডাউনলোড হয়েছে</string>
+    <string name="audio_transcriber_status_downloading">ডাউনলোড হচ্ছে…</string>
+    <string name="audio_transcriber_status_downloadable">ডাউনলোড করতে ট্যাপ করুন</string>
+    <string name="audio_transcriber_status_unavailable">এই ডিভাইসে উপলব্ধ নয়</string>
+    <string name="dialog_download_audio_transcriber_title">অডিও ট্রান্সক্রাইবার ডাউনলোড করুন</string>
+    <string name="dialog_download_audio_transcriber_description">এটি Wi-Fi এর মাধ্যমে ডিভাইসে অডিও ট্রান্সক্রাইবার মডেল ডাউনলোড করবে। আপনি কি চালিয়ে যেতে চান?</string>
+    <string name="msg_downloading_audio_model">অডিও AI মডেল ডাউনলোড হচ্ছে: %1$d%%</string>
 </resources>

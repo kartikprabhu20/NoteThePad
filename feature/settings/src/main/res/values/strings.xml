@@ -21,6 +21,23 @@
     <string name="setting_ai_assistant">AI Assistant</string>
     <string name="setting_ai_model">AI Model</string>
     <string name="setting_appearance">Appearance</string>
+    <string name="setting_note_shape">Note Shape</string>
+    <string name="dialog_select_note_shape_title">Select Note Shape</string>
+
+    <!-- Note Shape Names -->
+    <string name="note_shape_default">Default</string>
+    <string name="note_shape_sticky_clipped">Sticky Clipped</string>
+    <string name="note_shape_perforated_paper">Perforated Paper</string>
+    <string name="note_shape_frosted_glass">Frosted Glass</string>
+    <string name="note_shape_taped_note">Taped Note</string>
+    <string name="note_shape_blueprint_grid">Blueprint Grid</string>
+    <string name="note_shape_scalloped_edge">Scalloped Edge</string>
+    <string name="note_shape_sticky_corner_curl">Sticky Corner Curl</string>
+    <string name="note_shape_crushed_paper">Crushed Paper</string>
+    <string name="note_shape_washi_tape_top">Washi Tape Top</string>
+    <string name="note_shape_stapled_corner">Stapled Corner</string>
+    <string name="note_shape_pinned_note">Pinned Note</string>
+    <string name="note_shape_sun_bleached_fade">Sun Bleached Fade</string>
     <string name="dialog_select_ai_model_title">Select AI Model</string>
     <string name="dialog_download_ai_model_title">Download AI Model</string>
     <string name="dialog_download_ai_model_description">The model needs %s storage on-device. Do you want to start the download?</string>

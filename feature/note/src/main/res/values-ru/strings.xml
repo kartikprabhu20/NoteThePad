@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">Диктофон</string>
     <string name="version_format">Версия %1$s</string>
     <string name="next">Далее</string>
+    <string name="hint_audio_to_text">Транскрипция аудио в текст…</string>
+    <string name="content_description_trascribe_audio">Транскрибировать аудио</string>
+    <string name="btn_add_to_note">Добавить в заметку</string>
 </resources>

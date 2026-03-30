@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">录音机</string>
     <string name="version_format">版本 %1$s</string>
     <string name="next">下一步</string>
+    <string name="hint_audio_to_text">音频转文字转录…</string>
+    <string name="content_description_trascribe_audio">转录音频</string>
+    <string name="btn_add_to_note">添加到笔记</string>
 </resources>

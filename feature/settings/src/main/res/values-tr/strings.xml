@@ -38,4 +38,27 @@
     <string name="setting_google_account">Google Hesabı</string>
     <string name="setting_theme_modes">Tema modları</string>
     <string name="settings_title">Ayarlar</string>
+    <string name="setting_note_shape">Not şekli</string>
+    <string name="dialog_select_note_shape_title">Not şeklini seçin</string>
+    <string name="note_shape_default">Varsayılan</string>
+    <string name="note_shape_sticky_clipped">Yapışkan kesik</string>
+    <string name="note_shape_perforated_paper">Delikli kağıt</string>
+    <string name="note_shape_frosted_glass">Buzlu cam</string>
+    <string name="note_shape_taped_note">Bantlı not</string>
+    <string name="note_shape_blueprint_grid">Plan ızgarası</string>
+    <string name="note_shape_scalloped_edge">Dalgalı kenar</string>
+    <string name="note_shape_sticky_corner_curl">Kıvrık köşe</string>
+    <string name="note_shape_crushed_paper">Buruşuk kağıt</string>
+    <string name="note_shape_washi_tape_top">Washi bant</string>
+    <string name="note_shape_stapled_corner">Zımbalı köşe</string>
+    <string name="note_shape_pinned_note">İğnelenmiş not</string>
+    <string name="note_shape_sun_bleached_fade">Güneşte solmuş</string>
+    <string name="setting_audio_transcriber">Ses yazıcı</string>
+    <string name="audio_transcriber_status_ready">İndirildi</string>
+    <string name="audio_transcriber_status_downloading">İndiriliyor…</string>
+    <string name="audio_transcriber_status_downloadable">İndirmek için dokunun</string>
+    <string name="audio_transcriber_status_unavailable">Bu cihazda kullanılamıyor</string>
+    <string name="dialog_download_audio_transcriber_title">Ses yazıcıyı indir</string>
+    <string name="dialog_download_audio_transcriber_description">Cihaz üzerindeki ses yazıcı modeli Wi-Fi üzerinden indirilecektir. Devam etmek istiyor musunuz?</string>
+    <string name="msg_downloading_audio_model">Ses AI modeli indiriliyor: %1$d%%</string>
 </resources>

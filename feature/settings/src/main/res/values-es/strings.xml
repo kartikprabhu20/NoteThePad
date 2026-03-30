@@ -38,4 +38,27 @@
     <string name="setting_google_account">Cuenta de Google</string>
     <string name="setting_theme_modes">Modos de tema</string>
     <string name="settings_title">Ajustes</string>
+    <string name="setting_note_shape">Forma de nota</string>
+    <string name="dialog_select_note_shape_title">Seleccionar forma de nota</string>
+    <string name="note_shape_default">Predeterminado</string>
+    <string name="note_shape_sticky_clipped">Nota adhesiva recortada</string>
+    <string name="note_shape_perforated_paper">Papel perforado</string>
+    <string name="note_shape_frosted_glass">Cristal esmerilado</string>
+    <string name="note_shape_taped_note">Nota con cinta</string>
+    <string name="note_shape_blueprint_grid">Cuadrícula de plano</string>
+    <string name="note_shape_scalloped_edge">Borde festoneado</string>
+    <string name="note_shape_sticky_corner_curl">Esquina doblada</string>
+    <string name="note_shape_crushed_paper">Papel arrugado</string>
+    <string name="note_shape_washi_tape_top">Cinta washi</string>
+    <string name="note_shape_stapled_corner">Esquina grapada</string>
+    <string name="note_shape_pinned_note">Nota fijada</string>
+    <string name="note_shape_sun_bleached_fade">Desteñido por el sol</string>
+    <string name="setting_audio_transcriber">Transcriptor de audio</string>
+    <string name="audio_transcriber_status_ready">Descargado</string>
+    <string name="audio_transcriber_status_downloading">Descargando…</string>
+    <string name="audio_transcriber_status_downloadable">Toca para descargar</string>
+    <string name="audio_transcriber_status_unavailable">No disponible en este dispositivo</string>
+    <string name="dialog_download_audio_transcriber_title">Descargar transcriptor de audio</string>
+    <string name="dialog_download_audio_transcriber_description">Se descargará el modelo de transcripción de audio en el dispositivo a través de Wi-Fi. ¿Deseas continuar?</string>
+    <string name="msg_downloading_audio_model">Descargando modelo de IA de audio: %1$d%%</string>
 </resources>

@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">Trình ghi âm</string>
     <string name="version_format">Phiên bản %1$s</string>
     <string name="next">Tiếp theo</string>
+    <string name="hint_audio_to_text">Chuyển âm thanh thành văn bản...</string>
+    <string name="content_description_trascribe_audio">Chuyển soạn âm thanh</string>
+    <string name="btn_add_to_note">Thêm vào ghi chú</string>
 </resources>

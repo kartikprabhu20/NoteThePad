@@ -38,4 +38,27 @@
     <string name="setting_google_account">Google-Konto</string>
     <string name="setting_theme_modes">Themen-Modi</string>
     <string name="settings_title">Einstellungen</string>
+    <string name="setting_note_shape">Notizform</string>
+    <string name="dialog_select_note_shape_title">Notizform auswählen</string>
+    <string name="note_shape_default">Standard</string>
+    <string name="note_shape_sticky_clipped">Haftnotiz abgeschnitten</string>
+    <string name="note_shape_perforated_paper">Perforiertes Papier</string>
+    <string name="note_shape_frosted_glass">Milchglas</string>
+    <string name="note_shape_taped_note">Angeklebte Notiz</string>
+    <string name="note_shape_blueprint_grid">Blaupause-Raster</string>
+    <string name="note_shape_scalloped_edge">Wellenrand</string>
+    <string name="note_shape_sticky_corner_curl">Ecke umgeschlagen</string>
+    <string name="note_shape_crushed_paper">Zerknittertes Papier</string>
+    <string name="note_shape_washi_tape_top">Washi-Tape</string>
+    <string name="note_shape_stapled_corner">Geheftete Ecke</string>
+    <string name="note_shape_pinned_note">Angeheftete Notiz</string>
+    <string name="note_shape_sun_bleached_fade">Sonnenverwaschen</string>
+    <string name="setting_audio_transcriber">Audio-Transkription</string>
+    <string name="audio_transcriber_status_ready">Heruntergeladen</string>
+    <string name="audio_transcriber_status_downloading">Wird heruntergeladen…</string>
+    <string name="audio_transcriber_status_downloadable">Zum Herunterladen tippen</string>
+    <string name="audio_transcriber_status_unavailable">Auf diesem Gerät nicht verfügbar</string>
+    <string name="dialog_download_audio_transcriber_title">Audio-Transkription herunterladen</string>
+    <string name="dialog_download_audio_transcriber_description">Das Audio-Transkriptionsmodell wird über WLAN auf das Gerät heruntergeladen. Möchten Sie fortfahren?</string>
+    <string name="msg_downloading_audio_model">Audio-KI-Modell wird heruntergeladen: %1$d%%</string>
 </resources>

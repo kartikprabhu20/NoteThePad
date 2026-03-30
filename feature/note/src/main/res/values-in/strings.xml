@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">Perekam Audio</string>
     <string name="version_format">Versi %1$s</string>
     <string name="next">Berikutnya</string>
+    <string name="hint_audio_to_text">Transkripsi audio ke teks...</string>
+    <string name="content_description_trascribe_audio">Transkripsi Audio</string>
+    <string name="btn_add_to_note">Tambah ke catatan</string>
 </resources>

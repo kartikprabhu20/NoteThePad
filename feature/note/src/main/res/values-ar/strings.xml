@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">مسجل الصوت</string>
     <string name="version_format">الإصدار %1$s</string>
     <string name="next">التالي</string>
+    <string name="hint_audio_to_text">تحويل الصوت إلى نص...</string>
+    <string name="content_description_trascribe_audio">نسخ الصوت</string>
+    <string name="btn_add_to_note">إضافة إلى الملاحظة</string>
 </resources>

@@ -38,4 +38,27 @@
     <string name="setting_google_account">Аккаунт Google</string>
     <string name="setting_theme_modes">Темы оформления</string>
     <string name="settings_title">Настройки</string>
+    <string name="setting_note_shape">Форма заметки</string>
+    <string name="dialog_select_note_shape_title">Выберите форму заметки</string>
+    <string name="note_shape_default">По умолчанию</string>
+    <string name="note_shape_sticky_clipped">Обрезанный стикер</string>
+    <string name="note_shape_perforated_paper">Перфорированная бумага</string>
+    <string name="note_shape_frosted_glass">Матовое стекло</string>
+    <string name="note_shape_taped_note">Заметка на скотче</string>
+    <string name="note_shape_blueprint_grid">Сетка чертежа</string>
+    <string name="note_shape_scalloped_edge">Фестончатый край</string>
+    <string name="note_shape_sticky_corner_curl">Загнутый уголок</string>
+    <string name="note_shape_crushed_paper">Мятая бумага</string>
+    <string name="note_shape_washi_tape_top">Лента васи</string>
+    <string name="note_shape_stapled_corner">Скреплённый уголок</string>
+    <string name="note_shape_pinned_note">Прикреплённая заметка</string>
+    <string name="note_shape_sun_bleached_fade">Выгоревшая на солнце</string>
+    <string name="setting_audio_transcriber">Транскрибатор аудио</string>
+    <string name="audio_transcriber_status_ready">Загружено</string>
+    <string name="audio_transcriber_status_downloading">Загрузка…</string>
+    <string name="audio_transcriber_status_downloadable">Нажмите для загрузки</string>
+    <string name="audio_transcriber_status_unavailable">Недоступно на этом устройстве</string>
+    <string name="dialog_download_audio_transcriber_title">Загрузить транскрибатор аудио</string>
+    <string name="dialog_download_audio_transcriber_description">Модель транскрибатора аудио будет загружена на устройство через Wi-Fi. Продолжить?</string>
+    <string name="msg_downloading_audio_model">Загрузка аудио модели ИИ: %1$d%%</string>
 </resources>

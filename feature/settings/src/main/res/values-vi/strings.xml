@@ -38,4 +38,27 @@
     <string name="setting_google_account">Tài khoản Google</string>
     <string name="setting_theme_modes">Chế độ giao diện</string>
     <string name="settings_title">Cài đặt</string>
+    <string name="setting_note_shape">Hình dạng ghi chú</string>
+    <string name="dialog_select_note_shape_title">Chọn hình dạng ghi chú</string>
+    <string name="note_shape_default">Mặc định</string>
+    <string name="note_shape_sticky_clipped">Giấy dán cắt</string>
+    <string name="note_shape_perforated_paper">Giấy đục lỗ</string>
+    <string name="note_shape_frosted_glass">Kính mờ</string>
+    <string name="note_shape_taped_note">Ghi chú dán băng</string>
+    <string name="note_shape_blueprint_grid">Lưới bản vẽ</string>
+    <string name="note_shape_scalloped_edge">Viền lượn sóng</string>
+    <string name="note_shape_sticky_corner_curl">Góc cuộn</string>
+    <string name="note_shape_crushed_paper">Giấy nhàu</string>
+    <string name="note_shape_washi_tape_top">Băng washi</string>
+    <string name="note_shape_stapled_corner">Góc dập ghim</string>
+    <string name="note_shape_pinned_note">Ghi chú ghim</string>
+    <string name="note_shape_sun_bleached_fade">Phai nắng</string>
+    <string name="setting_audio_transcriber">Chuyển đổi âm thanh</string>
+    <string name="audio_transcriber_status_ready">Đã tải xuống</string>
+    <string name="audio_transcriber_status_downloading">Đang tải xuống…</string>
+    <string name="audio_transcriber_status_downloadable">Nhấn để tải xuống</string>
+    <string name="audio_transcriber_status_unavailable">Không khả dụng trên thiết bị này</string>
+    <string name="dialog_download_audio_transcriber_title">Tải xuống bộ chuyển đổi âm thanh</string>
+    <string name="dialog_download_audio_transcriber_description">Mô hình chuyển đổi âm thanh sẽ được tải xuống thiết bị qua Wi-Fi. Bạn có muốn tiếp tục không?</string>
+    <string name="msg_downloading_audio_model">Đang tải mô hình AI âm thanh: %1$d%%</string>
 </resources>

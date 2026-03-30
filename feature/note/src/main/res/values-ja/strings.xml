@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">音声レコーダー</string>
     <string name="version_format">バージョン %1$s</string>
     <string name="next">次へ</string>
+    <string name="hint_audio_to_text">音声からテキストへの書き起こし...</string>
+    <string name="content_description_trascribe_audio">音声を書き起こす</string>
+    <string name="btn_add_to_note">メモに追加</string>
 </resources>

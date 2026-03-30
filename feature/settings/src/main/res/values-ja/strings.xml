@@ -38,4 +38,27 @@
     <string name="setting_google_account">Google アカウント</string>
     <string name="setting_theme_modes">テーマモード</string>
     <string name="settings_title">設定</string>
+    <string name="setting_note_shape">ノートの形状</string>
+    <string name="dialog_select_note_shape_title">ノートの形状を選択</string>
+    <string name="note_shape_default">デフォルト</string>
+    <string name="note_shape_sticky_clipped">付箋クリップ</string>
+    <string name="note_shape_perforated_paper">ミシン目入り用紙</string>
+    <string name="note_shape_frosted_glass">すりガラス</string>
+    <string name="note_shape_taped_note">テープ付きメモ</string>
+    <string name="note_shape_blueprint_grid">設計図グリッド</string>
+    <string name="note_shape_scalloped_edge">波形の縁</string>
+    <string name="note_shape_sticky_corner_curl">角めくれ</string>
+    <string name="note_shape_crushed_paper">くしゃくしゃの紙</string>
+    <string name="note_shape_washi_tape_top">マスキングテープ</string>
+    <string name="note_shape_stapled_corner">ホチキス留め</string>
+    <string name="note_shape_pinned_note">ピン留めメモ</string>
+    <string name="note_shape_sun_bleached_fade">日焼け色あせ</string>
+    <string name="setting_audio_transcriber">音声文字起こし</string>
+    <string name="audio_transcriber_status_ready">ダウンロード済み</string>
+    <string name="audio_transcriber_status_downloading">ダウンロード中…</string>
+    <string name="audio_transcriber_status_downloadable">タップしてダウンロード</string>
+    <string name="audio_transcriber_status_unavailable">このデバイスでは利用できません</string>
+    <string name="dialog_download_audio_transcriber_title">音声文字起こしをダウンロード</string>
+    <string name="dialog_download_audio_transcriber_description">Wi-Fi経由でデバイスに音声文字起こしモデルをダウンロードします。続行しますか？</string>
+    <string name="msg_downloading_audio_model">音声AIモデルをダウンロード中: %1$d%%</string>
 </resources>

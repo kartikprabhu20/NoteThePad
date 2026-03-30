@@ -38,4 +38,27 @@
     <string name="setting_google_account">Account Google</string>
     <string name="setting_theme_modes">Modalità tema</string>
     <string name="settings_title">Impostazioni</string>
+    <string name="setting_note_shape">Forma della nota</string>
+    <string name="dialog_select_note_shape_title">Seleziona forma della nota</string>
+    <string name="note_shape_default">Predefinito</string>
+    <string name="note_shape_sticky_clipped">Adesivo ritagliato</string>
+    <string name="note_shape_perforated_paper">Carta perforata</string>
+    <string name="note_shape_frosted_glass">Vetro smerigliato</string>
+    <string name="note_shape_taped_note">Nota con nastro</string>
+    <string name="note_shape_blueprint_grid">Griglia progetto</string>
+    <string name="note_shape_scalloped_edge">Bordo smerlato</string>
+    <string name="note_shape_sticky_corner_curl">Angolo arricciato</string>
+    <string name="note_shape_crushed_paper">Carta stropicciata</string>
+    <string name="note_shape_washi_tape_top">Nastro washi</string>
+    <string name="note_shape_stapled_corner">Angolo spillato</string>
+    <string name="note_shape_pinned_note">Nota appuntata</string>
+    <string name="note_shape_sun_bleached_fade">Sbiadito dal sole</string>
+    <string name="setting_audio_transcriber">Trascrittore audio</string>
+    <string name="audio_transcriber_status_ready">Scaricato</string>
+    <string name="audio_transcriber_status_downloading">Download in corso…</string>
+    <string name="audio_transcriber_status_downloadable">Tocca per scaricare</string>
+    <string name="audio_transcriber_status_unavailable">Non disponibile su questo dispositivo</string>
+    <string name="dialog_download_audio_transcriber_title">Scarica trascrittore audio</string>
+    <string name="dialog_download_audio_transcriber_description">Il modello di trascrizione audio verrà scaricato sul dispositivo tramite Wi-Fi. Vuoi continuare?</string>
+    <string name="msg_downloading_audio_model">Download del modello IA audio in corso: %1$d%%</string>
 </resources>

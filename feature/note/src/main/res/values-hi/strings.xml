@@ -64,7 +64,7 @@
     <string name="option_video_recorder">वीडियो रिकॉर्डर</string>
     <string name="order_ascending">आरोही</string>
     <string name="order_color">रंग</string>
-    <string name="order_date">तारीख</string>
+    <string name="order_date">तاريخ</string>
     <string name="order_descending">अवरोही</string>
     <string name="order_title">शीर्षक</string>
     <string name="placeholder_tag_example">जैसे: व्यक्तिगत</string>
@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">ऑडियो रिकॉर्डर</string>
     <string name="version_format">संस्करण %1$s</string>
     <string name="next">अगला</string>
+    <string name="hint_audio_to_text">ऑडियो से टेक्स्ट ट्रांसक्रिप्शन...</string>
+    <string name="content_description_trascribe_audio">ऑडियो ट्रांसक्राइब करें</string>
+    <string name="btn_add_to_note">नोट में जोड़ें</string>
 </resources>

@@ -38,4 +38,27 @@
     <string name="setting_google_account">Google 账号</string>
     <string name="setting_theme_modes">主题模式</string>
     <string name="settings_title">设置</string>
+    <string name="setting_note_shape">笔记形状</string>
+    <string name="dialog_select_note_shape_title">选择笔记形状</string>
+    <string name="note_shape_default">默认</string>
+    <string name="note_shape_sticky_clipped">便签裁剪</string>
+    <string name="note_shape_perforated_paper">穿孔纸</string>
+    <string name="note_shape_frosted_glass">磨砂玻璃</string>
+    <string name="note_shape_taped_note">胶带便签</string>
+    <string name="note_shape_blueprint_grid">蓝图网格</string>
+    <string name="note_shape_scalloped_edge">波浪边缘</string>
+    <string name="note_shape_sticky_corner_curl">翻卷角</string>
+    <string name="note_shape_crushed_paper">揉皱纸张</string>
+    <string name="note_shape_washi_tape_top">和纸胶带</string>
+    <string name="note_shape_stapled_corner">订书钉角</string>
+    <string name="note_shape_pinned_note">图钉便签</string>
+    <string name="note_shape_sun_bleached_fade">日晒褪色</string>
+    <string name="setting_audio_transcriber">音频转写器</string>
+    <string name="audio_transcriber_status_ready">已下载</string>
+    <string name="audio_transcriber_status_downloading">下载中…</string>
+    <string name="audio_transcriber_status_downloadable">点击下载</string>
+    <string name="audio_transcriber_status_unavailable">此设备不可用</string>
+    <string name="dialog_download_audio_transcriber_title">下载音频转写器</string>
+    <string name="dialog_download_audio_transcriber_description">将通过 Wi-Fi 下载设备端音频转写模型。是否继续？</string>
+    <string name="msg_downloading_audio_model">正在下载音频 AI 模型：%1$d%%</string>
 </resources>

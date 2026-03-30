@@ -73,4 +73,7 @@
     <string name="title_audio_recorder">오디오 녹음기</string>
     <string name="version_format">버전 %1$s</string>
     <string name="next">다음</string>
+    <string name="hint_audio_to_text">오디오를 텍스트로 변환 중...</string>
+    <string name="content_description_trascribe_audio">오디오 받아쓰기</string>
+    <string name="btn_add_to_note">노트에 추가</string>
 </resources>

@@ -38,4 +38,27 @@
     <string name="setting_google_account">Compte Google</string>
     <string name="setting_theme_modes">Modes de thème</string>
     <string name="settings_title">Paramètres</string>
+    <string name="setting_note_shape">Forme de la note</string>
+    <string name="dialog_select_note_shape_title">Choisir la forme de la note</string>
+    <string name="note_shape_default">Par défaut</string>
+    <string name="note_shape_sticky_clipped">Post-it découpé</string>
+    <string name="note_shape_perforated_paper">Papier perforé</string>
+    <string name="note_shape_frosted_glass">Verre dépoli</string>
+    <string name="note_shape_taped_note">Note scotchée</string>
+    <string name="note_shape_blueprint_grid">Grille de plan</string>
+    <string name="note_shape_scalloped_edge">Bord festonné</string>
+    <string name="note_shape_sticky_corner_curl">Coin replié</string>
+    <string name="note_shape_crushed_paper">Papier froissé</string>
+    <string name="note_shape_washi_tape_top">Ruban washi</string>
+    <string name="note_shape_stapled_corner">Coin agrafé</string>
+    <string name="note_shape_pinned_note">Note épinglée</string>
+    <string name="note_shape_sun_bleached_fade">Décoloré par le soleil</string>
+    <string name="setting_audio_transcriber">Transcripteur audio</string>
+    <string name="audio_transcriber_status_ready">Téléchargé</string>
+    <string name="audio_transcriber_status_downloading">Téléchargement…</string>
+    <string name="audio_transcriber_status_downloadable">Appuyez pour télécharger</string>
+    <string name="audio_transcriber_status_unavailable">Non disponible sur cet appareil</string>
+    <string name="dialog_download_audio_transcriber_title">Télécharger le transcripteur audio</string>
+    <string name="dialog_download_audio_transcriber_description">Le modèle de transcription audio sera téléchargé sur l\'appareil via Wi-Fi. Voulez-vous continuer ?</string>
+    <string name="msg_downloading_audio_model">Téléchargement du modèle IA audio : %1$d%%</string>
 </resources>
