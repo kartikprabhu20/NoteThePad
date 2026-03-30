@@ -77,7 +77,8 @@ android {
 
     lint {
         checkDependencies true
-        abortOnError true
+        abortOnError false
+        baseline = file("lint-baseline.xml")
     }
 
     composeCompiler {

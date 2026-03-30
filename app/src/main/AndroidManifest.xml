@@ -28,8 +28,7 @@
         android:theme="@style/Theme.MyApplication"
         android:fullBackupContent="@xml/backup_rules"
         android:largeHeap="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:extractNativeLibs="true">
+        android:dataExtractionRules="@xml/data_extraction_rules">
 
         <uses-native-library android:name="libvndksupport.so" android:required="false"/>
         <uses-native-library android:name="libOpenCL.so" android:required="false"/>
