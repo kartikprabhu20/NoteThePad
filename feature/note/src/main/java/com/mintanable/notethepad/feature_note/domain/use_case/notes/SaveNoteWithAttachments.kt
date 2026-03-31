@@ -17,15 +17,16 @@ class SaveNoteWithAttachments(
 ) {
 
     @Throws(InvalidNoteException::class)
-    suspend operator fun invoke(noteEntity: NoteEntity, tagEntities: List<TagEntity> = emptyList()) : Long{
+    suspend operator fun invoke(noteEntity: NoteEntity, tagEntities: List<TagEntity> = emptyList()) : String{
         if(noteEntity.title.isBlank()){
             throw InvalidNoteException("The title of the note cant be empty")
         }
-        return repository.insertNote(noteEntity, tagEntities)
+        repository.insertNote(noteEntity, tagEntities)
+        return noteEntity.id
     }
 
     suspend operator fun invoke(
-        id: Long,
+        id: String? = null,
         title: String,
         content: String,
         timestamp: Long,
@@ -37,7 +38,7 @@ class SaveNoteWithAttachments(
         checkboxItems: List<CheckboxItem>,
         tagEntities: List<TagEntity> = emptyList(),
         backgroundImage: Int = -1
-    ) : Result<Long> {
+    ) : Result<String> {
 
         Log.d("kptest", "SaveNoteWithAttachments invoke: ${imageUris+audioUris}")
        try{
@@ -63,7 +64,7 @@ class SaveNoteWithAttachments(
                }
                json.toString()
            }
-           val newNoteEntityId = repository.insertNote(
+           val noteToInsert = if (id != null && id.isNotBlank()) {
                 NoteEntity(
                     id = id,
                     title = title,
@@ -75,10 +76,22 @@ class SaveNoteWithAttachments(
                     reminderTime = reminderTime,
                     audioTranscriptions = transcriptionsJson,
                     backgroundImage = backgroundImage
-                ),
-                tagEntities
-            )
-            return Result.success(newNoteEntityId)
+                )
+            } else {
+                NoteEntity(
+                    title = title,
+                    content = newContent,
+                    timestamp = timestamp,
+                    color = color,
+                    imageUris = imageUriList,
+                    audioUris = audioUriList,
+                    reminderTime = reminderTime,
+                    audioTranscriptions = transcriptionsJson,
+                    backgroundImage = backgroundImage
+                )
+            }
+           val newNoteEntityId = repository.insertNote(noteToInsert, tagEntities)
+           return Result.success(newNoteEntityId)
         } catch (e: Exception) {
             return Result.failure(e)
         }

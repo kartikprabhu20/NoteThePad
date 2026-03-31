@@ -4,7 +4,7 @@ import com.mintanable.notethepad.core.model.note.CheckboxItem
 import org.json.JSONObject
 
 data class DetailedNote (
-    val id: Long = 0L,
+    val id: String = "",
     val title: String,
     val content: String,
     val timestamp: Long,

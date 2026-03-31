@@ -11,7 +11,7 @@ class DeleteNote(
         repository.deleteNote(noteEntity)
     }
 
-    suspend operator fun invoke(id: Long){
+    suspend operator fun invoke(id: String){
         repository.deleteNoteWithId(id)
     }
 }
