@@ -6,17 +6,20 @@ import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import java.util.UUID
 
 @Entity(
     indices = [
         Index(value = ["title"]),
         Index(value = ["timestamp"]),
         Index(value = ["color"]),
-        Index(value = ["reminderTime"])
+        Index(value = ["reminderTime"]),
+        Index(value = ["userId"]),
+        Index(value = ["isDeleted"])
     ]
 )
 data class NoteEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val title: String,
     val content: String,
     val timestamp: Long,
@@ -25,7 +28,10 @@ data class NoteEntity(
     val audioUris: List<String> = emptyList(),
     val reminderTime: Long = -1,
     val audioTranscriptions: String = "",
-    val backgroundImage: Int = -1
+    val backgroundImage: Int = -1,
+    val lastUpdateTime: Long = System.currentTimeMillis(),
+    val userId: String? = null,
+    val isDeleted: Boolean = false
 )
 
 class InvalidNoteException(message: String): Exception(message)

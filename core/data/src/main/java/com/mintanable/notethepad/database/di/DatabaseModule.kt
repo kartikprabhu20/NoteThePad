@@ -1,7 +1,9 @@
 package com.mintanable.notethepad.database.di
 
 import android.content.Context
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.common.DispatcherProvider
+import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
 import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.NoteDatabase
 import com.mintanable.notethepad.database.db.dao.NoteDao
@@ -47,9 +49,12 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideNoteRepository(
-        databaseManager: DatabaseManager
+        databaseManager: DatabaseManager,
+        supabaseSyncService: SupabaseSyncService,
+        userPreferencesRepository: UserPreferencesRepository,
+        authRepository: AuthRepository
     ): NoteRepository {
-        return NoteRepositoryImpl(databaseManager)
+        return NoteRepositoryImpl(databaseManager, supabaseSyncService, userPreferencesRepository, authRepository)
     }
 
     @Provides

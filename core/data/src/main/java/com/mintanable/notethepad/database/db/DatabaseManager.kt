@@ -29,7 +29,11 @@ class DatabaseManager @Inject constructor(
             NoteDatabase::class.java,
             NoteDatabase.DATABASE_NAME
         )
-            .addMigrations(NoteDatabase.MIGRATION_10_11, NoteDatabase.MIGRATION_11_12)
+            .addMigrations(
+                NoteDatabase.MIGRATION_10_11,
+                NoteDatabase.MIGRATION_11_12,
+                NoteDatabase.MIGRATION_12_13
+            )
             .build()
     }
 

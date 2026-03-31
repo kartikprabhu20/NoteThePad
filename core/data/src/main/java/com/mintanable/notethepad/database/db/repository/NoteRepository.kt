@@ -9,10 +9,13 @@ import java.io.File
 
 interface NoteRepository {
     fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>>
-    suspend fun getNoteById(id: Long): NoteWithTags?
-    suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): Long
+    suspend fun getNoteById(id: String): NoteWithTags?
+    suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): String
     suspend fun deleteNote(noteEntity: NoteEntity)
-    suspend fun deleteNoteWithId(id: Long)
+    suspend fun deleteNoteWithId(id: String)
+    suspend fun restoreNote(id: String)
+    suspend fun deleteNotePermanently(id: String)
+    fun getDeletedNotes(): Flow<List<NoteWithTags>>
     suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags>
     fun getTopNotes(limit: Int): Flow<List<NoteWithTags>>
     fun getAllTags(): Flow<List<TagEntity>>

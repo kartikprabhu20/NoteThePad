@@ -16,12 +16,26 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-import javax.inject.Singleton
+import javax.inject.Singleton import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.core.network.sync.NoteTagCrossRefDto
+import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
+import com.mintanable.notethepad.core.network.sync.TagDto
+import com.mintanable.notethepad.database.db.util.toDto
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Singleton
 class NoteRepositoryImpl @Inject constructor(
-    private val dbManager: DatabaseManager
+    private val dbManager: DatabaseManager,
+    private val supabaseSyncService: SupabaseSyncService,
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val authRepository: AuthRepository
 ) : NoteRepository {
+
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // Helper properties to always get the LATEST instance
     private val noteDao get() = dbManager.database.noteDao()
@@ -39,42 +53,126 @@ class NoteRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getNoteById(id: Long): NoteWithTags? {
+    override suspend fun getNoteById(id: String): NoteWithTags? {
         return noteDao.getNoteById(id)
     }
 
-    override suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): Long {
+    override suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): String {
         return withContext(Dispatchers.IO) {
-            db.withTransaction {
-                var noteId = noteDao.inserNote(noteEntity)
+            val user = authRepository.getSignedInFirebaseUser().first()
+            val userId = user?.uid
+            
+            val updatedNote = noteEntity.copy(
+                userId = userId,
+                lastUpdateTime = System.currentTimeMillis(),
+                isDeleted = false
+            )
 
-                if (noteId == -1L || noteId == 0L) {
-                    noteDao.updateNote(noteEntity)
-                    noteId = noteEntity.id
-                }
+            db.withTransaction {
+                noteDao.inserNote(updatedNote)
+                noteDao.updateNote(updatedNote) // Ensure update if IGNORE failed
+                val noteId = updatedNote.id
 
                 noteDao.deleteLinksForNote(noteId)
                 tagEntities.forEach { tag ->
-                    var tagId = tagDao.insertTag(tag)
-
-                    if (tagId == -1L || tagId == 0L) {
-                        val existingTag = tagDao.getTagByName(tag.tagName)
-                        tagId = existingTag?.tagId ?: 0L
-                    }
-
-                    noteDao.insertNoteTagCrossRef(NoteTagCrossRef(noteId, tagId))
+                    val updatedTag = tag.copy(
+                        userId = userId,
+                        lastUpdateTime = System.currentTimeMillis(),
+                        isDeleted = false
+                    )
+                    tagDao.insertTag(updatedTag)
+                    tagDao.updateTag(updatedTag)
+                    
+                    val crossRef = NoteTagCrossRef(
+                        noteId = noteId,
+                        tagId = updatedTag.tagId,
+                        userId = userId,
+                        lastUpdateTime = System.currentTimeMillis(),
+                        isDeleted = false
+                    )
+                    noteDao.insertNoteTagCrossRef(crossRef)
+                    
+                    syncTag(updatedTag)
+                    syncCrossRef(crossRef)
                 }
+                syncNote(updatedNote)
                 noteId
             }
         }
     }
 
     override suspend fun deleteNote(noteEntity: NoteEntity) {
-        noteDao.deleteNote(noteEntity)
+        val deletedNote = noteEntity.copy(
+            isDeleted = true,
+            lastUpdateTime = System.currentTimeMillis()
+        )
+        noteDao.updateNote(deletedNote)
+        syncNote(deletedNote)
     }
 
-    override suspend fun deleteNoteWithId(id: Long) {
+    override suspend fun deleteNoteWithId(id: String) {
+        val noteWithTags = noteDao.getNoteById(id)
+        noteWithTags?.noteEntity?.let { deleteNote(it) }
+    }
+
+    override suspend fun restoreNote(id: String) {
+        val noteWithTags = noteDao.getNoteById(id)
+        noteWithTags?.noteEntity?.let {
+            val restoredNote = it.copy(
+                isDeleted = false,
+                lastUpdateTime = System.currentTimeMillis()
+            )
+            noteDao.updateNote(restoredNote)
+            syncNote(restoredNote)
+        }
+    }
+
+    override suspend fun deleteNotePermanently(id: String) {
         noteDao.deleteNoteWithId(id)
+        noteDao.deleteLinksForNote(id)
+      }
+
+    override fun getDeletedNotes(): Flow<List<NoteWithTags>> {
+        return noteDao.getDeletedNotes()
+    }
+
+    private fun syncNote(note: NoteEntity) {
+        repositoryScope.launch {
+            val settings = userPreferencesRepository.settingsFlow.first()
+            if (settings.supaSyncEnabled && note.userId != null) {
+                try {
+                    supabaseSyncService.syncNote(note.toDto())
+                } catch (e: Exception) {
+                    Log.e("Sync", "Failed to sync note: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private fun syncTag(tag: TagEntity) {
+        repositoryScope.launch {
+            val settings = userPreferencesRepository.settingsFlow.first()
+            if (settings.supaSyncEnabled && tag.userId != null) {
+                try {
+                    supabaseSyncService.syncTag(tag.toDto())
+                } catch (e: Exception) {
+                    Log.e("Sync", "Failed to sync tag: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private fun syncCrossRef(crossRef: NoteTagCrossRef) {
+        repositoryScope.launch {
+            val settings = userPreferencesRepository.settingsFlow.first()
+            if (settings.supaSyncEnabled && crossRef.userId != null) {
+                try {
+                    supabaseSyncService.syncCrossRef(crossRef.toDto())
+                } catch (e: Exception) {
+                    Log.e("Sync", "Failed to sync crossRef: ${e.message}")
+                }
+            }
+        }
     }
 
     override suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags> {
@@ -90,15 +188,20 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertTag(tagEntity: TagEntity): Long {
-        return tagDao.insertTag(tagEntity)
+        val rowId = tagDao.insertTag(tagEntity)
+        syncTag(tagEntity)
+        return rowId
     }
 
     override suspend fun updateTag(tagEntity: TagEntity) {
         tagDao.updateTag(tagEntity)
+        syncTag(tagEntity)
     }
 
     override suspend fun deleteTag(tagEntity: TagEntity) {
-        tagDao.deleteTag(tagEntity)
+        val deletedTag = tagEntity.copy(isDeleted = true, lastUpdateTime = System.currentTimeMillis())
+        tagDao.updateTag(deletedTag)
+        syncTag(deletedTag)
     }
 
     override suspend fun getTagByName(tagName: String): TagEntity? {

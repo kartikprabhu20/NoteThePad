@@ -18,6 +18,7 @@ interface NoteDao {
     @Transaction
     @Query("""
         SELECT * FROM noteEntity 
+        WHERE isDeleted = 0
         ORDER BY 
             CASE WHEN :order = 'title' AND :ascending = 1 THEN title END ASC,
             CASE WHEN :order = 'title' AND :ascending = 0 THEN title END DESC,
@@ -30,28 +31,32 @@ interface NoteDao {
 
     @Transaction
     @Query("SELECT * FROM noteEntity WHERE id =:id")
-    suspend fun getNoteById(id: Long): NoteWithTags?
+    suspend fun getNoteById(id: String): NoteWithTags?
 
     @Transaction
-    @Query("SELECT * FROM noteEntity WHERE reminderTime > :currentTime")
+    @Query("SELECT * FROM noteEntity WHERE reminderTime > :currentTime AND isDeleted = 0")
     suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags>
 
     @Transaction
-    @Query("SELECT * FROM noteEntity ORDER BY timestamp DESC LIMIT :limit")
+    @Query("SELECT * FROM noteEntity WHERE isDeleted = 0 ORDER BY timestamp DESC LIMIT :limit")
     fun getTopNotes(limit: Int): Flow<List<NoteWithTags>>
 
     @Transaction
     @Query("""
     SELECT * FROM noteEntity
-    WHERE id IN (
+    WHERE isDeleted = 0 AND id IN (
         SELECT noteId FROM note_tag_cross_ref 
-        WHERE tagId = :tagId
+        WHERE tagId = :tagId AND isDeleted = 0
     )
     """)
-    fun getNotesByTag(tagId: Long): Flow<List<NoteWithTags>>
+    fun getNotesByTag(tagId: String): Flow<List<NoteWithTags>>
+
+    @Transaction
+    @Query("SELECT * FROM noteEntity WHERE isDeleted = 1 ORDER BY lastUpdateTime DESC")
+    fun getDeletedNotes(): Flow<List<NoteWithTags>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun inserNote(noteEntity: NoteEntity): Long
+    suspend fun inserNote(noteEntity: NoteEntity)
 
     @Update
     suspend fun updateNote(noteEntity: NoteEntity)
@@ -63,8 +68,8 @@ interface NoteDao {
     suspend fun deleteNote(noteEntity: NoteEntity)
 
     @Query("DELETE FROM noteEntity WHERE id = :id")
-    suspend fun deleteNoteWithId(id: Long)
+    suspend fun deleteNoteWithId(id: String)
 
     @Query("DELETE FROM note_tag_cross_ref WHERE noteId = :noteId")
-    suspend fun deleteLinksForNote(noteId: Long)
+    suspend fun deleteLinksForNote(noteId: String)
 }
