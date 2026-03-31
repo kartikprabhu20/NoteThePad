@@ -3,6 +3,7 @@ package com.mintanable.notethepad.database.db.repository
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -34,6 +35,11 @@ class NavigationDrawerItemRepositoryImpl: NavigationDrawerItemRepository {
             ),
             DrawerItem.TextDrawerItem(
                 title = "Labels"
+            ),
+            DrawerItem.NavigationDrawerItem(
+                title = "Archive",
+                icon = Icons.Filled.Archive,
+                route = Screen.ArchiveScreen.route
             ),
             DrawerItem.NavigationDrawerItem(
                 title = "Settings",

@@ -75,7 +75,7 @@ fun AppDrawer(
     appVersionProvider: AppVersionProvider?
 ) {
     var isLabelEditing by rememberSaveable { mutableStateOf(false) }
-    var pendingEdits by rememberSaveable { mutableStateOf(mapOf<Long, String>()) }
+    var pendingEdits by rememberSaveable { mutableStateOf(mapOf<String, String>()) }
 
     ModalDrawerSheet(modifier = modifier) {
 
@@ -225,7 +225,6 @@ fun AppDrawer(
 @Composable
 fun DrawerHeader(
     modifier: Modifier = Modifier,
-    title: String = stringResource(R.string.app_name),
     user: User?
 ) {
     Column(modifier = modifier,
@@ -345,7 +344,6 @@ fun PreviewDrawHeader(){
     NoteThePadTheme {
         DrawerHeader(
             Modifier,
-            "NoteThePad",
             User(
                 "1",
                 "test@gmail.com",
