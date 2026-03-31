@@ -166,6 +166,15 @@ fun SettingsScreen(
                 if (state.isAuthorisingBackup) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
                 }
+                SettingSwitchItem(
+                    title = stringResource(R.string.supasync_title),
+                    subtitle = stringResource(R.string.supasync_description),
+                    checked = currentSettings.supaSyncEnabled,
+                    enableSettings = true,
+                    onCheckedChange = { checked ->
+                        onEvent(SettingsEvent.UpdateSupaSync(checked))
+                    }
+                )
             }
 
             if(isGoogleLinked && currentSettings.backupSettings.backupFrequency != BackupFrequency.OFF){

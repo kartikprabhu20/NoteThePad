@@ -229,6 +229,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.ConfirmDownloadAudioTranscriber -> confirmDownloadAudioTranscriber()
             SettingsEvent.DismissDownloadAudioTranscriberDialog -> _showDownloadAudioTranscriberDialog.value = false
             is SettingsEvent.UpdateNoteShape -> updateNoteShape(event.noteShape)
+            is SettingsEvent.UpdateSupaSync -> updateSupaSync(event.enabled)
         }
     }
 
@@ -288,6 +289,10 @@ class SettingsViewModel @Inject constructor(
 
     private fun updateNoteShape(shape: NoteShape) {
         viewModelScope.launch { dataStore.updateNoteShape(shape) }
+    }
+
+    private fun updateSupaSync(enabled: Boolean) {
+        viewModelScope.launch { dataStore.updateSupaSync(enabled) }
     }
 
     private fun signOut() {

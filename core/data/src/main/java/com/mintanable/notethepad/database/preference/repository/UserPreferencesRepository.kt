@@ -36,6 +36,7 @@ class UserPreferencesRepository @Inject constructor(
         val AI_MODEL_NAME = stringPreferencesKey("ai_model_name")
         val BACKUP_MEDIA = booleanPreferencesKey("backup_media")
         val NOTE_SHAPE = stringPreferencesKey("note_shape")
+        val SUPASYNC_ENABLED = booleanPreferencesKey("supasync_enabled")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -53,9 +54,11 @@ class UserPreferencesRepository @Inject constructor(
             val aiModelName = preferences[PreferencesKeys.AI_MODEL_NAME] ?: "None"
             val backupMedia = preferences[PreferencesKeys.BACKUP_MEDIA] ?: false
             val noteShape = preferences[PreferencesKeys.NOTE_SHAPE] ?: NoteShape.DEFAULT.name
+            val supaSyncEnabled = preferences[PreferencesKeys.SUPASYNC_ENABLED] ?: false
 
             Settings(
                 backupEnabled = backupEnabled,
+                supaSyncEnabled = supaSyncEnabled,
                 notificationsEnabled = notifications,
                 themeMode = ThemeMode.valueOf(theme),
                 isGridViewSelected = isGridViewEnabled,
@@ -125,6 +128,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun updateNoteShape(shape: NoteShape) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.NOTE_SHAPE] = shape.name
+        }
+    }
+
+    suspend fun updateSupaSync(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SUPASYNC_ENABLED] = enabled
         }
     }
 }

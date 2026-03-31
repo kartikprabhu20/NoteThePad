@@ -33,4 +33,5 @@ sealed class SettingsEvent {
     data object ConfirmDownloadAudioTranscriber : SettingsEvent()
     data object DismissDownloadAudioTranscriberDialog : SettingsEvent()
     data class UpdateNoteShape(val noteShape: NoteShape) : SettingsEvent()
+    data class UpdateSupaSync(val enabled: Boolean) : SettingsEvent()
 }

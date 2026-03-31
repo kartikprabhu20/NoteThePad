@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_settings.presentation.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import com.mintanable.notethepad.theme.NoteThePadTheme
 @Composable
 fun SettingSwitchItem(
     title: String,
+    subtitle: String? = null,
     checked: Boolean,
     enableSettings: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -25,7 +27,19 @@ fun SettingSwitchItem(
         modifier = Modifier.fillMaxWidth().enabled(enableSettings).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = title, modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
+        Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            subtitle?.let {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
         Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
@@ -38,7 +52,7 @@ fun SettingSwitchItem(
 @Composable
 fun PreviewSettingSwitchItem(){
     NoteThePadTheme {
-        SettingSwitchItem("test", true,true, {})
+        SettingSwitchItem("test", "subtitle",true,true, {})
     }
 }
 
@@ -50,6 +64,6 @@ fun PreviewSettingSwitchItem(){
 @Composable
 fun PreviewSettingSwitchItem2(){
     NoteThePadTheme {
-        SettingSwitchItem("test", true,false, {})
+        SettingSwitchItem("test", "subtitle", true,false, {})
     }
 }

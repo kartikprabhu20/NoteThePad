@@ -3,6 +3,7 @@ package com.mintanable.notethepad.core.model.settings
 data class Settings(
     val notificationsEnabled: Boolean = true,
     val backupEnabled: Boolean = false,
+    val supaSyncEnabled: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isGridViewSelected: Boolean = false,
     val googleAccount: String? = null,
