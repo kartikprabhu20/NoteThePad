@@ -77,11 +77,11 @@ class AddEditNoteViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context
 ): ViewModel(){
 
-    private val passedNoteId: Long = savedStateHandle.get<Long>("noteId") ?: -1L
+    private val passedNoteId: String = savedStateHandle.get<String>("noteId") ?: ""
     private val passedReminderTime: Long = savedStateHandle.get<Long>("reminderTime") ?: -1L
     private val passedInitialTitle: String = savedStateHandle.get<String>("initialTitle") ?: ""
-    private val isEditMode = passedNoteId != -1L
-    private var currentNoteId: Long = 0L
+    private val isEditMode = passedNoteId.isNotBlank()
+    private var currentNoteId: String = ""
     private var currentRecordingFile: File? = null
     private val imageSuggestionsCache = mutableMapOf<String, List<String>>()
     private var cachedImageBytes: ByteArray? = null
@@ -132,7 +132,8 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private fun loadNote(id: Long) {
+    private fun loadNote(id: String) {
+        if (id.isBlank()) return
         viewModelScope.launch {
             noteUseCases.getDetailedNote(id)?.also { detailedNote ->
                 currentNoteId = detailedNote.id
@@ -229,8 +230,8 @@ class AddEditNoteViewModel @Inject constructor(
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
                     saveNote(currentNoteId)
-                        .onSuccess {
-                            if(currentNoteId != 0L) { rescheduleReminder(currentNoteId) }
+                        .onSuccess { id ->
+                            if(id.isNotBlank()) { rescheduleReminder(id) }
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                             _eventFlow.emit(UiEvent.SaveNote)
                         }
@@ -244,7 +245,7 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.MakeCopy -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
-                    saveNote(0L)
+                    saveNote("")// as new note
                         .onSuccess { id ->
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                             _eventFlow.emit(UiEvent.MakeCopy(id))
@@ -341,7 +342,7 @@ class AddEditNoteViewModel @Inject constructor(
             }
             is AddEditNoteEvent.CancelReminder -> {
                 _uiState.update { it.copy(reminderTime = -1, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
-                if(currentNoteId != 0L) { reminderScheduler.cancel(currentNoteId) }
+                if (currentNoteId.isNotBlank()) { reminderScheduler.cancel(currentNoteId.hashCode().toLong()) }
             }
             is AddEditNoteEvent.CheckAlarmPermission -> {
                 checkExactAlarmPermission()
@@ -550,7 +551,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
             fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri })
-            if(currentNoteId != 0L) { noteUseCases.deleteNote(currentNoteId) }
+            if(currentNoteId.isNotBlank()) { noteUseCases.deleteNote(currentNoteId) }
             _eventFlow.emit(UiEvent.DeleteNote(currentNoteId))
         }
     }
@@ -607,10 +608,10 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveNote(id:Long): Result<Long> {
+    private suspend fun saveNote(id: String): Result<String> {
         val state = uiState.value
         return noteUseCases.saveNoteWithAttachments.invoke(
-            id = id,
+            id = id.ifBlank { null },
             title = state.titleState.richText.rawText,
             content = RichTextSerializer.serialize(state.contentRichTextState.document),
             timestamp = System.currentTimeMillis(),
@@ -625,12 +626,13 @@ class AddEditNoteViewModel @Inject constructor(
         )
     }
 
-    private fun rescheduleReminder(id: Long){
+    private fun rescheduleReminder(id: String){
         val state = uiState.value
-        reminderScheduler.cancel(id = id)
+        val longId = id.hashCode().toLong()
+        reminderScheduler.cancel(id = longId)
         if(state.reminderTime > System.currentTimeMillis()) {
             reminderScheduler.schedule(
-                id = id,
+                id = longId,
                 title = state.titleState.richText.rawText,
                 content = state.contentRichTextState.document.rawText,
                 reminderTime = state.reminderTime
@@ -690,13 +692,4 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    sealed class UiEvent{
-        data class ShowSnackbar(val message:String):UiEvent()
-        data object SaveNote: UiEvent()
-        data class DeleteNote(val id: Long): UiEvent()
-        data class MakeCopy(val newNoteId: Long): UiEvent()
-        data object LaunchAudioRecorder : UiEvent()
-        data class LaunchCamera(val type: AttachmentType) : UiEvent()
-        data class RequestWidgetPin(val noteId: Long):UiEvent()
-    }
 }

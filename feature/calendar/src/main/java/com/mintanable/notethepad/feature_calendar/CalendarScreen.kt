@@ -715,7 +715,7 @@ private fun NewNoteBottomSheetContent(
 
 private object CalendarPreviewData {
     val sampleNote = DetailedNote(
-        id = 1,
+        id = "1",
         title = "Team Sync Meeting",
         content = "Discuss calendar feature",
         reminderTime = Instant.now().toEpochMilli(),
@@ -725,8 +725,8 @@ private object CalendarPreviewData {
 
     val notes = listOf(
         sampleNote,
-        sampleNote.copy(id = 2, title = "Gym Session", reminderTime = Instant.now().plusSeconds(3600).toEpochMilli()),
-        sampleNote.copy(id = 3, title = "Dinner with Sarah", reminderTime = Instant.now().plusSeconds(3600).toEpochMilli())
+        sampleNote.copy(id = "2", title = "Gym Session", reminderTime = Instant.now().plusSeconds(3600).toEpochMilli()),
+        sampleNote.copy(id = "3", title = "Dinner with Sarah", reminderTime = Instant.now().plusSeconds(3600).toEpochMilli())
     )
 }
 

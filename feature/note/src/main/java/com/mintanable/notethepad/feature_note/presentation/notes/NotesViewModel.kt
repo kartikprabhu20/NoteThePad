@@ -63,7 +63,7 @@ class NotesViewModel @Inject constructor(
     private val _filterState = MutableStateFlow(
         DataQuery(
             filter = savedStateHandle.get<String>("filterType") ?: NotesFilterType.ALL.filter,
-            tagId = savedStateHandle.get<Long>("tagId") ?: -1L,
+            tagId = savedStateHandle.get<String>("tagId") ?: "",
             tagName = savedStateHandle.get<String>("tagName") ?: "",
             order = NoteOrder.Date(OrderType.Descending)
         )
@@ -130,7 +130,7 @@ class NotesViewModel @Inject constructor(
             initialValue = NoteShape.DEFAULT
         )
 
-    fun updateFilter(filter: String, tagId: Long = -1L, tagName: String = "") {
+    fun updateFilter(filter: String, tagId: String = "", tagName: String = "") {
         _filterState.value = _filterState.value.copy(
             filter = filter,
             tagId = tagId,
@@ -208,7 +208,7 @@ class NotesViewModel @Inject constructor(
 
             is NotesEvent.AddLabel -> {
                 viewModelScope.launch {
-                    tagUseCases.saveTag(TagEntity(event.tagName))
+                    tagUseCases.saveTag(TagEntity(tagName = event.tagName))
                     _showLabelDialog.value = false
                 }
             }
@@ -237,5 +237,5 @@ class NotesViewModel @Inject constructor(
         data class RequestWidgetPin(val note: DetailedNote) : UiEvent()
     }
 
-    data class DataQuery(val filter: String, val tagId: Long, val tagName: String, val order: NoteOrder)
+    data class DataQuery(val filter: String, val tagId: String, val tagName: String, val order: NoteOrder)
 }

@@ -369,7 +369,7 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isTrue()
                 assertThat(awaitItem().isSaving).isFalse()
             }
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.SaveNote::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.SaveNote::class.java)
         }
     }
 
@@ -388,7 +388,7 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isTrue()
                 assertThat(awaitItem().isSaving).isFalse()
             }
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.ShowSnackbar::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.ShowSnackbar::class.java)
         }
     }
 
@@ -407,7 +407,7 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isTrue()
                 assertThat(awaitItem().isSaving).isFalse()
             }
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.MakeCopy::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.MakeCopy::class.java)
         }
     }
 
@@ -426,7 +426,7 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isTrue()
                 assertThat(awaitItem().isSaving).isFalse()
             }
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.ShowSnackbar::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.ShowSnackbar::class.java)
         }
     }
 
@@ -434,7 +434,7 @@ class AddEditNoteViewModelTest {
     fun `Delete a note emits Delete event`() = runTest {
         viewModel.eventFlow.test {
             viewModel.onEvent(AddEditNoteEvent.DeleteNote)
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.DeleteNote::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.DeleteNote::class.java)
         }
     }
 
@@ -453,7 +453,7 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isTrue()
                 assertThat(awaitItem().isSaving).isFalse()
             }
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.RequestWidgetPin::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.RequestWidgetPin::class.java)
         }
     }
 
@@ -472,7 +472,7 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isTrue()
                 assertThat(awaitItem().isSaving).isFalse()
             }
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.ShowSnackbar::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.ShowSnackbar::class.java)
         }
     }
 
@@ -681,7 +681,7 @@ class AddEditNoteViewModelTest {
     fun `Microphone permission granted emits LaunchAudioRecorder event`() = runTest {
         viewModel.eventFlow.test {
             viewModel.checkMicrophonePermission(isGranted = true, shouldShowRationale = false)
-            assertThat(awaitItem()).isInstanceOf(AddEditNoteViewModel.UiEvent.LaunchAudioRecorder::class.java)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.LaunchAudioRecorder::class.java)
         }
     }
 
@@ -709,7 +709,7 @@ class AddEditNoteViewModelTest {
         val type = AttachmentType.IMAGE
         viewModel.eventFlow.test {
             viewModel.checkCameraPermission(isGranted = true, shouldShowRationale = false, attachmentType = type)
-            val event = awaitItem() as AddEditNoteViewModel.UiEvent.LaunchCamera
+            val event = awaitItem() as UiEvent.LaunchCamera
             assertThat(event.type).isEqualTo(type)
         }
     }

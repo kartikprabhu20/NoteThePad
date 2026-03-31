@@ -76,11 +76,10 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Sug
 import com.mintanable.notethepad.feature_note.presentation.modify.components.TextEditBar
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
-import kotlinx.coroutines.launch
 
 @Composable
 fun NoteEditorContent(
-    noteId: Long,
+    noteId: String,
     noteColor: Int,
     backgroundImage: Int,
     attachedImages: List<Uri>,
@@ -227,7 +226,7 @@ fun NoteEditorContent(
                     .background(noteBackgroundAnimatable.value)
                     .sharedBounds(
                         sharedContentState = rememberSharedContentState(
-                            key = if (noteId <= 0L) "notescreens_fab" else "note-$noteId"
+                            key = if (noteId.isEmpty()) "notescreens_fab" else "note-$noteId"
                         ),
                         animatedVisibilityScope = animatedVisibilityScope,
                         enter = fadeIn(tween(200)),

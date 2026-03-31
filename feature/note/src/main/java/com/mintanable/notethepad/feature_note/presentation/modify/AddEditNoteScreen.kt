@@ -74,12 +74,12 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AddEditNoteScreen(
     navController: NavController,
-    noteId: Long,
+    noteId: String,
     viewModel: AddEditNoteViewModel = hiltViewModel(),
     isDarkTheme: Boolean,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
-    onPinWidget: (Long) -> Unit = {}
+    onPinWidget: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -173,11 +173,11 @@ fun AddEditNoteScreen(
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
             when (event) {
-                is AddEditNoteViewModel.UiEvent.ShowSnackbar -> {
+                is UiEvent.ShowSnackbar -> {
                     snackBarHostState.showSnackbar(message = event.message)
                 }
 
-                is AddEditNoteViewModel.UiEvent.SaveNote -> {
+                is UiEvent.SaveNote -> {
                     focusManager.clearFocus()
                     withContext(NonCancellable) {
                         if (sheetState.isVisible) {
@@ -188,7 +188,7 @@ fun AddEditNoteScreen(
                     }
                 }
 
-                is AddEditNoteViewModel.UiEvent.MakeCopy -> {
+                is UiEvent.MakeCopy -> {
                     hideSheetAndNavigate {
                         viewModel.onEvent(AddEditNoteEvent.StopMedia)
                         navController.navigate(
@@ -201,7 +201,7 @@ fun AddEditNoteScreen(
                     }
                 }
 
-                is AddEditNoteViewModel.UiEvent.DeleteNote -> {
+                is UiEvent.DeleteNote -> {
                     withContext(NonCancellable) {
                         hideSheetAndNavigate {
                             viewModel.onEvent(AddEditNoteEvent.StopMedia)
@@ -210,11 +210,11 @@ fun AddEditNoteScreen(
                     }
                 }
 
-                is AddEditNoteViewModel.UiEvent.LaunchAudioRecorder -> {
+                is UiEvent.LaunchAudioRecorder -> {
                     viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.AUDIO_RECORDER))
                 }
 
-                is AddEditNoteViewModel.UiEvent.LaunchCamera -> {
+                is UiEvent.LaunchCamera -> {
                     val uri = viewModel.generateTempUri(event.type)
                     if (event.type == AttachmentType.IMAGE) {
                         cameraImageUri = uri
@@ -225,8 +225,8 @@ fun AddEditNoteScreen(
                     }
                 }
 
-                is AddEditNoteViewModel.UiEvent.RequestWidgetPin -> {
-                    event.noteId?.let { onPinWidget(it) }
+                is UiEvent.RequestWidgetPin -> {
+                    onPinWidget(event.noteId)
                 }
             }
         }

@@ -46,6 +46,7 @@ import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
+import com.mintanable.notethepad.feature_note.presentation.archive.ArchiveScreen
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -81,8 +82,8 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val navController = rememberNavController()
                     LaunchedEffect(currentIntent) {
-                        val noteId = currentIntent?.getLongExtra(NavigationConstants.EXTRA_NOTE_ID, -1L) ?: -1L
-                        if (noteId != -1L) {
+                        val noteId = currentIntent?.getStringExtra(NavigationConstants.EXTRA_NOTE_ID)
+                        if (!noteId.isNullOrBlank()) {
                             navController.navigate(Screen.AddEditNoteScreen.passArgs(noteId = noteId)) {
                                 launchSingleTop = true
                             }
@@ -123,7 +124,7 @@ class MainActivity : AppCompatActivity() {
                                 route = Screen.NotesScreen.route,
                                 arguments = listOf(
                                     navArgument("tagId") {
-                                        type = NavType.LongType; defaultValue = -1L
+                                        type = NavType.StringType; defaultValue = ""
                                     },
                                     navArgument("tagName") {
                                         type = NavType.StringType; defaultValue = ""
@@ -169,7 +170,7 @@ class MainActivity : AppCompatActivity() {
                                                 action = SingleNoteWidgetReceiver.PINNING_ACTION
                                             }
                                             val pendingIntent = PendingIntent.getBroadcast(
-                                                this@MainActivity, note.id?.toInt() ?: 0, callback,
+                                                this@MainActivity, note.id.hashCode(), callback,
                                                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                                             )
                                             appWidgetManager.requestPinAppWidget(
@@ -191,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                                 route = Screen.AddEditNoteScreen.route,
                                 arguments = listOf(
                                     navArgument(name = "noteId") {
-                                        type = NavType.LongType; defaultValue = -1L
+                                        type = NavType.StringType; defaultValue = ""
                                     },
                                     navArgument(name = "reminderTime") {
                                         type = NavType.LongType; defaultValue = -1L
@@ -202,7 +203,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                             ) {
                                 AddEditNoteScreen(
-                                    noteId = it.arguments?.getLong("noteId") ?: 0L,
+                                    noteId = it.arguments?.getString("noteId") ?: "",
                                     isDarkTheme = isDarkTheme,
                                     navController = navController,
                                     sharedTransitionScope = this@SharedTransitionLayout,
@@ -226,7 +227,7 @@ class MainActivity : AppCompatActivity() {
                                                 action = SingleNoteWidgetReceiver.PINNING_ACTION
                                             }
                                             val pendingIntent = PendingIntent.getBroadcast(
-                                                this@MainActivity, noteId.toInt(), callback,
+                                                this@MainActivity, noteId.hashCode(), callback,
                                                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                                             )
                                             appWidgetManager.requestPinAppWidget(
@@ -287,6 +288,9 @@ class MainActivity : AppCompatActivity() {
                             }
                             composable(route = Screen.CalendarScreen.route) {
                                 CalendarScreen(navController = navController)
+                            }
+                            composable(route = Screen.ArchiveScreen.route) {
+                                ArchiveScreen(onBackPressed = { navController.navigateUp() })
                             }
                         }
                     }
