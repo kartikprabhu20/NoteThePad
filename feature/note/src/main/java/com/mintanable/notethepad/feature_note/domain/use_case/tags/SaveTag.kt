@@ -8,12 +8,13 @@ import kotlinx.coroutines.withContext
 class SaveTag(
     private val repository: NoteRepository
 ) {
-    suspend operator fun invoke(tagEntity: TagEntity): Long = withContext(Dispatchers.IO) {
-        var tagId = repository.insertTag(tagEntity)
+    suspend operator fun invoke(tagEntity: TagEntity): String = withContext(Dispatchers.IO) {
+        var rowId = repository.insertTag(tagEntity)
+        var tagId = tagEntity.tagId
 
-        if (tagId == -1L) {
+        if (rowId == -1L) {
             repository.updateTag(tagEntity)
-            tagId = repository.getTagByName(tagEntity.tagName)?.tagId ?: tagId
+            tagId = repository.getTagByName(tagEntity.tagName)?.tagId  ?: tagId
         }
         return@withContext tagId
     }
