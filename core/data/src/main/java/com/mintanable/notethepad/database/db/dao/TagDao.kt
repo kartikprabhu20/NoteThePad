@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TagDao {
-    @Query("SELECT * FROM tag_table")
+    @Query("SELECT * FROM tag_table WHERE isDeleted = 0")
     fun getAllTags(): Flow<List<TagEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -24,8 +24,8 @@ interface TagDao {
     suspend fun deleteTag(tagEntity: TagEntity)
 
     @Query("SELECT * FROM tag_table WHERE tagId = :id")
-    suspend fun getTagById(id: Long): TagEntity?
+    suspend fun getTagById(id: String): TagEntity?
 
-    @Query("SELECT * FROM tag_table WHERE tagName = :tagName")
+    @Query("SELECT * FROM tag_table WHERE tagName = :tagName AND isDeleted = 0")
     suspend fun getTagByName(tagName: String): TagEntity?
 }
