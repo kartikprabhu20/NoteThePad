@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
@@ -45,16 +45,14 @@ class NoteWidgetConfigActivity : AppCompatActivity() {
 
             NoteThePadTheme(darkTheme = isDarkTheme) {
                 NoteWidgetConfigScreen(onNoteClicked = { note ->
-                    note.id?.let {
-                        saveAndFinish(it)
-                    } ?: setResult(RESULT_CANCELED)
+                    saveAndFinish(note.id)
 
                 })
             }
         }
     }
 
-    private fun saveAndFinish(noteId: Long) {
+    private fun saveAndFinish(noteId: String) {
         NoteWidgetPrefs.saveNoteId(this, appWidgetId, noteId)
         val verify = NoteWidgetPrefs.getNoteId(this, appWidgetId)
 

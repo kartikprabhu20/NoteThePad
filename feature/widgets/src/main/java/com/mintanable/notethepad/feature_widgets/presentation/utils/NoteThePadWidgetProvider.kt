@@ -32,9 +32,9 @@ class SingleNoteWidgetReceiver : GlanceAppWidgetReceiver() {
         // Handle pending note if any
         appWidgetIds.forEach { appWidgetId ->
             val existingNoteId = NoteWidgetPrefs.getNoteId(context, appWidgetId)
-            if (existingNoteId == -1L) {
+            if (existingNoteId.isEmpty()) {
                 val pendingNoteId = NoteWidgetPrefs.getPendingNoteId(context)
-                if (pendingNoteId != -1L) {
+                if (pendingNoteId.isNotEmpty()) {
                     NoteWidgetPrefs.saveNoteId(context, appWidgetId, pendingNoteId)
                     NoteWidgetPrefs.clearPendingNoteId(context)
                 }
@@ -45,7 +45,7 @@ class SingleNoteWidgetReceiver : GlanceAppWidgetReceiver() {
         // BroadcastReceiver.goAsync() can only be called once per broadcast.
         // super.onUpdate triggers updateAll() which handles all instances.
         val idsWithNotes = appWidgetIds.filter {
-            NoteWidgetPrefs.getNoteId(context, it) != -1L
+            NoteWidgetPrefs.getNoteId(context, it).isNotEmpty()
         }
 
         if (idsWithNotes.isNotEmpty()) {
@@ -55,8 +55,8 @@ class SingleNoteWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == PINNING_ACTION) {
-            val noteId = intent.getLongExtra(PINNING_NOTE_ID, -1L)
-            if (noteId != -1L) {
+            val noteId = intent.getStringExtra(PINNING_NOTE_ID) ?: ""
+            if (noteId.isNotEmpty()) {
                 NoteWidgetPrefs.savePendingNoteId(context, noteId)
             }
 
@@ -64,7 +64,7 @@ class SingleNoteWidgetReceiver : GlanceAppWidgetReceiver() {
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID
             )
-            if (noteId != -1L && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+            if (noteId.isNotEmpty() && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                 NoteWidgetPrefs.saveNoteId(context, appWidgetId, noteId)
                 NoteWidgetPrefs.clearPendingNoteId(context)
             }

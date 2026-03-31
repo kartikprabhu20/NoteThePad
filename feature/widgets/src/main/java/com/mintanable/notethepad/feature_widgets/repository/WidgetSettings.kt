@@ -9,27 +9,27 @@ object NoteWidgetPrefs {
     private const val KEY_PREFIX = "note_id_"
     private const val PENDING_NOTE_ID = "pending_note_id"
 
-    fun saveNoteId(context: Context, appWidgetId: Int, noteId: Long) {
+    fun saveNoteId(context: Context, appWidgetId: Int, noteId: String) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
-            putLong("$KEY_PREFIX$appWidgetId", noteId)
+            putString("$KEY_PREFIX$appWidgetId", noteId)
         }
     }
 
-    fun getNoteId(context: Context, appWidgetId: Int): Long {
+    fun getNoteId(context: Context, appWidgetId: Int): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getLong("$KEY_PREFIX$appWidgetId", -1L)
+            .getString("$KEY_PREFIX$appWidgetId", "") ?: ""
     }
 
-    fun savePendingNoteId(context: Context, noteId: Long) {
+    fun savePendingNoteId(context: Context, noteId: String) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit(commit = true) {
-                putLong(PENDING_NOTE_ID, noteId)
+                putString(PENDING_NOTE_ID, noteId)
             }
     }
 
-    fun getPendingNoteId(context: Context): Long {
+    fun getPendingNoteId(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getLong(PENDING_NOTE_ID, -1L)
+            .getString(PENDING_NOTE_ID, "") ?: ""
     }
 
     fun clearPendingNoteId(context: Context) {

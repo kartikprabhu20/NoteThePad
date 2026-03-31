@@ -46,7 +46,7 @@ class SingleNoteWidget : GlanceAppWidget() {
         val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
         val noteId = NoteWidgetPrefs.getNoteId(context, appWidgetId)
 
-        val note = if (noteId != -1L) {
+        val note = if (noteId.isNotEmpty()) {
             val entryPoint = EntryPointAccessors.fromApplication(
                 context,
                 WidgetEntryPoint::class.java
@@ -71,7 +71,7 @@ class SingleNoteWidget : GlanceAppWidget() {
                 } else {
                     NoteItem(
                         DetailedNote(
-                            id = 0L,
+                            id = "",
                             title = context.getString(R.string.msg_no_note_found),
                             content = context.getString(R.string.msg_add_notes_prompt),
                             timestamp = System.currentTimeMillis(),
