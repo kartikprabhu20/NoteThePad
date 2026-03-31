@@ -22,7 +22,8 @@ class RescheduleAlarmsWorker @AssistedInject constructor(
         val notesToRemind = repository.getNotesWithFutureReminders(currentTime)
         notesToRemind.forEach { noteWithTags ->
             val note = noteWithTags.noteEntity
-            note.id?.let { scheduler.schedule(id = it, note.title, note.content, note.reminderTime) }
+            val longId = note.id.hashCode().toLong()
+            scheduler.schedule(id = longId, note.title, note.content, note.reminderTime)
         }
 
         return Result.success()
