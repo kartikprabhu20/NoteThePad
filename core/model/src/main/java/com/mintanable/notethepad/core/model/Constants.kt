@@ -10,5 +10,7 @@ object NoteThePadConstants {
 
     const val BACKUP_DB_FILE_NAME = "NoteThePad_Backup.db"
 
-    const val SUPA_SYNC_SORKER = "supa_sync_worker"
+    const val SUPA_SYNC_WORKER = "supa_sync_worker"
+    const val SUPA_FETCH_WORKER = "supa_fetch_worker"
+
 }

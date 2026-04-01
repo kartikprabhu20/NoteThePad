@@ -298,6 +298,7 @@ class SettingsViewModel @Inject constructor(
             dataStore.updateSupaSync(enabled)
             if (enabled) {
                 noteRepository.pullFromCloud()
+                noteRepository.triggerSync()
 //                noteRepository.startRealtimeSync()
             }
         }

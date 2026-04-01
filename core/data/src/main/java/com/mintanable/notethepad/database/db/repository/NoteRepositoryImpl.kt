@@ -10,7 +10,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.mintanable.notethepad.auth.repository.AuthRepository
-import com.mintanable.notethepad.core.model.NoteThePadConstants.SUPA_SYNC_SORKER
+import com.mintanable.notethepad.core.model.NoteThePadConstants.SUPA_FETCH_WORKER
+import com.mintanable.notethepad.core.model.NoteThePadConstants.SUPA_SYNC_WORKER
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
@@ -19,7 +20,6 @@ import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.NoteTagCrossRef
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.database.db.entity.TagEntity
-import com.mintanable.notethepad.database.db.util.toEntity
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -158,7 +158,28 @@ class NoteRepositoryImpl @Inject constructor(
             .build()
 
         workManager.enqueueUniqueWork(
-            SUPA_SYNC_SORKER,
+            SUPA_SYNC_WORKER,
+            ExistingWorkPolicy.KEEP,
+            syncRequest
+        )
+    }
+
+    private fun enqueueFetch() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncRequest = OneTimeWorkRequestBuilder<SupaFetchWorker>()
+            .setConstraints(constraints)
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                WorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+
+        workManager.enqueueUniqueWork(
+            SUPA_FETCH_WORKER,
             ExistingWorkPolicy.KEEP,
             syncRequest
         )
@@ -239,44 +260,9 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun pullFromCloud() {
-        val user = authRepository.getSignedInFirebaseUser().first()
-        val userId = user?.uid ?: return
-        
-        supabaseSyncService.setSyncing(true)
-        try {
-            val remoteNotes = supabaseSyncService.fetchNotes(userId)
-            val remoteTags = supabaseSyncService.fetchTags(userId)
-            val remoteRefs = supabaseSyncService.fetchCrossRefs(userId)
-
-            Log.d("kptest", "remoteNotes size: ${remoteNotes.size}")
-            Log.d("kptest", "remoteTags size: ${remoteTags.size}")
-            Log.d("kptest", "remoteRefs size: ${remoteRefs.size}")
-
-            db.withTransaction {
-                remoteNotes.forEach { dto ->
-                    val local = noteDao.getNoteById(dto.id)
-                    if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
-                        val rowid = noteDao.inserNote(dto.toEntity())
-                        if(rowid == -1L)
-                            noteDao.updateNote(dto.toEntity())
-                    }
-                }
-                remoteTags.forEach { dto ->
-                    val local = tagDao.getTagById(dto.tagId)
-                    if (local == null || dto.lastUpdateTime > local.lastUpdateTime) {
-                        val rowid = tagDao.insertTag(dto.toEntity())
-                        if(rowid == -1L)
-                            tagDao.updateTag(dto.toEntity())
-                    }
-                }
-                remoteRefs.forEach { dto ->
-                    noteDao.insertNoteTagCrossRef(dto.toEntity())
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("Sync", "Pull failed: ${e.message}")
-        } finally {
-            supabaseSyncService.setSyncing(false)
+        val settings = userPreferencesRepository.settingsFlow.first()
+        if (settings.supaSyncEnabled) {
+            enqueueFetch()
         }
     }
 
