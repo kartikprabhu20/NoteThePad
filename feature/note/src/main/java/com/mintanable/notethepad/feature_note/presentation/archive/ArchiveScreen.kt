@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.archive
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +24,20 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mintanable.notethepad.feature_note.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArchiveScreen(
     onBackPressed: () -> Unit,
+    isDarkTheme: Boolean = false,
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     val deletedNotes by viewModel.deletedNotes.collectAsState()
@@ -48,13 +55,21 @@ fun ArchiveScreen(
         }
     ) { paddingValues ->
         if (deletedNotes.isEmpty()) {
-            Text(
-                "No deleted notes",
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge
-            )
+            val resource =
+                if (isDarkTheme) {
+                    R.drawable.trash_male_dark
+                } else {
+                    R.drawable.trash_male_pastel
+                }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(resource),
+                    contentDescription = stringResource(R.string.content_description_empty_list)
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),

@@ -290,7 +290,10 @@ class MainActivity : AppCompatActivity() {
                                 CalendarScreen(navController = navController)
                             }
                             composable(route = Screen.ArchiveScreen.route) {
-                                ArchiveScreen(onBackPressed = { navController.navigateUp() })
+                                ArchiveScreen(
+                                    onBackPressed = { navController.navigateUp() },
+                                    isDarkTheme = isDarkTheme,
+                                )
                             }
                         }
                     }
