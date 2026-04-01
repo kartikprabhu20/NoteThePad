@@ -58,7 +58,8 @@ class DetailedNoteMapper @Inject constructor(
             checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(noteEntity.content) else emptyList(),
             isCheckboxListAvailable = isCheckbox,
             tagEntities = tagEntities,
-            backgroundImage = noteEntity.backgroundImage
+            backgroundImage = noteEntity.backgroundImage,
+            lastUpdateTime = noteEntity.lastUpdateTime
         )
     }
 }

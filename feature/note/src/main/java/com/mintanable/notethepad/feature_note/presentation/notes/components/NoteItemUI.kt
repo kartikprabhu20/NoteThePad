@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.components.drawNoteShape
 import com.mintanable.notethepad.components.drawNoteWithImage
@@ -55,11 +56,14 @@ import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.RedOrange
 import com.mintanable.notethepad.theme.ThemePreviews
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun NoteItemUI(
     note: DetailedNote,
-    modifier:Modifier=Modifier,
+    modifier: Modifier = Modifier,
     noteShape: NoteShape = NoteShape.DEFAULT,
     enableDeleteIcon: Boolean = true,
     onDeleteClick: () -> Unit,
@@ -69,10 +73,11 @@ fun NoteItemUI(
     isDarkTheme: Boolean = false
 ) {
     Box(
-        modifier=modifier.height(IntrinsicSize.Min)
-    ){
+        modifier = modifier.height(IntrinsicSize.Min)
+    ) {
         val resolvedColor = NoteColors.resolveDisplayColor(note.color, isDarkTheme).toArgb()
-        val resolvedBackgroundRes = NoteColors.resolveBackgroundImage(note.backgroundImage, isDarkTheme)
+        val resolvedBackgroundRes =
+            NoteColors.resolveBackgroundImage(note.backgroundImage, isDarkTheme)
         val hasBackgroundImage = note.backgroundImage != -1
         val imagePainter = if (hasBackgroundImage) {
             painterResource(id = resolvedBackgroundRes)
@@ -82,7 +87,12 @@ fun NoteItemUI(
 
         Canvas(modifier = Modifier.matchParentSize()) {
             if (hasBackgroundImage) {
-                drawNoteWithImage(noteShape, noteColorInt = resolvedColor, imagePainter = imagePainter, isDarkTheme=isDarkTheme)
+                drawNoteWithImage(
+                    noteShape,
+                    noteColorInt = resolvedColor,
+                    imagePainter = imagePainter,
+                    isDarkTheme = isDarkTheme
+                )
             } else {
                 drawNoteShape(noteShape, resolvedColor)
             }
@@ -112,9 +122,22 @@ fun NoteItemUI(
                             animatedVisibilityScope = animatedVisibilityScope
                         )
                 )
+
+                if (note.lastUpdateTime > 0L) {
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                            .format(Date(note.lastUpdateTime)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if(!note.isCheckboxListAvailable){
+                if (!note.isCheckboxListAvailable) {
                     val contentAnnotated = remember(note.content) {
                         RichTextAnnotator.toAnnotatedString(RichTextSerializer.deserialize(note.content))
                     }
@@ -131,15 +154,15 @@ fun NoteItemUI(
                             )
                     )
                 } else {
-                    SimpleCheckboxList( checklist = note.checkListItems )
+                    SimpleCheckboxList(checklist = note.checkListItems)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
-                ){
-                    if(note.imageUris.isNotEmpty()){
+                ) {
+                    if (note.imageUris.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Default.Collections,
                             contentDescription = stringResource(R.string.content_description_images_attached),
@@ -147,7 +170,7 @@ fun NoteItemUI(
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
-                    if(note.audioAttachments.isNotEmpty()){
+                    if (note.audioAttachments.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Default.Mic,
                             contentDescription = stringResource(R.string.content_description_audio_attached),
@@ -155,9 +178,9 @@ fun NoteItemUI(
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
-                    if(note.reminderTime > -1){
+                    if (note.reminderTime > -1) {
                         Icon(
-                            imageVector = if(note.reminderTime> System.currentTimeMillis())
+                            imageVector = if (note.reminderTime > System.currentTimeMillis())
                                 Icons.Default.Notifications
                             else
                                 Icons.Default.NotificationsOff,
@@ -167,7 +190,7 @@ fun NoteItemUI(
                         )
                     }
 
-                    if(note.checkListItems.isNotEmpty()){
+                    if (note.checkListItems.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Default.Checklist,
                             contentDescription = stringResource(R.string.content_description_checkboxes_available),
@@ -176,7 +199,7 @@ fun NoteItemUI(
                         )
                     }
 
-                    if(note.tagEntities.isNotEmpty()){
+                    if (note.tagEntities.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Label,
                             contentDescription = stringResource(R.string.content_description_tags_available),
@@ -187,10 +210,12 @@ fun NoteItemUI(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if(enableDeleteIcon) {
+                    if (enableDeleteIcon) {
                         IconButton(
                             onClick = onPinClick,
-                            modifier = Modifier.size(24.dp).padding(2.dp)
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(2.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PushPin,
@@ -223,7 +248,11 @@ fun NoteItemUIPreviewCheckboxes() {
     val isDark = isSystemInDarkTheme()
     NoteThePadTheme(darkTheme = isDark) {
         SharedTransitionLayout {
-            AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
+            AnimatedContent(
+                targetState = true,
+                label = "preview",
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) { isVisible ->
                 if (isVisible) {
                     Column(
                         modifier = Modifier
@@ -238,11 +267,12 @@ fun NoteItemUIPreviewCheckboxes() {
                                 color = RedOrange.toArgb(),
                                 id = "1",
                                 imageUris = listOf("image"),
-                                audioAttachments = listOf(Attachment("x",123)),
+                                audioAttachments = listOf(Attachment("x", 123)),
                                 reminderTime = 1,
                                 checkListItems = listOf(CheckboxItem(text = "abc")),
                                 isCheckboxListAvailable = true,
-                                tagEntities = listOf(TagEntity("abc"))
+                                tagEntities = listOf(TagEntity("abc")),
+                                lastUpdateTime = 1775018420480
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},
@@ -265,7 +295,11 @@ fun NoteItemUIPreview() {
     val isDark = isSystemInDarkTheme()
     NoteThePadTheme(darkTheme = isDark) {
         SharedTransitionLayout {
-            AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
+            AnimatedContent(
+                targetState = true,
+                label = "preview",
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) { isVisible ->
                 if (isVisible) {
                     Column(
                         modifier = Modifier
@@ -280,9 +314,10 @@ fun NoteItemUIPreview() {
                                 color = RedOrange.toArgb(),
                                 id = "1",
                                 imageUris = listOf("image"),
-                                audioAttachments = listOf(Attachment("x",123)),
+                                audioAttachments = listOf(Attachment("x", 123)),
                                 reminderTime = 1,
-                                tagEntities = listOf(TagEntity("abc"))
+                                tagEntities = listOf(TagEntity("abc")),
+                                lastUpdateTime = 1775018420480
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},
@@ -305,7 +340,11 @@ fun NoteItemUIBackgrroundImagePreview() {
     val isDark = isSystemInDarkTheme()
     NoteThePadTheme(darkTheme = isDark) {
         SharedTransitionLayout {
-            AnimatedContent(targetState = true, label = "preview", modifier = Modifier.background(MaterialTheme.colorScheme.surface)) { isVisible ->
+            AnimatedContent(
+                targetState = true,
+                label = "preview",
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) { isVisible ->
                 if (isVisible) {
                     Column(
                         modifier = Modifier
@@ -320,10 +359,11 @@ fun NoteItemUIBackgrroundImagePreview() {
                                 color = -1,
                                 id = "1",
                                 imageUris = listOf("image"),
-                                audioAttachments = listOf(Attachment("x",123)),
+                                audioAttachments = listOf(Attachment("x", 123)),
                                 reminderTime = 1,
                                 tagEntities = listOf(TagEntity("abc")),
-                                backgroundImage = 2
+                                backgroundImage = 2,
+                                lastUpdateTime = 1775018420480
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},

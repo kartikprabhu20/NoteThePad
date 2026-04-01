@@ -15,7 +15,8 @@ data class DetailedNote (
     val checkListItems: List<CheckboxItem> = emptyList(),
     val isCheckboxListAvailable: Boolean = false,
     val tagEntities: List<TagEntity> = emptyList(),
-    val backgroundImage: Int = -1
+    val backgroundImage: Int = -1,
+    val lastUpdateTime: Long = 0L
 ){
     fun toNote(): NoteEntity{
         val json = JSONObject()
