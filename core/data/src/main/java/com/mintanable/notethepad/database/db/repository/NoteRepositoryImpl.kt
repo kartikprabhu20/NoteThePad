@@ -2,30 +2,30 @@ package com.mintanable.notethepad.database.db.repository
 
 import android.util.Log
 import androidx.room.withTransaction
-import com.mintanable.notethepad.database.db.entity.NoteEntity
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.model.note.NoteOrder
+import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
+import com.mintanable.notethepad.database.db.DatabaseManager
+import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.NoteTagCrossRef
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
-import com.mintanable.notethepad.core.model.note.OrderType
-import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.entity.TagEntity
+import com.mintanable.notethepad.database.db.util.toDto
+import com.mintanable.notethepad.database.db.util.toEntity
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-import javax.inject.Singleton import com.mintanable.notethepad.auth.repository.AuthRepository
-import com.mintanable.notethepad.core.network.sync.NoteTagCrossRefDto
-import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
-import com.mintanable.notethepad.core.network.sync.TagDto
-import com.mintanable.notethepad.database.db.util.toDto
-import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import javax.inject.Singleton
 
 @Singleton
 class NoteRepositoryImpl @Inject constructor(
@@ -36,6 +36,8 @@ class NoteRepositoryImpl @Inject constructor(
 ) : NoteRepository {
 
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    override val isSyncing: Flow<Boolean> = supabaseSyncService.isSyncing
 
     // Helper properties to always get the LATEST instance
     private val noteDao get() = dbManager.database.noteDao()
@@ -236,4 +238,80 @@ class NoteRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun pullFromCloud() {
+        val user = authRepository.getSignedInFirebaseUser().first()
+        val userId = user?.uid ?: return
+        
+        supabaseSyncService.setSyncing(true)
+        try {
+            val remoteNotes = supabaseSyncService.fetchNotes(userId)
+            val remoteTags = supabaseSyncService.fetchTags(userId)
+            val remoteRefs = supabaseSyncService.fetchCrossRefs(userId)
+
+            db.withTransaction {
+                remoteNotes.forEach { dto ->
+                    val local = noteDao.getNoteById(dto.id)
+                    if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
+                        noteDao.inserNote(dto.toEntity())
+                        noteDao.updateNote(dto.toEntity())
+                    }
+                }
+                remoteTags.forEach { dto ->
+                    val local = tagDao.getTagById(dto.tagId)
+                    if (local == null || dto.lastUpdateTime > local.lastUpdateTime) {
+                        tagDao.insertTag(dto.toEntity())
+                        tagDao.updateTag(dto.toEntity())
+                    }
+                }
+                remoteRefs.forEach { dto ->
+                    noteDao.insertNoteTagCrossRef(dto.toEntity())
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("Sync", "Pull failed: ${e.message}")
+        } finally {
+            supabaseSyncService.setSyncing(false)
+        }
+    }
+
+    override fun startRealtimeSync() {
+//        repositoryScope.launch {
+//            val user = authRepository.getSignedInFirebaseUser().first()
+//            val userId = user?.uid ?: return@launch
+//            val settings = userPreferencesRepository.settingsFlow.first()
+//            if(!settings.supaSyncEnabled) return@launch
+//
+//            val client = supabaseSyncService.getSupabaseClient()
+//            val channel = client.channel("db-changes")
+//
+//            val noteFlow = channel.postgresChangeFlow<PostgrestAction.Update>(schema = "public") {
+//                table = "note_entity"
+//            }
+//            val noteInsertFlow = channel.postgresChangeFlow<PostgrestAction.Insert>(schema = "public") {
+//                table = "note_entity"
+//            }
+//
+//            launch {
+//                noteFlow.collect { action -> handleNoteChange(action.record, userId) }
+//            }
+//            launch {
+//                noteInsertFlow.collect { action -> handleNoteChange(action.record, userId) }
+//            }
+//
+//            // Similarly for tags and refs... (simplified for brevity but including base logic)
+//            // In a real app, I'd subscribe to all tables.
+//
+//            channel.subscribe()
+//        }
+    }
+
+//    private suspend fun handleNoteChange(dto: NoteDto, currentUserId: String) {
+//        if (dto.userId != currentUserId) return
+//        val local = noteDao.getNoteById(dto.id)
+//        if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
+//            noteDao.inserNote(dto.toEntity())
+//            noteDao.updateNote(dto.toEntity())
+//        }
+//    }
 }

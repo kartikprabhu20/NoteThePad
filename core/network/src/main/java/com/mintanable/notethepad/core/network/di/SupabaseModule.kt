@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.core.network.di
 
+import com.mintanable.notethepad.core.network.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,8 +15,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object SupabaseModule {
 
-    private const val SUPABASE_URL = "YOUR_SUPABASE_URL" // Placeholder
-    private const val SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY" // Placeholder
+    private const val SUPABASE_URL = BuildConfig.SUPABASE_URL
+    private const val SUPABASE_ANON_KEY = BuildConfig.SUPABASE_ANON_KEY
 
     @Provides
     @Singleton

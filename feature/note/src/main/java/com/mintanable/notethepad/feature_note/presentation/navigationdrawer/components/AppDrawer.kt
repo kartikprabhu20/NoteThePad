@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -72,7 +73,8 @@ fun AppDrawer(
     onItemSelected: (Int, DrawerItem) -> Unit,
     onTagDeleted: (TagEntity) -> Unit,
     onTagEdited: (TagEntity) -> Unit,
-    appVersionProvider: AppVersionProvider?
+    appVersionProvider: AppVersionProvider?,
+    isSyncing: Boolean = false
 ) {
     var isLabelEditing by rememberSaveable { mutableStateOf(false) }
     var pendingEdits by rememberSaveable { mutableStateOf(mapOf<String, String>()) }
@@ -80,7 +82,7 @@ fun AppDrawer(
     ModalDrawerSheet(modifier = modifier) {
 
         Column(modifier = Modifier.fillMaxHeight()) {
-            DrawerHeader(user = user, modifier = Modifier.fillMaxWidth())
+            DrawerHeader(user = user, modifier = Modifier.fillMaxWidth(), isSyncing = isSyncing)
             Spacer(modifier = Modifier.height(8.dp))
 
             LazyColumn(
@@ -225,21 +227,32 @@ fun AppDrawer(
 @Composable
 fun DrawerHeader(
     modifier: Modifier = Modifier,
-    user: User?
+    user: User?,
+    isSyncing: Boolean = false
 ) {
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(12.dp))
 
-        Image(
-            painter = painterResource(R.drawable.notethepad_logo),
-            contentDescription = stringResource(R.string.content_description_empty_list),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(vertical = 16.dp, horizontal = 32.dp),
-//            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.notethepad_logo),
+                contentDescription = stringResource(R.string.content_description_empty_list),
+                modifier = Modifier
+                    .height(72.dp)
+                    .padding(vertical = 16.dp)
+            )
+            if (isSyncing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp).padding(4.dp),
+                    strokeWidth = 2.dp
+                )
+            }
+        }
 
         user?.photoUrl?.let { url ->
             if (url.isNotBlank()) {
@@ -349,7 +362,9 @@ fun PreviewDrawHeader(){
                 "test@gmail.com",
                 "testUser",
                 "testuri",
-                false))
+                false),
+            isSyncing = true
+        )
     }
 }
 

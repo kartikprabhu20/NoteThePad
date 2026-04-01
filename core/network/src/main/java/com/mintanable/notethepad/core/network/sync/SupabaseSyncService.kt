@@ -2,52 +2,25 @@ package com.mintanable.notethepad.core.network.sync
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
-
-@Serializable
-data class NoteDto(
-    val id: String,
-    val title: String,
-    val content: String,
-    val timestamp: Long,
-    val color: Int,
-    val imageUris: List<String>,
-    val audioUris: List<String>,
-    val reminderTime: Long,
-    val audioTranscriptions: String,
-    val backgroundImage: Int,
-    val lastUpdateTime: Long,
-    val userId: String?,
-    val isDeleted: Boolean
-)
-
-@Serializable
-data class TagDto(
-    val tagName: String,
-    val tagId: String,
-    val lastUpdateTime: Long,
-    val userId: String?,
-    val isDeleted: Boolean
-)
-
-@Serializable
-data class NoteTagCrossRefDto(
-    val noteId: String,
-    val tagId: String,
-    val userId: String?,
-    val isDeleted: Boolean,
-    val lastUpdateTime: Long
-)
 
 @Singleton
 class SupabaseSyncService @Inject constructor(
     private val supabaseClient: SupabaseClient
 ) {
+    private val _isSyncing = MutableStateFlow(false)
+    val isSyncing = _isSyncing.asStateFlow()
+
+    fun setSyncing(syncing: Boolean) {
+        _isSyncing.value = syncing
+    }
+
     suspend fun syncNote(noteDto: NoteDto) {
         if (noteDto.userId != null) {
-            supabaseClient.postgrest["NoteEntity"].upsert(noteDto)
+            supabaseClient.postgrest["note_entity"].upsert(noteDto)
         }
     }
 
@@ -62,4 +35,36 @@ class SupabaseSyncService @Inject constructor(
             supabaseClient.postgrest["note_tag_cross_ref"].upsert(crossRefDto)
         }
     }
+
+    suspend fun fetchNotes(userId: String): List<NoteDto> {
+        return supabaseClient.postgrest["note_entity"]
+            .select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }
+            .decodeList<NoteDto>()
+    }
+
+    suspend fun fetchTags(userId: String): List<TagDto> {
+        return supabaseClient.postgrest["tag_table"]
+            .select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }
+            .decodeList<TagDto>()
+    }
+
+    suspend fun fetchCrossRefs(userId: String): List<NoteTagCrossRefDto> {
+        return supabaseClient.postgrest["note_tag_cross_ref"]
+            .select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }
+            .decodeList<NoteTagCrossRefDto>()
+    }
+
+    fun getSupabaseClient() = supabaseClient
 }

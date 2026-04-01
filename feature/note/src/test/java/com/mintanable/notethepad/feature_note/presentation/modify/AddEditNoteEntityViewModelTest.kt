@@ -111,7 +111,7 @@ class AddEditNoteViewModelTest {
 
     @Test
     fun `When Note ID is passed, UI State loads correct data`() = runTest {
-        val noteId = 1L
+        val noteId = "1L"
         val realSavedStateHandle = SavedStateHandle(mapOf("noteId" to noteId))
 
         val detailedNote = DetailedNote(
@@ -360,7 +360,7 @@ class AddEditNoteViewModelTest {
             noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } coAnswers {
             delay(100)
-            Result.success(1L)
+            Result.success("1L")
         }
         viewModel.eventFlow.test {
             viewModel.uiState.test {
@@ -398,7 +398,7 @@ class AddEditNoteViewModelTest {
             noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } coAnswers {
             delay(100)
-            Result.success(1L)
+            Result.success("1L")
         }
         viewModel.eventFlow.test {
             viewModel.uiState.test {
@@ -444,7 +444,7 @@ class AddEditNoteViewModelTest {
             noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } coAnswers {
             delay(100)
-            Result.success(1L)
+            Result.success("1L")
         }
         viewModel.eventFlow.test {
             viewModel.uiState.test {
@@ -563,7 +563,7 @@ class AddEditNoteViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `CancelReminder updates state and cancels scheduled alarm`() = runTest {
-        val noteId = 1L
+        val noteId = "1L"
         val handle = SavedStateHandle(mapOf("noteId" to noteId))
         val detailedNote = DetailedNote(
             id = noteId,
@@ -583,7 +583,7 @@ class AddEditNoteViewModelTest {
         viewModel.onEvent(AddEditNoteEvent.CancelReminder)
 
         assertThat(viewModel.uiState.value.reminderTime).isEqualTo(-1L)
-        verify(exactly = 1) { reminderScheduler.cancel(noteId) }
+        verify(exactly = 1) { reminderScheduler.cancel(noteId.hashCode().toLong()) }
     }
 
     // ── Checkbox ────────────────────────────────────────────────────────

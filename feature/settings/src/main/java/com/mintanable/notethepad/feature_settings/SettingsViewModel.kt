@@ -31,6 +31,7 @@ import com.mintanable.notethepad.feature_backup.domain.use_case.DownloadBackup
 import com.mintanable.notethepad.feature_backup.domain.use_case.ScheduleBackupUseCase
 import com.mintanable.notethepad.feature_backup.domain.use_case.ClearAppDataUseCase
 import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.feature_settings.presentation.BackupUiState
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsState
@@ -78,7 +79,8 @@ class SettingsViewModel @Inject constructor(
     private val getSupportedAiModels: GetSupportedAiModels,
     private val clearAppDataUseCase: ClearAppDataUseCase,
     private val getAudioModelStatus: GetAudioModelStatus,
-    private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase
+    private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase,
+    private val noteRepository: NoteRepository
 ) : ViewModel() {
 
     companion object {
@@ -292,7 +294,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun updateSupaSync(enabled: Boolean) {
-        viewModelScope.launch { dataStore.updateSupaSync(enabled) }
+        viewModelScope.launch { 
+            dataStore.updateSupaSync(enabled)
+            if (enabled) {
+                noteRepository.pullFromCloud()
+//                noteRepository.startRealtimeSync()
+            }
+        }
     }
 
     private fun signOut() {

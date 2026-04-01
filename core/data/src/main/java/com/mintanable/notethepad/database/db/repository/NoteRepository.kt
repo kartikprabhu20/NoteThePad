@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface NoteRepository {
+    val isSyncing: Flow<Boolean>
     fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>>
     suspend fun getNoteById(id: String): NoteWithTags?
     suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): String
@@ -25,4 +26,6 @@ interface NoteRepository {
     suspend fun getTagByName(tagName: String): TagEntity?
     suspend fun checkpoint(): File
     suspend fun swapDatabase(dbFile: File)
+    suspend fun pullFromCloud()
+    fun startRealtimeSync()
 }

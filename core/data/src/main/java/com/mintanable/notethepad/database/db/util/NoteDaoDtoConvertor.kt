@@ -15,3 +15,18 @@ fun NoteEntity.toDto() = NoteDto(
 
 fun TagEntity.toDto() = TagDto(tagName, tagId, lastUpdateTime, userId, isDeleted)
 fun NoteTagCrossRef.toDto() = NoteTagCrossRefDto(noteId, tagId, userId, isDeleted, lastUpdateTime)
+
+fun NoteDto.toEntity() = NoteEntity(
+    id = id, title = title, content = content, timestamp = timestamp, color = color,
+    imageUris = imageUris, audioUris = audioUris, reminderTime = reminderTime,
+    audioTranscriptions = audioTranscriptions, backgroundImage = backgroundImage,
+    lastUpdateTime = lastUpdateTime, userId = userId, isDeleted = isDeleted
+)
+
+fun TagDto.toEntity() = TagEntity(
+    tagName = tagName, tagId = tagId, lastUpdateTime = lastUpdateTime, userId = userId, isDeleted = isDeleted
+)
+
+fun NoteTagCrossRefDto.toEntity() = NoteTagCrossRef(
+    noteId = noteId, tagId = tagId, userId = userId, isDeleted = isDeleted, lastUpdateTime = lastUpdateTime
+)

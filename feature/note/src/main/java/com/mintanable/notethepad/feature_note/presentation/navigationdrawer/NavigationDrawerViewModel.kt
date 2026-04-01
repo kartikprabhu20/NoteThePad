@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+import kotlinx.coroutines.flow.combine
+
 @HiltViewModel
 class NavigationDrawerViewModel @Inject constructor(
     private val getNavigationDrawerItems: GetNavigationDrawerItems,
@@ -31,12 +33,16 @@ class NavigationDrawerViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val navigationDrawerState: StateFlow<NavigationDrawerState> = _isLoggedIn
-        .flatMapLatest { loggedIn ->
-            getNavigationDrawerItems(loggedIn)
-        }
-        .map { items ->
-            NavigationDrawerState(items = items)
+    val navigationDrawerState: StateFlow<NavigationDrawerState> = combine(
+        _isLoggedIn,
+        noteRepository.isSyncing
+    ) { loggedIn, syncing ->
+        Pair(loggedIn, syncing)
+    }
+        .flatMapLatest { (loggedIn, syncing) ->
+            getNavigationDrawerItems(loggedIn).map { items ->
+                NavigationDrawerState(items = items, isSyncing = syncing)
+            }
         }
         .stateIn(
             scope = viewModelScope,
@@ -50,5 +56,6 @@ class NavigationDrawerViewModel @Inject constructor(
 }
 
 data class NavigationDrawerState(
-    val items: List<DrawerItem> = emptyList()
+    val items: List<DrawerItem> = emptyList(),
+    val isSyncing: Boolean = false
 )

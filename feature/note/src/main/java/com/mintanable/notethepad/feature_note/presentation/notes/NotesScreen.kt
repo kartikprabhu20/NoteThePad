@@ -168,6 +168,7 @@ fun NotesScreen(
                 onTagDeleted = { tag -> notesViewModel.onEvent(NotesEvent.DeleteLabel(tag)) },
                 onTagEdited = { tag -> notesViewModel.onEvent(NotesEvent.EditLabel(tag)) },
                 appVersionProvider = appVersionProvider,
+                isSyncing = navigationDrawerState.isSyncing
             )
         }
     ) {
