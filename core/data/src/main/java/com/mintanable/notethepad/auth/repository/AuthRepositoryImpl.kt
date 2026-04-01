@@ -55,6 +55,10 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getFreshFirebaseToken(): String? {
+        return firebaseAuth.currentUser?.getIdToken(false)?.await()?.token
+    }
+
     override suspend fun signOut() {
         try {
             firebaseAuth.signOut()

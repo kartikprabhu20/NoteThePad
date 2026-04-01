@@ -47,8 +47,12 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
 
     // Supabase
-    implementation "io.github.jan-tennert.supabase:postgrest-kt:2.6.0"
-    implementation "io.github.jan-tennert.supabase:realtime-kt:2.6.0"
+    def supabaseVersion = "2.6.0"
+    implementation(platform("io.github.jan-tennert.supabase:bom:$supabaseVersion"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt")
+
     implementation "io.ktor:ktor-client-android:2.3.12"
 
     testImplementation 'junit:junit:4.13.2'

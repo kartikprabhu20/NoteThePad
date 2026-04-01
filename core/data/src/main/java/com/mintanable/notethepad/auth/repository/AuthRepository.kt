@@ -8,6 +8,7 @@ interface AuthRepository {
     suspend fun signInWithGoogle(token: String): Result<User>
     suspend fun signInWithFacebook(token: String): Result<User>
     fun getSignedInFirebaseUser(): Flow<User?>
+    suspend fun getFreshFirebaseToken(): String?
     suspend fun signOut()
     fun isUserSignedInWithGoogle(): Boolean
 }

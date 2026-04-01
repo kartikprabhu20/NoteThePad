@@ -1,7 +1,12 @@
 package com.mintanable.notethepad.core.network.sync
 
+import android.util.Log
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
@@ -18,21 +23,83 @@ class SupabaseSyncService @Inject constructor(
         _isSyncing.value = syncing
     }
 
-    suspend fun syncNote(noteDto: NoteDto) {
-        if (noteDto.userId != null) {
-            supabaseClient.postgrest["note_entity"].upsert(noteDto)
+    suspend fun ensureAuthenticated(fireBaseToken: String?) {
+        try {
+            if (fireBaseToken != null) {
+                supabaseClient.auth.importAuthToken(accessToken = fireBaseToken, refreshToken = "")
+                supabaseClient.auth.importSession(
+                    UserSession(
+                        accessToken = fireBaseToken,
+                        refreshToken = "",
+                        expiresIn = 3600,
+                        tokenType = "bearer",
+                        user = null
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("Sync", "Failed to refresh Firebase token: ${e.message}")
         }
     }
 
-    suspend fun syncTag(tagDto: TagDto) {
-        if (tagDto.userId != null) {
-            supabaseClient.postgrest["tag_table"].upsert(tagDto)
+    suspend fun syncNote(noteDto: NoteDto): Boolean {
+        Log.d("Sync", "syncNote")
+
+        return try {
+            val result: PostgrestResult = supabaseClient.from("note_entity").upsert(noteDto) {
+                select() //to use decodeAs() later
+            }
+
+            val isSuccess = result.data != "[]" && result.data.isNotEmpty()
+
+            if (isSuccess) {
+                val confirmedNote = result.decodeSingle<NoteDto>()
+                Log.d("Sync", "Server confirmed Note ID: ${confirmedNote.id}")
+            }
+
+            isSuccess
+        } catch (e: Exception) {
+            Log.e("Sync", "Postgrest Error: ${e.message}")
+            false
         }
     }
 
-    suspend fun syncCrossRef(crossRefDto: NoteTagCrossRefDto) {
-        if (crossRefDto.userId != null) {
-            supabaseClient.postgrest["note_tag_cross_ref"].upsert(crossRefDto)
+    suspend fun syncTag(tagDto: TagDto): Boolean {
+        if (tagDto.userId == null) return false
+
+        return try {
+            val result = supabaseClient.from("tag_table").upsert(tagDto) {
+                select()
+            }
+
+            val isSuccess = result.data != "[]" && result.data.isNotEmpty()
+            if (isSuccess) {
+                Log.d("SupabaseSync", "Tag synced: ${tagDto.tagId}")
+            }
+            isSuccess
+        } catch (e: Exception) {
+            Log.e("SupabaseSync", "Failed to sync tag ${tagDto.tagId}: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun syncCrossRef(crossRefDto: NoteTagCrossRefDto): Boolean {
+        if (crossRefDto.userId == null) return false
+
+        return try {
+            val result = supabaseClient.from("note_tag_cross_ref").upsert(crossRefDto) {
+                select()
+            }
+
+            val isSuccess = result.data != "[]" && result.data.isNotEmpty()
+            if (isSuccess) {
+                Log.d("SupabaseSync", "CrossRef synced: Note ${crossRefDto.noteId} <-> Tag ${crossRefDto.tagId}")
+            }
+            isSuccess
+        } catch (e: Exception) {
+            // This often fails if the Note or Tag hasn't reached the server yet
+            Log.e("SupabaseSync", "CrossRef sync failed (Check FK constraints): ${e.message}")
+            false
         }
     }
 

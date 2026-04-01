@@ -63,11 +63,12 @@ class NoteRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             val user = authRepository.getSignedInFirebaseUser().first()
             val userId = user?.uid
-            
+
             val updatedNote = noteEntity.copy(
                 userId = userId,
                 lastUpdateTime = System.currentTimeMillis(),
-                isDeleted = false
+                isDeleted = false,
+                isSynced = false
             )
 
             db.withTransaction {
@@ -106,7 +107,8 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun deleteNote(noteEntity: NoteEntity) {
         val deletedNote = noteEntity.copy(
             isDeleted = true,
-            lastUpdateTime = System.currentTimeMillis()
+            lastUpdateTime = System.currentTimeMillis(),
+            isSynced = false
         )
         noteDao.updateNote(deletedNote)
         syncNote(deletedNote)
@@ -122,7 +124,8 @@ class NoteRepositoryImpl @Inject constructor(
         noteWithTags?.noteEntity?.let {
             val restoredNote = it.copy(
                 isDeleted = false,
-                lastUpdateTime = System.currentTimeMillis()
+                lastUpdateTime = System.currentTimeMillis(),
+                isSynced = false
             )
             noteDao.updateNote(restoredNote)
             syncNote(restoredNote)
@@ -138,43 +141,60 @@ class NoteRepositoryImpl @Inject constructor(
         return noteDao.getDeletedNotes()
     }
 
-    private fun syncNote(note: NoteEntity) {
-        repositoryScope.launch {
-            val settings = userPreferencesRepository.settingsFlow.first()
-            if (settings.supaSyncEnabled && note.userId != null) {
-                try {
-                    supabaseSyncService.syncNote(note.toDto())
-                } catch (e: Exception) {
-                    Log.e("Sync", "Failed to sync note: ${e.message}")
+    private suspend fun syncNote(note: NoteEntity): Boolean {
+        supabaseSyncService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
+        val settings = userPreferencesRepository.settingsFlow.first()
+        if (settings.supaSyncEnabled && note.userId != null) {
+            return try {
+                val result = supabaseSyncService.syncNote(note.toDto())
+
+                if (result) {
+                    noteDao.updateNote(note.copy(isSynced = true))
+                    Log.d("Sync", "Successfully synced tag: ${note.id}")
                 }
+                result
+            } catch (e: Exception) {
+                Log.e("Sync", "Failed to sync note ${note.id}: ${e.message}")
+                false
             }
         }
+        return false
     }
 
-    private fun syncTag(tag: TagEntity) {
-        repositoryScope.launch {
-            val settings = userPreferencesRepository.settingsFlow.first()
-            if (settings.supaSyncEnabled && tag.userId != null) {
-                try {
-                    supabaseSyncService.syncTag(tag.toDto())
-                } catch (e: Exception) {
-                    Log.e("Sync", "Failed to sync tag: ${e.message}")
+    private suspend fun syncTag(tag: TagEntity): Boolean {
+        supabaseSyncService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
+        val settings = userPreferencesRepository.settingsFlow.first()
+        if (settings.supaSyncEnabled && tag.userId != null) {
+            return try {
+                val isSuccess = supabaseSyncService.syncTag(tag.toDto())
+
+                if (isSuccess) {
+                     tagDao.updateTag(tag.copy(isSynced = true))
+                     Log.d("Sync", "Successfully synced tag: ${tag.tagId}")
                 }
+                isSuccess
+            } catch (e: Exception) {
+                Log.e("Sync", "Failed to sync tag ${tag.tagId}: ${e.message}")
+                false
             }
         }
+        return false
     }
 
-    private fun syncCrossRef(crossRef: NoteTagCrossRef) {
-        repositoryScope.launch {
-            val settings = userPreferencesRepository.settingsFlow.first()
-            if (settings.supaSyncEnabled && crossRef.userId != null) {
-                try {
-                    supabaseSyncService.syncCrossRef(crossRef.toDto())
-                } catch (e: Exception) {
-                    Log.e("Sync", "Failed to sync crossRef: ${e.message}")
-                }
+    private suspend fun syncCrossRef(crossRef: NoteTagCrossRef): Boolean {
+        supabaseSyncService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
+        val settings = userPreferencesRepository.settingsFlow.first()
+        if (settings.supaSyncEnabled && crossRef.userId != null) {
+            return try {
+                val isSuccess = supabaseSyncService.syncCrossRef(crossRef.toDto())
+                Log.d("Sync", "${if(isSuccess)"Successfully synced" else "Failed to sync"}  cross-ref: ${crossRef.noteId}")
+                return isSuccess
+            } catch (e: Exception) {
+                Log.e("Sync", "Failed to sync crossRef: ${e.message}")
+                false
             }
         }
+        return false
     }
 
     override suspend fun getNotesWithFutureReminders(currentTime: Long): List<NoteWithTags> {
