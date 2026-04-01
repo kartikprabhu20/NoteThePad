@@ -32,7 +32,9 @@ class DatabaseManager @Inject constructor(
             .addMigrations(
                 NoteDatabase.MIGRATION_10_11,
                 NoteDatabase.MIGRATION_11_12,
-                NoteDatabase.MIGRATION_12_13
+                NoteDatabase.MIGRATION_12_13,
+                NoteDatabase.MIGRATION_13_14,
+                NoteDatabase.MIGRATION_14_15
             )
             .build()
     }

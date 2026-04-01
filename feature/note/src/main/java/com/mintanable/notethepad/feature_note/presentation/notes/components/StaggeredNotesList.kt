@@ -29,7 +29,8 @@ fun StaggeredNotesList(
     onDeleteClicked: (DetailedNote) -> Unit,
     onPinClicked: (DetailedNote) -> Unit,
     enableDeletion: Boolean = true,
-    isDarkTheme: Boolean = false
+    isDarkTheme: Boolean = false,
+    isSyncEnabled: Boolean = false
 ) {
 
     with(sharedTransitionScope) {
@@ -70,7 +71,8 @@ fun StaggeredNotesList(
                     },
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
-                    isDarkTheme = isDarkTheme
+                    isDarkTheme = isDarkTheme,
+                    isSyncEnabled = isSyncEnabled
                 )
             }
         }

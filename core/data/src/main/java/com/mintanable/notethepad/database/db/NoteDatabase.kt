@@ -18,7 +18,7 @@ import com.mintanable.notethepad.database.db.util.NoteConverters
         TagEntity::class,
         NoteTagCrossRef::class
     ],
-    version = 13
+    version = 15
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase : RoomDatabase() {
@@ -118,6 +118,19 @@ abstract class NoteDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_noteId` ON `note_tag_cross_ref` (`noteId`)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_userId` ON `note_tag_cross_ref` (`userId`)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_note_tag_cross_ref_isDeleted` ON `note_tag_cross_ref` (`isDeleted`)")
+            }
+        }
+
+        val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE NoteEntity ADD COLUMN is_synced INTEGER NOT NULL DEFAULT 0")
+
+            }
+        }
+        val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE tag_table ADD COLUMN is_synced INTEGER NOT NULL DEFAULT 0")
+
             }
         }
     }

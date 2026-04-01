@@ -17,6 +17,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettin
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,6 +46,7 @@ class NotesViewModel @Inject constructor(
     private val tagUseCases: TagUseCases,
     getLayoutSettings: GetLayoutSettings,
     getNoteShapeSettings: GetNoteShapeSettings,
+    getSupaSyncSettings: GetSupaSyncSettings,
     private val toggleLayoutSettings: ToggleLayoutSettings,
     private val fileIOUseCases: FileIOUseCases,
     private val dispatchers: DispatcherProvider,
@@ -128,6 +130,13 @@ class NotesViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = NoteShape.DEFAULT
+        )
+
+    val supaSyncEnabled: StateFlow<Boolean> = getSupaSyncSettings()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
         )
 
     fun updateFilter(filter: String, tagId: String = "", tagName: String = "") {

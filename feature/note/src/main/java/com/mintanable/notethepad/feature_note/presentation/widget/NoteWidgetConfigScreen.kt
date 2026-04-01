@@ -25,6 +25,7 @@ fun NoteWidgetConfigScreen(
 ) {
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
+    val supaSyncEnabled by notesViewModel.supaSyncEnabled.collectAsStateWithLifecycle()
 
     SharedTransitionLayout {
 
@@ -46,7 +47,8 @@ fun NoteWidgetConfigScreen(
                             animatedVisibilityScope = this@AnimatedContent,
                             onNoteClicked = onNoteClicked,
                             onDeleteClicked = { },
-                            onPinClicked = { }
+                            onPinClicked = { },
+                            isSyncEnabled = supaSyncEnabled
                         )
                     }
                 }

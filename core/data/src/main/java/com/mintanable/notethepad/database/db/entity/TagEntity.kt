@@ -29,6 +29,9 @@ data class TagEntity(
     @SerialName("is_deleted")
     val isDeleted: Boolean = false,
 
+    @SerialName("is_synced")
+    val isSynced: Boolean = false,
+
     @PrimaryKey
     @SerialName("tag_id")
     val tagId: String = UUID.randomUUID().toString()

@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
@@ -70,7 +72,8 @@ fun NoteItemUI(
     onPinClick: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
-    isDarkTheme: Boolean = false
+    isDarkTheme: Boolean = false,
+    isSyncEnabled: Boolean = false
 ) {
     Box(
         modifier = modifier.height(IntrinsicSize.Min)
@@ -126,13 +129,27 @@ fun NoteItemUI(
                 if (note.lastUpdateTime > 0L) {
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
-                        text = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-                            .format(Date(note.lastUpdateTime)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                                .format(Date(note.lastUpdateTime)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                        )
+
+                        if (isSyncEnabled && !note.isSynced) {
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                imageVector = Icons.Default.CloudOff,
+                                contentDescription = "Sync pending",
+                                modifier = Modifier.size(14.dp).alpha(0.7f),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -363,14 +380,16 @@ fun NoteItemUIBackgrroundImagePreview() {
                                 reminderTime = 1,
                                 tagEntities = listOf(TagEntity("abc")),
                                 backgroundImage = 2,
-                                lastUpdateTime = 1775018420480
+                                lastUpdateTime = 1775018420480,
+                                isSynced = false
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             onDeleteClick = {},
                             onPinClick = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
-                            isDarkTheme = isDark
+                            isDarkTheme = isDark,
+                            isSyncEnabled = true
                         )
                     }
                 }

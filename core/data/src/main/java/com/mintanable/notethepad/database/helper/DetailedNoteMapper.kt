@@ -59,7 +59,8 @@ class DetailedNoteMapper @Inject constructor(
             isCheckboxListAvailable = isCheckbox,
             tagEntities = tagEntities,
             backgroundImage = noteEntity.backgroundImage,
-            lastUpdateTime = noteEntity.lastUpdateTime
+            lastUpdateTime = noteEntity.lastUpdateTime,
+            isSynced = noteEntity.isSynced
         )
     }
 }

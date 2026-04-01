@@ -95,6 +95,7 @@ fun NotesScreen(
     val isFiltered = filterState.filter != NotesFilterType.ALL.filter
     val currentOrder = filterState.order
     val existingTags by navigationDrawerViewModel.existingTags.collectAsStateWithLifecycle()
+    val supaSyncEnabled by notesViewModel.supaSyncEnabled.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
 
@@ -290,7 +291,8 @@ fun NotesScreen(
                                     )
                                 },
                                 onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) },
-                                isDarkTheme = isDarkTheme
+                                isDarkTheme = isDarkTheme,
+                                isSyncEnabled = supaSyncEnabled
                             )
                         } else {
                             val resource =

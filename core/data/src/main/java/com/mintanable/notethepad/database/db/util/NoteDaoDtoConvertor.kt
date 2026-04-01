@@ -20,7 +20,8 @@ fun NoteDto.toEntity() = NoteEntity(
     id = id, title = title, content = content, timestamp = timestamp, color = color,
     imageUris = imageUris, audioUris = audioUris, reminderTime = reminderTime,
     audioTranscriptions = audioTranscriptions, backgroundImage = backgroundImage,
-    lastUpdateTime = lastUpdateTime, userId = userId, isDeleted = isDeleted
+    lastUpdateTime = lastUpdateTime, userId = userId, isDeleted = isDeleted,
+    isSynced = true
 )
 
 fun TagDto.toEntity() = TagEntity(
