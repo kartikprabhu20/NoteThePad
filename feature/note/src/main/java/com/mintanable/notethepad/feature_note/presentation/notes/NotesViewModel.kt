@@ -12,11 +12,9 @@ import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -44,10 +42,8 @@ class NotesViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val noteUseCases: NoteUseCases,
     private val tagUseCases: TagUseCases,
-    getLayoutSettings: GetLayoutSettings,
     getNoteShapeSettings: GetNoteShapeSettings,
     getSupaSyncSettings: GetSupaSyncSettings,
-    private val toggleLayoutSettings: ToggleLayoutSettings,
     private val fileIOUseCases: FileIOUseCases,
     private val dispatchers: DispatcherProvider,
     private val widgetRefresher: WidgetRefresher
@@ -117,13 +113,6 @@ class NotesViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
-
-    val isGridViewEnabled: StateFlow<Boolean> = getLayoutSettings()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
-        )
 
     val noteShape: StateFlow<NoteShape> = getNoteShapeSettings()
         .stateIn(
@@ -223,10 +212,6 @@ class NotesViewModel @Inject constructor(
             }
 
         }
-    }
-
-    fun toggleGridView(enabled: Boolean) {
-        viewModelScope.launch { toggleLayoutSettings(enabled) }
     }
 
     fun refreshWidget() {

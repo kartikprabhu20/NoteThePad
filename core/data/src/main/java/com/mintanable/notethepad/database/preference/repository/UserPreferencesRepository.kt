@@ -29,7 +29,6 @@ class UserPreferencesRepository @Inject constructor(
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val BACKUP_ENABLED = booleanPreferencesKey("backup_enabled")
-        val GRID_VIEW_ENABLED = booleanPreferencesKey("gridview_enabled")
         val BACKUP_INTERVAL = stringPreferencesKey("backup_interval")
         val BACKUP_TIME_HOUR = intPreferencesKey("backup_time_hour")
         val BACKUP_TIME_MINUTE = intPreferencesKey("backup_time_minute")
@@ -47,7 +46,6 @@ class UserPreferencesRepository @Inject constructor(
             val notifications = preferences[PreferencesKeys.NOTIFICATIONS_ENABLED] ?: true
             val theme = preferences[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name
             val backupEnabled = preferences[PreferencesKeys.BACKUP_ENABLED] ?: false
-            val isGridViewEnabled = preferences[PreferencesKeys.GRID_VIEW_ENABLED] ?: false
             val backupInterval = preferences[PreferencesKeys.BACKUP_INTERVAL] ?: BackupFrequency.OFF.name
             val backupTimeHour = preferences[PreferencesKeys.BACKUP_TIME_HOUR] ?: 2
             val backupTimeMinutes = preferences[PreferencesKeys.BACKUP_TIME_MINUTE] ?: 0
@@ -61,7 +59,6 @@ class UserPreferencesRepository @Inject constructor(
                 supaSyncEnabled = supaSyncEnabled,
                 notificationsEnabled = notifications,
                 themeMode = ThemeMode.valueOf(theme),
-                isGridViewSelected = isGridViewEnabled,
                 backupSettings = BackupSettings(
                     backupFrequency = BackupFrequency.valueOf(backupInterval),
                     backupTimeHour = backupTimeHour,
@@ -110,12 +107,6 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun updateTheme(mode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = mode.name
-        }
-    }
-
-    suspend fun gridviewEnabled(enabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.GRID_VIEW_ENABLED] = enabled
         }
     }
 

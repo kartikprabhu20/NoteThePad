@@ -24,7 +24,6 @@ fun NoteWidgetConfigScreen(
     onNoteClicked: (DetailedNote) -> Unit
 ) {
     val state by notesViewModel.state.collectAsStateWithLifecycle()
-    val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val supaSyncEnabled by notesViewModel.supaSyncEnabled.collectAsStateWithLifecycle()
 
     SharedTransitionLayout {
@@ -41,7 +40,6 @@ fun NoteWidgetConfigScreen(
 
                         StaggeredNotesList(
                             notes = state.notes,
-                            isGridView = isGridView,
                             enableDeletion = false,
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,

@@ -5,7 +5,6 @@ data class Settings(
     val backupEnabled: Boolean = false,
     val supaSyncEnabled: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val isGridViewSelected: Boolean = false,
     val googleAccount: String? = null,
     val backupSettings: BackupSettings = BackupSettings(),
     val aiModelName: String = "None",

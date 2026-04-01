@@ -17,9 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -135,10 +133,8 @@ fun PreviewSearchBar(modifier: Modifier = Modifier) {
 @Composable
 fun TopSearchBar(
     searchQuery: String,
-    isGridView: Boolean,
     showLogoAnimation: Boolean = false,
     onLogoAnimationComplete: () -> Unit = {},
-    onToogleGridView: (Boolean) -> Unit,
     onValueChange: (String) -> Unit,
     onFocusChanged: (FocusState) -> Unit,
     onClearClicked: () -> Unit,
@@ -178,15 +174,6 @@ fun TopSearchBar(
                 contentDescription = stringResource(R.string.content_description_sort)
             )
         }
-
-        IconButton(onClick = {
-            onToogleGridView(!isGridView)}) {
-            Icon(
-                imageVector = if (isGridView) Icons.AutoMirrored.Filled.ViewList else Icons.Default.GridView,
-                contentDescription = stringResource(R.string.content_description_toggle_layout)
-            )
-        }
-
     }
 }
 
@@ -200,6 +187,6 @@ fun TopSearchBar(
 fun PreviewTopSearchBar(modifier: Modifier = Modifier) {
     NoteThePadTheme{
         var searchQuery by  remember{ mutableStateOf("")}
-        TopSearchBar(searchQuery,onValueChange = {searchQuery=it}, onFocusChanged = {}, onClearClicked = {searchQuery=""}, onExpandClicked = {}, isGridView = false, onToogleGridView = {})
+        TopSearchBar(searchQuery,onValueChange = {searchQuery=it}, onFocusChanged = {}, onClearClicked = {searchQuery=""}, onExpandClicked = {})
     }
 }

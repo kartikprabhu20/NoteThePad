@@ -87,7 +87,6 @@ fun NotesScreen(
     val state by notesViewModel.state.collectAsStateWithLifecycle()
     val navigationDrawerState by navigationDrawerViewModel.navigationDrawerState.collectAsStateWithLifecycle()
     val searchQuery by notesViewModel.searchInputText.collectAsStateWithLifecycle()
-    val isGridView by notesViewModel.isGridViewEnabled.collectAsStateWithLifecycle()
     val noteShape by notesViewModel.noteShape.collectAsStateWithLifecycle()
     val isOrderSectionVisible by notesViewModel.isOrderSectionVisible.collectAsStateWithLifecycle()
      val showLabelDialog by notesViewModel.showLabelDialog.collectAsStateWithLifecycle()
@@ -189,14 +188,10 @@ fun NotesScreen(
                         title = {
                             TopSearchBar(
                                 searchQuery,
-                                isGridView = isGridView,
                                 showLogoAnimation = showLogoAnimation,
                                 onLogoAnimationComplete = {
                                     NotesViewModel.markAnimationShown()
                                     showLogoAnimation = false
-                                },
-                                onToogleGridView = {
-                                    notesViewModel.toggleGridView(it)
                                 },
                                 onValueChange = {
                                     notesViewModel.onEvent(NotesEvent.SearchBarValueChange(it))
@@ -280,7 +275,6 @@ fun NotesScreen(
                         if (state.notes.isNotEmpty()) {
                             StaggeredNotesList(
                                 notes = state.notes,
-                                isGridView = isGridView,
                                 noteShape = noteShape,
                                 sharedTransitionScope = sharedTransitionScope,
                                 animatedVisibilityScope = animatedVisibilityScope,
