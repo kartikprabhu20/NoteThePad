@@ -26,6 +26,7 @@ interface NoteRepository {
     suspend fun getTagByName(tagName: String): TagEntity?
     suspend fun checkpoint(): File
     suspend fun swapDatabase(dbFile: File)
+    suspend fun triggerSync()
     suspend fun pullFromCloud()
     fun startRealtimeSync()
 }

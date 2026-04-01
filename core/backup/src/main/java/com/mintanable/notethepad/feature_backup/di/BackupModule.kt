@@ -50,14 +50,6 @@ abstract class BackupModule {
     companion object {
         @Provides
         @Singleton
-        fun provideWorkManager(
-            @ApplicationContext context: Context
-        ): WorkManager {
-            return WorkManager.Companion.getInstance(context)
-        }
-
-        @Provides
-        @Singleton
         fun provideGoogleDriveService(): GoogleDriveService {
             return GoogleDriveService()
         }

@@ -9,4 +9,6 @@ object NoteThePadConstants {
     const val DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID = "download_aimodel_channel"
 
     const val BACKUP_DB_FILE_NAME = "NoteThePad_Backup.db"
+
+    const val SUPA_SYNC_SORKER = "supa_sync_worker"
 }

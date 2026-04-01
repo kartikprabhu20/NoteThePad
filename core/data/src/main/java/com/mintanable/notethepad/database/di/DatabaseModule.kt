@@ -16,6 +16,7 @@ import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import com.mintanable.notethepad.database.preference.repository.SharedPreferencesRepository
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import androidx.work.WorkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,9 +53,16 @@ object DatabaseModule {
         databaseManager: DatabaseManager,
         supabaseSyncService: SupabaseSyncService,
         userPreferencesRepository: UserPreferencesRepository,
-        authRepository: AuthRepository
+        authRepository: AuthRepository,
+        workManager: WorkManager
     ): NoteRepository {
-        return NoteRepositoryImpl(databaseManager, supabaseSyncService, userPreferencesRepository, authRepository)
+        return NoteRepositoryImpl(
+            databaseManager,
+            supabaseSyncService,
+            userPreferencesRepository,
+            authRepository,
+            workManager
+        )
     }
 
     @Provides

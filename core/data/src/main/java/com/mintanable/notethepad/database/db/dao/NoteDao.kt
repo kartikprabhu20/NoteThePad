@@ -55,8 +55,16 @@ interface NoteDao {
     @Query("SELECT * FROM noteEntity WHERE isDeleted = 1 ORDER BY lastUpdateTime DESC")
     fun getDeletedNotes(): Flow<List<NoteWithTags>>
 
+    @Transaction
+    @Query("SELECT * FROM noteEntity WHERE isSynced = 0 AND isDeleted = 0")
+    suspend fun getUnsyncedNotes(): List<NoteWithTags>
+
+    @Transaction
+    @Query("SELECT * FROM noteEntity WHERE isSynced = 0 AND isDeleted = 1")
+    suspend fun getUnsyncedDeletedNotes(): List<NoteWithTags>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun inserNote(noteEntity: NoteEntity)
+    suspend fun inserNote(noteEntity: NoteEntity): Long
 
     @Update
     suspend fun updateNote(noteEntity: NoteEntity)
@@ -72,4 +80,7 @@ interface NoteDao {
 
     @Query("DELETE FROM note_tag_cross_ref WHERE noteId = :noteId")
     suspend fun deleteLinksForNote(noteId: String)
+
+    @Query("SELECT * FROM note_tag_cross_ref WHERE noteId = :noteId")
+    suspend fun getCrossRefsForNote(noteId: String): List<NoteTagCrossRef>
 }

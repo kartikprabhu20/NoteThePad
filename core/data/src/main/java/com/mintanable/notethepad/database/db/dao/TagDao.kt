@@ -14,6 +14,12 @@ interface TagDao {
     @Query("SELECT * FROM tag_table WHERE isDeleted = 0")
     fun getAllTags(): Flow<List<TagEntity>>
 
+    @Query("SELECT * FROM tag_table WHERE isSynced = 0 AND isDeleted = 0")
+    suspend fun getUnsyncedTags(): List<TagEntity>
+
+    @Query("SELECT * FROM tag_table WHERE isSynced = 0 AND isDeleted = 1")
+    suspend fun getUnsyncedDeletedTags(): List<TagEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTag(tagEntity: TagEntity): Long
 
