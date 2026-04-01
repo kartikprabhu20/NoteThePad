@@ -46,7 +46,8 @@ fun NoteWidgetConfigScreen(
                             onNoteClicked = onNoteClicked,
                             onDeleteClicked = { },
                             onPinClicked = { },
-                            isSyncEnabled = supaSyncEnabled
+                            isSyncEnabled = supaSyncEnabled,
+                            onRefresh = {}
                         )
                     }
                 }

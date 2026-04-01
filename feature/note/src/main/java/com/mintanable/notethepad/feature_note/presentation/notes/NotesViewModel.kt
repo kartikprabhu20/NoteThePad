@@ -16,6 +16,9 @@ import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettin
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncStatus
+import com.mintanable.notethepad.feature_note.domain.use_case.RefreshSupaSync
+import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,9 +47,11 @@ class NotesViewModel @Inject constructor(
     private val tagUseCases: TagUseCases,
     getNoteShapeSettings: GetNoteShapeSettings,
     getSupaSyncSettings: GetSupaSyncSettings,
+    getSupaSyncStatus: GetSupaSyncStatus,
     private val fileIOUseCases: FileIOUseCases,
     private val dispatchers: DispatcherProvider,
-    private val widgetRefresher: WidgetRefresher
+    private val widgetRefresher: WidgetRefresher,
+    private val refreshSupaSync: RefreshSupaSync
 ) : ViewModel() {
 
     companion object {
@@ -57,6 +62,13 @@ class NotesViewModel @Inject constructor(
             shouldShowLogoAnimation = false
         }
     }
+
+    val isSupaSyncing: StateFlow<Boolean> = getSupaSyncStatus()
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
 
     private val _filterState = MutableStateFlow(
         DataQuery(
@@ -160,7 +172,7 @@ class NotesViewModel @Inject constructor(
                     recentlyDeletedNote = event.detailedNote
 
                     _eventFlow.emit(
-                        UiEvent.ShowSnackbar(
+                        ShowSnackbar(
                             message = "Note deleted",
                             actionLabel = "Undo",
                             onAction = { onEvent(NotesEvent.RestoreNote) }
@@ -180,7 +192,7 @@ class NotesViewModel @Inject constructor(
 
             is NotesEvent.PinNote -> {
                 viewModelScope.launch {
-                    _eventFlow.emit(UiEvent.RequestWidgetPin(event.detailedNote))
+                    _eventFlow.emit(RequestWidgetPin(event.detailedNote))
                 }
             }
 
@@ -211,6 +223,7 @@ class NotesViewModel @Inject constructor(
                 }
             }
 
+            NotesEvent.RefreshCloudNotes -> { viewModelScope.launch { refreshSupaSync() } }
         }
     }
 

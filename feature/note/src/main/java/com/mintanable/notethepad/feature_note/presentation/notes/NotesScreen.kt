@@ -95,6 +95,7 @@ fun NotesScreen(
     val currentOrder = filterState.order
     val existingTags by navigationDrawerViewModel.existingTags.collectAsStateWithLifecycle()
     val supaSyncEnabled by notesViewModel.supaSyncEnabled.collectAsStateWithLifecycle()
+    val isSupaSyncing by notesViewModel.isSupaSyncing.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
 
@@ -267,7 +268,7 @@ fun NotesScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    androidx.compose.animation.AnimatedVisibility(
+                    AnimatedVisibility(
                         visible = !showLogoAnimation,
                         enter = fadeIn(tween(300)),
                         exit = fadeOut(tween(0))
@@ -284,9 +285,17 @@ fun NotesScreen(
                                         NotesEvent.DeleteNote(note)
                                     )
                                 },
-                                onPinClicked = { note -> notesViewModel.onEvent(NotesEvent.PinNote(note)) },
+                                onPinClicked = { note ->
+                                    notesViewModel.onEvent(
+                                        NotesEvent.PinNote(
+                                            note
+                                        )
+                                    )
+                                },
                                 isDarkTheme = isDarkTheme,
-                                isSyncEnabled = supaSyncEnabled
+                                isSyncEnabled = supaSyncEnabled,
+                                isSyncing = isSupaSyncing,
+                                onRefresh = { notesViewModel.onEvent(NotesEvent.RefreshCloudNotes) }
                             )
                         } else {
                             val resource =

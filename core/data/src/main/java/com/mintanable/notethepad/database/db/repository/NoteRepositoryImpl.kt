@@ -259,7 +259,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun pullFromCloud() {
+    override suspend fun fetchCloudData() {
         val settings = userPreferencesRepository.settingsFlow.first()
         if (settings.supaSyncEnabled) {
             enqueueFetch()

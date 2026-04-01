@@ -27,6 +27,6 @@ interface NoteRepository {
     suspend fun checkpoint(): File
     suspend fun swapDatabase(dbFile: File)
     suspend fun triggerSync()
-    suspend fun pullFromCloud()
+    suspend fun fetchCloudData()
     fun startRealtimeSync()
 }

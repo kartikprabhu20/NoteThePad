@@ -16,4 +16,5 @@ sealed class NotesEvent {
     data class AddLabel(val tagName: String) : NotesEvent()
     data class EditLabel(val tagEntity: TagEntity) : NotesEvent()
     data class DeleteLabel(val tagEntity: TagEntity) : NotesEvent()
+    data object RefreshCloudNotes : NotesEvent()
 }
