@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
@@ -40,6 +41,8 @@ import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.core.richtext.model.RichTextDocument
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.components.RoundedScrollingLazyVerticalGrid
@@ -178,6 +181,10 @@ fun NoteItemRow(note: DetailedNote) {
         containerModifier = containerModifier.height(estimatedHeight)
     }
 
+    val spannableContent = remember(note.content) {
+        RichTextSerializer.toSpannable(RichTextSerializer.deserialize(note.content))
+    }
+
     Box(
         modifier = containerModifier
     ) {
@@ -202,7 +209,7 @@ fun NoteItemRow(note: DetailedNote) {
             Spacer(GlanceModifier.height(4.dp))
 
             Text(
-                text = note.content,
+                text = spannableContent.toString(),
                 style = NoteListLayoutTextStyles.contentText,
                 maxLines = 5
             )

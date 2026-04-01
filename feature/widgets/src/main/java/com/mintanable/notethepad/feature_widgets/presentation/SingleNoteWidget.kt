@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,7 @@ import androidx.glance.background
 import androidx.glance.layout.Box
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
@@ -30,6 +32,9 @@ import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.core.richtext.compose.RichTextAnnotator
+import com.mintanable.notethepad.core.richtext.model.RichTextDocument
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.utils.GridBreakpointPreviews
@@ -126,10 +131,14 @@ fun NoteItem(
             }
 
             item{
+                val spannableContent = remember(note.content) {
+                    RichTextSerializer.toSpannable(RichTextSerializer.deserialize(note.content))
+                }
                 Text(
-                    text = note.content,
+                    text = spannableContent.toString(),
                     style = NoteListLayoutTextStyles.contentText,
                     modifier = GlanceModifier
+                        .fillMaxSize()
                         .maybeClickable(action)
                 )
             }

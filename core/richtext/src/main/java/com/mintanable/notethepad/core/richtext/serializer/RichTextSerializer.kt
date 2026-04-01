@@ -1,5 +1,11 @@
 package com.mintanable.notethepad.core.richtext.serializer
 
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -54,4 +60,41 @@ object RichTextSerializer {
     }
 
     private fun plainText(raw: String) = RichTextDocument(rawText = raw, spans = emptyList())
+
+    fun toSpannable(doc: RichTextDocument) : SpannableString {
+        val spannable = SpannableString(doc.rawText)
+
+        doc.spans.forEach { span ->
+            val start = span.start.coerceIn(0, doc.rawText.length)
+            val end = span.end.coerceIn(start, doc.rawText.length)
+
+            when (span.type) {
+                SpanType.BOLD -> {
+                    spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                SpanType.ITALIC -> {
+                    spannable.setSpan(StyleSpan(Typeface.ITALIC), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                SpanType.UNDERLINE -> {
+                    spannable.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                SpanType.H1 -> {
+                    // H1 is Bold + 1.5x larger
+                    spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    spannable.setSpan(RelativeSizeSpan(1.5f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                SpanType.H2 -> {
+                    // H2 is Bold + 1.2x larger
+                    spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    spannable.setSpan(RelativeSizeSpan(1.2f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                SpanType.BULLET -> {
+                    // For widgets, bullets are best handled by the deserializer
+                    // prepending "• " to the rawText, as BulletSpan is buggy in RemoteViews.
+                }
+                else -> {}
+            }
+        }
+        return spannable
+    }
 }
