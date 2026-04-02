@@ -56,12 +56,15 @@ class SingleNoteWidget : GlanceAppWidget() {
                 WidgetEntryPoint::class.java
             )
             val noteWithTags = entryPoint.noteRepository().getNoteById(noteId)
-            noteWithTags?.let { entryPoint.detailedNoteMapper().toDetailedNote(it.noteEntity, it.tagEntities) }
+            noteWithTags?.let {
+                entryPoint.detailedNoteMapper().toDetailedNote(it.noteEntity, it.tagEntities)
+            }
         } else null
 
         provideContent {
             val intent = Intent(NavigationConstants.ACTION_OPEN_NOTE).apply {
-                component = ComponentName(context.packageName, NavigationConstants.MAIN_ACTIVITY_CLASS)
+                component =
+                    ComponentName(context.packageName, NavigationConstants.MAIN_ACTIVITY_CLASS)
                 if (note != null) {
                     putExtra(NavigationConstants.EXTRA_NOTE_ID, note.id)
                 }
@@ -70,20 +73,26 @@ class SingleNoteWidget : GlanceAppWidget() {
 
             GlanceTheme {
                 Box(modifier = GlanceModifier.fillMaxSize()) {
-                if (note != null) {
-                    NoteItem(note, actionStartActivity(intent))
-                } else {
-                    NoteItem(
-                        DetailedNote(
-                            id = "",
-                            title = context.getString(R.string.msg_no_note_found),
-                            content = context.getString(R.string.msg_add_notes_prompt),
-                            timestamp = System.currentTimeMillis(),
-                            color = NoteColors.colors[0].toArgb()
-                        ),
-                        null
+                    if (note != null) {
+                        NoteItem(note, actionStartActivity(intent))
+                    } else {
+                        NoteItem(
+                            DetailedNote(
+                                id = "",
+                                title = context.getString(R.string.msg_no_note_found),
+                                content = context.getString(R.string.msg_add_notes_prompt),
+                                timestamp = System.currentTimeMillis(),
+                                color = NoteColors.colors[0].toArgb()
+                            ),
+                            null
+                        )
+                    }
+
+                    Spacer(
+                        modifier = GlanceModifier
+                            .fillMaxSize()
+                            .clickable(actionStartActivity(intent))
                     )
-                }
                 }
             }
         }
@@ -103,7 +112,7 @@ fun NoteItem(
 
     Box(
         modifier = GlanceModifier.fillMaxSize()
-    ){
+    ) {
 
         if (note.backgroundImage != -1) {
             val backgroundRes = NoteColors.resolveBackgroundImage(note.backgroundImage)
@@ -142,7 +151,7 @@ fun NoteItem(
                 Spacer(modifier = GlanceModifier.height(8.dp))
             }
 
-            item{
+            item {
                 IconsRow(
                     note,
                     modifier = GlanceModifier.maybeClickable(action)
@@ -150,7 +159,7 @@ fun NoteItem(
                 Spacer(modifier = GlanceModifier.height(8.dp))
             }
 
-            item{
+            item {
                 val spannableContent = remember(note.content) {
                     RichTextSerializer.toSpannable(RichTextSerializer.deserialize(note.content))
                 }
@@ -178,11 +187,11 @@ private fun GlanceModifier.maybeClickable(action: Action?): GlanceModifier {
 private fun NoteListContentPreview() {
     NoteItem(
         DetailedNote(
-        title = "Remember to call landlord",
-        content = "Repairing basin and pipes",
-        timestamp = 123,
-        color = NoteColors.colors.get(1).toArgb(),
-        reminderTime = 1234556
+            title = "Remember to call landlord",
+            content = "Repairing basin and pipes",
+            timestamp = 123,
+            color = NoteColors.colors.get(1).toArgb(),
+            reminderTime = 1234556
         ),
         null
     )
