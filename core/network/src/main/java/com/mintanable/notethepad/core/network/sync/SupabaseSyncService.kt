@@ -26,7 +26,6 @@ class SupabaseSyncService @Inject constructor(
     suspend fun ensureAuthenticated(fireBaseToken: String?) {
         try {
             if (fireBaseToken != null) {
-                supabaseClient.auth.importAuthToken(accessToken = fireBaseToken, refreshToken = "")
                 supabaseClient.auth.importSession(
                     UserSession(
                         accessToken = fireBaseToken,

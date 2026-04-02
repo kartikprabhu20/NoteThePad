@@ -28,7 +28,7 @@ object SupabaseModule {
         ) {
             install(Postgrest)
             install(Realtime)
-            install(Auth)
+            install(Auth) { this.alwaysAutoRefresh = false }
         }
     }
 }
