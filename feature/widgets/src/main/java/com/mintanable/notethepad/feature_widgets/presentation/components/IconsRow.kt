@@ -11,7 +11,7 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
-import androidx.glance.unit.ColorProvider
+import androidx.glance.color.ColorProvider
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.feature_widgets.R
@@ -42,10 +42,13 @@ fun IconsRow(
 
 @Composable
 private fun WidgetIcon(resId: Int) {
+    val provider = ColorProvider(
+        day = Color.White,
+        night = Color.Black
+    )
     Image(
         provider = ImageProvider(resId),
         contentDescription = null,
         modifier = GlanceModifier.size(24.dp).padding(end = 4.dp),
-        colorFilter = ColorFilter.tint(ColorProvider(Color.Black.copy(alpha = 0.5f)))
-    )
+        colorFilter = ColorFilter.tint(provider)    )
 }

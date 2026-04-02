@@ -28,5 +28,4 @@ interface NoteRepository {
     suspend fun swapDatabase(dbFile: File)
     suspend fun triggerSync()
     suspend fun fetchCloudData()
-    fun startRealtimeSync()
 }

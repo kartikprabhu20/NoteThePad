@@ -107,7 +107,7 @@ class AndroidAudioRecorder @Inject constructor(
         return maxAmp
     }
 
-    private fun createWavHeader(audioLen: Long, dataLen: Long, sampleRate: Int, channels: Int, byteRate: Int): ByteArray {
+    private fun createWavHeader(audioLen: Long, dataLen: Long, sampleRate: Int = 16000, channels: Int = 1, byteRate: Int = (16000 * 1 * 16 / 8)): ByteArray {
         val header = ByteArray(44)
         header[0] = 'R'.code.toByte(); header[1] = 'I'.code.toByte(); header[2] = 'F'.code.toByte(); header[3] = 'F'.code.toByte()
         header[4] = (dataLen and 0xff).toByte(); header[5] = (dataLen shr 8 and 0xff).toByte()

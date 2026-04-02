@@ -118,7 +118,7 @@ fun SuggestedTagsRow(
 
 @ThemePreviews
 @Composable
-fun previewSuggestedTagsRow() {
+fun PreviewSuggestedTagsRow() {
     NoteThePadTheme {
         Box(modifier = Modifier
             .fillMaxSize()

@@ -141,7 +141,11 @@ half4 main(float2 fragCoord) {
  * random "bumps" from 1d perlin noise.
  */
 @Composable
-fun AudioAnimation(bgColor: Color, amplitude: Int, modifier: Modifier = Modifier) {
+fun AudioAnimation(
+  amplitude: Int,
+  modifier: Modifier = Modifier,
+  bgColor: Color = Color.Black
+) {
   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
     val shader = remember { RuntimeShader(SHADER) }
     val shaderBrush = remember { ShaderBrush(shader) }

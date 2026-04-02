@@ -24,6 +24,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AiModule {
 
+    @Suppress("PurposefulConstant")
     @Provides
     @Singleton
     fun provideGeminiApiKey(): String = BuildConfig.GEMINI_API_KEY

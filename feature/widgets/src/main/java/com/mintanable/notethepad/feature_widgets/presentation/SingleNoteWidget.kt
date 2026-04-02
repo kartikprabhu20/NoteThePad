@@ -24,17 +24,14 @@ import androidx.glance.background
 import androidx.glance.layout.Box
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
-import androidx.glance.unit.ColorProvider
-import com.mintanable.notethepad.core.common.NavigationConstants
-import com.mintanable.notethepad.database.db.entity.DetailedNote
+import androidx.glance.color.ColorProvider
 import com.mintanable.notethepad.NoteColors
-import com.mintanable.notethepad.core.richtext.compose.RichTextAnnotator
-import com.mintanable.notethepad.core.richtext.model.RichTextDocument
+import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
+import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
 import com.mintanable.notethepad.feature_widgets.presentation.utils.GridBreakpointPreviews
@@ -106,7 +103,7 @@ fun NoteItem(
                 .fillMaxSize()
                 .background(
                     imageProvider = ImageProvider(R.drawable.widget_background),
-                    colorFilter = ColorFilter.tint(ColorProvider(Color(note.color)))
+                    colorFilter = ColorFilter.tint(ColorProvider(Color(note.color), Color(note.color)))
                 )
                 .padding(8.dp)
         ) {

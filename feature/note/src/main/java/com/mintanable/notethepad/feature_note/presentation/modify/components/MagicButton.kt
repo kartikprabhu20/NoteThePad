@@ -151,7 +151,7 @@ fun Modifier.magicBorder(
 
 @ThemePreviews
 @Composable
-fun previewMagicBorder() {
+fun PreviewMagicBorder() {
     NoteThePadTheme {
         SharedTransitionLayout {
             AnimatedContent(targetState = true, label = "preview") { isVisible ->

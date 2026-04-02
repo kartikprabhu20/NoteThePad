@@ -27,6 +27,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,7 +58,7 @@ fun SearchBar(
     textStyle: TextStyle = TextStyle(),
     isSingleLine: Boolean = false
 ) {
-    var rotationAngle by remember { mutableStateOf(0f) }
+    var rotationAngle by remember { mutableFloatStateOf(0f) }
     val rotation by animateFloatAsState(
         targetValue = rotationAngle,
         animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing),

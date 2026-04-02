@@ -26,6 +26,7 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -36,12 +37,10 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
-import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.NoteColors
-import com.mintanable.notethepad.core.richtext.model.RichTextDocument
 import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.IconsRow
@@ -194,7 +193,7 @@ fun NoteItemRow(note: DetailedNote) {
                 .fillMaxWidth()
                 .background(
                     imageProvider = ImageProvider(R.drawable.widget_background),
-                    colorFilter = ColorFilter.tint(ColorProvider(Color(note.color)))
+                    colorFilter = ColorFilter.tint(ColorProvider(day = Color(note.color), night = Color(note.color)))
                 )
                 .padding(8.dp)
                 .clickable(actionStartActivity(launchIntent))

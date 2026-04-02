@@ -340,6 +340,7 @@ class GemmaLocalDataSource @Inject constructor(
                       * Document/form: "Summarize document"
                       * Code/technical: "Explain this code"
                       * Nature/animal: "Identify this"
+                      * Generic/Unknown: "Describe this image"
                     Example output: Convert to text, Create checklist, Summarize document
                 """.trimIndent()
             )
@@ -347,7 +348,7 @@ class GemmaLocalDataSource @Inject constructor(
             var response = ""
             withTimeout(30_000L) {
                 runInference(
-                    prompt = "Analyze this image and suggest exactly 3 short action phrases:",
+                    prompt = "Image Analysis Task: Suggest 3 short action phrases based on the categories provided. Output:",
                     imageData = imageBytes
                 ).collect { chunk ->
                     response += chunk

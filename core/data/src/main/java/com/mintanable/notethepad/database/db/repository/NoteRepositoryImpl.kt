@@ -265,44 +265,4 @@ class NoteRepositoryImpl @Inject constructor(
             enqueueFetch()
         }
     }
-
-    override fun startRealtimeSync() {
-//        repositoryScope.launch {
-//            val user = authRepository.getSignedInFirebaseUser().first()
-//            val userId = user?.uid ?: return@launch
-//            val settings = userPreferencesRepository.settingsFlow.first()
-//            if(!settings.supaSyncEnabled) return@launch
-//
-//            val client = supabaseSyncService.getSupabaseClient()
-//            val channel = client.channel("db-changes")
-//
-//            val noteFlow = channel.postgresChangeFlow<PostgrestAction.Update>(schema = "public") {
-//                table = "note_entity"
-//            }
-//            val noteInsertFlow = channel.postgresChangeFlow<PostgrestAction.Insert>(schema = "public") {
-//                table = "note_entity"
-//            }
-//
-//            launch {
-//                noteFlow.collect { action -> handleNoteChange(action.record, userId) }
-//            }
-//            launch {
-//                noteInsertFlow.collect { action -> handleNoteChange(action.record, userId) }
-//            }
-//
-//            // Similarly for tags and refs... (simplified for brevity but including base logic)
-//            // In a real app, I'd subscribe to all tables.
-//
-//            channel.subscribe()
-//        }
-    }
-
-//    private suspend fun handleNoteChange(dto: NoteDto, currentUserId: String) {
-//        if (dto.userId != currentUserId) return
-//        val local = noteDao.getNoteById(dto.id)
-//        if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
-//            noteDao.inserNote(dto.toEntity())
-//            noteDao.updateNote(dto.toEntity())
-//        }
-//    }
 }
