@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.runtime.Composable
@@ -26,7 +27,8 @@ enum class BottomSheetType {
     AUDIO_RECORDER,
     CHECKBOX,
     LABEL,
-    COLOR_SELECTOR
+    COLOR_SELECTOR,
+    COLLABORATORS
 }
 
 interface AdditionalOption {
@@ -64,6 +66,7 @@ enum class MoreSettingsOptions(
     PIN(R.string.option_pin_widget, Icons.Default.PushPin),
     LABEL(R.string.option_add_label, Icons.AutoMirrored.Filled.Label),
     SEND(R.string.option_send, Icons.Default.Share),
+    COLLABORATE(R.string.option_collaborate, Icons.Default.People),
     DELETE(R.string.option_delete, Icons.Default.Delete),
     COPY(R.string.option_make_copy, Icons.Default.ContentCopy);
 

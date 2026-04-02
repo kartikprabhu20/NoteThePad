@@ -6,6 +6,7 @@ import com.mintanable.notethepad.core.richtext.model.RichTextState
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
+import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.permissions.DeniedType
@@ -48,5 +49,10 @@ data class AddEditNoteUiState(
     val imageSuggestions: List<String> = emptyList(),
     val isAnalyzingImage: Boolean = false,
     val imageQueryResult: String = "",
-    val isImageQueryLoading: Boolean = false
+    val isImageQueryLoading: Boolean = false,
+
+    val collaborators: List<Collaborator> = emptyList(),
+    val isLoadingCollaborators: Boolean = false,
+    val collaboratorError: String? = null,
+    val isOwner: Boolean = true
 )

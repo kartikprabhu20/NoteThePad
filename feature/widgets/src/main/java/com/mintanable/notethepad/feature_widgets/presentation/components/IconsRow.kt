@@ -43,8 +43,8 @@ fun IconsRow(
 @Composable
 private fun WidgetIcon(resId: Int) {
     val provider = ColorProvider(
-        day = Color.White,
-        night = Color.Black
+        day = Color.Black,
+        night = Color.White
     )
     Image(
         provider = ImageProvider(resId),

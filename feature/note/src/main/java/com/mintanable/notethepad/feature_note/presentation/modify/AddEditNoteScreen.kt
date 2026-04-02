@@ -55,6 +55,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Dat
 import com.mintanable.notethepad.feature_note.presentation.modify.components.SavingOverlay
 import com.mintanable.notethepad.feature_note.presentation.modify.components.ZoomedImageOverlay
 import com.mintanable.notethepad.feature_note.presentation.modify.components.sections.ColorSelectorBottomSheetContent
+import com.mintanable.notethepad.feature_note.presentation.modify.components.sections.CollaboratorsBottomSheetContent
 import com.mintanable.notethepad.feature_note.presentation.modify.components.sections.NoteEditorContent
 import com.mintanable.notethepad.feature_note.presentation.notes.AttachmentOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.AudioSourceOptions
@@ -436,6 +437,16 @@ fun AddEditNoteScreen(
                     },
                     transcriptionText = uiState.liveTranscription
                 )
+            } else if (uiState.currentSheetType == BottomSheetType.COLLABORATORS) {
+                CollaboratorsBottomSheetContent(
+                    collaborators = uiState.collaborators,
+                    isLoading = uiState.isLoadingCollaborators,
+                    errorMessage = uiState.collaboratorError,
+                    isOwner = uiState.isOwner,
+                    onInvite = { viewModel.onEvent(AddEditNoteEvent.InviteCollaborator(it)) },
+                    onRemove = { viewModel.onEvent(AddEditNoteEvent.RemoveCollaborator(it)) },
+                    onLeave = { viewModel.onEvent(AddEditNoteEvent.LeaveNote) }
+                )
             } else {
                 BottomSheetContent(
                     items = sheetItems,
@@ -497,6 +508,10 @@ fun AddEditNoteScreen(
                             MoreSettingsOptions.LABEL -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                                 viewModel.onEvent(AddEditNoteEvent.ShowLabelDialog)
+                            }
+
+                            MoreSettingsOptions.COLLABORATE -> {
+                                viewModel.onEvent(AddEditNoteEvent.OpenCollaborateSheet)
                             }
 
                             MoreSettingsOptions.SEND -> {

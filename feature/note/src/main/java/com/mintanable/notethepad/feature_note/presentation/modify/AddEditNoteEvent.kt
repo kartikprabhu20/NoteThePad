@@ -49,4 +49,8 @@ sealed class AddEditNoteEvent {
     data object ClearImageQueryResult : AddEditNoteEvent()
     data object ToggleRichTextBar : AddEditNoteEvent()
     data object ShareNote : AddEditNoteEvent()
+    data object OpenCollaborateSheet : AddEditNoteEvent()
+    data class InviteCollaborator(val email: String) : AddEditNoteEvent()
+    data class RemoveCollaborator(val collaboratorUserId: String) : AddEditNoteEvent()
+    data object LeaveNote : AddEditNoteEvent()
 }
