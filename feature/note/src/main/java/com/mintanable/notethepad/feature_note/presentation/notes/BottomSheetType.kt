@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -62,9 +63,9 @@ enum class MoreSettingsOptions(
 ) : AdditionalOption {
     PIN(R.string.option_pin_widget, Icons.Default.PushPin),
     LABEL(R.string.option_add_label, Icons.AutoMirrored.Filled.Label),
+    SEND(R.string.option_send, Icons.Default.Share),
     DELETE(R.string.option_delete, Icons.Default.Delete),
     COPY(R.string.option_make_copy, Icons.Default.ContentCopy);
-//    SHARE("Send", Icons.Default.Share)
 
     override val title: String
         @Composable get() = stringResource(titleRes)

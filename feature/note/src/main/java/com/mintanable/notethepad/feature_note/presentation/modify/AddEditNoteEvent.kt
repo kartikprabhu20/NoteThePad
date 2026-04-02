@@ -48,4 +48,5 @@ sealed class AddEditNoteEvent {
     data object ClearImageSuggestions : AddEditNoteEvent()
     data object ClearImageQueryResult : AddEditNoteEvent()
     data object ToggleRichTextBar : AddEditNoteEvent()
+    data object ShareNote : AddEditNoteEvent()
 }

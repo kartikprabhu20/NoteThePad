@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
+import android.content.Intent
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 
 sealed class UiEvent{
@@ -10,4 +11,5 @@ sealed class UiEvent{
     data object LaunchAudioRecorder : UiEvent()
     data class LaunchCamera(val type: AttachmentType) : UiEvent()
     data class RequestWidgetPin(val noteId: String):UiEvent()
+    data class ShareNote(val intent: Intent) : UiEvent()
 }

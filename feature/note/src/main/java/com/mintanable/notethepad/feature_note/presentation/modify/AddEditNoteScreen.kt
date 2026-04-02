@@ -228,6 +228,12 @@ fun AddEditNoteScreen(
                 is UiEvent.RequestWidgetPin -> {
                     onPinWidget(event.noteId)
                 }
+
+                is UiEvent.ShareNote -> {
+                    context.startActivity(
+                        Intent.createChooser(event.intent, "Send note via…")
+                    )
+                }
             }
         }
     }
@@ -493,9 +499,10 @@ fun AddEditNoteScreen(
                                 viewModel.onEvent(AddEditNoteEvent.ShowLabelDialog)
                             }
 
-//                            MoreSettingsOptions.SHARE -> {
-//
-//                            }
+                            MoreSettingsOptions.SEND -> {
+                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                                viewModel.onEvent(AddEditNoteEvent.ShareNote)
+                            }
 
                             ReminderOptions.DATE_AND_TIME -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
