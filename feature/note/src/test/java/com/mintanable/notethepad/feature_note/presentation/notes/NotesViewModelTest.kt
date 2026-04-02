@@ -1,23 +1,24 @@
 package com.mintanable.notethepad.feature_note.presentation.notes
 
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
-import com.mintanable.notethepad.database.db.entity.DetailedNote
-import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.core.model.settings.NoteShape
+import com.mintanable.notethepad.database.db.entity.DetailedNote
+import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.TagEntity
+import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
+import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncStatus
+import com.mintanable.notethepad.feature_note.domain.use_case.RefreshSupaSync
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
-import com.mintanable.notethepad.feature_note.domain.use_case.GetLayoutSettings
-import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
-import com.mintanable.notethepad.feature_note.domain.use_case.ToggleLayoutSettings
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -42,14 +43,16 @@ import org.robolectric.RobolectricTestRunner
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotesViewModelTest {
     private val noteUseCases = mockk<NoteUseCases>(relaxed = true)
-    private val getLayoutSettings = mockk<GetLayoutSettings>(relaxed = true)
     private val getNoteShapeSettings = mockk<GetNoteShapeSettings>(relaxed = true)
-    private val toggleLayoutSettings = mockk<ToggleLayoutSettings>(relaxed = true)
     private val fileIOUseCases = mockk<FileIOUseCases>(relaxed = true)
     private val tagUseCases = mockk<TagUseCases>(relaxed = true)
 
     private val savedStateHandle = SavedStateHandle()
     private val widgetRefresher = mockk< WidgetRefresher>(relaxed = true)
+    private val getSupaSyncSettings =  mockk<GetSupaSyncSettings>(relaxed = true)
+    private val getSupaSyncStatus =  mockk<GetSupaSyncStatus>(relaxed = true)
+    private val refreshSupaSync = mockk<RefreshSupaSync>(relaxed = true)
+
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val testDispatcherProvider = TestDispatcherProvider(testDispatcher)
@@ -59,18 +62,18 @@ class NotesViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        every { getLayoutSettings() } returns flowOf(true)
-        every { getNoteShapeSettings() } returns flowOf(com.mintanable.notethepad.core.model.settings.NoteShape.DEFAULT)
+        every { getNoteShapeSettings() } returns flowOf(NoteShape.DEFAULT)
         viewModel = NotesViewModel(
             savedStateHandle = savedStateHandle,
             noteUseCases = noteUseCases,
             tagUseCases = tagUseCases,
-            getLayoutSettings = getLayoutSettings,
             getNoteShapeSettings = getNoteShapeSettings,
-            toggleLayoutSettings = toggleLayoutSettings,
             fileIOUseCases = fileIOUseCases,
             dispatchers = testDispatcherProvider,
-            widgetRefresher = widgetRefresher
+            widgetRefresher = widgetRefresher,
+            getSupaSyncSettings = getSupaSyncSettings,
+            refreshSupaSync = refreshSupaSync,
+            getSupaSyncStatus = getSupaSyncStatus
         )
     }
 
@@ -82,7 +85,7 @@ class NotesViewModelTest {
     @Test
     fun `Search query updates state after debounce`() = runTest {
         val notes = listOf(DetailedNote(
-            id = 1,
+            id = "1",
             title = "Testing Title",
             content = "Testing Content",
             audioAttachments = emptyList(),
@@ -109,9 +112,9 @@ class NotesViewModelTest {
 
     @Test
     fun `Changing filter via updateFilter triggers new database fetch`() = runTest {
-        val tagEntity = TagEntity(tagId = 10L, tagName = "Work")
+        val tagEntity = TagEntity(tagId = "10L", tagName = "Work")
         val tagNotes = listOf(DetailedNote(
-            id = 1,
+            id = "1",
             title = "Testing Title",
             content = "Testing Content",
             audioAttachments = emptyList(),
@@ -136,7 +139,7 @@ class NotesViewModelTest {
 
             val state = awaitItem()
             assertThat(state.notes).isEqualTo(tagNotes)
-            verify { noteUseCases.getNotesWithTags(any(), tagEntity) }
+            verify { noteUseCases.getNotesWithTags(any(), match { it.tagId == tagEntity.tagId && it.tagName == tagEntity.tagName }) }
         }
     }
 
@@ -144,7 +147,7 @@ class NotesViewModelTest {
     fun `Changing note order triggers new database fetch`() = runTest {
         val newOrder = NoteOrder.Title(OrderType.Ascending)
         val mockNotes = listOf(DetailedNote(
-            id = 1,
+            id = "1",
             title = "Testing Title",
             content = "Testing Content",
             audioAttachments = emptyList(),
@@ -172,7 +175,7 @@ class NotesViewModelTest {
     @Test
     fun `DeleteNote deletes files and note, then RestoreNote re-saves it`() = runTest {
         val note = DetailedNote(
-            id = 1,
+            id = "1",
             title = "Testing Title",
             content = "Testing Content",
             audioAttachments = emptyList(),
@@ -199,7 +202,7 @@ class NotesViewModelTest {
     @Test
     fun `DeleteNote emits Snackbar with working Undo action`() = runTest {
         val note = DetailedNote(
-            id = 1,
+            id = "1",
             title = "Testing Title",
             content = "Testing Content",
             audioAttachments = emptyList(),

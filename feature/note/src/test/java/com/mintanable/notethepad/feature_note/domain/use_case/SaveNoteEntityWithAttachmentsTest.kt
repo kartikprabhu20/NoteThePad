@@ -28,13 +28,13 @@ class SaveNoteWithAttachmentsTest {
     @Before
     fun setUp() {
         saveNote = SaveNoteWithAttachments(repository, fileManager)
-        coEvery { repository.insertNote(any(), any()) } returns 1L
+        coEvery { repository.insertNote(any(), any()) } returns "1L"
     }
 
     @Test
     fun `Title is blank, returns Result failure`() = runTest {
         val result = saveNote(
-            id = 0L, title = "   ", content = "", timestamp = 0L,
+            id = "0L", title = "   ", content = "", timestamp = 0L,
             color = 0, reminderTime = 0L, checkboxItems = emptyList()
         )
 
@@ -58,7 +58,7 @@ class SaveNoteWithAttachmentsTest {
         coEvery { fileManager.saveMediaToStorage(externalAudioUri, any()) } returns newSavedPath2
 
         val result = saveNote(
-            id = 0L,
+            id = "0L",
             title = "Valid Title",
             content = "Content",
             timestamp = 1L,
@@ -89,7 +89,7 @@ class SaveNoteWithAttachmentsTest {
         val expectedContent = CheckboxConvertors.checkboxesToString(checkboxes)
 
         saveNote(
-            id = 0L,
+            id = "0L",
             title = "Grocery List",
             content = "Old Text Content",
             timestamp = 1L,

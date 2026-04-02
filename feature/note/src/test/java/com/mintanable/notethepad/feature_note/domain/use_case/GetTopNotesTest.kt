@@ -40,7 +40,7 @@ class GetTopNotesTest {
         val limit = 2
         val mockNotes = listOf(
             NoteWithTags(NoteEntity(
-                id = 1,
+                id = "1",
                 title = "Top 1",
                 content = "...",
                 audioUris = emptyList(),
@@ -50,7 +50,7 @@ class GetTopNotesTest {
                 tagEntities = listOf(TagEntity("test"))
             ),
             NoteWithTags(NoteEntity(
-                id = 2,
+                id = "2",
                 title = "Top 2",
                 content = "...",
                 audioUris = emptyList(),

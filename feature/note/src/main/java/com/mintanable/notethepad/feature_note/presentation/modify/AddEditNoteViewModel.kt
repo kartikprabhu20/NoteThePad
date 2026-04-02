@@ -173,7 +173,8 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.EnteredTitle -> {
                 _uiState.update { it.copy(
                     titleState = it.titleState.copy(
-                        richText = RichTextDocument(rawText = event.value)
+                        richText = RichTextDocument(rawText = event.value),
+                        isHintVisible = event.value.isBlank() && !it.titleState.isFocused,
                     )
                 )}
             }

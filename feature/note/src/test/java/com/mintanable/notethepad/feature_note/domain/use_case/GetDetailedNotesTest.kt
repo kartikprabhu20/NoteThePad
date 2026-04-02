@@ -43,12 +43,13 @@ class GetDetailedNotesTest {
     @Test
     fun `Sort notes by title ascending, returns correct order with mapped details`() = runTest {
 
+        val tag = TagEntity("fruits")
         val mockNotes = listOf(
             NoteWithTags(
-                NoteEntity(id = 1, title = "Apple", content = "[ ] Buy Apple", audioUris = listOf("uri1"), timestamp = 1, color = 1),
-                tagEntities = listOf(TagEntity("fruits"))
+                NoteEntity(id = "1", title = "Apple", content = "[ ] Buy Apple", audioUris = listOf("uri1"), timestamp = 1, color = 1),
+                tagEntities = listOf(tag)
             ),
-            NoteWithTags(NoteEntity(id = 2, title = "Banana", content = "Just a fruit", audioUris = emptyList(), timestamp = 2, color = 2))
+            NoteWithTags(NoteEntity(id = "2", title = "Banana", content = "Just a fruit", audioUris = emptyList(), timestamp = 2, color = 2))
         )
 
         coEvery { repository.getNotes(any()) } returns flowOf(mockNotes)
@@ -58,7 +59,7 @@ class GetDetailedNotesTest {
 
         assertThat(result).hasSize(2)
         assertThat(result[0].title).isEqualTo("Apple")
-        assertThat(result[0].tagEntities[0]).isEqualTo(TagEntity("fruits"))
+        assertThat(result[0].tagEntities[0]).isEqualTo(tag)
 
         assertThat(result[0].isCheckboxListAvailable).isTrue()
         assertThat(result[0].checkListItems.first().text).isEqualTo("Buy Apple")
@@ -69,7 +70,7 @@ class GetDetailedNotesTest {
     @Test
     fun `Verify LruCache prevents redundant audio metadata calls`() = runTest {
         val uri = "file://audio.mp3"
-        val noteEntity = NoteEntity(id = 1, title = "Test", content = "...", audioUris = listOf(uri), timestamp = 1, color = 1)
+        val noteEntity = NoteEntity(id = "1", title = "Test", content = "...", audioUris = listOf(uri), timestamp = 1, color = 1)
 
         coEvery { repository.getNotes(any()) } returns flowOf(listOf(NoteWithTags(noteEntity)), listOf(NoteWithTags(noteEntity)))
         coEvery { audioMetadataProvider.getDuration(any()) } returns 3000L

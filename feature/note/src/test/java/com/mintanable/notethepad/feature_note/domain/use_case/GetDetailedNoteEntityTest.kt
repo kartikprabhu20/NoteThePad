@@ -38,7 +38,8 @@ class GetDetailedNoteTest {
 
     @Test
     fun `When valid ID is provided, returns correctly mapped DetailedNote`() = runTest {
-        val noteId = 1L
+        val tag = TagEntity("tag")
+        val noteId = "1L"
         val fakeNoteEntity = NoteEntity(
             id = noteId,
             title = "Test Note",
@@ -49,7 +50,7 @@ class GetDetailedNoteTest {
             color = 0xFFFFFF,
         )
 
-        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNoteEntity, tagEntities = listOf( TagEntity("tag")))
+        coEvery { repository.getNoteById(noteId) } returns NoteWithTags(fakeNoteEntity, tagEntities = listOf(tag))
         coEvery { audioMetadataProvider.getDuration(any()) } returns 3500L
 
         val result = getDetailedNote(noteId)
@@ -58,12 +59,12 @@ class GetDetailedNoteTest {
         assertThat(result?.title).isEqualTo("Test Note")
         assertThat(result?.isCheckboxListAvailable).isTrue()
         assertThat(result?.audioAttachments?.first()?.duration).isEqualTo(3500L)
-        assertThat(result?.tagEntities?.get(0)).isEqualTo(TagEntity("tag"))
+        assertThat(result?.tagEntities?.get(0)).isEqualTo(tag)
     }
 
     @Test
     fun `When note ID does not exist, returns null`() = runTest {
-        val noteId = 999L
+        val noteId = "999L"
         coEvery { repository.getNoteById(noteId) } returns null
 
         val result = getDetailedNote(noteId)
@@ -74,7 +75,7 @@ class GetDetailedNoteTest {
 
     @Test
     fun `Verify Mapper Cache is utilized for multiple calls with same URI`() = runTest {
-        val noteId = 1L
+        val noteId = "1L"
         val uri = "file://audio.mp3"
         val fakeNoteEntity = NoteEntity(
             id = noteId,
