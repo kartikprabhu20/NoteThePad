@@ -52,6 +52,10 @@ interface NoteDao {
     fun getNotesByTag(tagId: String): Flow<List<NoteWithTags>>
 
     @Transaction
+    @Query("SELECT * FROM noteEntity WHERE id IN (:ids) AND isDeleted = 0")
+    fun getNotesByIds(ids: List<String>): Flow<List<NoteWithTags>>
+
+    @Transaction
     @Query("SELECT * FROM noteEntity WHERE isDeleted = 1 ORDER BY lastUpdateTime DESC")
     fun getDeletedNotes(): Flow<List<NoteWithTags>>
 

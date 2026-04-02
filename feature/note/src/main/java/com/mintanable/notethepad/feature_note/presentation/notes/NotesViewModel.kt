@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_note.presentation.notes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
@@ -34,7 +35,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -51,7 +54,8 @@ class NotesViewModel @Inject constructor(
     private val fileIOUseCases: FileIOUseCases,
     private val dispatchers: DispatcherProvider,
     private val widgetRefresher: WidgetRefresher,
-    private val refreshSupaSync: RefreshSupaSync
+    private val refreshSupaSync: RefreshSupaSync,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     companion object {
@@ -80,13 +84,26 @@ class NotesViewModel @Inject constructor(
     )
     val filterState = _filterState.asStateFlow()
 
-    private val _notesFromDb = _filterState.flatMapLatest {  query ->
-        when (query.filter) {
-            NotesFilterType.REMINDERS.filter -> noteUseCases.getNotesWithReminders(query.order)
-            NotesFilterType.TAGS.filter -> noteUseCases.getNotesWithTags(query.order, TagEntity(tagId = query.tagId, tagName = query.tagName))
-            else -> noteUseCases.getDetailedNotes(query.order)
-        }
-    }.flowOn(dispatchers.io)
+    private val userId = authRepository.getSignedInFirebaseUser()
+        .map { it?.uid }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    private val _notesFromDb = combine(_filterState, userId) { query, uId -> query to uId }
+        .flatMapLatest { (query, uId) ->
+            when (query.filter) {
+                NotesFilterType.REMINDERS.filter -> noteUseCases.getNotesWithReminders(query.order)
+                NotesFilterType.TAGS.filter -> noteUseCases.getNotesWithTags(query.order, TagEntity(tagId = query.tagId, tagName = query.tagName))
+                NotesFilterType.SHARED.filter -> {
+                    if (uId != null) noteUseCases.getSharedNotes(uId)
+                    else flowOf(emptyList())
+                }
+                else -> noteUseCases.getDetailedNotes(query.order)
+            }
+        }.flowOn(dispatchers.io)
 
     private var recentlyDeletedNote: DetailedNote? = null
 

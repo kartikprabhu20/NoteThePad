@@ -59,6 +59,10 @@ class NoteRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun getNotesByIds(ids: List<String>): Flow<List<NoteWithTags>> {
+        return noteDao.getNotesByIds(ids)
+    }
+
     override suspend fun getNoteById(id: String): NoteWithTags? {
         return noteDao.getNoteById(id)
     }

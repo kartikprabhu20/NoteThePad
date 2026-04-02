@@ -10,6 +10,7 @@ import java.io.File
 interface NoteRepository {
     val isSyncing: Flow<Boolean>
     fun getNotes(noteOrder: NoteOrder): Flow<List<NoteWithTags>>
+    fun getNotesByIds(ids: List<String>): Flow<List<NoteWithTags>>
     suspend fun getNoteById(id: String): NoteWithTags?
     suspend fun insertNote(noteEntity: NoteEntity, tagEntities: List<TagEntity>): String
     suspend fun deleteNote(noteEntity: NoteEntity)

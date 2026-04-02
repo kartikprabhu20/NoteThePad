@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.di
 
 import android.content.Context
+import com.mintanable.notethepad.database.db.repository.CollaborationRepository
 import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.database.db.repository.NoteRepository
@@ -30,6 +31,7 @@ import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import com.mintanable.notethepad.database.preference.repository.SharedPreferencesRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNavigationDrawerItems
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.CreateContentFromUri
+import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetSharedNotes
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.GetCameraPermissionFlag
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.GetMicrophonePermissionFlag
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.MarkCameraPermissionFlag
@@ -51,6 +53,7 @@ object NoteModule {
     @Singleton
     fun provideNoteUseCases(
         repository: NoteRepository,
+        collaborationRepository: CollaborationRepository,
         fileManager: FileManager,
         detailedNoteMapper: DetailedNoteMapper
     ): NoteUseCases {
@@ -61,7 +64,8 @@ object NoteModule {
             deleteNote = DeleteNote(repository),
             saveNoteWithAttachments = SaveNoteWithAttachments(repository, fileManager),
             getDetailedNote = GetDetailedNote(repository, detailedNoteMapper),
-            getTopNotes = GetTopNotes(repository, detailedNoteMapper)
+            getTopNotes = GetTopNotes(repository, detailedNoteMapper),
+            getSharedNotes = GetSharedNotes(collaborationRepository, repository, detailedNoteMapper)
         )
     }
 
