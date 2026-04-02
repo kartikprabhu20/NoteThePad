@@ -114,7 +114,7 @@ fun NoteEditorContent(
         noteBackgroundAnimatable.animateTo(target, tween(500))
     }
 
-    val resolvedBackgroundRes = NoteColors.resolveBackgroundImage(backgroundImage, isDarkTheme)
+    val resolvedBackgroundRes = NoteColors.resolveBackgroundImage(backgroundImage)
     val hasBackgroundImage = backgroundImage != -1
     val imageAlpha by animateFloatAsState(
         targetValue = if (hasBackgroundImage) 1f else 0f,

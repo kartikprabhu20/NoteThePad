@@ -101,10 +101,8 @@ fun ColorSelectorBottomSheetContent(
                 key = { index, _ -> "bg_$index" }
             ) { index, backgroundImage ->
 
-                val backgroundImageRes = if (isDarkTheme) backgroundImage.darkRes else backgroundImage.lightRes
-
                 BackgroundImageCircle(
-                    imageRes = backgroundImageRes,
+                    imageRes = backgroundImage.res,
                     isSelected = selectedBackgroundImage == index,
                     onClick = { onBackgroundImageClick(index) }
                 )

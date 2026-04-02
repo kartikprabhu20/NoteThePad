@@ -30,6 +30,7 @@ import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
@@ -184,17 +185,35 @@ fun NoteItemRow(note: DetailedNote) {
         RichTextSerializer.toSpannable(RichTextSerializer.deserialize(note.content))
     }
 
+    val noteColorProvider = ColorProvider(
+        day = Color(NoteColors.resolveDisplayColor(note.color, false).toArgb()),
+        night = Color(NoteColors.resolveDisplayColor(note.color, true).toArgb())
+    )
+
     Box(
         modifier = containerModifier
     ) {
+        if (note.backgroundImage != -1) {
+            Image(
+                provider = ImageProvider(NoteColors.resolveBackgroundImage(note.backgroundImage)),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = GlanceModifier.fillMaxSize()
+            )
+        } else {
+            Spacer(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .background(
+                        imageProvider = ImageProvider(R.drawable.widget_background),
+                        colorFilter = ColorFilter.tint(colorProvider = noteColorProvider)
+                    )
+            )
+        }
 
         Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .background(
-                    imageProvider = ImageProvider(R.drawable.widget_background),
-                    colorFilter = ColorFilter.tint(ColorProvider(day = Color(note.color), night = Color(note.color)))
-                )
                 .padding(8.dp)
                 .clickable(actionStartActivity(launchIntent))
         ) {

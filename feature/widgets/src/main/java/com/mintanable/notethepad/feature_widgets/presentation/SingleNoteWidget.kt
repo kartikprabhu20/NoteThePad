@@ -12,6 +12,7 @@ import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
@@ -28,6 +29,7 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.color.ColorProvider
+import androidx.glance.layout.ContentScale
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
@@ -94,17 +96,38 @@ fun NoteItem(
     action: Action?
 ) {
 
+    val noteColorProvider = ColorProvider(
+        day = Color(NoteColors.resolveDisplayColor(note.color, false).toArgb()),
+        night = Color(NoteColors.resolveDisplayColor(note.color, true).toArgb())
+    )
+
     Box(
-        modifier = GlanceModifier
-            .fillMaxSize()
+        modifier = GlanceModifier.fillMaxSize()
     ){
+
+        if (note.backgroundImage != -1) {
+            val backgroundRes = NoteColors.resolveBackgroundImage(note.backgroundImage)
+
+            Image(
+                provider = ImageProvider(backgroundRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = GlanceModifier.fillMaxSize()
+            )
+        } else {
+            Spacer(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .background(
+                        imageProvider = ImageProvider(R.drawable.widget_background),
+                        colorFilter = ColorFilter.tint(noteColorProvider)
+                    )
+            )
+        }
+
         LazyColumn(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(
-                    imageProvider = ImageProvider(R.drawable.widget_background),
-                    colorFilter = ColorFilter.tint(ColorProvider(Color(note.color), Color(note.color)))
-                )
                 .padding(8.dp)
         ) {
             item {

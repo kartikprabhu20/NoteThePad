@@ -79,8 +79,7 @@ fun NoteItemUI(
         modifier = modifier.height(IntrinsicSize.Min)
     ) {
         val resolvedColor = NoteColors.resolveDisplayColor(note.color, isDarkTheme).toArgb()
-        val resolvedBackgroundRes =
-            NoteColors.resolveBackgroundImage(note.backgroundImage, isDarkTheme)
+        val resolvedBackgroundRes = NoteColors.resolveBackgroundImage(note.backgroundImage)
         val hasBackgroundImage = note.backgroundImage != -1
         val imagePainter = if (hasBackgroundImage) {
             painterResource(id = resolvedBackgroundRes)

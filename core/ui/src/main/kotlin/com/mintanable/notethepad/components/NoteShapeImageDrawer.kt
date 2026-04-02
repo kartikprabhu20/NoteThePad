@@ -52,17 +52,36 @@ fun DrawScope.drawNoteWithImage(
         }
     }
 
-    //Draw the Background (Color or Image)
+    //Draw the Background (Color and Cropped Image)
     clipPath(paperPath) {
-        // Base Color (Always draw this as a fallback/underlay)
+        // Base Color (Underlay)
         drawPath(path = paperPath, color = basePaperColor)
 
-        // Overlay Image if exists
+        // Overlay Image with ContentScale.Crop behavior
         if (imagePainter != null && imageAlpha > 0f) {
-            with(imagePainter) {
-                draw(size = size, alpha = imageAlpha)
+            val srcSize = imagePainter.intrinsicSize
+
+            // Calculate scale to fill the container (Crop logic)
+            val widthScale = width / srcSize.width
+            val heightScale = height / srcSize.height
+            val scale = maxOf(widthScale, heightScale)
+
+            val finalWidth = srcSize.width * scale
+            val finalHeight = srcSize.height * scale
+
+            // Center the image within the bounds
+            val dx = (width - finalWidth) / 2f
+            val dy = (height - finalHeight) / 2f
+
+            withTransform({
+                translate(left = dx, top = dy)
+            }) {
+                with(imagePainter) {
+                    draw(size = Size(finalWidth, finalHeight), alpha = imageAlpha)
+                }
             }
-            // Subtle darkening so text remains readable
+
+            // Readability Overlay
             drawRect(
                 color = Color.Black.copy(alpha = if (isDarkTheme) 0.2f else 0.05f),
                 blendMode = BlendMode.Darken
@@ -91,7 +110,7 @@ fun DrawScope.drawNoteWithImage(
                     color = Color.Transparent,
                     radius = holeRadius,
                     center = Offset((i * (holeSpacing + holeRadius * 2)) + holeSpacing, 12.dp.toPx()),
-                    blendMode = BlendMode.Clear // Punches holes through EVERYTHING
+                    blendMode = BlendMode.Clear
                 )
             }
         }
@@ -110,7 +129,7 @@ fun DrawScope.drawNoteWithImage(
             val tapePath = Path().apply {
                 moveTo(startX, -5.dp.toPx())
                 repeat(10) { i ->
-                    lineTo(startX + (i/10f)*tapeWidth, -5.dp.toPx() + random.nextFloat()*4.dp.toPx())
+                    lineTo(startX + (i / 10f) * tapeWidth, -5.dp.toPx() + random.nextFloat() * 4.dp.toPx())
                 }
                 lineTo(startX + tapeWidth, tapeHeight)
                 lineTo(startX, tapeHeight)
@@ -175,7 +194,6 @@ fun DrawScope.drawNoteWithImage(
                 size = size
             )
         }
-
         else -> {}
     }
 }
