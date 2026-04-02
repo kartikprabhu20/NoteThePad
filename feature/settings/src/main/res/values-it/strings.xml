@@ -61,4 +61,7 @@
     <string name="dialog_download_audio_transcriber_title">Scarica trascrittore audio</string>
     <string name="dialog_download_audio_transcriber_description">Il modello di trascrizione audio verrà scaricato sul dispositivo tramite Wi-Fi. Vuoi continuare?</string>
     <string name="msg_downloading_audio_model">Download del modello IA audio in corso: %1$d%%</string>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">Sincronizzazione in tempo reale con Supabase (richiede l\'accesso)</string>
 </resources>

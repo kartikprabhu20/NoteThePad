@@ -61,4 +61,7 @@
     <string name="dialog_download_audio_transcriber_title">تنزيل ناسخ الصوت</string>
     <string name="dialog_download_audio_transcriber_description">سيتم تنزيل نموذج ناسخ الصوت على الجهاز عبر Wi-Fi. هل تريد المتابعة؟</string>
     <string name="msg_downloading_audio_model">جارٍ تنزيل نموذج الذكاء الاصطناعي الصوتي: %1$d%%</string>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">مزامنة في الوقت الفعلي مع Supabase (يتطلب تسجيل الدخول)</string>
 </resources>

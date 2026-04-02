@@ -61,4 +61,7 @@
     <string name="dialog_download_audio_transcriber_title">অডিও ট্রান্সক্রাইবার ডাউনলোড করুন</string>
     <string name="dialog_download_audio_transcriber_description">এটি Wi-Fi এর মাধ্যমে ডিভাইসে অডিও ট্রান্সক্রাইবার মডেল ডাউনলোড করবে। আপনি কি চালিয়ে যেতে চান?</string>
     <string name="msg_downloading_audio_model">অডিও AI মডেল ডাউনলোড হচ্ছে: %1$d%%</string>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">সুপাবেসের সাথে রিয়েল-টাইম সিঙ্ক (লগইন প্রয়োজন)</string>
 </resources>

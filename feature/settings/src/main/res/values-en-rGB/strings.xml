@@ -61,4 +61,7 @@
     <string name="dialog_download_audio_transcriber_title">Download Audio Transcriber</string>
     <string name="dialog_download_audio_transcriber_description">This will download the on-device audio transcriber model over Wi-Fi. Do you want to continue?</string>
     <string name="msg_downloading_audio_model">Downloading Audio AI model in progress: %1$d%%</string>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">Real-time sync with Supabase (requires Login)</string>
 </resources>

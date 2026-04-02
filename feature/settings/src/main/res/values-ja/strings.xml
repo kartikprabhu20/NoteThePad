@@ -61,4 +61,7 @@
     <string name="dialog_download_audio_transcriber_title">音声文字起こしをダウンロード</string>
     <string name="dialog_download_audio_transcriber_description">Wi-Fi経由でデバイスに音声文字起こしモデルをダウンロードします。続行しますか？</string>
     <string name="msg_downloading_audio_model">音声AIモデルをダウンロード中: %1$d%%</string>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">Supabaseとのリアルタイム同期（ログインが必要）</string>
 </resources>

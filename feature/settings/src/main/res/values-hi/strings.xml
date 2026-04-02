@@ -61,4 +61,7 @@
     <string name="dialog_download_audio_transcriber_title">ऑडियो ट्रांसक्राइबर डाउनलोड करें</string>
     <string name="dialog_download_audio_transcriber_description">यह Wi-Fi के माध्यम से डिवाइस पर ऑडियो ट्रांसक्राइबर मॉडल डाउनलोड करेगा। क्या आप जारी रखना चाहते हैं?</string>
     <string name="msg_downloading_audio_model">ऑडियो AI मॉडल डाउनलोड हो रहा है: %1$d%%</string>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">SupaBase के साथ रीयल-टाइम सिंक (लॉगिन आवश्यक)</string>
 </resources>
