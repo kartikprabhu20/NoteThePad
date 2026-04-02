@@ -4,5 +4,6 @@ data class FileIOUseCases(
     val createFile: CreateFile,
     val createUri: CreateUri,
     val deleteFiles: DeleteFiles,
-    val saveMediaToStorage: SaveMediaToStorage
+    val saveMediaToStorage: SaveMediaToStorage,
+    val createContentFromUri: CreateContentFromUri
 )

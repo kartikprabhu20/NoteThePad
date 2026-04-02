@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
@@ -474,6 +475,86 @@ class AddEditNoteViewModel @Inject constructor(
                 val cachedKey = _uiState.value.zoomedImageUri?.toString()
                 val cached = cachedKey?.let { imageSuggestionsCache[it] } ?: emptyList()
                 _uiState.update { it.copy(imageQueryResult = "", isImageQueryLoading = false, imageSuggestions = cached) }
+            }
+
+            is AddEditNoteEvent.ShareNote -> {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isSaving = true) }
+                    saveNote(currentNoteId)
+                        .onSuccess { id ->
+                            if (currentNoteId.isBlank() && id.isNotBlank()) {
+                                currentNoteId = id
+                            }
+                            if (id.isNotBlank()) { rescheduleReminder(id) }
+                            _uiState.update { it.copy(isSaving = false) }
+                            
+                            val intent = withContext(Dispatchers.IO) { buildShareIntent() }
+                            _eventFlow.emit(UiEvent.ShareNote(intent))
+                        }
+                        .onFailure { e ->
+                            _uiState.update { it.copy(isSaving = false) }
+                            _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed before sharing"))
+                        }
+                }
+            }
+        }
+    }
+
+    private fun buildShareIntent(): Intent {
+        val state = uiState.value
+        val title = state.titleState.richText.rawText.trim()
+        val body = buildString {
+            if (state.isCheckboxListAvailable) {
+                state.checkListItems.forEach { item ->
+                    append(if (item.isChecked) "☑ " else "☐ ")
+                    append(item.text)
+                    append("\n")
+                }
+            } else {
+                append(state.contentRichTextState.document.rawText.trim())
+            }
+            if (state.tagEntities.isNotEmpty()) {
+                if (isNotEmpty()) append("\n\n")
+                append(state.tagEntities.joinToString(" ") { "#${it.tagName}" })
+            }
+        }
+
+        val imageUris = state.attachedImages.mapNotNull { fileIOUseCases.createContentFromUri(it) }
+        val audioUris = state.attachedAudios.mapNotNull { fileIOUseCases.createContentFromUri(it.uri.toUri()) }
+        val allAttachments = ArrayList(imageUris + audioUris)
+
+        val textBody = if (title.isNotBlank()) "$title\n\n$body" else body
+
+        return if (allAttachments.isEmpty()) {
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, title)
+                putExtra(Intent.EXTRA_TEXT, textBody)
+            }
+        } else if (allAttachments.size == 1) {
+            val uri = allAttachments[0]
+            Intent(Intent.ACTION_SEND).apply {
+                type = appContext.contentResolver.getType(uri) ?: "*/*"
+                putExtra(Intent.EXTRA_SUBJECT, title)
+                putExtra(Intent.EXTRA_TEXT, textBody)
+                putExtra(Intent.EXTRA_STREAM, uri)
+                clipData = android.content.ClipData.newRawUri(null, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+        } else {
+            Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                type = if (imageUris.isNotEmpty()) "image/*" else "audio/*"
+                putExtra(Intent.EXTRA_SUBJECT, title)
+                putExtra(Intent.EXTRA_TEXT, textBody)
+                putParcelableArrayListExtra(Intent.EXTRA_STREAM, allAttachments)
+                
+                // Essential for granting read permissions to multiple URIs on modern Android
+                val clipData = android.content.ClipData.newRawUri(null, allAttachments[0])
+                for (i in 1 until allAttachments.size) {
+                    clipData.addItem(android.content.ClipData.Item(allAttachments[i]))
+                }
+                this.clipData = clipData
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
         }
     }

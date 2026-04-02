@@ -29,6 +29,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import com.mintanable.notethepad.database.preference.repository.SharedPreferencesRepository
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNavigationDrawerItems
+import com.mintanable.notethepad.feature_note.domain.use_case.fileio.CreateContentFromUri
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.GetCameraPermissionFlag
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.GetMicrophonePermissionFlag
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.MarkCameraPermissionFlag
@@ -101,7 +102,8 @@ object NoteModule {
             createFile = CreateFile(fileManager),
             createUri = CreateUri(fileManager),
             deleteFiles = DeleteFiles(fileManager),
-            saveMediaToStorage = SaveMediaToStorage(fileManager)
+            saveMediaToStorage = SaveMediaToStorage(fileManager),
+            createContentFromUri = CreateContentFromUri(fileManager)
         )
     }
 

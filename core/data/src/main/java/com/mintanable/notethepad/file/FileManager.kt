@@ -21,6 +21,7 @@ class FileManager @Inject constructor(
 ) {
 
     private val folderName = "NoteAttachments"
+    val authority = "${context.packageName}.fileprovider"
 
     fun getMediaDir(): File {
         val dir = File(context.getExternalFilesDir(null), folderName)
@@ -80,7 +81,7 @@ class FileManager @Inject constructor(
     fun createUri(extension: String,prefix: String?): Uri? {
         return try {
             val file = createFile(extension, prefix) ?: return null
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            FileProvider.getUriForFile(context, authority, file)
         } catch (e: Exception) {
             Log.e("kptest", "Error while createUri: $e")
             null
@@ -157,7 +158,7 @@ class FileManager @Inject constructor(
     /**
      * Resolves a URI to a File ONLY if it points to our app's internal NoteAttachments folder.
      */
-    fun getFileFromInternalUri(uri: Uri): File? {
+    private fun getFileFromInternalUri(uri: Uri): File? {
         if (!isInternalUri(uri)) return null
         
         return when (uri.scheme) {
@@ -169,5 +170,18 @@ class FileManager @Inject constructor(
             null -> File(uri.toString()) // Assume raw path
             else -> null
         }
+    }
+
+    fun uriToContent(uri: Uri): Uri? = try {
+        if (uri.scheme == "content" && uri.authority == authority) uri
+        else if (uri.scheme == "file" || (uri.scheme == null && uri.path != null)) {
+            val file = java.io.File(uri.path ?: return null)
+            androidx.core.content.FileProvider.getUriForFile(context, authority, file)
+        } else if (uri.scheme == "content") {
+            uri
+        } else null
+    } catch (e: Exception) {
+        Log.e("ShareNote", "Could not convert URI: $uri", e)
+        null
     }
 }
