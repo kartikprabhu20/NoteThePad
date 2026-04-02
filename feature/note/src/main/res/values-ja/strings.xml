@@ -59,6 +59,7 @@
     <string name="option_gallery">ギャラリー</string>
     <string name="option_image">画像</string>
     <string name="option_make_copy">コピーを作成</string>
+    <string name="option_send">送信</string>
     <string name="option_pin_widget">ウィジェットとして固定</string>
     <string name="option_video">動画</string>
     <string name="option_video_recorder">動画録画</string>

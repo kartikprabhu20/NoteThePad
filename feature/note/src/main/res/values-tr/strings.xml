@@ -59,6 +59,7 @@
     <string name="option_gallery">Galeri</string>
     <string name="option_image">Resim</string>
     <string name="option_make_copy">Kopya oluştur</string>
+    <string name="option_send">Gönder</string>
     <string name="option_pin_widget">Widget olarak sabitle</string>
     <string name="option_video">Video</string>
     <string name="option_video_recorder">Video kaydedici</string>

@@ -59,6 +59,7 @@
     <string name="option_gallery">Galleria</string>
     <string name="option_image">Immagine</string>
     <string name="option_make_copy">Crea una copia</string>
+    <string name="option_send">Invia</string>
     <string name="option_pin_widget">Fissa come widget</string>
     <string name="option_video">Video</string>
     <string name="option_video_recorder">Registratore video</string>

@@ -59,6 +59,7 @@
     <string name="option_gallery">相册</string>
     <string name="option_image">图片</string>
     <string name="option_make_copy">创建副本</string>
+    <string name="option_send">发送</string>
     <string name="option_pin_widget">固定为小部件</string>
     <string name="option_video">视频</string>
     <string name="option_video_recorder">视频录制</string>

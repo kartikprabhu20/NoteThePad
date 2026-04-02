@@ -59,6 +59,7 @@
     <string name="option_gallery">Галерея</string>
     <string name="option_image">Изображение</string>
     <string name="option_make_copy">Создать копию</string>
+    <string name="option_send">Отправить</string>
     <string name="option_pin_widget">Закрепить как виджет</string>
     <string name="option_video">Видео</string>
     <string name="option_video_recorder">Видеозапись</string>

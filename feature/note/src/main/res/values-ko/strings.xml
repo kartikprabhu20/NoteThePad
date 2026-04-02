@@ -59,6 +59,7 @@
     <string name="option_gallery">갤러리</string>
     <string name="option_image">이미지</string>
     <string name="option_make_copy">복사본 만들기</string>
+    <string name="option_send">보내기</string>
     <string name="option_pin_widget">위젯으로 고정</string>
     <string name="option_video">동영상</string>
     <string name="option_video_recorder">동영상 녹화기</string>
