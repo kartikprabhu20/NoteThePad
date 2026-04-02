@@ -6,8 +6,12 @@ import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
 import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.NoteDatabase
+import com.mintanable.notethepad.database.db.dao.CollaboratorDao
 import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.dao.TagDao
+import com.mintanable.notethepad.core.network.sync.CollaborationService
+import com.mintanable.notethepad.database.db.repository.CollaborationRepository
+import com.mintanable.notethepad.database.db.repository.CollaborationRepositoryImpl
 import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepository
 import com.mintanable.notethepad.database.db.repository.NavigationDrawerItemRepositoryImpl
 import com.mintanable.notethepad.database.db.repository.NoteRepository
@@ -46,6 +50,9 @@ object DatabaseModule {
 
     @Provides
     fun provideTagDao(db: NoteDatabase): TagDao = db.tagDao()
+
+    @Provides
+    fun provideCollaboratorDao(db: NoteDatabase): CollaboratorDao = db.collaboratorDao()
 
     @Provides
     @Singleton
@@ -87,5 +94,14 @@ object DatabaseModule {
     @Singleton
     fun provideNavigationDrawerRepository(): NavigationDrawerItemRepository {
         return NavigationDrawerItemRepositoryImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCollaborationRepository(
+        collaborationService: CollaborationService,
+        collaboratorDao: CollaboratorDao
+    ): CollaborationRepository {
+        return CollaborationRepositoryImpl(collaborationService, collaboratorDao)
     }
 }
