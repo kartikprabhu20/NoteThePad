@@ -300,17 +300,10 @@ fun NotesScreen(
                             )
                         } else {
                             val resource =
-                                if (isDarkTheme) {
-                                    if (searchQuery.isNotEmpty())
-                                        R.drawable.search_female_dark
-                                    else
-                                        R.drawable.empty_male_dark
-                                } else {
-                                    if (searchQuery.isNotEmpty())
-                                        R.drawable.search_female_pastel
-                                    else
-                                        R.drawable.empty_male_pastel
-                                }
+                                if (searchQuery.isNotEmpty())
+                                    R.drawable.search_female
+                                else
+                                    R.drawable.empty_male
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center

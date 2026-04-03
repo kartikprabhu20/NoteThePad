@@ -114,7 +114,6 @@ class AiModelRepositoryImpl @Inject constructor(
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     val gistResponse = response.body?.string()
-                    Log.d("kptest", "gistResponse $gistResponse")
 
                     if (!gistResponse.isNullOrEmpty()) {
                         val wrapper = gson.fromJson(gistResponse, GistWrapper::class.java)

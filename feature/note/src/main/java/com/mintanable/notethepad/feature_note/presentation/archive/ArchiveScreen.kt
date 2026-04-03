@@ -55,12 +55,7 @@ fun ArchiveScreen(
         }
     ) { paddingValues ->
         if (deletedNotes.isEmpty()) {
-            val resource =
-                if (isDarkTheme) {
-                    R.drawable.trash_male_dark
-                } else {
-                    R.drawable.trash_male_pastel
-                }
+            val resource = R.drawable.trash_male
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
