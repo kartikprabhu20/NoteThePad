@@ -42,7 +42,6 @@ class CollaborationRepositoryImpl @Inject constructor(
     ): Boolean {
         ensureAuth()
         val dto = NoteCollaboratorDto(
-            id = UUID.randomUUID().toString(),
             noteId = noteId,
             ownerUserId = ownerUserId,
             collaboratorUserId = collaborator.userId,
@@ -77,7 +76,7 @@ class CollaborationRepositoryImpl @Inject constructor(
     override suspend fun fetchAndCacheCollaborators(noteId: String): List<CollaboratorEntity> {
         ensureAuth()
         val remote = collaborationService.getCollaborators(noteId)
-        val entities = remote.map { it.toEntity() }
+        val entities = remote.filter { it.id != null }.map { it.toEntity() }
         collaboratorDao.replaceCollaboratorsForNote(noteId, entities)
         return entities
     }
@@ -87,7 +86,7 @@ class CollaborationRepositoryImpl @Inject constructor(
     }
 
     private fun NoteCollaboratorDto.toEntity() = CollaboratorEntity(
-        id = id,
+        id = id!!,
         noteId = noteId,
         ownerUserId = ownerUserId,
         collaboratorUserId = collaboratorUserId,

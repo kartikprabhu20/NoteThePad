@@ -106,9 +106,9 @@ class SupaFetchWorker @AssistedInject constructor(
                 val myCollaborations = collaborationService.getMyCollaborations(userId)
                 val notesIShared = collaborationService.getNotesIShared(userId)
                 val allCollaboratorDtos = (myCollaborations + notesIShared).distinctBy { it.id }
-                val collaboratorEntities = allCollaboratorDtos.map { dto ->
+                val collaboratorEntities = allCollaboratorDtos.filter { it.id != null }.map { dto ->
                     CollaboratorEntity(
-                        id = dto.id,
+                        id = dto.id!!,
                         noteId = dto.noteId,
                         ownerUserId = dto.ownerUserId,
                         collaboratorUserId = dto.collaboratorUserId,

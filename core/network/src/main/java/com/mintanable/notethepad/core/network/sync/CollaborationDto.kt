@@ -15,7 +15,7 @@ data class UserProfileDto(
 
 @Serializable
 data class NoteCollaboratorDto(
-    val id: String = "",
+    val id: String? = null,
     @SerialName("note_id")
     val noteId: String,
     @SerialName("owner_user_id")
