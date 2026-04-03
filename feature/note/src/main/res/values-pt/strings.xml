@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Cores de fundo</string>
     <string name="subtitle_background_images">Imagens de fundo</string>
     <string name="transparent">Transparente</string>
+
+    <string name="msg_save_failed">Falha ao salvar</string>
+    <string name="msg_pin_failed">Falha ao salvar, não é possível fixar na tela inicial</string>
+    <string name="msg_save_failed_sharing">Falha ao salvar antes de compartilhar</string>
+    <string name="msg_save_before_invite">Salve a nota antes de convidar colaboradores</string>
+    <string name="msg_invitation_sent">Convite enviado para %1$s</string>
+    <string name="msg_leave_failed">Falha ao sair da nota</string>
+    <string name="msg_save_before_collaborate">Salve a nota primeiro para colaborar</string>
+    <string name="msg_remove_collaborator_failed">Falha ao remover colaborador</string>
+
+    <string name="option_collaborate">Colaborar</string>
+    <string name="invite_collaborator">Convidar por e-mail</string>
+    <string name="collaborator_not_found">Usuário não encontrado</string>
+    <string name="cannot_invite_self">Você não pode convidar a si mesmo</string>
+    <string name="collaborator_already_added">O usuário já é um colaborador</string>
+    <string name="leave_note">Sair da nota</string>
+    <string name="remove_collaborator">Remover</string>
+    <string name="shared_notes">Compartilhado</string>
+    <string name="invite">Convidar</string>
+    <string name="owner_label">Proprietário</string>
+    <string name="title_archive">Arquivo</string>
+    <string name="content_description_restore">Restaurar</string>
+    <string name="content_description_delete_permanently">Excluir permanentemente</string>
+    <string name="msg_add_collaborator_failed">Falha ao adicionar colaborador</string>
 </resources>

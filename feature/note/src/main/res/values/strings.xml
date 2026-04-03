@@ -31,6 +31,15 @@
     <string name="title_ai_suggestions">AI tag suggestions</string>
     <string name="label_more_items">+ %1$d more</string>
     <string name="msg_note_deleted">Note deleted</string>
+    <string name="msg_save_failed">Save Failed</string>
+    <string name="msg_pin_failed">Save Failed, can\'t pin to homescreen</string>
+    <string name="msg_save_failed_sharing">Save Failed before sharing</string>
+    <string name="msg_save_before_invite">Please save the note before inviting collaborators</string>
+    <string name="msg_invitation_sent">Invitation sent to %1$s</string>
+    <string name="msg_leave_failed">Failed to leave note</string>
+    <string name="msg_save_before_collaborate">Save the note first to collaborate</string>
+    <string name="msg_remove_collaborator_failed">Failed to remove collaborator</string>
+    <string name="msg_add_collaborator_failed">Failed to add collaborator</string>
 
     <!-- App Drawer (Specific to Note feature navigation) -->
     <string name="drawer_labels_header">Labels</string>
@@ -47,6 +56,16 @@
     <string name="option_delete">Delete</string>
     <string name="option_make_copy">Make a copy</string>
     <string name="option_send">Send</string>
+    <string name="option_collaborate">Collaborate</string>
+    <string name="invite_collaborator">Invite by email</string>
+    <string name="collaborator_not_found">User not found</string>
+    <string name="cannot_invite_self">You cannot invite yourself</string>
+    <string name="collaborator_already_added">User is already a collaborator</string>
+    <string name="leave_note">Leave note</string>
+    <string name="remove_collaborator">Remove</string>
+    <string name="shared_notes">Shared</string>
+    <string name="invite">Invite</string>
+    <string name="owner_label">Owner</string>
     <string name="option_camera">Camera</string>
     <string name="option_gallery">Gallery</string>
     <string name="option_video_recorder">Video recorder</string>
@@ -104,4 +123,9 @@
     <string name="title_color_selection">Note Appearance</string>
     <string name="subtitle_background_colors">Background Colors</string>
     <string name="subtitle_background_images">Background Images</string>
+
+    <!-- Archive -->
+    <string name="title_archive">Archive</string>
+    <string name="content_description_restore">Restore</string>
+    <string name="content_description_delete_permanently">Delete Permanently</string>
 </resources>

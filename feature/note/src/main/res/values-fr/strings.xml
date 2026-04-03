@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Couleurs d\'arrière-plan</string>
     <string name="subtitle_background_images">Images d\'arrière-plan</string>
     <string name="transparent">Transparent</string>
+
+    <string name="msg_save_failed">Échec de l\'enregistrement</string>
+    <string name="msg_pin_failed">Échec de l\'enregistrement, impossible d\'épingler à l\'écran d\'accueil</string>
+    <string name="msg_save_failed_sharing">Échec de l\'enregistrement avant le partage</string>
+    <string name="msg_save_before_invite">Veuillez enregistrer la note avant d\'inviter des collaborateurs</string>
+    <string name="msg_invitation_sent">Invitation envoyée à %1$s</string>
+    <string name="msg_leave_failed">Échec de la sortie de la note</string>
+    <string name="msg_save_before_collaborate">Enregistrez d\'abord la note pour collaborer</string>
+    <string name="msg_remove_collaborator_failed">Échec de la suppression du collaborateur</string>
+
+    <string name="option_collaborate">Collaborer</string>
+    <string name="invite_collaborator">Inviter par e-mail</string>
+    <string name="collaborator_not_found">Utilisateur non trouvé</string>
+    <string name="cannot_invite_self">Vous ne pouvez pas vous inviter vous-même</string>
+    <string name="collaborator_already_added">L\'utilisateur est déjà un collaborateur</string>
+    <string name="leave_note">Quitter la note</string>
+    <string name="remove_collaborator">Supprimer</string>
+    <string name="shared_notes">Partagé</string>
+    <string name="invite">Inviter</string>
+    <string name="owner_label">Propriétaire</string>
+    <string name="title_archive">Archives</string>
+    <string name="content_description_restore">Restaurer</string>
+    <string name="content_description_delete_permanently">Supprimer définitivement</string>
+    <string name="msg_add_collaborator_failed">Échec de l\'ajout du collaborateur</string>
 </resources>

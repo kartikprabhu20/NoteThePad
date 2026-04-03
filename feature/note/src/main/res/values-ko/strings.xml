@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">배경색</string>
     <string name="subtitle_background_images">배경 이미지</string>
     <string name="transparent">투명</string>
+
+    <string name="msg_save_failed">저장 실패</string>
+    <string name="msg_pin_failed">저장 실패, 홈 화면에 고정할 수 없습니다</string>
+    <string name="msg_save_failed_sharing">공유 전 저장 실패</string>
+    <string name="msg_save_before_invite">공동 작업자를 초대하기 전에 노트를 저장해 주세요</string>
+    <string name="msg_invitation_sent">%1$s에게 초대장을 보냈습니다</string>
+    <string name="msg_leave_failed">노트 나가기 실패</string>
+    <string name="msg_save_before_collaborate">공동 작업을 하려면 먼저 노트를 저장하세요</string>
+    <string name="msg_remove_collaborator_failed">공동 작업자 제거 실패</string>
+
+    <string name="option_collaborate">공동 작업</string>
+    <string name="invite_collaborator">이메일로 초대</string>
+    <string name="collaborator_not_found">사용자를 찾을 수 없음</string>
+    <string name="cannot_invite_self">자신을 초대할 수 없습니다</string>
+    <string name="collaborator_already_added">이미 공동 작업자인 사용자입니다</string>
+    <string name="leave_note">노트 나가기</string>
+    <string name="remove_collaborator">삭제</string>
+    <string name="shared_notes">공유됨</string>
+    <string name="invite">초대</string>
+    <string name="owner_label">소유자</string>
+    <string name="title_archive">보관함</string>
+    <string name="content_description_restore">복원</string>
+    <string name="content_description_delete_permanently">영구 삭제</string>
+    <string name="msg_add_collaborator_failed">공동 작업자 추가 실패</string>
 </resources>

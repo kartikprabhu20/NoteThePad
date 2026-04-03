@@ -3,7 +3,7 @@
     <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">স্বয়ংক্রিয় ট্যাগ</string>
     <string name="btn_cancel">বাতিল করুন</string>
-    <string name="btn_confirm">নিশ্চیت করুন</string>
+    <string name="btn_confirm">নিশ্চিত করুন</string>
     <string name="btn_download">ডাউনলোড</string>
     <string name="btn_start_recording">রেকর্ডিং শুরু করুন</string>
     <string name="btn_stop_recording">রেকর্ডিং বন্ধ করুন</string>
@@ -63,7 +63,7 @@
     <string name="option_pin_widget">উইজেট হিসেবে পিন করুন</string>
     <string name="option_video">ভিডিও</string>
     <string name="option_video_recorder">ভিডিও রেকর্ডার</string>
-    <string name="order_ascending">আরোহী</string>
+    <string name="order_ascending">আরোোহী</string>
     <string name="order_color">রঙ</string>
     <string name="order_date">তারিখ</string>
     <string name="order_descending">অবরোহী</string>
@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">পটভূমির রং</string>
     <string name="subtitle_background_images">পটভূমির ছবি</string>
     <string name="transparent">স্বচ্ছ</string>
+
+    <string name="msg_save_failed">সংরক্ষণ করতে ব্যর্থ হয়েছে</string>
+    <string name="msg_pin_failed">সংরক্ষণ করতে ব্যর্থ হয়েছে, হোমস্ক্রিনে পিন করা যাচ্ছে না</string>
+    <string name="msg_save_failed_sharing">শেয়ার করার আগে সংরক্ষণ করতে ব্যর্থ হয়েছে</string>
+    <string name="msg_save_before_invite">সহযোগীদের আমন্ত্রণ জানানোর আগে দয়া করে নোটটি সংরক্ষণ করুন</string>
+    <string name="msg_invitation_sent">%1$s-এ আমন্ত্রণ পাঠানো হয়েছে</string>
+    <string name="msg_leave_failed">নোট ত্যাগ করতে ব্যর্থ হয়েছে</string>
+    <string name="msg_save_before_collaborate">সহযোগিতার জন্য প্রথমে নোটটি সংরক্ষণ করুন</string>
+    <string name="msg_remove_collaborator_failed">সহযোগীকে সরাতে ব্যর্থ হয়েছে</string>
+
+    <string name="option_collaborate">সহযোগিতা করুন</string>
+    <string name="invite_collaborator">ইমেলের মাধ্যমে আমন্ত্রণ জানান</string>
+    <string name="collaborator_not_found">ব্যবহারকারী পাওয়া যায়নি</string>
+    <string name="cannot_invite_self">আপনি নিজেকে আমন্ত্রণ জানাতে পারবেন না</string>
+    <string name="collaborator_already_added">ব্যবহারকারী ইতিমধ্যে একজন সহযোগী</string>
+    <string name="leave_note">নোট ত্যাগ করুন</string>
+    <string name="remove_collaborator">সরান</string>
+    <string name="shared_notes">শেয়ার করা নোট</string>
+    <string name="invite">আমন্ত্রণ জানান</string>
+    <string name="owner_label">মালিক</string>
+    <string name="title_archive">আর্কাইভ</string>
+    <string name="content_description_restore">পুনরুদ্ধার করুন</string>
+    <string name="content_description_delete_permanently">চিরতরে মুছে ফেলুন</string>
+    <string name="msg_add_collaborator_failed">সহযোগী যোগ করতে ব্যর্থ হয়েছে</string>
 </resources>

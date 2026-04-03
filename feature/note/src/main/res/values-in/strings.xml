@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Warna Latar Belakang</string>
     <string name="subtitle_background_images">Gambar Latar Belakang</string>
     <string name="transparent">Transparan</string>
+
+    <string name="msg_save_failed">Gagal menyimpan</string>
+    <string name="msg_pin_failed">Gagal menyimpan, tidak bisa disematkan ke layar utama</string>
+    <string name="msg_save_failed_sharing">Gagal menyimpan sebelum berbagi</string>
+    <string name="msg_save_before_invite">Harap simpan catatan sebelum mengundang kolaborator</string>
+    <string name="msg_invitation_sent">Undangan dikirim ke %1$s</string>
+    <string name="msg_leave_failed">Gagal meninggalkan catatan</string>
+    <string name="msg_save_before_collaborate">Simpan catatan terlebih dahulu untuk berkolaborasi</string>
+    <string name="msg_remove_collaborator_failed">Gagal menghapus kolaborator</string>
+
+    <string name="option_collaborate">Kolaborasi</string>
+    <string name="invite_collaborator">Undang melalui email</string>
+    <string name="collaborator_not_found">Pengguna tidak ditemukan</string>
+    <string name="cannot_invite_self">Anda tidak bisa mengundang diri sendiri</string>
+    <string name="collaborator_already_added">Pengguna sudah menjadi kolaborator</string>
+    <string name="leave_note">Tinggalkan catatan</string>
+    <string name="remove_collaborator">Hapus</string>
+    <string name="shared_notes">Dibagikan</string>
+    <string name="invite">Undang</string>
+    <string name="owner_label">Pemilik</string>
+    <string name="title_archive">Arsip</string>
+    <string name="content_description_restore">Pulihkan</string>
+    <string name="content_description_delete_permanently">Hapus Permanen</string>
+    <string name="msg_add_collaborator_failed">Gagal menambahkan kolaborator</string>
 </resources>

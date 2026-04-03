@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Colori di sfondo</string>
     <string name="subtitle_background_images">Immagini di sfondo</string>
     <string name="transparent">Trasparente</string>
+
+    <string name="msg_save_failed">Salvataggio non riuscito</string>
+    <string name="msg_pin_failed">Salvataggio non riuscito, impossibile fissare alla schermata iniziale</string>
+    <string name="msg_save_failed_sharing">Salvataggio non riuscito prima della condivisione</string>
+    <string name="msg_save_before_invite">Salva la nota prima di invitare collaboratori</string>
+    <string name="msg_invitation_sent">Invito inviato a %1$s</string>
+    <string name="msg_leave_failed">Impossibile abbandonare la nota</string>
+    <string name="msg_save_before_collaborate">Salva prima la nota per collaborare</string>
+    <string name="msg_remove_collaborator_failed">Impossibile rimuovere il collaboratore</string>
+
+    <string name="option_collaborate">Collabora</string>
+    <string name="invite_collaborator">Invita tramite email</string>
+    <string name="collaborator_not_found">Utente non trovato</string>
+    <string name="cannot_invite_self">Non puoi invitare te stesso</string>
+    <string name="collaborator_already_added">L\'utente è già un collaboratore</string>
+    <string name="leave_note">Abbandona nota</string>
+    <string name="remove_collaborator">Rimuovi</string>
+    <string name="shared_notes">Condivise</string>
+    <string name="invite">Invita</string>
+    <string name="owner_label">Proprietario</string>
+    <string name="title_archive">Archivio</string>
+    <string name="content_description_restore">Ripristina</string>
+    <string name="content_description_delete_permanently">Elimina definitivamente</string>
+    <string name="msg_add_collaborator_failed">Impossibile aggiungere il collaboratore</string>
 </resources>

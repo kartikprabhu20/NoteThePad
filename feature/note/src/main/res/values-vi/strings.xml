@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Màu Nền</string>
     <string name="subtitle_background_images">Hình Nền</string>
     <string name="transparent">Trong suốt</string>
+
+    <string name="msg_save_failed">Lưu thất bại</string>
+    <string name="msg_pin_failed">Lưu thất bại, không thể ghim vào màn hình chính</string>
+    <string name="msg_save_failed_sharing">Lưu thất bại trước khi chia sẻ</string>
+    <string name="msg_save_before_invite">Vui lòng lưu ghi chú trước khi mời cộng tác viên</string>
+    <string name="msg_invitation_sent">Đã gửi lời mời đến %1$s</string>
+    <string name="msg_leave_failed">Rời khỏi ghi chú thất bại</string>
+    <string name="msg_save_before_collaborate">Lưu ghi chú trước để cộng tác</string>
+    <string name="msg_remove_collaborator_failed">Xóa cộng tác viên thất bại</string>
+
+    <string name="option_collaborate">Cộng tác</string>
+    <string name="invite_collaborator">Mời qua email</string>
+    <string name="collaborator_not_found">Không tìm thấy người dùng</string>
+    <string name="cannot_invite_self">Bạn không thể tự mời chính mình</string>
+    <string name="collaborator_already_added">Người dùng đã là cộng tác viên</string>
+    <string name="leave_note">Rời khỏi ghi chú</string>
+    <string name="remove_collaborator">Gỡ bỏ</string>
+    <string name="shared_notes">Được chia sẻ</string>
+    <string name="invite">Mời</string>
+    <string name="owner_label">Chủ sở hữu</string>
+    <string name="title_archive">Lưu trữ</string>
+    <string name="content_description_restore">Khôi phục</string>
+    <string name="content_description_delete_permanently">Xóa vĩnh viễn</string>
+    <string name="msg_add_collaborator_failed">Thêm cộng tác viên thất bại</string>
 </resources>

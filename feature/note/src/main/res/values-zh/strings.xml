@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">背景颜色</string>
     <string name="subtitle_background_images">背景图片</string>
     <string name="transparent">透明</string>
+
+    <string name="msg_save_failed">保存失败</string>
+    <string name="msg_pin_failed">保存失败，无法固定到主屏幕</string>
+    <string name="msg_save_failed_sharing">分享前保存失败</string>
+    <string name="msg_save_before_invite">请在邀请协作者之前保存笔记</string>
+    <string name="msg_invitation_sent">邀请已发送至 %1$s</string>
+    <string name="msg_leave_failed">退出笔记失败</string>
+    <string name="msg_save_before_collaborate">请先保存笔记以进行协作</string>
+    <string name="msg_remove_collaborator_failed">移除协作者失败</string>
+
+    <string name="option_collaborate">协作</string>
+    <string name="invite_collaborator">通过邮箱邀请</string>
+    <string name="collaborator_not_found">未找到用户</string>
+    <string name="cannot_invite_self">您不能邀请自己</string>
+    <string name="collaborator_already_added">该用户已是协作者</string>
+    <string name="leave_note">退出笔记</string>
+    <string name="remove_collaborator">移除</string>
+    <string name="shared_notes">已共享</string>
+    <string name="invite">邀请</string>
+    <string name="owner_label">所有者</string>
+    <string name="title_archive">归档</string>
+    <string name="content_description_restore">恢复</string>
+    <string name="content_description_delete_permanently">永久删除</string>
+    <string name="msg_add_collaborator_failed">添加协作者失败</string>
 </resources>

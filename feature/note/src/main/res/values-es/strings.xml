@@ -50,7 +50,7 @@
     <string name="label_undo">Deshacer</string>
     <string name="loading">Cargando...</string>
     <string name="msg_note_deleted">Nota eliminada</string>
-    <string name="msg_saving_note">Guardando nota…</string>
+    <string name="msg_saving_note">Guardan nota…</string>
     <string name="option_add_label">Añadir etiqueta</string>
     <string name="option_audio">Audio</string>
     <string name="option_audio_recorder">Grabador de audio</string>
@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Colores de fondo</string>
     <string name="subtitle_background_images">Imágenes de fondo</string>
     <string name="transparent">Transparente</string>
+
+    <string name="msg_save_failed">Error al guardar</string>
+    <string name="msg_pin_failed">Error al guardar, no se puede anclar a la pantalla de inicio</string>
+    <string name="msg_save_failed_sharing">Error al guardar antes de compartir</string>
+    <string name="msg_save_before_invite">Guarda la nota antes de invitar a colaboradores</string>
+    <string name="msg_invitation_sent">Invitación enviada a %1$s</string>
+    <string name="msg_leave_failed">Error al salir de la nota</string>
+    <string name="msg_save_before_collaborate">Guarda la nota primero para colaborar</string>
+    <string name="msg_remove_collaborator_failed">Error al eliminar al colaborador</string>
+
+    <string name="option_collaborate">Colaborar</string>
+    <string name="invite_collaborator">Invitar por correo electrónico</string>
+    <string name="collaborator_not_found">Usuario no encontrado</string>
+    <string name="cannot_invite_self">No puedes invitarte a ti mismo</string>
+    <string name="collaborator_already_added">El usuario ya es un colaborador</string>
+    <string name="leave_note">Salir de la nota</string>
+    <string name="remove_collaborator">Eliminar</string>
+    <string name="shared_notes">Compartido</string>
+    <string name="invite">Invitar</string>
+    <string name="owner_label">Propietario</string>
+    <string name="title_archive">Archivo</string>
+    <string name="content_description_restore">Restaurar</string>
+    <string name="content_description_delete_permanently">Eliminar permanentemente</string>
+    <string name="msg_add_collaborator_failed">Error al añadir colaborador</string>
 </resources>

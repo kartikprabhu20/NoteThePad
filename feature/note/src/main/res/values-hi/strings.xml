@@ -65,7 +65,7 @@
     <string name="option_video_recorder">वीडियो रिकॉर्डर</string>
     <string name="order_ascending">आरोही</string>
     <string name="order_color">रंग</string>
-    <string name="order_date">तاريخ</string>
+    <string name="order_date">तारीख</string>
     <string name="order_descending">अवरोही</string>
     <string name="order_title">शीर्षक</string>
     <string name="placeholder_tag_example">जैसे: व्यक्तिगत</string>
@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">पृष्ठभूमि के रंग</string>
     <string name="subtitle_background_images">पृष्ठभूमि छवियां</string>
     <string name="transparent">पारदर्शी</string>
+
+    <string name="msg_save_failed">सहेजना विफल रहा</string>
+    <string name="msg_pin_failed">सहेजना विफल रहा, होमस्क्रीन पर पिन नहीं किया जा सकता</string>
+    <string name="msg_save_failed_sharing">साझा करने से पहले सहेजना विफल रहा</string>
+    <string name="msg_save_before_invite">कृपया सहयोगियों को आमंत्रित करने से पहले नोट सहेजें</string>
+    <string name="msg_invitation_sent">%1$s को आमंत्रण भेजा गया</string>
+    <string name="msg_leave_failed">नोट छोड़ने में विफल रहा</string>
+    <string name="msg_save_before_collaborate">सहयोग करने के लिए पहले नोट सहेजें</string>
+    <string name="msg_remove_collaborator_failed">सहयोगी को हटाने में विफल रहा</string>
+
+    <string name="option_collaborate">सहयोग करें</string>
+    <string name="invite_collaborator">ईमेल द्वारा आमंत्रित करें</string>
+    <string name="collaborator_not_found">उपयोगकर्ता नहीं मिला</string>
+    <string name="cannot_invite_self">आप खुद को आमंत्रित नहीं कर सकते</string>
+    <string name="collaborator_already_added">उपयोगकर्ता पहले से ही एक सहयोगी है</string>
+    <string name="leave_note">नोट छोड़ें</string>
+    <string name="remove_collaborator">हटाएं</string>
+    <string name="shared_notes">साझा</string>
+    <string name="invite">आमंत्रित करें</string>
+    <string name="owner_label">स्वामी</string>
+    <string name="title_archive">अभिलेखागार</string>
+    <string name="content_description_restore">पुनर्स्थापित करें</string>
+    <string name="content_description_delete_permanently">स्थायी रूप से हटाएं</string>
+    <string name="msg_add_collaborator_failed">सहयोगी जोड़ने में विफल रहा</string>
 </resources>

@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">背景色</string>
     <string name="subtitle_background_images">背景画像</string>
     <string name="transparent">透明</string>
+
+    <string name="msg_save_failed">保存に失敗しました</string>
+    <string name="msg_pin_failed">保存に失敗しました。ホーム画面に固定できません</string>
+    <string name="msg_save_failed_sharing">共有前の保存に失敗しました</string>
+    <string name="msg_save_before_invite">共同編集者を招待する前にメモを保存してください</string>
+    <string name="msg_invitation_sent">%1$s に招待を送信しました</string>
+    <string name="msg_leave_failed">メモの退出に失敗しました</string>
+    <string name="msg_save_before_collaborate">共同編集を行うには、まずメモを保存してください</string>
+    <string name="msg_remove_collaborator_failed">共同編集者の削除に失敗しました</string>
+
+    <string name="option_collaborate">共同編集</string>
+    <string name="invite_collaborator">メールで招待</string>
+    <string name="collaborator_not_found">ユーザーが見つかりません</string>
+    <string name="cannot_invite_self">自分自身を招待することはできません</string>
+    <string name="collaborator_already_added">ユーザーは既に共同編集者です</string>
+    <string name="leave_note">メモから退出</string>
+    <string name="remove_collaborator">削除</string>
+    <string name="shared_notes">共有済み</string>
+    <string name="invite">招待</string>
+    <string name="owner_label">オーナー</string>
+    <string name="title_archive">アーカイブ</string>
+    <string name="content_description_restore">復元</string>
+    <string name="content_description_delete_permanently">永久に削除</string>
+    <string name="msg_add_collaborator_failed">共同編集者の追加に失敗しました</string>
 </resources>

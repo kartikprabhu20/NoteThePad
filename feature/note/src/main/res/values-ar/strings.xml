@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">ألوان الخلفية</string>
     <string name="subtitle_background_images">صور الخلفية</string>
     <string name="transparent">شفاف</string>
+
+    <string name="msg_save_failed">فشل الحفظ</string>
+    <string name="msg_pin_failed">فشل الحفظ، لا يمكن التثبيت على الشاشة الرئيسية</string>
+    <string name="msg_save_failed_sharing">فشل الحفظ قبل المشاركة</string>
+    <string name="msg_save_before_invite">يرجى حفظ الملاحظة قبل دعوة المتعاونين</string>
+    <string name="msg_invitation_sent">تم إرسال الدعوة إلى %1$s</string>
+    <string name="msg_leave_failed">فشل مغادرة الملاحظة</string>
+    <string name="msg_save_before_collaborate">احفظ الملاحظة أولاً للتعاون</string>
+    <string name="msg_remove_collaborator_failed">فشل إزالة المتعاون</string>
+
+    <string name="option_collaborate">تعاون</string>
+    <string name="invite_collaborator">دعوة عبر البريد الإلكتروني</string>
+    <string name="collaborator_not_found">المستخدم غير موجود</string>
+    <string name="cannot_invite_self">لا يمكنك دعوة نفسك</string>
+    <string name="collaborator_already_added">المستخدم متعاون بالفعل</string>
+    <string name="leave_note">مغادرة الملاحظة</string>
+    <string name="remove_collaborator">إزالة</string>
+    <string name="shared_notes">مشتركة</string>
+    <string name="invite">دعوة</string>
+    <string name="owner_label">المالك</string>
+    <string name="title_archive">الأرشيف</string>
+    <string name="content_description_restore">استعادة</string>
+    <string name="content_description_delete_permanently">حذف نهائي</string>
+    <string name="msg_add_collaborator_failed">فشل إضافة المتعاون</string>
 </resources>

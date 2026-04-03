@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Цвета фона</string>
     <string name="subtitle_background_images">Фоновые изображения</string>
     <string name="transparent">Прозрачный</string>
+
+    <string name="msg_save_failed">Ошибка сохранения</string>
+    <string name="msg_pin_failed">Ошибка сохранения, не удалось закрепить на главном экране</string>
+    <string name="msg_save_failed_sharing">Ошибка сохранения перед отправкой</string>
+    <string name="msg_save_before_invite">Пожалуйста, сохраните заметку перед приглашением соавторов</string>
+    <string name="msg_invitation_sent">Приглашение отправлено на %1$s</string>
+    <string name="msg_leave_failed">Не удалось покинуть заметку</string>
+    <string name="msg_save_before_collaborate">Сначала сохраните заметку для совместной работы</string>
+    <string name="msg_remove_collaborator_failed">Не удалось удалить соавтора</string>
+
+    <string name="option_collaborate">Совместная работа</string>
+    <string name="invite_collaborator">Пригласить по почте</string>
+    <string name="collaborator_not_found">Пользователь не найден</string>
+    <string name="cannot_invite_self">Вы не можете пригласить самого себя</string>
+    <string name="collaborator_already_added">Пользователь уже является соавтором</string>
+    <string name="leave_note">Покинуть заметку</string>
+    <string name="remove_collaborator">Удалить</string>
+    <string name="shared_notes">Общие</string>
+    <string name="invite">Пригласить</string>
+    <string name="owner_label">Владелец</string>
+    <string name="title_archive">Архив</string>
+    <string name="content_description_restore">Восстановить</string>
+    <string name="content_description_delete_permanently">Удалить навсегда</string>
+    <string name="msg_add_collaborator_failed">Не удалось добавить соавтора</string>
 </resources>

@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Hintergrundfarben</string>
     <string name="subtitle_background_images">Hintergrundbilder</string>
     <string name="transparent">Transparent</string>
+
+    <string name="msg_save_failed">Speichern fehlgeschlagen</string>
+    <string name="msg_pin_failed">Speichern fehlgeschlagen, Fixieren auf dem Startbildschirm nicht möglich</string>
+    <string name="msg_save_failed_sharing">Speichern vor dem Teilen fehlgeschlagen</string>
+    <string name="msg_save_before_invite">Bitte speichern Sie die Notiz, bevor Sie Mitarbeiter einladen</string>
+    <string name="msg_invitation_sent">Einladung an %1$s gesendet</string>
+    <string name="msg_leave_failed">Verlassen der Notiz fehlgeschlagen</string>
+    <string name="msg_save_before_collaborate">Speichern Sie die Notiz zuerst, um zusammenzuarbeiten</string>
+    <string name="msg_remove_collaborator_failed">Mitarbeiter konnte nicht entfernt werden</string>
+
+    <string name="option_collaborate">Zusammenarbeit</string>
+    <string name="invite_collaborator">Per E-Mail einladen</string>
+    <string name="collaborator_not_found">Benutzer nicht gefunden</string>
+    <string name="cannot_invite_self">Sie können sich nicht selbst einladen</string>
+    <string name="collaborator_already_added">Benutzer ist bereits ein Mitarbeiter</string>
+    <string name="leave_note">Notiz verlassen</string>
+    <string name="remove_collaborator">Entfernen</string>
+    <string name="shared_notes">Geteilt</string>
+    <string name="invite">Einladen</string>
+    <string name="owner_label">Besitzer</string>
+    <string name="title_archive">Archiv</string>
+    <string name="content_description_restore">Wiederherstellen</string>
+    <string name="content_description_delete_permanently">Endgültig löschen</string>
+    <string name="msg_add_collaborator_failed">Mitarbeiter konnte nicht hinzugefügt werden</string>
 </resources>

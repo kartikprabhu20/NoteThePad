@@ -82,4 +82,28 @@
     <string name="subtitle_background_colors">Arka Plan Renkleri</string>
     <string name="subtitle_background_images">Arka Plan Görüntüleri</string>
     <string name="transparent">Şeffaf</string>
+
+    <string name="msg_save_failed">Kaydetme başarısız</string>
+    <string name="msg_pin_failed">Kaydetme başarısız, ana ekrana sabitleme yapılamıyor</string>
+    <string name="msg_save_failed_sharing">Paylaşmadan önce kaydetme başarısız</string>
+    <string name="msg_save_before_invite">Lütfen ortak çalışanları davet etmeden önce notu kaydedin</string>
+    <string name="msg_invitation_sent">Davet %1$s adresine gönderildi</string>
+    <string name="msg_leave_failed">Nottan ayrılma başarısız</string>
+    <string name="msg_save_before_collaborate">Birlikte çalışmak için önce notu kaydedin</string>
+    <string name="msg_remove_collaborator_failed">Ortak çalışan kaldırma başarısız</string>
+
+    <string name="option_collaborate">İş birliği yap</string>
+    <string name="invite_collaborator">E-posta ile davet et</string>
+    <string name="collaborator_not_found">Kullanıcı bulunamadı</string>
+    <string name="cannot_invite_self">Kendinizi davet edemezsiniz</string>
+    <string name="collaborator_already_added">Kullanıcı zaten bir iş ortağı</string>
+    <string name="leave_note">Notu bırak</string>
+    <string name="remove_collaborator">Kaldır</string>
+    <string name="shared_notes">Paylaşılanlar</string>
+    <string name="invite">Davet et</string>
+    <string name="owner_label">Sahibi</string>
+    <string name="title_archive">Arşiv</string>
+    <string name="content_description_restore">Geri yükle</string>
+    <string name="content_description_delete_permanently">Kalıcı olarak sil</string>
+    <string name="msg_add_collaborator_failed">İş ortağı eklenemedi</string>
 </resources>

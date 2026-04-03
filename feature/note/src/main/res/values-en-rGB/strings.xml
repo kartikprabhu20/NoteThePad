@@ -82,4 +82,26 @@
     <string name="content_description_color_selector">Colour selector</string>
     <string name="subtitle_background_colors">Background Colours</string>
     <string name="subtitle_background_images">Background Images</string>
+    <string name="msg_add_collaborator_failed">Failed to add collaborator</string>
+    <string name="msg_save_failed">Save Failed</string>
+    <string name="msg_pin_failed">Save Failed, cannot pin to home screen</string>
+    <string name="msg_save_failed_sharing">Save Failed before sharing</string>
+    <string name="msg_save_before_invite">Please save the note before inviting collaborators</string>
+    <string name="msg_invitation_sent">Invitation sent to %1$s</string>
+    <string name="msg_leave_failed">Failed to leave note</string>
+    <string name="msg_save_before_collaborate">Save the note first to collaborate</string>
+    <string name="msg_remove_collaborator_failed">Failed to remove collaborator</string>
+    <string name="option_collaborate">Collaborate</string>
+    <string name="invite_collaborator">Invite by email</string>
+    <string name="collaborator_not_found">User not found</string>
+    <string name="cannot_invite_self">You cannot invite yourself</string>
+    <string name="collaborator_already_added">User is already a collaborator</string>
+    <string name="leave_note">Leave note</string>
+    <string name="remove_collaborator">Remove</string>
+    <string name="shared_notes">Shared</string>
+    <string name="invite">Invite</string>
+    <string name="owner_label">Owner</string>
+    <string name="title_archive">Archive</string>
+    <string name="content_description_restore">Restore</string>
+    <string name="content_description_delete_permanently">Delete Permanently</string>
 </resources>
