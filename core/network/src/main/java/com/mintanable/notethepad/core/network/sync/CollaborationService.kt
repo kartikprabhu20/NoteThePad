@@ -2,6 +2,8 @@ package com.mintanable.notethepad.core.network.sync
 
 import android.util.Log
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.rpc
@@ -14,6 +16,24 @@ import javax.inject.Singleton
 class CollaborationService @Inject constructor(
     private val supabaseClient: SupabaseClient
 ) {
+
+    suspend fun ensureAuthenticated(fireBaseToken: String?) {
+        try {
+            if (fireBaseToken != null) {
+                supabaseClient.auth.importSession(
+                    UserSession(
+                        accessToken = fireBaseToken,
+                        refreshToken = "",
+                        expiresIn = 3600,
+                        tokenType = "bearer",
+                        user = null
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to import Firebase token: ${e.message}")
+        }
+    }
 
     suspend fun upsertUserProfile(
         userId: String,

@@ -100,8 +100,9 @@ object DatabaseModule {
     @Singleton
     fun provideCollaborationRepository(
         collaborationService: CollaborationService,
-        collaboratorDao: CollaboratorDao
+        collaboratorDao: CollaboratorDao,
+        authRepository: AuthRepository
     ): CollaborationRepository {
-        return CollaborationRepositoryImpl(collaborationService, collaboratorDao)
+        return CollaborationRepositoryImpl(collaborationService, collaboratorDao, authRepository)
     }
 }

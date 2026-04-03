@@ -1,21 +1,29 @@
 package com.mintanable.notethepad.database.db.repository
 
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.core.network.sync.CollaborationService
 import com.mintanable.notethepad.core.network.sync.NoteCollaboratorDto
 import com.mintanable.notethepad.database.db.dao.CollaboratorDao
 import com.mintanable.notethepad.database.db.entity.CollaboratorEntity
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CollaborationRepositoryImpl @Inject constructor(
     private val collaborationService: CollaborationService,
-    private val collaboratorDao: CollaboratorDao
+    private val collaboratorDao: CollaboratorDao,
+    private val authRepository: AuthRepository
 ) : CollaborationRepository {
 
+    private suspend fun ensureAuth() {
+        collaborationService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
+    }
+
     override suspend fun findUserByEmail(email: String): Collaborator? {
+        ensureAuth()
         val result = collaborationService.findUserByEmail(email) ?: return null
         return Collaborator(
             id = "",
@@ -32,7 +40,9 @@ class CollaborationRepositoryImpl @Inject constructor(
         ownerUserId: String,
         collaborator: Collaborator
     ): Boolean {
+        ensureAuth()
         val dto = NoteCollaboratorDto(
+            id = UUID.randomUUID().toString(),
             noteId = noteId,
             ownerUserId = ownerUserId,
             collaboratorUserId = collaborator.userId,
@@ -48,6 +58,7 @@ class CollaborationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeCollaborator(noteId: String, collaboratorUserId: String): Boolean {
+        ensureAuth()
         val success = collaborationService.removeCollaborator(noteId, collaboratorUserId)
         if (success) {
             collaboratorDao.deleteCollaborator(noteId, collaboratorUserId)
@@ -64,6 +75,7 @@ class CollaborationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchAndCacheCollaborators(noteId: String): List<CollaboratorEntity> {
+        ensureAuth()
         val remote = collaborationService.getCollaborators(noteId)
         val entities = remote.map { it.toEntity() }
         collaboratorDao.replaceCollaboratorsForNote(noteId, entities)
