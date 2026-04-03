@@ -148,6 +148,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     private fun enqueueSync() {
+        Log.d("kptest", "enqueueSync called")
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -163,12 +164,14 @@ class NoteRepositoryImpl @Inject constructor(
 
         workManager.enqueueUniqueWork(
             SUPA_SYNC_WORKER,
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.REPLACE,
             syncRequest
         )
     }
 
     private fun enqueueFetch() {
+        Log.d("kptest", "enqueueFetch called")
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -184,7 +187,7 @@ class NoteRepositoryImpl @Inject constructor(
 
         workManager.enqueueUniqueWork(
             SUPA_FETCH_WORKER,
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.REPLACE,
             syncRequest
         )
     }
