@@ -16,16 +16,21 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckBox
@@ -58,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.SizePreviews
 import com.mintanable.notethepad.theme.ThemePreviews
 import kotlinx.coroutines.delay
 
@@ -133,6 +139,7 @@ fun NoteBottomAppBar(
                     exit = fadeOut()
                 ) {
                     Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.Bottom
                     ) {
@@ -170,6 +177,8 @@ fun NoteBottomAppBar(
                                     MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
+
+                        Spacer(modifier = Modifier.width(12.dp))
                     }
                 }
             },
@@ -188,7 +197,7 @@ fun NoteBottomAppBar(
     }
 }
 
-
+@SizePreviews
 @ThemePreviews
 @Composable
 fun PreviewBottomAppBar(){

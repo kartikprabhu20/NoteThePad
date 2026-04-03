@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 
 private val DarkColorPalette = darkColorScheme(
@@ -293,3 +294,24 @@ fun NoteThePadTheme(
 )
 annotation class ThemePreviews
 
+@Preview(
+    name = "Small Phone",
+    showBackground = true,
+    device = "spec:width=320dp,height=640dp,dpi=480"
+)
+@Preview(
+    name = "Standard Phone",
+    showBackground = true,
+    device = Devices.PIXEL_9
+)
+@Preview(
+    name = "Tablet",
+    showBackground = true,
+    device = Devices.TABLET
+)
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:width=640dp,height=320dp,dpi=480"
+)
+annotation class SizePreviews
