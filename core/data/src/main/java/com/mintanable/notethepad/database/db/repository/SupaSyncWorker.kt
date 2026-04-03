@@ -6,6 +6,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.core.network.sync.CollaborationService
 import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
 import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.util.toDto
@@ -20,6 +21,7 @@ class SupaSyncWorker @AssistedInject constructor(
     @Assisted private val workerParams: WorkerParameters,
     private val dbManager: DatabaseManager,
     private val supabaseSyncService: SupabaseSyncService,
+    private val collaborationService: CollaborationService,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val authRepository: AuthRepository
 ) : CoroutineWorker(appContext, workerParams) {
@@ -30,8 +32,16 @@ class SupaSyncWorker @AssistedInject constructor(
         return try {
             val settings = userPreferencesRepository.settingsFlow.first()
             if (!settings.supaSyncEnabled) {
+                Log.e("SupaFetchWorker", "Supa sync disabled - EXITING EARLY")
                 return Result.success()
             }
+
+            val user = authRepository.getSignedInFirebaseUser().first()
+            if (user == null) {
+                Log.e("SupaFetchWorker", "USER IS NULL - EXITING EARLY")
+                return Result.failure()
+            }
+            val userId = user.uid
 
             // Ensure Auth is valid
             supabaseSyncService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
@@ -48,6 +58,11 @@ class SupaSyncWorker @AssistedInject constructor(
             val unsyncedDeletedTags = tagDao.getUnsyncedDeletedTags()
 
             var allSuccessful = true
+
+            Log.d("kptest", "unsyncedNotes size: ${unsyncedNotes.size}")
+            Log.d("kptest", "unsyncedDeletedNotes size: ${unsyncedDeletedNotes.size}")
+            Log.d("kptest", "unsyncedTags size: ${unsyncedTags.size}")
+            Log.d("kptest", "unsyncedDeletedTags size: ${unsyncedDeletedTags.size}")
 
             // Sync Notes
             (unsyncedNotes + unsyncedDeletedNotes).forEach { noteWithTags ->
@@ -86,6 +101,22 @@ class SupaSyncWorker @AssistedInject constructor(
                     } else {
                         allSuccessful = false
                     }
+                }
+            }
+
+            // Upsert current user profile
+            val userEmail = user.email
+            if (userEmail != null) {
+                val isUserUploaded = collaborationService.upsertUserProfile(
+                    userId = userId,
+                    email = userEmail,
+                    displayName = user.displayName,
+                    photoUrl = user.photoUrl
+                )
+                if(isUserUploaded){
+                    Log.d("SupaSyncWorker", "Synced userprofile")
+                } else {
+                    allSuccessful = false
                 }
             }
 

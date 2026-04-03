@@ -32,12 +32,27 @@ class SupaFetchWorker @AssistedInject constructor(
         Log.d("SupaFetchWorker", "Starting fetch")
 
         return try {
+
+            val settings = userPreferencesRepository.settingsFlow.first()
+            if (!settings.supaSyncEnabled) {
+                Log.e("SupaFetchWorker", "Supa sync disabled - EXITING EARLY")
+                return Result.success()
+            }
+
+            val user = authRepository.getSignedInFirebaseUser().first()
+            if (user == null) {
+                Log.e("SupaFetchWorker", "USER IS NULL - EXITING EARLY")
+                return Result.failure()
+            }
+            val userId = user.uid
+
             val noteDao = dbManager.database.noteDao()
             val tagDao = dbManager.database.tagDao()
             val db = dbManager.database
 
-            val user = authRepository.getSignedInFirebaseUser().first()
-            val userId = user?.uid ?: return Result.retry()
+            // Ensure Auth is valid
+            supabaseSyncService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
+
 
             var allSuccessful = true
             supabaseSyncService.setSyncing(true)
@@ -108,16 +123,6 @@ class SupaFetchWorker @AssistedInject constructor(
                 }
                 Log.d("kptest", "collaborators synced: ${collaboratorEntities.size}")
 
-                // Upsert current user profile
-                val userEmail = user.email
-                if (userEmail != null) {
-                    collaborationService.upsertUserProfile(
-                        userId = userId,
-                        email = userEmail,
-                        displayName = user.displayName,
-                        photoUrl = user.photoUrl
-                    )
-                }
             } catch (e: Exception) {
                 Log.e("Sync", "Pull failed: ${e.message}")
                 allSuccessful = false
@@ -131,7 +136,7 @@ class SupaFetchWorker @AssistedInject constructor(
                 Result.retry()
             }
         } catch (e: Exception) {
-            Log.e("SupaSyncWorker", "Sync failed: ${e.message}")
+            Log.e("SupaFetchWorker", "Fetch failed: ${e.message}")
             Result.retry()
         }
     }
