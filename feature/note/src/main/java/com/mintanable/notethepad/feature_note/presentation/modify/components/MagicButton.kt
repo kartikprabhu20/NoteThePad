@@ -16,6 +16,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,79 +35,104 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import com.mintanable.notethepad.feature_note.R
 
 @Composable
 fun MagicButton(
-    title: String,
+    title: String? = null,
+    imageVector: ImageVector? = Icons.Default.AutoAwesome,
+    painter: Painter? = null,
     isVisible: Boolean,
     modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
     onButtonClicked: () -> Unit,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
 ) {
+    val transition = animatedVisibilityScope?.transition
+    val isExiting = transition?.targetState?.let { it != EnterExitState.Visible } ?: false
 
-    val transition = animatedVisibilityScope.transition
-    val isExiting = transition.targetState != EnterExitState.Visible
-    val screenAlpha by transition.animateFloat(
+    val screenAlpha by transition?.animateFloat(
         label = "MagicButtonScreenAlpha",
-        transitionSpec = {
-            if (isExiting) {
-                tween(300)
-            } else {
-                tween(50)
-            }
-        }
+        transitionSpec = { if (isExiting) tween(300) else tween(50) }
     ) { state ->
         if (state == EnterExitState.Visible) 1f else 0f
+    } ?: rememberUpdatedState(1f)
+
+    val shimmerOffset = remember { Animatable(0f) }
+    LaunchedEffect (Unit) {
+        shimmerOffset.animateTo(
+            targetValue = 2000f,
+            animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)
+        )
     }
 
-    with(sharedTransitionScope) {
-        AnimatedVisibility(
-            visible = isVisible && !isExiting,
-            enter = fadeIn() + scaleIn(initialScale = 0.8f) + expandVertically(),
-            exit = fadeOut(),
-            modifier = modifier
-                .graphicsLayer { alpha = screenAlpha }
-                .let { if (isExiting) it.skipToLookaheadSize() else it }
-                .let {
-                    if (transition.isRunning && !isExiting) {
-                        it.renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
-                    } else it
-                }
+    val isIconOnly = title.isNullOrBlank()
+    val buttonModifier = if (isIconOnly) {
+        Modifier.size(42.dp)
+    } else {
+        Modifier
+    }
+    val horizontalPadding = if (isIconOnly) 0.dp else 24.dp
+    val verticalPadding = if (isIconOnly) 0.dp else 12.dp
+
+
+    val magicButton = @Composable { contentModifier: Modifier ->
+        Surface(
+            onClick = onButtonClicked,
+            shape = shape,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+            tonalElevation = 0.dp,
+            modifier = contentModifier
+                .then(buttonModifier)
+                .magicBorder(
+                width = 3.dp,
+                shimmerOffset = shimmerOffset.value,
+                shape = shape
+            )
         ) {
-            Surface(
-                onClick = onButtonClicked,
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
-                tonalElevation = 0.dp,
-                modifier = Modifier
-                    .magicBorder(width = 2.dp, shape = CircleShape)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(
+                    horizontal = horizontalPadding,
+                    vertical = verticalPadding
+                )
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(
-                        horizontal = 24.dp,
-                        vertical = 12.dp
-                    ) // Custom padding
-                ) {
+                if (painter != null) {
                     Icon(
-                        imageVector = Icons.Default.AutoAwesome,
+                        painter = painter,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(24.dp)
                     )
+                } else if (imageVector != null) {
+                    Icon(
+                        imageVector = imageVector,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                if (!isIconOnly) {
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = title,
@@ -117,22 +143,43 @@ fun MagicButton(
             }
         }
     }
-}
 
+    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            AnimatedVisibility(
+                visible = isVisible && !isExiting,
+                enter = fadeIn() + scaleIn(initialScale = 0.8f) + expandVertically(),
+                exit = fadeOut(),
+                modifier = modifier
+                    .graphicsLayer { alpha = screenAlpha }
+                    .let { if (isExiting) it.skipToLookaheadSize() else it }
+                    .let {
+                        if (transition?.isRunning == true && !isExiting) {
+                            it.renderInSharedTransitionScopeOverlay(zIndexInOverlay = 5f)
+                        } else it
+                    }
+            ) {
+                magicButton(Modifier)
+            }
+        }
+    } else {
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = fadeIn() + scaleIn(initialScale = 0.8f),
+            exit = fadeOut(),
+            modifier = modifier
+        ) {
+            magicButton(Modifier)
+        }
+    }
+}
 
 @Composable
 fun Modifier.magicBorder(
     width: Dp = 2.dp,
-    shape: RoundedCornerShape = CircleShape
+    shimmerOffset: Float,
+    shape: Shape = CircleShape
 ): Modifier {
-
-    val shimmerOffset = remember { Animatable(0f) }
-    LaunchedEffect (Unit) {
-        shimmerOffset.animateTo(
-            targetValue = 2000f,
-            animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)
-        )
-    }
 
     val magicBrush = Brush.linearGradient(
         colors = listOf(
@@ -141,8 +188,8 @@ fun Modifier.magicBorder(
             Color(0xFFFF0266), // Pink
             Color(0xFF6200EE), // Back to Purple
         ),
-        start = Offset(shimmerOffset.value - 500f, 0f),
-        end = Offset(shimmerOffset.value, 200f),
+        start = Offset(shimmerOffset - 500f, 0f),
+        end = Offset(shimmerOffset, 200f),
         tileMode = TileMode.Mirror
     )
 
@@ -167,6 +214,33 @@ fun PreviewMagicBorder() {
                             onButtonClicked = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun PreviewMagicBorderIcon() {
+    NoteThePadTheme {
+        SharedTransitionLayout {
+            AnimatedContent(targetState = true, label = "preview") { isVisible ->
+                if (isVisible) {
+                    Row(
+                        modifier = Modifier
+                            .background(NoteColors.colors[2])
+                            .padding(24.dp)
+                    ) {
+                        MagicButton(
+                            isVisible = true,
+                            painter = painterResource(R.drawable.speech_to_text_24px),
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            shape = RoundedCornerShape(6.dp),
+                            onButtonClicked = {}
                         )
                     }
                 }

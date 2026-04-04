@@ -16,7 +16,8 @@ fun LazyListScope.audioAttachmentSection(
     transcribingUri: String?,
     onDelete: (String) -> Unit,
     onPlayPause: (String) -> Unit,
-    onTranscribe: (String) -> Unit
+    onTranscribe: (String) -> Unit,
+    isTranscribeSupported: Boolean
 ) {
 
     if (attachedAudios.isNotEmpty()) {
@@ -28,9 +29,10 @@ fun LazyListScope.audioAttachmentSection(
                         attachment = audioUri,
                         playbackState = mediaState,
                         isTranscribing = audioUri.uri == transcribingUri,
-                        onDelete = onDelete,
-                        onPlayPause = onPlayPause,
-                        onTranscribe = onTranscribe
+                        onDeleteClicked = onDelete,
+                        onPlayPauseClicked = onPlayPause,
+                        onTranscribeClicked = onTranscribe,
+                        isTranscribeSupported = isTranscribeSupported
                     )
                 }
             }

@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,10 +46,11 @@ import kotlin.random.Random
 fun AudioPlayerUI(
     attachment: Attachment,
     playbackState: MediaState?,
-    onDelete: (String) -> Unit,
-    onPlayPause: (String) -> Unit,
-    onTranscribe: (String) -> Unit,
-    isTranscribing: Boolean = false
+    onDeleteClicked: (String) -> Unit,
+    onPlayPauseClicked: (String) -> Unit,
+    onTranscribeClicked: (String) -> Unit,
+    isTranscribing: Boolean = false,
+    isTranscribeSupported: Boolean = false
 ) {
 
     val uri = attachment.uri
@@ -66,9 +68,10 @@ fun AudioPlayerUI(
             isPlaying = isPlaying,
             progress = progress,
             totalDuration = totalDuration,
-            onPlayPause = { onPlayPause(uri) },
-            onDelete = { onDelete(uri) },
-            onTranscribe = { onTranscribe(uri) }
+            onPlayPauseClicked = { onPlayPauseClicked(uri) },
+            onDeleteClicked = { onDeleteClicked(uri) },
+            onTranscribeClicked = { onTranscribeClicked(uri) },
+            isTranscribeSupported = isTranscribeSupported
         )
 
         if (isTranscribing) {
@@ -112,9 +115,10 @@ fun AudioPlayerPanel(
     isPlaying: Boolean,
     progress: Float,
     totalDuration: Long,
-    onPlayPause: () -> Unit,
-    onDelete: () -> Unit,
-    onTranscribe: () -> Unit
+    onPlayPauseClicked: () -> Unit,
+    onDeleteClicked: () -> Unit,
+    onTranscribeClicked: () -> Unit,
+    isTranscribeSupported: Boolean,
 ) {
 
     val mockAmplitudes = remember {
@@ -130,7 +134,7 @@ fun AudioPlayerPanel(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onPlayPause) {
+            IconButton(onClick = onPlayPauseClicked) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = null,
@@ -156,27 +160,27 @@ fun AudioPlayerPanel(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            IconButton(
-                onClick = onTranscribe,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
+            if(isTranscribeSupported) {
+                MagicButton(
+                    isVisible = isTranscribeSupported,
                     painter = painterResource(R.drawable.speech_to_text_24px),
-                    contentDescription = stringResource(R.string.content_description_trascribe_audio),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(20.dp)
+                    shape = RoundedCornerShape(4.dp),
+                    onButtonClicked = onTranscribeClicked
                 )
             }
 
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(32.dp).padding(end = 4.dp)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable { onDeleteClicked() }
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(R.string.content_description_remove_audio),
                     tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -190,8 +194,7 @@ fun PreviewAudioPlayerPanel() {
         Box(modifier = Modifier
             .background(NoteColors.colors[2])
             .padding(8.dp)) {
-            AudioPlayerPanel(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {}, {})
-
+            AudioPlayerPanel(isPlaying = true, progress = 0.5F, totalDuration = 1L, {}, {}, {}, isTranscribeSupported = true)
         }
     }
 }
@@ -236,9 +239,10 @@ fun PreviewAudioPlayerUI() {
             AudioPlayerUI(
                 attachment = mockAttachment,
                 playbackState = mockPlaybackState,
-                onDelete = {},
-                onPlayPause = {},
-                onTranscribe = {}
+                onDeleteClicked = {},
+                onPlayPauseClicked = {},
+                onTranscribeClicked = {},
+                isTranscribeSupported = true
             )
 
         }
@@ -249,15 +253,17 @@ fun PreviewAudioPlayerUI() {
 @Composable
 fun PreviewAudioPlayerUIEmpty() {
     NoteThePadTheme {
-        Box(modifier = Modifier
-            .background(NoteColors.colors[0])
-            .padding(8.dp)) {
+        Box(
+            modifier = Modifier
+                .background(NoteColors.colors[0])
+                .padding(8.dp)
+        ) {
             AudioPlayerUI(
                 attachment = Attachment(uri = "", duration = 60000L),
                 playbackState = null,
-                onDelete = {},
-                onPlayPause = {},
-                onTranscribe = {}
+                onDeleteClicked = {},
+                onPlayPauseClicked = {},
+                onTranscribeClicked = {}
             )
         }
     }

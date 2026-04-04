@@ -65,6 +65,7 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.richtext.model.RichTextState
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.R
@@ -96,6 +97,7 @@ fun NoteEditorContent(
     tagEntities: List<TagEntity> = emptyList(),
     suggestedTags: List<String> = emptyList(),
     isSuggestionTagsLoading: Boolean = false,
+    collaborators: List<Collaborator> = emptyList(),
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -269,6 +271,8 @@ fun NoteEditorContent(
                             onEvent(AddEditNoteEvent.RemoveImage(deletedUri))
                         },
                         onImageClick = { onEvent(AddEditNoteEvent.ToggleZoom(it)) },
+                        isAnalyzeImageSupported = true,
+                        onAnalyzeImageClicked = { onEvent(AddEditNoteEvent.ToggleZoom(attachedImages[0])) },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
                     )
@@ -345,7 +349,8 @@ fun NoteEditorContent(
                         transcribingUri = transcribingUri,
                         onDelete = { deletedUri -> onEvent(AddEditNoteEvent.RemoveAudio(deletedUri)) },
                         onPlayPause = { uri -> onEvent(AddEditNoteEvent.UpdateNowPlaying(uri)) },
-                        onTranscribe = { uri -> onEvent(AddEditNoteEvent.TranscribeAttachedAudio(uri)) }
+                        onTranscribe = { uri -> onEvent(AddEditNoteEvent.TranscribeAttachedAudio(uri)) },
+                        isTranscribeSupported = true
                     )
 
                     reminderAttachmentSection(
@@ -357,6 +362,11 @@ fun NoteEditorContent(
                     tagsSection(
                         tagEntities = tagEntities,
                         onDelete = { tagName -> onEvent(AddEditNoteEvent.DeleteLabel(tagName)) },
+                    )
+
+                    collaboratorsSection(
+                        collaborators = collaborators,
+                        onCollaboratorClick = { onEvent(AddEditNoteEvent.OpenCollaborateSheet) }
                     )
 
                     item {

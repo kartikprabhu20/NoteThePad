@@ -19,7 +19,7 @@ fun LazyListScope.collaboratorsSection(
         item {
             FlowRow(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(vertical = 8.dp)
                     .clickable { onCollaboratorClick() },
                 horizontalArrangement = Arrangement.spacedBy((-8).dp)
             ) {
