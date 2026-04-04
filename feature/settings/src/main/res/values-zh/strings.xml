@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">与 Supabase 实时同步（需要登录）</string>
+    <string name="dialog_ai_model_downloaded">已下载</string>
+    <string name="content_description_delete_model">删除 AI 模型</string>
+    <string name="dialog_delete_ai_model_title">删除 AI 模型？</string>
+    <string name="dialog_delete_ai_model_description">您确定要删除模型“%1$s”吗？这将释放 %2$s 的存储空间。</string>
+    <string name="setting_ai_model_selection_title">选择 AI 模型</string>
 </resources>

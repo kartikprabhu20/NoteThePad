@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">Supabaseとのリアルタイム同期（ログインが必要）</string>
+    <string name="dialog_ai_model_downloaded">ダウンロード済み</string>
+    <string name="content_description_delete_model">AIモデルを削除</string>
+    <string name="dialog_delete_ai_model_title">AIモデルを削除しますか？</string>
+    <string name="dialog_delete_ai_model_description">本当にモデル「%1$s」を削除しますか？これにより、%2$sのストレージ空き容量が確保されます。</string>
+    <string name="setting_ai_model_selection_title">AIモデルを選択</string>
 </resources>

@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">Синхронизация в реальном времени с Supabase (требуется вход)</string>
+    <string name="dialog_ai_model_downloaded">Загружено</string>
+    <string name="content_description_delete_model">Удалить модель ИИ</string>
+    <string name="dialog_delete_ai_model_title">Удалить модель ИИ?</string>
+    <string name="dialog_delete_ai_model_description">Вы уверены, что хотите удалить модель \'%1$s\'? Это освободит %2$s памяти.</string>
+    <string name="setting_ai_model_selection_title">Выбрать модель ИИ</string>
 </resources>

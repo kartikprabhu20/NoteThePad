@@ -73,4 +73,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">Real-time sync with Supabase (requires Login)</string>
+    <string name="dialog_ai_model_downloaded">Downloaded</string>
+    <string name="content_description_delete_model">Delete AI Model</string>
+    <string name="dialog_delete_ai_model_title">Delete AI Model?</string>
+    <string name="dialog_delete_ai_model_description">Are you sure you want to delete the model \'%1$s\'? This will free up %2$s of storage space.</string>
+    <string name="setting_ai_model_selection_title">Select AI Model</string>
 </resources>

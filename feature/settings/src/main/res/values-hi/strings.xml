@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">SupaBase के साथ रीयल-टाइम सिंक (लॉगिन आवश्यक)</string>
+    <string name="dialog_ai_model_downloaded">डाउनलोड किया गया</string>
+    <string name="content_description_delete_model">AI मॉडल हटाएं</string>
+    <string name="dialog_delete_ai_model_title">AI मॉडल हटाएं?</string>
+    <string name="dialog_delete_ai_model_description">क्या आप वाकई \'%1$s\' मॉडल को हटाना चाहते हैं? इससे %2$s स्टोरेज खाली हो जाएगा।</string>
+    <string name="setting_ai_model_selection_title">AI मॉडल चुनें</string>
 </resources>

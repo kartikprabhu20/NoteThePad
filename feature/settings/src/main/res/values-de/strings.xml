@@ -61,4 +61,12 @@
     <string name="dialog_download_audio_transcriber_title">Audio-Transkription herunterladen</string>
     <string name="dialog_download_audio_transcriber_description">Das Audio-Transkriptionsmodell wird über WLAN auf das Gerät heruntergeladen. Möchten Sie fortfahren?</string>
     <string name="msg_downloading_audio_model">Audio-KI-Modell wird heruntergeladen: %1$d%%</string>
-</resources>
+
+    <string name="supasync_title">SupaSync</string>
+    <string name="supasync_description">Echtzeitsynchronisierung mit Supabase (Anmeldung erforderlich)</string>
+    <string name="dialog_ai_model_downloaded">Heruntergeladen</string>
+    <string name="content_description_delete_model">KI-Modell löschen</string>
+    <string name="dialog_delete_ai_model_title">KI-Modell löschen?</string>
+    <string name="dialog_delete_ai_model_description">Sind Sie sicher, dass Sie das Modell \'%1$s\' löschen möchten? Dies wird %2$s Speicherplatz freigeben.</string>
+    <string name="setting_ai_model_selection_title">KI-Modell auswählen</string>
+ </resources>

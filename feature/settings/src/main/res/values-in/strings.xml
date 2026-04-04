@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">Sinkronisasi waktu nyata dengan Supabase (memerlukan Login)</string>
+    <string name="dialog_ai_model_downloaded">Terunduh</string>
+    <string name="content_description_delete_model">Hapus Model AI</string>
+    <string name="dialog_delete_ai_model_title">Hapus Model AI?</string>
+    <string name="dialog_delete_ai_model_description">Apakah Anda yakin ingin menghapus model \'%1$s\'? Ini akan membebaskan %2$s ruang penyimpanan.</string>
+    <string name="setting_ai_model_selection_title">Pilih Model AI</string>
 </resources>

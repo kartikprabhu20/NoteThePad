@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">সুপাবেসের সাথে রিয়েল-টাইম সিঙ্ক (লগইন প্রয়োজন)</string>
+    <string name="dialog_ai_model_downloaded">ডাউনলোড করা হয়েছে</string>
+    <string name="content_description_delete_model">AI মডেল মুছে ফেলুন</string>
+    <string name="dialog_delete_ai_model_title">AI মডেল কি মুছে ফেলতে চান?</string>
+    <string name="dialog_delete_ai_model_description">আপনি কি নিশ্চিত যে আপনি \'%1$s\' মডেলটি মুছে ফেলতে চান? এটি %2$s স্টোরেজ খালি করবে।</string>
+    <string name="setting_ai_model_selection_title">AI মডেল নির্বাচন করুন</string>
 </resources>

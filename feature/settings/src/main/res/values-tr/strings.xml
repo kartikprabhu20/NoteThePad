@@ -64,4 +64,9 @@
 
     <string name="supasync_title">SupaSync</string>
     <string name="supasync_description">Supabase ile gerçek zamanlı senkronizasyon (Oturum açma gerektirir)</string>
+    <string name="dialog_ai_model_downloaded">İndirildi</string>
+    <string name="content_description_delete_model">Yapay Zeka Modelini Sil</string>
+    <string name="dialog_delete_ai_model_title">Yapay Zeka Modelini Sil?</string>
+    <string name="dialog_delete_ai_model_description">\'%1$s\' modelini silmek istediğinizden emin misiniz? Bu işlem %2$s depolama alanı boşaltacaktır.</string>
+    <string name="setting_ai_model_selection_title">Yapay Zeka Modeli Seç</string>
 </resources>
