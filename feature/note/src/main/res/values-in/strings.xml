@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">AI masih merespons. Apakah Anda ingin menghentikannya dan kembali?</string>
     <string name="btn_stop">Berhenti &amp; Kembali</string>
     <string name="btn_continue">Lanjutkan</string>
+    <string name="dialog_logout_title">Keluar?</string>
+    <string name="dialog_logout_message">Apakah Anda yakin ingin keluar?</string>
+    <string name="btn_logout">Keluar</string>
 </resources>

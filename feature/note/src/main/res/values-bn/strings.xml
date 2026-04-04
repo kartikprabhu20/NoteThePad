@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">এআই এখনও প্রতিক্রিয়া দিচ্ছে। আপনি কি এটি বন্ধ করে ফিরে যেতে চান?</string>
     <string name="btn_stop">বন্ধ করুন এবং ফিরে যান</string>
     <string name="btn_continue">চালিয়ে যান</string>
+    <string name="dialog_logout_title">লগ আউট করবেন?</string>
+    <string name="dialog_logout_message">আপনি কি নিশ্চিত যে আপনি লগ আউট করতে চান?</string>
+    <string name="btn_logout">লগ আউট</string>
 </resources>

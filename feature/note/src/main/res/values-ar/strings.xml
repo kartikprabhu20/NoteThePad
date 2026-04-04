@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">لا يزال الذكاء الاصطناعي يستجيب. هل تريد إيقافه والعودة؟</string>
     <string name="btn_stop">إيقاف والعودة</string>
     <string name="btn_continue">متابعة</string>
+    <string name="dialog_logout_title">تسجيل الخروج؟</string>
+    <string name="dialog_logout_message">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
+    <string name="btn_logout">تسجيل الخروج</string>
 </resources>

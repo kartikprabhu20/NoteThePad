@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">Die KI antwortet noch. Möchten Sie abbrechen und zurückkehren?</string>
     <string name="btn_stop">Stoppen &amp; Zurück</string>
     <string name="btn_continue">Fortfahren</string>
+    <string name="dialog_logout_title">Abmelden?</string>
+    <string name="dialog_logout_message">Sind Sie sicher, dass Sie sich abmelden möchten?</string>
+    <string name="btn_logout">Abmelden</string>
 </resources>

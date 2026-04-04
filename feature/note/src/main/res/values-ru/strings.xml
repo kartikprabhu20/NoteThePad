@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">ИИ все еще отвечает. Вы хотите остановить его и вернуться?</string>
     <string name="btn_stop">Остановить и вернуться</string>
     <string name="btn_continue">Продолжить</string>
+    <string name="dialog_logout_title">Выйти?</string>
+    <string name="dialog_logout_message">Вы уверены, что хотите выйти?</string>
+    <string name="btn_logout">Выйти</string>
 </resources>

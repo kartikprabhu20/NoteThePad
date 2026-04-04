@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">AI가 아직 응답 중입니다. 중단하고 돌아가시겠습니까?</string>
     <string name="btn_stop">중단 및 돌아가기</string>
     <string name="btn_continue">계속</string>
+    <string name="dialog_logout_title">로그아웃하시겠습니까?</string>
+    <string name="dialog_logout_message">정말 로그아웃하시겠습니까?</string>
+    <string name="btn_logout">로그아웃</string>
 </resources>

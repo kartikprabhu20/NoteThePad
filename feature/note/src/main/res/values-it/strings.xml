@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">L\'IA sta ancora rispondendo. Vuoi interromperla e tornare indietro?</string>
     <string name="btn_stop">Interrompi e torna indietro</string>
     <string name="btn_continue">Continua</string>
+    <string name="dialog_logout_title">Logout?</string>
+    <string name="dialog_logout_message">Sei sicuro di voler uscire?</string>
+    <string name="btn_logout">Logout</string>
 </resources>

@@ -109,4 +109,7 @@
     <string name="dialog_stop_ai_message">The AI is still responding. Do you want to stop it and go back?</string>
     <string name="btn_stop">Stop &amp; Go Back</string>
     <string name="btn_continue">Continue</string>
+    <string name="dialog_logout_title">Logout?</string>
+    <string name="dialog_logout_message">Are you sure you want to log out?</string>
+    <string name="btn_logout">Logout</string>
 </resources>

@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">AI vẫn đang phản hồi. Bạn có muốn dừng lại và quay lại không?</string>
     <string name="btn_stop">Dừng và quay lại</string>
     <string name="btn_continue">Tiếp tục</string>
+    <string name="dialog_logout_title">Đăng xuất?</string>
+    <string name="dialog_logout_message">Bạn có chắc chắn muốn đăng xuất không?</string>
+    <string name="btn_logout">Đăng xuất</string>
 </resources>

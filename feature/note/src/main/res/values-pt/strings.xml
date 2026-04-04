@@ -56,7 +56,7 @@
     <string name="option_camera">Câmera</string>
     <string name="option_choose_date_time">Escolher data &amp; hora</string>
     <string name="option_delete">Excluir</string>
-    <string name="option_gallery">Galeri</string>
+    <string name="option_gallery">Galería</string>
     <string name="option_image">Imagem</string>
     <string name="option_make_copy">Fazer uma cópia</string>
     <string name="option_send">Enviar</string>
@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">A IA ainda está respondendo. Deseja parar e voltar?</string>
     <string name="btn_stop">Parar e voltar</string>
     <string name="btn_continue">Continuar</string>
+    <string name="dialog_logout_title">Sair?</string>
+    <string name="dialog_logout_message">Tem certeza que deseja sair?</string>
+    <string name="btn_logout">Sair</string>
 </resources>

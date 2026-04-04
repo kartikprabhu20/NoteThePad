@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">AI 仍在响应。是否要停止并返回？</string>
     <string name="btn_stop">停止并返回</string>
     <string name="btn_continue">继续</string>
+    <string name="dialog_logout_title">退出登录？</string>
+    <string name="dialog_logout_message">您确定要退出登录吗？</string>
+    <string name="btn_logout">退出登录</string>
 </resources>

@@ -12,7 +12,7 @@
     <string name="content_description_appdrawer_logo">एपड्रॉवर लोगो</string>
     <string name="content_description_attach">संलग्न करें</string>
     <string name="content_description_attached_image">संलग्न छवि</string>
-    <string name="content_description_audio_attached">ऑডিও संलग्न</string>
+    <string name="content_description_audio_attached">ऑडियो संलग्न</string>
     <string name="content_description_back">पीछे</string>
     <string name="content_description_checkbox">चेकबॉक्स</string>
     <string name="content_description_checkbox_state">चेकबॉक्स</string>
@@ -51,7 +51,7 @@
     <string name="msg_note_deleted">नोट हटा दिया गया</string>
     <string name="msg_saving_note">नोट सहेजा जा रहा है…</string>
     <string name="option_add_label">लेबल जोड़ें</string>
-    <string name="option_audio">ऑডিও</string>
+    <string name="option_audio">ऑडियो</string>
     <string name="option_audio_recorder">ऑडियो रिकॉर्डर</string>
     <string name="option_camera">कैमरा</string>
     <string name="option_choose_date_time">दिनांक और समय चुनें</string>
@@ -74,7 +74,7 @@
     <string name="title_audio_recorder">ऑडियो रिकॉर्डर</string>
     <string name="version_format">संस्करण %1$s</string>
     <string name="next">अगला</string>
-    <string name="hint_audio_to_text">ऑডিও से टेक्स्ट ट्रांसक्रिप्शन...</string>
+    <string name="hint_audio_to_text">ऑडियो से टेक्स्ट ट्रांसक्रिप्शन...</string>
     <string name="content_description_trascribe_audio">ऑडियो ट्रांसक्राइब करें</string>
     <string name="btn_add_to_note">नोट में जोड़ें</string>
     <string name="content_description_color_selector">रंग चयनकर्ता</string>
@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">एआई अभी भी प्रतिक्रिया दे रहा है। क्या आप इसे रोककर वापस जाना चाहते हैं?</string>
     <string name="btn_stop">रोकें और वापस जाएं</string>
     <string name="btn_continue">जारी रखें</string>
+    <string name="dialog_logout_title">लॉग आउट करें?</string>
+    <string name="dialog_logout_message">क्या आप वाकई लॉग आउट करना चाहते हैं?</string>
+    <string name="btn_logout">लॉग आउट</string>
 </resources>

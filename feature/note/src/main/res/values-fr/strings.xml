@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">L\'IA répond encore. Voulez-vous l\'arrêter et revenir en arrière ?</string>
     <string name="btn_stop">Arrêter et revenir</string>
     <string name="btn_continue">Continuer</string>
+    <string name="dialog_logout_title">Se déconnecter ?</string>
+    <string name="dialog_logout_message">Êtes-vous sûr de vouloir vous déconnecter ?</string>
+    <string name="btn_logout">Déconnexion</string>
 </resources>

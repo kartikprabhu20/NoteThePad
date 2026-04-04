@@ -111,4 +111,7 @@
     <string name="dialog_stop_ai_message">Yapay zeka hala yanıt veriyor. Durdurup geri gitmek istiyor musunuz?</string>
     <string name="btn_stop">Durdur ve Geri Git</string>
     <string name="btn_continue">Devam Et</string>
+    <string name="dialog_logout_title">Oturumu kapat?</string>
+    <string name="dialog_logout_message">Oturumu kapatmak istediğinizden emin misiniz?</string>
+    <string name="btn_logout">Oturumu kapat</string>
 </resources>

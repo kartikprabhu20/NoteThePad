@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -34,6 +35,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -99,6 +101,7 @@ fun NotesScreen(
     val isSupaSyncing by notesViewModel.isSupaSyncing.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
+    var showLogoutConfirmation by rememberSaveable { mutableStateOf(false) }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -152,9 +155,7 @@ fun NotesScreen(
                                 NotesFilterType.REMINDERS.filter
                             )
                             else if (item.route == Screen.LogOut.route) {
-                                scope.launch {
-                                    onLogOut()
-                                }
+                                showLogoutConfirmation = true
                             } else {
                                 navController.navigate(item.route)
                             }
@@ -318,5 +319,32 @@ fun NotesScreen(
                 }
             }
         }
+    }
+
+    if (showLogoutConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showLogoutConfirmation = false },
+            title = { Text(stringResource(R.string.dialog_logout_title)) },
+            text = { Text(stringResource(R.string.dialog_logout_message)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        showLogoutConfirmation = false
+                        scope.launch {
+                            onLogOut()
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_logout))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showLogoutConfirmation = false }
+                ) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            }
+        )
     }
 }
