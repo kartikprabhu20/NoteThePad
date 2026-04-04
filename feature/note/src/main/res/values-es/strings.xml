@@ -106,4 +106,5 @@
     <string name="content_description_restore">Restaurar</string>
     <string name="content_description_delete_permanently">Eliminar permanentemente</string>
     <string name="msg_add_collaborator_failed">Error al añadir colaborador</string>
+    <string name="analyze_images">Analizar imágenes</string>
 </resources>

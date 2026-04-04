@@ -106,4 +106,5 @@
     <string name="content_description_restore">복원</string>
     <string name="content_description_delete_permanently">영구 삭제</string>
     <string name="msg_add_collaborator_failed">공동 작업자 추가 실패</string>
+    <string name="analyze_images">이미지 분석</string>
 </resources>

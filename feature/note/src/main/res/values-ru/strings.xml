@@ -106,4 +106,5 @@
     <string name="content_description_restore">Восстановить</string>
     <string name="content_description_delete_permanently">Удалить навсегда</string>
     <string name="msg_add_collaborator_failed">Не удалось добавить соавтора</string>
+    <string name="analyze_images">Анализировать изображения</string>
 </resources>

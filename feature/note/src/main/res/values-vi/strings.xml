@@ -106,4 +106,5 @@
     <string name="content_description_restore">Khôi phục</string>
     <string name="content_description_delete_permanently">Xóa vĩnh viễn</string>
     <string name="msg_add_collaborator_failed">Thêm cộng tác viên thất bại</string>
+    <string name="analyze_images">Phân tích hình ảnh</string>
 </resources>

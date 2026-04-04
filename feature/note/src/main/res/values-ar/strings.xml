@@ -106,4 +106,5 @@
     <string name="content_description_restore">استعادة</string>
     <string name="content_description_delete_permanently">حذف نهائي</string>
     <string name="msg_add_collaborator_failed">فشل إضافة المتعاون</string>
+    <string name="analyze_images">تحليل الصور</string>
 </resources>

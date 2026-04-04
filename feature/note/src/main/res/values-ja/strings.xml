@@ -72,16 +72,16 @@
     <string name="search_hint">メモを検索…</string>
     <string name="title_ai_suggestions">AIタグの提案</string>
     <string name="title_audio_recorder">音声レコーダー</string>
+    <string name="title_color_selection">ノートの外観</string>
+    <string name="subtitle_background_colors">背景色</string>
+    <string name="subtitle_background_images">背景画像</string>
+    <string name="transparent">透明</string>
     <string name="version_format">バージョン %1$s</string>
     <string name="next">次へ</string>
     <string name="hint_audio_to_text">音声からテキストへの書き起こし...</string>
     <string name="content_description_trascribe_audio">音声を書き起こす</string>
     <string name="btn_add_to_note">メモに追加</string>
     <string name="content_description_color_selector">カラーセレクター</string>
-    <string name="title_color_selection">ノートの外観</string>
-    <string name="subtitle_background_colors">背景色</string>
-    <string name="subtitle_background_images">背景画像</string>
-    <string name="transparent">透明</string>
 
     <string name="msg_save_failed">保存に失敗しました</string>
     <string name="msg_pin_failed">保存に失敗しました。ホーム画面に固定できません</string>
@@ -106,4 +106,5 @@
     <string name="content_description_restore">復元</string>
     <string name="content_description_delete_permanently">永久に削除</string>
     <string name="msg_add_collaborator_failed">共同編集者の追加に失敗しました</string>
+    <string name="analyze_images">画像を分析する</string>
 </resources>

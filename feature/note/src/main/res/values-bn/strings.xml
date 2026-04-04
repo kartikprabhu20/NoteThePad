@@ -106,4 +106,5 @@
     <string name="content_description_restore">পুনরুদ্ধার করুন</string>
     <string name="content_description_delete_permanently">চিরতরে মুছে ফেলুন</string>
     <string name="msg_add_collaborator_failed">সহযোগী যোগ করতে ব্যর্থ হয়েছে</string>
+    <string name="analyze_images">ছবি বিশ্লেষণ করুন</string>
 </resources>

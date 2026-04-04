@@ -106,4 +106,5 @@
     <string name="content_description_restore">Pulihkan</string>
     <string name="content_description_delete_permanently">Hapus Permanen</string>
     <string name="msg_add_collaborator_failed">Gagal menambahkan kolaborator</string>
+    <string name="analyze_images">Analisis Gambar</string>
 </resources>
