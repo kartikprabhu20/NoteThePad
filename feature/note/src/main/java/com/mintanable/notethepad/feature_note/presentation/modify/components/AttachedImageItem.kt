@@ -47,7 +47,6 @@ fun AttachedImageItem(
     val context = LocalContext.current
 
     val attachmentType = rememberSaveable(uri) { AttachmentHelper.getAttachmentType(context, uri) }
-    Log.d("kptest", "AttachedImageItem $uri $attachmentType")
     Box(
         modifier = modifier
             .size(100.dp)

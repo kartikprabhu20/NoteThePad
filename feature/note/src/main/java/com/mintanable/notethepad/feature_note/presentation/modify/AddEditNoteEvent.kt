@@ -45,6 +45,7 @@ sealed class AddEditNoteEvent {
     data class TranscribeAttachedAudio(val uri: String) : AddEditNoteEvent()
     data class AnalyzeImage(val uri: Uri) : AddEditNoteEvent()
     data class ExecuteImageQuery(val query: String) : AddEditNoteEvent()
+    data class ConfirmStopImageQuery(val shouldStop: Boolean) : AddEditNoteEvent()
     data object ClearImageSuggestions : AddEditNoteEvent()
     data object ClearImageQueryResult : AddEditNoteEvent()
     data object ToggleRichTextBar : AddEditNoteEvent()

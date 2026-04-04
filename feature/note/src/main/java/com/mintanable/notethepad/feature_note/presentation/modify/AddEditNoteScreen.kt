@@ -19,12 +19,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,6 +49,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.components.PermissionRationaleDialog
+import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.notes.util.NavigatationHelper
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.database.db.entity.AttachmentType
@@ -319,6 +323,28 @@ fun AddEditNoteScreen(
                 },
                 transitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+
+        if (uiState.showStopAIConfirmation) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.ConfirmStopImageQuery(false)) },
+                title = { Text(stringResource(R.string.dialog_stop_ai_title)) },
+                text = { Text(stringResource(R.string.dialog_stop_ai_message)) },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.onEvent(AddEditNoteEvent.ConfirmStopImageQuery(true)) }
+                    ) {
+                        Text(stringResource(R.string.btn_stop))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.onEvent(AddEditNoteEvent.ConfirmStopImageQuery(false)) }
+                    ) {
+                        Text(stringResource(R.string.btn_continue))
+                    }
+                }
             )
         }
 

@@ -50,6 +50,7 @@ data class AddEditNoteUiState(
     val isAnalyzingImage: Boolean = false,
     val imageQueryResult: String = "",
     val isImageQueryLoading: Boolean = false,
+    val showStopAIConfirmation: Boolean = false,
 
     val collaborators: List<Collaborator> = emptyList(),
     val isLoadingCollaborators: Boolean = false,
