@@ -38,6 +38,7 @@ import com.mintanable.notethepad.feature_settings.presentation.SettingsState
 import com.mintanable.notethepad.feature_settings.presentation.getLoadStatusFLow
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_ai.data.GeminiAudioModelDownloadWorker
+import com.mintanable.notethepad.feature_settings.domain.use_case.DeleteFileUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +81,8 @@ class SettingsViewModel @Inject constructor(
     private val clearAppDataUseCase: ClearAppDataUseCase,
     private val getAudioModelStatus: GetAudioModelStatus,
     private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase,
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val deleteFileUsecase: DeleteFileUsecase
 ) : ViewModel() {
 
     companion object {
@@ -178,6 +180,7 @@ class SettingsViewModel @Inject constructor(
         val upload = args[2] as LoadStatus
         val download = args[3] as LoadStatus
         val aiStatus = args[4] as LoadStatus
+        @Suppress("UNCHECKED_CAST")
         val models = args[5] as List<AiModel>
         val isAuthorising = args[6] as Boolean
         val downloadDialogModel = args[7] as AiModel?
@@ -232,6 +235,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.DismissDownloadAudioTranscriberDialog -> _showDownloadAudioTranscriberDialog.value = false
             is SettingsEvent.UpdateNoteShape -> updateNoteShape(event.noteShape)
             is SettingsEvent.UpdateSupaSync -> updateSupaSync(event.enabled)
+            is SettingsEvent.DeleteAiModel -> deleteAiModel(event.aiModel)
         }
     }
 
@@ -282,6 +286,19 @@ class SettingsViewModel @Inject constructor(
             if (!isNetworkReady) return@launch
             dataStore.updateAiModel(aiModel.name)
             downloadAiModelUseCase(aiModel.url, aiModel.downloadFileName)
+        }
+    }
+
+    private fun deleteAiModel(aiModel: AiModel) {
+        viewModelScope.launch {
+            val externalFilesDir = context.getExternalFilesDir(null)
+            val path = File(externalFilesDir, aiModel.downloadFileName).absolutePath
+            val result = deleteFileUsecase(path)
+            result.onSuccess {
+                refreshTrigger.emit(Unit)
+            }.onFailure { e ->
+                Log.e("kptest", "Delete failed", e)
+            }
         }
     }
 

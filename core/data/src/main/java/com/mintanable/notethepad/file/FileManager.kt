@@ -63,16 +63,19 @@ class FileManager @Inject constructor(
         return if (extension.isNullOrBlank()) "bin" else extension
     }
 
-    suspend fun deleteFiles(list: List<String>) {
-        withContext(Dispatchers.IO){
+    suspend fun deleteFiles(list: List<String>): Result<Any> = withContext(Dispatchers.IO){
+        runCatching {
             for(path in list){
                 try {
                     val file = getFileFromUri(path)
                     if (file?.exists() == true) {
-                        file.delete()
+                        val deleted = file.delete()
+                        if (!deleted) return@withContext Result.failure(Exception("Failed to delete: $path"))
+                        return@withContext Result.success("Success")
                     }
                 } catch (e: Exception) {
-                   Log.e("kptest", "Error while delete files: $e")
+                   Log.e("FileManager", "Error while delete files: $e")
+                    return@withContext Result.failure(Exception("Error while delete files: $e"))
                 }
             }
         }
@@ -83,7 +86,7 @@ class FileManager @Inject constructor(
             val file = createFile(extension, prefix) ?: return null
             FileProvider.getUriForFile(context, authority, file)
         } catch (e: Exception) {
-            Log.e("kptest", "Error while createUri: $e")
+            Log.e("FileManager", "Error while createUri: $e")
             null
         }
     }
@@ -181,7 +184,7 @@ class FileManager @Inject constructor(
             uri
         } else null
     } catch (e: Exception) {
-        Log.e("ShareNote", "Could not convert URI: $uri", e)
+        Log.e("FileManager", "Could not convert URI: $uri", e)
         null
     }
 }

@@ -37,4 +37,5 @@ sealed class Screen(val route:String){
     data object FirebaseLoginScreen : Screen("firebase_login_screen")
     data object LogOut : Screen("logout")
     data object SettingsScreen : Screen("settings_screen")
+    data object AiModelSelectionScreen : Screen("ai_model_selection_screen")
 }

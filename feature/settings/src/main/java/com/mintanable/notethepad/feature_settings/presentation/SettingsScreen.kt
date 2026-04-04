@@ -48,7 +48,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.components.TimePickerDialog
-import com.mintanable.notethepad.core.common.humanReadableSize
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
@@ -57,7 +56,6 @@ import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_settings.R
-import com.mintanable.notethepad.feature_settings.presentation.components.AiModelSelectionDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
 import com.mintanable.notethepad.feature_settings.presentation.components.NoteShapePickerDialog
 import com.mintanable.notethepad.feature_settings.presentation.components.RadioButtonsAlertDialog
@@ -76,6 +74,7 @@ import java.util.Locale
 fun SettingsScreen(
     state: SettingsState,
     onBackPressed: () -> Unit,
+    onNavigateToAiModelSelection: () -> Unit,
     onEvent: (SettingsEvent) -> Unit,
     showToast: (String) -> Unit
 ) {
@@ -83,7 +82,6 @@ fun SettingsScreen(
     var showRationaleDialog by rememberSaveable { mutableStateOf(false) }
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
-    var showAiModelDialog by rememberSaveable { mutableStateOf(false) }
     var showClearBackupDialog by rememberSaveable { mutableStateOf(false) }
     var showNoteShapeDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -281,7 +279,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.setting_ai_model),
                     subtitle = state.aiModels.find { it.name == currentSettings.aiModelName }?.displayName
                         ?: stringResource(R.string.loading),
-                    onClick = { showAiModelDialog = true }
+                    onClick = onNavigateToAiModelSelection
                 )
                 if (state.aiModelDownloadStatus is LoadStatus.Progress) {
                     Text(stringResource(R.string.msg_downloading_model, state.aiModelDownloadStatus.percentage),
@@ -373,44 +371,6 @@ fun SettingsScreen(
                     }
                     showIntervalDialog = false
                 },
-            )
-        }
-
-        if(showAiModelDialog) {
-            AiModelSelectionDialog(
-                currentModel = currentSettings.aiModelName,
-                aiModels = state.aiModels,
-                onDismiss = { showAiModelDialog = false },
-                onConfirm = { selectedModelName ->
-                    val aiModel = state.aiModels.find { it.name == selectedModelName }
-                    aiModel?.let {
-                        onEvent(SettingsEvent.SelectAiModel(aiModel))
-                    }
-                    showAiModelDialog = false
-                }
-            )
-        }
-
-        state.showDownloadModelDialog?.let { model ->
-            AlertDialog(
-                onDismissRequest = { onEvent(SettingsEvent.DismissDownloadDialog) },
-                title = { Text(stringResource(R.string.dialog_download_ai_model_title)) },
-                text = { Text(stringResource(R.string.dialog_download_ai_model_description, model.sizeInBytes.humanReadableSize())) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        onEvent(SettingsEvent.ConfirmDownloadAiModel(
-                            aiModel = model,
-                            onFailure = showToast
-                        ))
-                    }) {
-                        Text(stringResource(R.string.btn_download))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { onEvent(SettingsEvent.DismissDownloadDialog) }) {
-                        Text(stringResource(R.string.btn_cancel))
-                    }
-                }
             )
         }
 
@@ -510,6 +470,7 @@ fun PreviewSettingsScreen() {
                 )
             ),
             onBackPressed = {},
+            onNavigateToAiModelSelection = {},
             onEvent = {},
             showToast = {}
         )

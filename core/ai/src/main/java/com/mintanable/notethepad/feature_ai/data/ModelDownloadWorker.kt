@@ -114,7 +114,12 @@ class ModelDownloadWorker @AssistedInject constructor(
                                 val progress = ((downloaded * 100) / total).toInt()
                                 Log.d("kptest", "Model download in progress: $progress")
 
-                                setProgress(workDataOf("percent" to progress))
+                                setProgress(
+                                    workDataOf(
+                                        "percent" to progress,
+                                        "fileName" to fileName
+                                    )
+                                )
                                 setForeground(createForegroundInfo(downloadId = id, progress, fileName))
                             }
                         }

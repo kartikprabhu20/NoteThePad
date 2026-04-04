@@ -24,6 +24,7 @@ data class AiModel(
     val llmMaxToken: Int = 0,
     val accelerators: List<Accelerator> = emptyList(),
     val imported: Boolean = false,
+    val isDownloaded: Boolean = false,
 )
 
 @Serializable

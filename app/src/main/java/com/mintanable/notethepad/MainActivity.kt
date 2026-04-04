@@ -46,6 +46,7 @@ import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
+import com.mintanable.notethepad.feature_settings.presentation.AiModelSelectionScreen
 import com.mintanable.notethepad.feature_note.presentation.archive.ArchiveScreen
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -270,6 +271,9 @@ class MainActivity : AppCompatActivity() {
                                     onBackPressed = {
                                         navController.navigateUp()
                                     },
+                                    onNavigateToAiModelSelection = {
+                                        navController.navigate(Screen.AiModelSelectionScreen.route)
+                                    },
                                     onEvent = { event ->
                                         if (event is SettingsEvent.UpdateBackupSettings) {
                                             settingsViewModel.onEvent(event.copy(onAuthRequired = { pendingIntent ->
@@ -293,6 +297,14 @@ class MainActivity : AppCompatActivity() {
                                 ArchiveScreen(
                                     onBackPressed = { navController.navigateUp() },
                                     isDarkTheme = isDarkTheme,
+                                )
+                            }
+                            composable(route = Screen.AiModelSelectionScreen.route) {
+                                AiModelSelectionScreen(
+                                    state = state,
+                                    onBackPressed = { navController.navigateUp() },
+                                    onEvent = { event -> settingsViewModel.onEvent(event) },
+                                    showToast = showToast
                                 )
                             }
                         }

@@ -22,9 +22,10 @@ fun WorkManager.getLoadStatusFLow(
                     val progress = workInfo.progress.getInt("percent", 0)
                     val bytes = workInfo.progress.getLong("bytes", 0)
                     val totalBytes = workInfo.progress.getLong("totalBytes", 0)
+                    val fileName = workInfo.progress.getString("fileName")
 
                     Log.d("kptest", "[${type.name}] status progress:$progress $bytes/$totalBytes")
-                    LoadStatus.Progress(progress, type, bytes, totalBytes)
+                    LoadStatus.Progress(progress, type, bytes, totalBytes, fileName)
                 }
                 WorkInfo.State.SUCCEEDED -> {
                     Log.d("kptest", "[${type.name}] successful")
