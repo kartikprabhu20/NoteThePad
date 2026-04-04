@@ -48,6 +48,7 @@ class SupaSyncWorker @AssistedInject constructor(
 
             val noteDao = dbManager.database.noteDao()
             val tagDao = dbManager.database.tagDao()
+            val collaboratorDao = dbManager.database.collaboratorDao()
 
             //Fetch all unsynced notes (Active & Deleted)
             val unsyncedNotes = noteDao.getUnsyncedNotes()
@@ -68,7 +69,18 @@ class SupaSyncWorker @AssistedInject constructor(
             (unsyncedNotes + unsyncedDeletedNotes).forEach { noteWithTags ->
                 val note = noteWithTags.noteEntity
                 if (note.userId != null) {
-                    val success = supabaseSyncService.syncNote(note.toDto())
+                    // Use collaborator table to determine shared status — userId field
+                    // may have been corrupted to the collaborator's ID by a prior save.
+                    val collabs = collaboratorDao.getCollaboratorsForNoteOnce(note.id)
+                    val ownerFromCollab = collabs.firstOrNull()?.ownerUserId
+                    val isSharedNote = ownerFromCollab != null && ownerFromCollab != userId
+                    Log.d("kptest", "Syncing note ${note.id}, userId=${note.userId}, currentUser=$userId, isShared=$isSharedNote, owner=$ownerFromCollab")
+                    val success = if (isSharedNote) {
+                        // updateSharedNote strips user_id from the payload
+                        supabaseSyncService.updateSharedNote(note.toDto())
+                    } else {
+                        supabaseSyncService.syncNote(note.toDto())
+                    }
                     if (success) {
                         // Sync associated cross-refs to ensure linkages are uploaded
                         val crossRefs = noteDao.getCrossRefsForNote(note.id)

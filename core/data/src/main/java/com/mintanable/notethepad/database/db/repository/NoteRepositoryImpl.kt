@@ -72,8 +72,14 @@ class NoteRepositoryImpl @Inject constructor(
             val user = authRepository.getSignedInFirebaseUser().first()
             val userId = user?.uid
 
+            val collaboratorDao = dbManager.database.collaboratorDao()
+            val collabs = collaboratorDao.getCollaboratorsForNoteOnce(noteEntity.id)
+            val ownerFromCollab = collabs.firstOrNull()?.ownerUserId
+            val isSharedNote = ownerFromCollab != null && ownerFromCollab != userId
+            val noteUserId = if (isSharedNote) ownerFromCollab else userId
+
             val updatedNote = noteEntity.copy(
-                userId = userId,
+                userId = noteUserId,
                 lastUpdateTime = System.currentTimeMillis(),
                 isDeleted = false,
                 isSynced = false
@@ -141,7 +147,8 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun deleteNotePermanently(id: String) {
         noteDao.deleteNoteWithId(id)
         noteDao.deleteLinksForNote(id)
-      }
+        dbManager.database.collaboratorDao().deleteAllForNote(id)
+    }
 
     override fun getDeletedNotes(): Flow<List<NoteWithTags>> {
         return noteDao.getDeletedNotes()

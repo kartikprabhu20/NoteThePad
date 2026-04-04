@@ -40,7 +40,12 @@ import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.file.AttachmentHelper
 import com.mintanable.notethepad.permissions.DeniedType
+import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
+import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.database.db.repository.CollaborationRepository
+import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.modify.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +58,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -75,14 +81,19 @@ class AddEditNoteViewModel @Inject constructor(
     private val transcribeAudioFileUseCase: TranscribeAudioFileUseCase,
     private val analyzeImageUseCase: AnalyzeImageUseCase,
     private val queryImageUseCase: QueryImageUseCase,
+    private val authRepository: AuthRepository,
+    private val collaborationRepository: CollaborationRepository,
     @ApplicationContext private val appContext: Context
-): ViewModel(){
+) : ViewModel() {
+    private var imageQueryJob: Job? = null
 
     private val passedNoteId: String = savedStateHandle.get<String>("noteId") ?: ""
     private val passedReminderTime: Long = savedStateHandle.get<Long>("reminderTime") ?: -1L
     private val passedInitialTitle: String = savedStateHandle.get<String>("initialTitle") ?: ""
     private val isEditMode = passedNoteId.isNotBlank()
     private var currentNoteId: String = ""
+    private var currentUserId: String? = null
+    private var currentOwnerId: String? = null
     private var currentRecordingFile: File? = null
     private val imageSuggestionsCache = mutableMapOf<String, List<String>>()
     private var cachedImageBytes: ByteArray? = null
@@ -93,6 +104,71 @@ class AddEditNoteViewModel @Inject constructor(
                 if (isEditMode) -1 else NoteColors.colors.random().toArgb()
         )
     )
+
+    init {
+        observeCurrentUser()
+        if (isEditMode) {
+            loadNote(passedNoteId)
+        } else if (passedInitialTitle.isNotBlank()) {
+            _uiState.update {
+                it.copy(
+                    titleState = it.titleState.copy(
+                        richText = RichTextDocument(rawText = passedInitialTitle),
+                        isHintVisible = false
+                    )
+                )
+            }
+        }
+    }
+
+    private fun observeCurrentUser() {
+        viewModelScope.launch {
+            authRepository.getSignedInFirebaseUser().collect { user ->
+                currentUserId = user?.uid
+                updateOwnerStatus()
+            }
+        }
+    }
+
+    private fun updateOwnerStatus() {
+        val isOwner =
+            currentUserId != null && (currentOwnerId == null || currentOwnerId == currentUserId)
+        _uiState.update { it.copy(isOwner = isOwner) }
+    }
+
+    private fun observeCollaborators(noteId: String) {
+        viewModelScope.launch {
+            collaborationRepository.getCollaboratorsForNote(noteId).collect { entities ->
+                if (entities.isNotEmpty()) {
+                    currentOwnerId = entities.first().ownerUserId
+                    updateOwnerStatus()
+                }
+                _uiState.update { state ->
+                    state.copy(
+                        collaborators = entities.map { entity ->
+                            com.mintanable.notethepad.core.model.collaboration.Collaborator(
+                                id = entity.id,
+                                noteId = entity.noteId,
+                                userId = entity.collaboratorUserId,
+                                email = entity.collaboratorEmail,
+                                displayName = entity.collaboratorDisplayName,
+                                photoUrl = entity.collaboratorPhotoUrl,
+                                isOwner = entity.collaboratorUserId == entity.ownerUserId
+                            )
+                        },
+                        isLoadingCollaborators = false
+                    )
+                }
+            }
+        }
+        // Fetch fresh data from remote
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingCollaborators = true) }
+            collaborationRepository.fetchAndCacheCollaborators(noteId)
+            _uiState.update { it.copy(isLoadingCollaborators = false) }
+        }
+    }
+
     val uiState: StateFlow<AddEditNoteUiState> = combine(
         _uiState,
         mediaPlayer.mediaState,
@@ -128,7 +204,8 @@ class AddEditNoteViewModel @Inject constructor(
                         richText = RichTextDocument(rawText = passedInitialTitle),
                         isHintVisible = false
                     )
-                ) }
+                )
+                }
             }
         }
     }
@@ -164,32 +241,40 @@ class AddEditNoteViewModel @Inject constructor(
                         tagEntities = detailedNote.tagEntities
                     )
                 }
+                observeCollaborators(id)
             }
         }
     }
 
-    fun onEvent(event:AddEditNoteEvent){
+    fun onEvent(event: AddEditNoteEvent) {
         Log.d("AddEditNoteViewModel", "event: $event")
-        when(event){
+        when (event) {
             is AddEditNoteEvent.EnteredTitle -> {
-                _uiState.update { it.copy(
-                    titleState = it.titleState.copy(
-                        richText = RichTextDocument(rawText = event.value),
-                        isHintVisible = event.value.isBlank() && !it.titleState.isFocused,
+                _uiState.update {
+                    it.copy(
+                        titleState = it.titleState.copy(
+                            richText = RichTextDocument(rawText = event.value),
+                            isHintVisible = event.value.isBlank() && !it.titleState.isFocused,
+                        )
                     )
-                )}
+                }
             }
+
             is AddEditNoteEvent.ChangeTitleFocus -> {
-                _uiState.update { it.copy(
-                    titleState = it.titleState.copy(
-                        isFocused = event.focusState.isFocused,
-                        isHintVisible = !event.focusState.isFocused && it.titleState.richText.rawText.isBlank()
+                _uiState.update {
+                    it.copy(
+                        titleState = it.titleState.copy(
+                            isFocused = event.focusState.isFocused,
+                            isHintVisible = !event.focusState.isFocused && it.titleState.richText.rawText.isBlank()
+                        )
                     )
-                )}
+                }
             }
+
             is AddEditNoteEvent.EnteredContent -> {
                 _uiState.update { state ->
-                    val newState = RichTextEngine.onValueChanged(state.contentRichTextState, event.value)
+                    val newState =
+                        RichTextEngine.onValueChanged(state.contentRichTextState, event.value)
                     state.copy(
                         contentRichTextState = newState,
                         contentState = state.contentState.copy(
@@ -198,97 +283,127 @@ class AddEditNoteViewModel @Inject constructor(
                     )
                 }
             }
+
             is AddEditNoteEvent.ChangeContentFocus -> {
                 val focused = event.focusState.isFocused
-                _uiState.update { it.copy(
-                    contentState = it.contentState.copy(
-                        isFocused = focused,
-                        isHintVisible = !focused && it.contentRichTextState.document.rawText.isBlank()
-                    ),
-                    isRichTextBarActive = if (!focused) false else it.isRichTextBarActive,
-                    contentRichTextState = if (!focused) it.contentRichTextState.copy(
-                        pendingBlockType = null,
-                        pendingBullet = false,
-                        pendingStyles = emptySet()
-                    ) else it.contentRichTextState
-                )}
+                _uiState.update {
+                    it.copy(
+                        contentState = it.contentState.copy(
+                            isFocused = focused,
+                            isHintVisible = !focused && it.contentRichTextState.document.rawText.isBlank()
+                        ),
+                        isRichTextBarActive = if (!focused) false else it.isRichTextBarActive,
+                        contentRichTextState = if (!focused) it.contentRichTextState.copy(
+                            pendingBlockType = null,
+                            pendingBullet = false,
+                            pendingStyles = emptySet()
+                        ) else it.contentRichTextState
+                    )
+                }
             }
+
             is AddEditNoteEvent.ApplyContentFormat -> {
                 _uiState.update { state ->
-                    val newState = RichTextEngine.toggleFormat(state.contentRichTextState, event.type)
+                    val newState =
+                        RichTextEngine.toggleFormat(state.contentRichTextState, event.type)
                     state.copy(contentRichTextState = newState)
                 }
             }
+
             is AddEditNoteEvent.ToggleRichTextBar -> {
                 _uiState.update { it.copy(isRichTextBarActive = !it.isRichTextBarActive) }
             }
+
             is AddEditNoteEvent.ChangeColor -> {
                 _uiState.update { it.copy(noteColor = event.color, backgroundImage = -1) }
             }
+
             is AddEditNoteEvent.ChangeBackgroundImage -> {
                 _uiState.update { it.copy(backgroundImage = event.index, noteColor = -1) }
             }
+
             is AddEditNoteEvent.SaveNote -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
                     saveNote(currentNoteId)
                         .onSuccess { id ->
-                            if(id.isNotBlank()) { rescheduleReminder(id) }
+                            if (id.isNotBlank()) {
+                                rescheduleReminder(id)
+                            }
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                             _eventFlow.emit(UiEvent.SaveNote)
                         }
                         .onFailure { e ->
                             _uiState.update { it.copy(isSaving = false) }
-                            _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
+                            _eventFlow.emit(
+                                ShowSnackbar(
+                                    e.message ?: appContext.getString(R.string.msg_save_failed)
+                                )
+                            )
                         }
                 }
 
             }
+
             is AddEditNoteEvent.MakeCopy -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
                     saveNote("")// as new note
                         .onSuccess { id ->
                             _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
-                            _eventFlow.emit(UiEvent.MakeCopy(id))
+                            _eventFlow.emit(MakeCopy(id))
                         }
                         .onFailure { e ->
                             _uiState.update { it.copy(isSaving = false) }
-                            _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed"))
+                            _eventFlow.emit(
+                                ShowSnackbar(
+                                    e.message ?: appContext.getString(R.string.msg_save_failed)
+                                )
+                            )
                         }
                 }
             }
+
             is AddEditNoteEvent.DeleteNote -> {
                 deleteNote()
             }
+
             is AddEditNoteEvent.PinNote -> {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isSaving = true) }
                     saveNote(currentNoteId)
                         .onSuccess { id ->
                             _uiState.update { it.copy(isSaving = false) }
-                            _eventFlow.emit(UiEvent.RequestWidgetPin(id))
+                            _eventFlow.emit(RequestWidgetPin(id))
                         }
                         .onFailure {
                             _uiState.update { it.copy(isSaving = false) }
-                            _eventFlow.emit(UiEvent.ShowSnackbar("Save Failed, can't pin to homescreen"))
+                            _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_pin_failed)))
                         }
                 }
             }
+
             is AddEditNoteEvent.AttachImage -> {
-                _uiState.update { it.copy(
-                    attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
-                )}
+                _uiState.update {
+                    it.copy(
+                        attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
+                    )
+                }
             }
+
             is AddEditNoteEvent.RemoveImage -> {
                 _uiState.update { it.copy(attachedImages = it.attachedImages - event.uri) }
                 viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
             }
+
             is AddEditNoteEvent.AttachVideo -> {
-                _uiState.update { it.copy(
-                    attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
-                )}
+                _uiState.update {
+                    it.copy(
+                        attachedImages = if (it.attachedImages.contains(event.uri)) it.attachedImages else it.attachedImages + event.uri
+                    )
+                }
             }
+
             is AddEditNoteEvent.RemoveAudio -> {
                 viewModelScope.launch {
                     _uiState.update { state ->
@@ -301,20 +416,26 @@ class AddEditNoteViewModel @Inject constructor(
                     }
                 }
             }
+
             is AddEditNoteEvent.ToggleAudioRecording -> {
                 handleRecording(event.enableLiveTranscription)
             }
+
             is AddEditNoteEvent.DismissDialogs -> {
-                _uiState.update { it.copy(
-                    showCameraRationale = false,
-                    showMicrophoneRationale = false,
-                    settingsDeniedType = null,
-                    showAddNewTagDialog = false
-                )}
+                _uiState.update {
+                    it.copy(
+                        showCameraRationale = false,
+                        showMicrophoneRationale = false,
+                        settingsDeniedType = null,
+                        showAddNewTagDialog = false
+                    )
+                }
             }
+
             is AddEditNoteEvent.UpdateSheetType -> {
                 _uiState.update { it.copy(currentSheetType = event.sheetType) }
             }
+
             is AddEditNoteEvent.ToggleZoom -> {
                 val attachmentType = AttachmentHelper.getAttachmentType(appContext, event.uri)
                 if (attachmentType == AttachmentType.VIDEO) {
@@ -326,35 +447,88 @@ class AddEditNoteViewModel @Inject constructor(
                     analyzeImage(event.uri)
                 }
             }
+
             is AddEditNoteEvent.UpdateNowPlaying -> {
                 mediaPlayer.playPause(event.uri.toUri())
             }
+
             is AddEditNoteEvent.StopMedia -> {
+                if (_uiState.value.isImageQueryLoading) {
+                    _uiState.update { it.copy(showStopAIConfirmation = true) }
+                    return
+                }
                 mediaPlayer.stop()
-                _uiState.update { it.copy(
-                    zoomedImageUri = null,
-                    imageSuggestions = emptyList(),
-                    imageQueryResult = "",
-                    isImageQueryLoading = false,
-                    isAnalyzingImage = false
-                ) }
+                _uiState.update {
+                    it.copy(
+                        zoomedImageUri = null,
+                        imageSuggestions = emptyList(),
+                        imageQueryResult = "",
+                        isImageQueryLoading = false,
+                        isAnalyzingImage = false,
+                        showStopAIConfirmation = false
+                    )
+                }
             }
+
+            is AddEditNoteEvent.ConfirmStopImageQuery -> {
+                if (event.shouldStop) {
+                    imageQueryJob?.cancel()
+                    _uiState.update {
+                        it.copy(
+                            isImageQueryLoading = false,
+                            showStopAIConfirmation = false,
+                            zoomedImageUri = null,
+                            imageSuggestions = emptyList(),
+                            imageQueryResult = "",
+                            isAnalyzingImage = false
+                        )
+                    }
+                    mediaPlayer.stop()
+                } else {
+                    _uiState.update { it.copy(showStopAIConfirmation = false) }
+                }
+            }
+
             is AddEditNoteEvent.SetReminder -> {
-                _uiState.update { it.copy(reminderTime = event.timestamp, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
+                _uiState.update {
+                    it.copy(
+                        reminderTime = event.timestamp,
+                        showAlarmPermissionRationale = false,
+                        showDataAndTimePicker = false
+                    )
+                }
             }
+
             is AddEditNoteEvent.CancelReminder -> {
-                _uiState.update { it.copy(reminderTime = -1, showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
-                if (currentNoteId.isNotBlank()) { reminderScheduler.cancel(currentNoteId.hashCode().toLong()) }
+                _uiState.update {
+                    it.copy(
+                        reminderTime = -1,
+                        showAlarmPermissionRationale = false,
+                        showDataAndTimePicker = false
+                    )
+                }
+                if (currentNoteId.isNotBlank()) {
+                    reminderScheduler.cancel(currentNoteId.hashCode().toLong())
+                }
             }
+
             is AddEditNoteEvent.CheckAlarmPermission -> {
                 checkExactAlarmPermission()
             }
+
             is AddEditNoteEvent.DismissReminder -> {
-                _uiState.update { it.copy(showAlarmPermissionRationale = false, showDataAndTimePicker = false) }
+                _uiState.update {
+                    it.copy(
+                        showAlarmPermissionRationale = false,
+                        showDataAndTimePicker = false
+                    )
+                }
             }
+
             is AddEditNoteEvent.ToggleCheckbox -> {
-                if(uiState.value.isCheckboxListAvailable) {
-                    val textContent = CheckboxConvertors.checkboxesToContentString(uiState.value.checkListItems)
+                if (uiState.value.isCheckboxListAvailable) {
+                    val textContent =
+                        CheckboxConvertors.checkboxesToContentString(uiState.value.checkListItems)
                     val richText = RichTextDocument(rawText = textContent)
                     val annotated = RichTextAnnotator.toAnnotatedString(richText)
                     _uiState.update {
@@ -387,14 +561,24 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.AddChecklistItem -> {
                 _uiState.update { currentState ->
                     val currentItems = currentState.checkListItems
-                    val targetIndex = currentItems.indexOfFirst { it.id == event.previousCheckItem.id }
+                    val targetIndex =
+                        currentItems.indexOfFirst { it.id == event.previousCheckItem.id }
 
                     val newList = if (targetIndex != -1) {
                         currentItems.toMutableList().apply {
-                            add(targetIndex + 1,CheckboxItem(text = "", isChecked = event.previousCheckItem.isChecked))
+                            add(
+                                targetIndex + 1,
+                                CheckboxItem(
+                                    text = "",
+                                    isChecked = event.previousCheckItem.isChecked
+                                )
+                            )
                         }
                     } else {
-                        currentItems + CheckboxItem(text = "", isChecked = event.previousCheckItem.isChecked)
+                        currentItems + CheckboxItem(
+                            text = "",
+                            isChecked = event.previousCheckItem.isChecked
+                        )
                     }
 
                     currentState.copy(checkListItems = newList)
@@ -407,19 +591,25 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.InsertLabel -> {
                 _uiState.update { currentState ->
-                    val newTagEntities = if (currentState.tagEntities.map { it.tagName }.contains(event.tagName)) {
-                        currentState.tagEntities
-                    } else {
-                        currentState.tagEntities + TagEntity(event.tagName)
-                    }
-                    val newSuggestedTags = if(currentState.suggestedTags.contains(event.tagName)){
+                    val newTagEntities =
+                        if (currentState.tagEntities.map { it.tagName }.contains(event.tagName)) {
+                            currentState.tagEntities
+                        } else {
+                            currentState.tagEntities + TagEntity(event.tagName)
+                        }
+                    val newSuggestedTags = if (currentState.suggestedTags.contains(event.tagName)) {
                         currentState.suggestedTags - event.tagName
-                    }else{
+                    } else {
                         currentState.suggestedTags
                     }
-                    currentState.copy(tagEntities = newTagEntities, showAddNewTagDialog = false, suggestedTags = newSuggestedTags)
+                    currentState.copy(
+                        tagEntities = newTagEntities,
+                        showAddNewTagDialog = false,
+                        suggestedTags = newSuggestedTags
+                    )
                 }
             }
+
             is AddEditNoteEvent.DeleteLabel -> {
                 _uiState.update { currentState ->
                     val newList = currentState.tagEntities.filterNot { it.tagName == event.tagName }
@@ -435,10 +625,21 @@ class AddEditNoteViewModel @Inject constructor(
                         content = uiState.value.contentRichTextState.document.rawText
                     )
                         .onSuccess { suggestions ->
-                            _uiState.update { it.copy(isTagSuggestionLoading = false, suggestedTags = suggestions) } }
+                            _uiState.update {
+                                it.copy(
+                                    isTagSuggestionLoading = false,
+                                    suggestedTags = suggestions
+                                )
+                            }
+                        }
                         .onFailure { exeption ->
                             _uiState.update { it.copy(isTagSuggestionLoading = false) }
-                            _eventFlow.emit(UiEvent.ShowSnackbar(exeption.message ?: "Save Failed"))
+                            _eventFlow.emit(
+                                ShowSnackbar(
+                                    exeption.message
+                                        ?: appContext.getString(R.string.msg_save_failed)
+                                )
+                            )
                         }
                 }
             }
@@ -451,7 +652,8 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { state ->
                     val oldState = state.contentRichTextState
                     val currentText = oldState.document.rawText
-                    val appendedText = if (currentText.isEmpty()) event.transcript else "\n" + event.transcript
+                    val appendedText =
+                        if (currentText.isEmpty()) event.transcript else "\n" + event.transcript
                     val newText = currentText + appendedText
                     val newTfv = TextFieldValue(
                         text = newText,
@@ -469,12 +671,24 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.AnalyzeImage -> analyzeImage(event.uri)
             is AddEditNoteEvent.ExecuteImageQuery -> executeImageQuery(event.query)
             is AddEditNoteEvent.ClearImageSuggestions -> _uiState.update {
-                it.copy(imageSuggestions = emptyList(), imageQueryResult = "", isImageQueryLoading = false, isAnalyzingImage = false)
+                it.copy(
+                    imageSuggestions = emptyList(),
+                    imageQueryResult = "",
+                    isImageQueryLoading = false,
+                    isAnalyzingImage = false
+                )
             }
+
             is AddEditNoteEvent.ClearImageQueryResult -> {
                 val cachedKey = _uiState.value.zoomedImageUri?.toString()
                 val cached = cachedKey?.let { imageSuggestionsCache[it] } ?: emptyList()
-                _uiState.update { it.copy(imageQueryResult = "", isImageQueryLoading = false, imageSuggestions = cached) }
+                _uiState.update {
+                    it.copy(
+                        imageQueryResult = "",
+                        isImageQueryLoading = false,
+                        imageSuggestions = cached
+                    )
+                }
             }
 
             is AddEditNoteEvent.ShareNote -> {
@@ -485,16 +699,138 @@ class AddEditNoteViewModel @Inject constructor(
                             if (currentNoteId.isBlank() && id.isNotBlank()) {
                                 currentNoteId = id
                             }
-                            if (id.isNotBlank()) { rescheduleReminder(id) }
+                            if (id.isNotBlank()) {
+                                rescheduleReminder(id)
+                            }
                             _uiState.update { it.copy(isSaving = false) }
-                            
+
                             val intent = withContext(Dispatchers.IO) { buildShareIntent() }
-                            _eventFlow.emit(UiEvent.ShareNote(intent))
+                            _eventFlow.emit(ShareNote(intent))
                         }
                         .onFailure { e ->
                             _uiState.update { it.copy(isSaving = false) }
-                            _eventFlow.emit(UiEvent.ShowSnackbar(e.message ?: "Save Failed before sharing"))
+                            _eventFlow.emit(
+                                ShowSnackbar(
+                                    e.message
+                                        ?: appContext.getString(R.string.msg_save_failed_sharing)
+                                )
+                            )
                         }
+                }
+            }
+
+            is AddEditNoteEvent.InviteCollaborator -> {
+                viewModelScope.launch {
+                    if (currentNoteId.isBlank()) {
+                        _uiState.update { it.copy(isSaving = true) }
+                        saveNote(currentNoteId)
+                            .onSuccess { id ->
+                                if (id.isNotBlank()) {
+                                    rescheduleReminder(id)
+                                }
+                                _uiState.update { it.copy(isSaving = false) }
+                            }
+                            .onFailure { e ->
+                                _uiState.update { it.copy(isSaving = false) }
+                                _eventFlow.emit(
+                                    ShowSnackbar(
+                                        e.message ?: appContext.getString(R.string.msg_save_failed)
+                                    )
+                                )
+                                return@launch
+                            }
+                    }
+                    _uiState.update {
+                        it.copy(
+                            isLoadingCollaborators = true,
+                            collaboratorError = null
+                        )
+                    }
+                    val collaborator = collaborationRepository.findUserByEmail(event.email)
+                    if (collaborator == null) {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingCollaborators = false,
+                                collaboratorError = appContext.getString(R.string.collaborator_not_found)
+                            )
+                        }
+                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.collaborator_not_found)))
+                    } else if (collaborator.userId == currentUserId) {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingCollaborators = false,
+                                collaboratorError = appContext.getString(R.string.cannot_invite_self)
+                            )
+                        }
+                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.cannot_invite_self)))
+                    } else if (_uiState.value.collaborators.any { it.userId == collaborator.userId }) {
+                        _uiState.update {
+                            it.copy(
+                                isLoadingCollaborators = false,
+                                collaboratorError = appContext.getString(R.string.collaborator_already_added)
+                            )
+                        }
+                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.collaborator_already_added)))
+                    } else {
+                        val success = collaborationRepository.addCollaborator(
+                            noteId = currentNoteId,
+                            ownerUserId = currentUserId ?: "",
+                            collaborator = collaborator
+                        )
+                        if (success) {
+                            _uiState.update { it.copy(isLoadingCollaborators = false) }
+                            _eventFlow.emit(
+                                ShowSnackbar(
+                                    appContext.getString(
+                                        R.string.msg_invitation_sent,
+                                        event.email
+                                    )
+                                )
+                            )
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isLoadingCollaborators = false,
+                                    collaboratorError = appContext.getString(R.string.msg_remove_collaborator_failed)
+                                )
+                            }
+                            _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_remove_collaborator_failed)))
+                        }
+                    }
+                }
+            }
+
+            AddEditNoteEvent.LeaveNote -> {
+                viewModelScope.launch {
+                    val userId = currentUserId ?: return@launch
+                    val success = collaborationRepository.leaveNote(currentNoteId, userId)
+                    if (success) {
+                        _eventFlow.emit(UiEvent.SaveNote) // Use SaveNote to trigger navigation up
+                    } else {
+                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_leave_failed)))
+                    }
+                }
+            }
+
+            AddEditNoteEvent.OpenCollaborateSheet -> {
+                if (currentNoteId.isNotBlank()) {
+                    _uiState.update { it.copy(currentSheetType = BottomSheetType.COLLABORATORS) }
+                } else {
+                    viewModelScope.launch {
+                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_save_before_collaborate)))
+                    }
+                }
+            }
+
+            is AddEditNoteEvent.RemoveCollaborator -> {
+                viewModelScope.launch {
+                    val success = collaborationRepository.removeCollaborator(
+                        currentNoteId,
+                        event.collaboratorUserId
+                    )
+                    if (!success) {
+                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_remove_collaborator_failed)))
+                    }
                 }
             }
         }
@@ -547,7 +883,7 @@ class AddEditNoteViewModel @Inject constructor(
                 putExtra(Intent.EXTRA_SUBJECT, title)
                 putExtra(Intent.EXTRA_TEXT, textBody)
                 putParcelableArrayListExtra(Intent.EXTRA_STREAM, allAttachments)
-                
+
                 // Essential for granting read permissions to multiple URIs on modern Android
                 val clipData = android.content.ClipData.newRawUri(null, allAttachments[0])
                 for (i in 1 until allAttachments.size) {
@@ -561,9 +897,16 @@ class AddEditNoteViewModel @Inject constructor(
 
     private fun transcribeAttachedAudio(uriString: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(transcribingUri = uriString,
-                attachedAudios = it.attachedAudios.map { if (it.uri == uriString) it.copy(transcription = "") else it }
-            ) }
+            _uiState.update {
+                it.copy(
+                    transcribingUri = uriString,
+                    attachedAudios = it.attachedAudios.map {
+                        if (it.uri == uriString) it.copy(
+                            transcription = ""
+                        ) else it
+                    }
+                )
+            }
             transcribeAudioFileUseCase(uriString) { transcript ->
                 _uiState.update { state ->
                     state.copy(
@@ -615,8 +958,9 @@ class AddEditNoteViewModel @Inject constructor(
 
     private fun executeImageQuery(query: String) {
         val imageBytes = cachedImageBytes ?: return
-        viewModelScope.launch {
-            _uiState.update { it.copy(isImageQueryLoading = true, imageSuggestions = emptyList(), imageQueryResult = "") }
+        imageQueryJob?.cancel()
+        imageQueryJob = viewModelScope.launch {
+            _uiState.update { it.copy( isImageQueryLoading = true, imageSuggestions = emptyList(), imageQueryResult = "") }
             try {
                 queryImageUseCase(imageBytes, query).collect { chunk ->
                     _uiState.update { it.copy(imageQueryResult = it.imageQueryResult + chunk) }
@@ -634,7 +978,7 @@ class AddEditNoteViewModel @Inject constructor(
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
             fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri })
             if(currentNoteId.isNotBlank()) { noteUseCases.deleteNote(currentNoteId) }
-            _eventFlow.emit(UiEvent.DeleteNote(currentNoteId))
+            _eventFlow.emit(DeleteNote(currentNoteId))
         }
     }
 
@@ -643,7 +987,7 @@ class AddEditNoteViewModel @Inject constructor(
             if (uiState.value.isRecording) {
                 _uiState.update { it.copy(isRecording = false) }
 
-                if(enableLiveTranscription) {
+                if (enableLiveTranscription) {
                     stopLiveTransctiptions()
                     _uiState.update { state ->
                         val oldState = state.contentRichTextState
@@ -672,7 +1016,7 @@ class AddEditNoteViewModel @Inject constructor(
                     }
                 }
             } else {
-                if(enableLiveTranscription) {
+                if (enableLiveTranscription) {
                     _uiState.update { state -> state.copy(isRecording = true) }
                     startLiveTransctiption(onTranscription = { transcript ->
                         Log.d("kptest", "Transcription: $transcript")
@@ -708,11 +1052,11 @@ class AddEditNoteViewModel @Inject constructor(
         )
     }
 
-    private fun rescheduleReminder(id: String){
+    private fun rescheduleReminder(id: String) {
         val state = uiState.value
         val longId = id.hashCode().toLong()
         reminderScheduler.cancel(id = longId)
-        if(state.reminderTime > System.currentTimeMillis()) {
+        if (state.reminderTime > System.currentTimeMillis()) {
             reminderScheduler.schedule(
                 id = longId,
                 title = state.titleState.richText.rawText,

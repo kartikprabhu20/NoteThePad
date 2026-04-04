@@ -26,6 +26,9 @@ interface CollaboratorDao {
     @Query("SELECT DISTINCT noteId FROM note_collaborators_local WHERE collaboratorUserId = :userId OR ownerUserId = :userId")
     fun getSharedNoteIds(userId: String): Flow<List<String>>
 
+    @Query("SELECT DISTINCT noteId FROM note_collaborators_local WHERE collaboratorUserId = :userId OR ownerUserId = :userId")
+    suspend fun getSharedNoteIdsOnce(userId: String): List<String>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCollaborator(entity: CollaboratorEntity)
 

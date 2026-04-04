@@ -7,6 +7,11 @@ import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
+import io.github.jan.supabase.postgrest.rpc
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.add
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
@@ -59,6 +64,37 @@ class SupabaseSyncService @Inject constructor(
             isSuccess
         } catch (e: Exception) {
             Log.e("Sync", "Postgrest Error: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun updateSharedNote(noteDto: NoteDto): Boolean {
+        return try {
+            // Use RPC (POST) instead of .update() (PATCH) to avoid HTTP method issues
+            val result = supabaseClient.postgrest.rpc(
+                "update_shared_note",
+                buildJsonObject {
+                    put("p_note_id", noteDto.id)
+                    put("p_title", noteDto.title)
+                    put("p_content", noteDto.content)
+                    put("p_timestamp", noteDto.timestamp)
+                    put("p_color", noteDto.color)
+                    putJsonArray("p_image_uris") { noteDto.imageUris.forEach { add(it) } }
+                    putJsonArray("p_audio_uris") { noteDto.audioUris.forEach { add(it) } }
+                    put("p_reminder_time", noteDto.reminderTime)
+                    put("p_audio_transcriptions", noteDto.audioTranscriptions)
+                    put("p_background_image", noteDto.backgroundImage)
+                    put("p_last_update_time", noteDto.lastUpdateTime)
+                    put("p_is_deleted", noteDto.isDeleted)
+                }
+            )
+            val isSuccess = result.data != "[]" && result.data.isNotEmpty()
+            if (isSuccess) {
+                Log.d("Sync", "Shared note updated: ${noteDto.id}")
+            }
+            isSuccess
+        } catch (e: Exception) {
+            Log.e("Sync", "Shared note update error: ${e.message}")
             false
         }
     }
