@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">永久に削除</string>
     <string name="msg_add_collaborator_failed">共同編集者の追加に失敗しました</string>
     <string name="analyze_images">画像を分析する</string>
+    <string name="dialog_stop_ai_title">AIプロセスを停止しますか？</string>
+    <string name="dialog_stop_ai_message">AIがまだ応答中です。停止して戻りますか？</string>
+    <string name="btn_stop">停止して戻る</string>
+    <string name="btn_continue">続行</string>
 </resources>

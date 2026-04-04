@@ -84,7 +84,7 @@
     <string name="transparent">স্বচ্ছ</string>
 
     <string name="msg_save_failed">সংরক্ষণ করতে ব্যর্থ হয়েছে</string>
-    <string name="msg_pin_failed">সংরক্ষণ করতে ব্যর্থ হয়েছে, হোমস্ক্রিনে পিন করা যাচ্ছে না</string>
+    <string name="msg_pin_failed">সংরক্ষণ করতে ব্যর্থ হয়েছে, হোমস্كرিনে পিন করা যাচ্ছে না</string>
     <string name="msg_save_failed_sharing">শেয়ার করার আগে সংরক্ষণ করতে ব্যর্থ হয়েছে</string>
     <string name="msg_save_before_invite">সহযোগীদের আমন্ত্রণ জানানোর আগে দয়া করে নোটটি সংরক্ষণ করুন</string>
     <string name="msg_invitation_sent">%1$s-এ আমন্ত্রণ পাঠানো হয়েছে</string>
@@ -103,8 +103,12 @@
     <string name="invite">আমন্ত্রণ জানান</string>
     <string name="owner_label">মালিক</string>
     <string name="title_archive">আর্কাইভ</string>
-    <string name="content_description_restore">পুনরুদ্ধার করুন</string>
+    <string name="content_description_restore">পুনরুদ্ধار করুন</string>
     <string name="content_description_delete_permanently">চিরতরে মুছে ফেলুন</string>
     <string name="msg_add_collaborator_failed">সহযোগী যোগ করতে ব্যর্থ হয়েছে</string>
     <string name="analyze_images">ছবি বিশ্লেষণ করুন</string>
+    <string name="dialog_stop_ai_title">এআই প্রক্রিয়া বন্ধ করবেন?</string>
+    <string name="dialog_stop_ai_message">এআই এখনও প্রতিক্রিয়া দিচ্ছে। আপনি কি এটি বন্ধ করে ফিরে যেতে চান?</string>
+    <string name="btn_stop">বন্ধ করুন এবং ফিরে যান</string>
+    <string name="btn_continue">চালিয়ে যান</string>
 </resources>

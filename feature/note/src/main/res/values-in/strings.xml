@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">Hapus Permanen</string>
     <string name="msg_add_collaborator_failed">Gagal menambahkan kolaborator</string>
     <string name="analyze_images">Analisis Gambar</string>
+    <string name="dialog_stop_ai_title">Hentikan Proses AI?</string>
+    <string name="dialog_stop_ai_message">AI masih merespons. Apakah Anda ingin menghentikannya dan kembali?</string>
+    <string name="btn_stop">Berhenti &amp; Kembali</string>
+    <string name="btn_continue">Lanjutkan</string>
 </resources>

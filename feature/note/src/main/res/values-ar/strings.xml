@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">حذف نهائي</string>
     <string name="msg_add_collaborator_failed">فشل إضافة المتعاون</string>
     <string name="analyze_images">تحليل الصور</string>
+    <string name="dialog_stop_ai_title">إيقاف عملية الذكاء الاصطناعي؟</string>
+    <string name="dialog_stop_ai_message">لا يزال الذكاء الاصطناعي يستجيب. هل تريد إيقافه والعودة؟</string>
+    <string name="btn_stop">إيقاف والعودة</string>
+    <string name="btn_continue">متابعة</string>
 </resources>

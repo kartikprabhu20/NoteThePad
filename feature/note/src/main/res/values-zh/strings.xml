@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">永久删除</string>
     <string name="msg_add_collaborator_failed">添加协作者失败</string>
     <string name="analyze_images">分析图像</string>
+    <string name="dialog_stop_ai_title">停止 AI 进程？</string>
+    <string name="dialog_stop_ai_message">AI 仍在响应。是否要停止并返回？</string>
+    <string name="btn_stop">停止并返回</string>
+    <string name="btn_continue">继续</string>
 </resources>

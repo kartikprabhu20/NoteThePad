@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">Удалить навсегда</string>
     <string name="msg_add_collaborator_failed">Не удалось добавить соавтора</string>
     <string name="analyze_images">Анализировать изображения</string>
+    <string name="dialog_stop_ai_title">Остановить процесс ИИ?</string>
+    <string name="dialog_stop_ai_message">ИИ все еще отвечает. Вы хотите остановить его и вернуться?</string>
+    <string name="btn_stop">Остановить и вернуться</string>
+    <string name="btn_continue">Продолжить</string>
 </resources>

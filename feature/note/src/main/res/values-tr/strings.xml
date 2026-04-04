@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">Kalıcı olarak sil</string>
     <string name="msg_add_collaborator_failed">İş ortağı eklenemedi</string>
     <string name="analyze_images">Görüntüleri Analiz Et</string>
+    <string name="dialog_stop_ai_title">Yapay Zeka İşlemini Durdur?</string>
+    <string name="dialog_stop_ai_message">Yapay zeka hala yanıt veriyor. Durdurup geri gitmek istiyor musunuz?</string>
+    <string name="btn_stop">Durdur ve Geri Git</string>
+    <string name="btn_continue">Devam Et</string>
 </resources>

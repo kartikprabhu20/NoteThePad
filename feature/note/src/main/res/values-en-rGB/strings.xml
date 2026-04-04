@@ -104,5 +104,9 @@
     <string name="title_archive">Archive</string>
     <string name="content_description_restore">Restore</string>
     <string name="content_description_delete_permanently">Delete Permanently</string>
-    <string name="analyze_images">Analyze Images</string>
+    <string name="analyze_images">Analyse Images</string>
+    <string name="dialog_stop_ai_title">Stop AI Process?</string>
+    <string name="dialog_stop_ai_message">The AI is still responding. Do you want to stop it and go back?</string>
+    <string name="btn_stop">Stop &amp; Go Back</string>
+    <string name="btn_continue">Continue</string>
 </resources>

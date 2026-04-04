@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">영구 삭제</string>
     <string name="msg_add_collaborator_failed">공동 작업자 추가 실패</string>
     <string name="analyze_images">이미지 분석</string>
+    <string name="dialog_stop_ai_title">AI 프로세스를 중단할까요?</string>
+    <string name="dialog_stop_ai_message">AI가 아직 응답 중입니다. 중단하고 돌아가시겠습니까?</string>
+    <string name="btn_stop">중단 및 돌아가기</string>
+    <string name="btn_continue">계속</string>
 </resources>

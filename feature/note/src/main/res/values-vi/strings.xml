@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">Xóa vĩnh viễn</string>
     <string name="msg_add_collaborator_failed">Thêm cộng tác viên thất bại</string>
     <string name="analyze_images">Phân tích hình ảnh</string>
+    <string name="dialog_stop_ai_title">Dừng quá trình AI?</string>
+    <string name="dialog_stop_ai_message">AI vẫn đang phản hồi. Bạn có muốn dừng lại và quay lại không?</string>
+    <string name="btn_stop">Dừng và quay lại</string>
+    <string name="btn_continue">Tiếp tục</string>
 </resources>

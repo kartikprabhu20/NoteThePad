@@ -107,4 +107,8 @@
     <string name="content_description_delete_permanently">Eliminar permanentemente</string>
     <string name="msg_add_collaborator_failed">Error al añadir colaborador</string>
     <string name="analyze_images">Analizar imágenes</string>
+    <string name="dialog_stop_ai_title">¿Detener proceso de IA?</string>
+    <string name="dialog_stop_ai_message">La IA todavía está respondiendo. ¿Quieres detenerla y volver?</string>
+    <string name="btn_stop">Detener y volver</string>
+    <string name="btn_continue">Continuar</string>
 </resources>
