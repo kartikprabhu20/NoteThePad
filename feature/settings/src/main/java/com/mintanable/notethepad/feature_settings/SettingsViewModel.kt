@@ -56,7 +56,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -87,6 +89,7 @@ class SettingsViewModel @Inject constructor(
 
     companion object {
         private const val KEY_PENDING_BACKUP_NOW = "pending_backup_now"
+        private const val NONE_MODEL_NAME = "None"
     }
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
@@ -162,13 +165,16 @@ class SettingsViewModel @Inject constructor(
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
+    private val _aiModelsFlow = refreshTrigger.flatMapLatest { getSupportedAiModels() }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<SettingsState> = combine(
         _dataStoreSettings,
         _backupMetadataFlow,
         _backupUploadStatus,
         _backupDownloadStatus,
         _aiModelDownloadStatus,
-        getSupportedAiModels(),
+        _aiModelsFlow,
         _isAuthorisingBackup,
         _downloadDialogModel,
         _audioTranscriberStatusFlow,
@@ -213,6 +219,16 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsState()
     )
 
+    init {
+        _aiModelDownloadStatus
+            .onEach { status ->
+                if (status is LoadStatus.Error) {
+                    dataStore.updateAiModel(NONE_MODEL_NAME)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
     fun onEvent(event: SettingsEvent) {
         when (event) {
             is SettingsEvent.UpdateTheme -> updateTheme(event.themeMode)
@@ -227,7 +243,10 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.StartRestore -> startRestore(event.onFailure)
             is SettingsEvent.SelectAiModel -> selectAiModel(event.aiModel)
             is SettingsEvent.ConfirmDownloadAiModel -> confirmDownloadAiModel(event.aiModel, event.onFailure)
-            SettingsEvent.DismissDownloadDialog -> _downloadDialogModel.value = null
+            SettingsEvent.DismissDownloadDialog -> {
+                _downloadDialogModel.value = null
+                viewModelScope.launch { dataStore.updateAiModel(NONE_MODEL_NAME) }
+            }
             SettingsEvent.SignOut -> signOut()
             is SettingsEvent.ClearAppData -> clearAppData(event.onFailure)
             SettingsEvent.RequestDownloadAudioTranscriber -> _showDownloadAudioTranscriberDialog.value = true
