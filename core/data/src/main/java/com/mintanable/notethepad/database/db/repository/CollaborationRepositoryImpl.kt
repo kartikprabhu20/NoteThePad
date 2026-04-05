@@ -4,6 +4,7 @@ import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.core.network.sync.CollaborationService
 import com.mintanable.notethepad.core.network.sync.NoteCollaboratorDto
+import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.dao.CollaboratorDao
 import com.mintanable.notethepad.database.db.entity.CollaboratorEntity
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 class CollaborationRepositoryImpl @Inject constructor(
     private val collaborationService: CollaborationService,
     private val collaboratorDao: CollaboratorDao,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val dbManager: DatabaseManager
 ) : CollaborationRepository {
 
     private suspend fun ensureAuth() {
@@ -66,6 +68,21 @@ class CollaborationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun leaveNote(noteId: String, userId: String): Boolean {
+        // Create a personal copy BEFORE removing the collaborator record,
+        // so the user keeps a snapshot of the note they can edit and sync.
+        val noteDao = dbManager.database.noteDao()
+        val local = noteDao.getNoteById(noteId)
+        if (local != null && local.noteEntity.userId != userId) {
+            val duplicated = local.noteEntity.copy(
+                id = UUID.randomUUID().toString(),
+                userId = userId,
+                lastUpdateTime = System.currentTimeMillis(),
+                isSynced = false
+            )
+            noteDao.inserNote(duplicated)
+            noteDao.deleteNoteWithId(noteId)
+            noteDao.deleteLinksForNote(noteId)
+        }
         return removeCollaborator(noteId, userId)
     }
 

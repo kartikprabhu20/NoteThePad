@@ -76,8 +76,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val reminderScheduler: ReminderScheduler,
     tagUseCases: TagUseCases,
     private val getAutoTagsUseCase: GetAutoTagsUseCase,
-    private val startLiveTransctiption: StartLiveTransctiption,
-    private val stopLiveTransctiptions: StopLiveTranscription,
+    private val startLiveTranscription: StartLiveTransctiption,
+    private val stopLiveTranscription: StopLiveTranscription,
     private val transcribeAudioFileUseCase: TranscribeAudioFileUseCase,
     private val analyzeImageUseCase: AnalyzeImageUseCase,
     private val queryImageUseCase: QueryImageUseCase,
@@ -104,22 +104,6 @@ class AddEditNoteViewModel @Inject constructor(
                 if (isEditMode) -1 else NoteColors.colors.random().toArgb()
         )
     )
-
-    init {
-        observeCurrentUser()
-        if (isEditMode) {
-            loadNote(passedNoteId)
-        } else if (passedInitialTitle.isNotBlank()) {
-            _uiState.update {
-                it.copy(
-                    titleState = it.titleState.copy(
-                        richText = RichTextDocument(rawText = passedInitialTitle),
-                        isHintVisible = false
-                    )
-                )
-            }
-        }
-    }
 
     private fun observeCurrentUser() {
         viewModelScope.launch {
@@ -193,6 +177,7 @@ class AddEditNoteViewModel @Inject constructor(
     val videoPlayerEngine: ExoPlayer? = mediaPlayer.exoPlayer
 
     init {
+        observeCurrentUser()
         loadNote(passedNoteId)
         if (!isEditMode) {
             if (passedReminderTime > 0L) {
@@ -988,7 +973,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(isRecording = false) }
 
                 if (enableLiveTranscription) {
-                    stopLiveTransctiptions()
+                    stopLiveTranscription()
                     _uiState.update { state ->
                         val oldState = state.contentRichTextState
                         val currentText = oldState.document.rawText
@@ -1018,7 +1003,7 @@ class AddEditNoteViewModel @Inject constructor(
             } else {
                 if (enableLiveTranscription) {
                     _uiState.update { state -> state.copy(isRecording = true) }
-                    startLiveTransctiption(onTranscription = { transcript ->
+                    startLiveTranscription(onTranscription = { transcript ->
                         Log.d("kptest", "Transcription: $transcript")
                         _uiState.update { it.copy(liveTranscription = it.liveTranscription + " " + transcript) }
                     })
@@ -1112,7 +1097,7 @@ class AddEditNoteViewModel @Inject constructor(
         mediaPlayer.stop()
         if (uiState.value.isRecording) {
             viewModelScope.launch {
-                stopLiveTransctiptions()
+                stopLiveTranscription()
                 audioRecorder.stopRecording()
             }
         }

@@ -101,8 +101,9 @@ object DatabaseModule {
     fun provideCollaborationRepository(
         collaborationService: CollaborationService,
         collaboratorDao: CollaboratorDao,
-        authRepository: AuthRepository
+        authRepository: AuthRepository,
+        dbManager: DatabaseManager
     ): CollaborationRepository {
-        return CollaborationRepositoryImpl(collaborationService, collaboratorDao, authRepository)
+        return CollaborationRepositoryImpl(collaborationService, collaboratorDao, authRepository, dbManager)
     }
 }
