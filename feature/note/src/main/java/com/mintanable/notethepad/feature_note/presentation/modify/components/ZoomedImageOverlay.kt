@@ -83,6 +83,7 @@ fun ZoomedImageOverlay(
     isImageQueryLoading: Boolean = false,
     onSuggestionClicked: (String) -> Unit = {},
     onAppendToNote: (String) -> Unit = {},
+    canAnalyzeImage: Boolean = false,
     transitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
@@ -131,8 +132,8 @@ fun ZoomedImageOverlay(
                     }
                 }
 
-                // Image analysis UI (only for images, not videos)
-                if (isImage) {
+                // Image analysis UI (only for images, not videos, and only if model supports it)
+                if (isImage && canAnalyzeImage) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     when {

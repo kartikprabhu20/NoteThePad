@@ -21,6 +21,7 @@ import com.mintanable.notethepad.feature_ai.data.ModelDownloadWorker.Companion.M
 import com.mintanable.notethepad.feature_ai.domain.use_cases.DownloadAiModelUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.DownloadGeminiAudioTranscriberUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAudioModelStatus
+import com.mintanable.notethepad.feature_ai.domain.use_cases.GetNanoStatus
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetSupportedAiModels
 import com.mintanable.notethepad.feature_backup.domain.BackupSchedulerImpl
 import com.mintanable.notethepad.feature_backup.domain.network.NetworkMonitor
@@ -82,6 +83,7 @@ class SettingsViewModel @Inject constructor(
     private val getSupportedAiModels: GetSupportedAiModels,
     private val clearAppDataUseCase: ClearAppDataUseCase,
     private val getAudioModelStatus: GetAudioModelStatus,
+    private val getNanoStatus: GetNanoStatus,
     private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase,
     private val noteRepository: NoteRepository,
     private val deleteFileUsecase: DeleteFileUsecase
@@ -125,6 +127,10 @@ class SettingsViewModel @Inject constructor(
 
     private val _audioTranscriberStatusFlow: Flow<AiModelDownloadStatus> = flow {
         emitAll(getAudioModelStatus(""))
+    }.catch { emit(AiModelDownloadStatus.Unavailable) }
+
+    private val _nanoStatusFlow: Flow<AiModelDownloadStatus> = flow {
+        emitAll(getNanoStatus())
     }.catch { emit(AiModelDownloadStatus.Unavailable) }
 
     private val _dataStoreSettings : StateFlow<Settings> = combine(
@@ -179,7 +185,8 @@ class SettingsViewModel @Inject constructor(
         _downloadDialogModel,
         _audioTranscriberStatusFlow,
         _showDownloadAudioTranscriberDialog,
-        _audioDownloadStatus
+        _audioDownloadStatus,
+        _nanoStatusFlow
         ) { args: Array<Any?> ->
         val settings = args[0] as Settings
         val metadata = args[1] as BackupUiState
@@ -193,6 +200,7 @@ class SettingsViewModel @Inject constructor(
         val audioTranscriberStatus = args[8] as AiModelDownloadStatus
         val showAudioTranscriberDialog = args[9] as Boolean
         val audioModelStatus = args[10] as LoadStatus
+        val nanoStatus = args[11] as AiModelDownloadStatus
 
         val activeTransferStatus = when {
             download is LoadStatus.Progress -> download
@@ -211,7 +219,8 @@ class SettingsViewModel @Inject constructor(
             showDownloadModelDialog = downloadDialogModel,
             audioTranscriberStatus = audioTranscriberStatus,
             showDownloadAudioTranscriberDialog = showAudioTranscriberDialog,
-            audioModelStatus = audioModelStatus
+            audioModelStatus = audioModelStatus,
+            nanoStatus = nanoStatus
         )
     }.stateIn(
         scope = viewModelScope,
@@ -277,6 +286,18 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             if (aiModel.url.isEmpty()) {
                 withContext(Dispatchers.IO) { dataStore.updateAiModel(aiModel.name) }
+                // Gemini Nano needs the separate SpeechRecognizer (SODA) model for
+                // transcription. If it's not Ready yet, prompt the user to download it.
+                if (aiModel.name == "Gemini Nano (System)") {
+                    val status = getAudioModelStatus("")
+                        .catch { emit(AiModelDownloadStatus.Unavailable) }
+                        .first()
+                    if (status != AiModelDownloadStatus.Ready &&
+                        status != AiModelDownloadStatus.Unavailable
+                    ) {
+                        _showDownloadAudioTranscriberDialog.value = true
+                    }
+                }
                 return@launch
             }
 

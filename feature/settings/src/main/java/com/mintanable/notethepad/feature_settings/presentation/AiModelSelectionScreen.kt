@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.core.common.humanReadableSize
 import com.mintanable.notethepad.core.model.ai.AiModel
+import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
 import com.mintanable.notethepad.core.model.backup.LoadType
@@ -78,11 +79,16 @@ fun AiModelSelectionScreen(
                 .padding(paddingValues)
         ) {
             items(state.aiModels) { model ->
+                val isNanoUnsupported = model.name == "Gemini Nano (System)" &&
+                        state.nanoStatus == AiModelDownloadStatus.Unavailable
                 AiModelItem(
                     model = model,
                     state = state,
                     isSelected = model.name == state.settings.aiModelName,
-                    onSelect = { onEvent(SettingsEvent.SelectAiModel(model)) },
+                    isDisabled = isNanoUnsupported,
+                    onSelect = {
+                        if (!isNanoUnsupported) onEvent(SettingsEvent.SelectAiModel(model))
+                    },
                     onDelete = { modelToDelete = model }
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
@@ -154,8 +160,23 @@ fun AiModelItem(
     state: SettingsState,
     isSelected: Boolean,
     onSelect: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    isDisabled: Boolean = false
 ) {
+    val contentAlpha = if (isDisabled) 0.5f else 1f
+    val primaryTextColor = if (isDisabled)
+        MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha)
+    else MaterialTheme.colorScheme.onSurface
+    val secondaryTextColor = if (isDisabled)
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = contentAlpha)
+    else MaterialTheme.colorScheme.onSurfaceVariant
+
+    val displayLabel = if (isDisabled) {
+        model.displayName + " " + stringResource(R.string.ai_model_device_not_supported)
+    } else {
+        model.displayName
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -164,6 +185,7 @@ fun AiModelItem(
                 .fillMaxWidth()
                 .selectable(
                     selected = isSelected,
+                    enabled = !isDisabled,
                     onClick = onSelect
                 )
                 .padding(16.dp),
@@ -171,6 +193,7 @@ fun AiModelItem(
         ) {
             RadioButton(
                 selected = isSelected,
+                enabled = !isDisabled,
                 onClick = onSelect
             )
             Column(
@@ -179,15 +202,15 @@ fun AiModelItem(
                     .padding(horizontal = 12.dp)
             ) {
                 Text(
-                    text = model.displayName,
+                    text = displayLabel,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = primaryTextColor
                 )
                 Text(
                     text = model.info,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = secondaryTextColor
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

@@ -90,6 +90,7 @@ fun AddEditNoteScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val existingTags by viewModel.existingTags.collectAsStateWithLifecycle()
+    val aiCapabilities by viewModel.aiCapabilities.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -291,6 +292,7 @@ fun AddEditNoteScreen(
             suggestedTags = uiState.suggestedTags,
             isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
             collaborators = uiState.collaborators,
+            aiCapabilities = aiCapabilities,
             onEvent = onEvent,
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
@@ -321,6 +323,7 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.AttachTranscript(result))
                     viewModel.onEvent(AddEditNoteEvent.ClearImageQueryResult)
                 },
+                canAnalyzeImage = aiCapabilities.canAnalyzeImage,
                 transitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope
             )

@@ -103,6 +103,8 @@ const MODULES = [
   { id: ':feature:settings', label: ':feature:settings', type: 'feature' },
   { id: ':feature:calendar', label: ':feature:calendar', type: 'feature' },
   { id: ':core:template', label: ':core:template', type: 'core' },
+  { id: ':core:richtext', label: ':core:richtext', type: 'core' },
+  { id: ':core:network', label: ':core:network', type: 'core' },
 ];
 
 // [from, to, isApi]
@@ -111,6 +113,7 @@ const EDGES = [
   [':app',                          ':core:common',                false],
   [':app',                          ':core:ui',                    false],
   [':app',                          ':core:data',                  false],
+  [':app',                          ':core:network',               false],
   [':app',                          ':feature:note',               false],
   [':app',                          ':feature:auth',               false],
   [':app',                          ':feature:widgets',            false],
@@ -119,6 +122,8 @@ const EDGES = [
   [':core:common',                  ':core:model',                 false],
   [':core:data',                    ':core:model',                 false],
   [':core:data',                    ':core:common',                false],
+  [':core:data',                    ':core:network',               false],
+  [':core:ui',                      ':core:model',                 false],
   [':core:ai',                      ':core:model',                 false],
   [':core:ai',                      ':core:data',                  false],
   [':core:ai',                      ':core:common',                false],
@@ -127,6 +132,7 @@ const EDGES = [
   [':feature:note',                 ':core:common',                false],
   [':feature:note',                 ':core:ui',                    false],
   [':feature:note',                 ':core:ai',                    false],
+  [':feature:note',                 ':core:richtext',              false],
   [':core:backup',                  ':core:model',                 false],
   [':core:backup',                  ':core:common',                false],
   [':core:backup',                  ':core:data',                  false],
@@ -138,6 +144,7 @@ const EDGES = [
   [':feature:widgets',              ':core:common',                false],
   [':feature:widgets',              ':core:data',                  false],
   [':feature:widgets',              ':core:ui',                    false],
+  [':feature:widgets',              ':core:richtext',              false],
   [':feature:settings',             ':core:model',                 false],
   [':feature:settings',             ':core:data',                  false],
   [':feature:settings',             ':core:common',                false],
@@ -156,17 +163,19 @@ const COL = 168, ROW = 120, PX = 36, PY = 48;
 const DEFAULT_POS = {
   ':app':                            { col: 1.5, row: 0 },
   ':core:model':                     { col: 2, row: 4 },
-  ':core:common':                    { col: 1.5, row: 3 },
-  ':core:data':                      { col: 2.5, row: 3 },
-  ':core:ui':                        { col: 3, row: 2 },
-  ':core:ai':                        { col: 1, row: 2 },
+  ':core:common':                    { col: 1, row: 3 },
+  ':core:data':                      { col: 2, row: 3 },
+  ':core:ui':                        { col: 3.5, row: 2 },
+  ':core:ai':                        { col: 0.5, row: 2 },
   ':feature:note':                   { col: 2, row: 1 },
-  ':core:backup':                    { col: 2, row: 2 },
+  ':core:backup':                    { col: 1.5, row: 2 },
   ':feature:auth':                   { col: 0, row: 1 },
   ':feature:widgets':                { col: 4, row: 1 },
   ':feature:settings':               { col: 3, row: 1 },
   ':feature:calendar':               { col: 1, row: 1 },
   ':core:template':                  { col: 2.5, row: 0 },
+  ':core:richtext':                  { col: 2.5, row: 2 },
+  ':core:network':                   { col: 3, row: 3 },
 };
 
 function defaultXY(id) {

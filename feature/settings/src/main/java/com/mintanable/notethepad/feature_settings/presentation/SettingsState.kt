@@ -15,5 +15,6 @@ data class SettingsState(
     val showDownloadModelDialog: AiModel? = null,
     val audioTranscriberStatus: AiModelDownloadStatus = AiModelDownloadStatus.Unavailable,
     val showDownloadAudioTranscriberDialog: Boolean = false,
-    val audioModelStatus: LoadStatus = LoadStatus.Idle
+    val audioModelStatus: LoadStatus = LoadStatus.Idle,
+    val nanoStatus: AiModelDownloadStatus = AiModelDownloadStatus.Unavailable
 )

@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import android.net.Uri
+import com.mintanable.notethepad.core.model.ai.AiCapabilities
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -98,6 +99,7 @@ fun NoteEditorContent(
     suggestedTags: List<String> = emptyList(),
     isSuggestionTagsLoading: Boolean = false,
     collaborators: List<Collaborator> = emptyList(),
+    aiCapabilities: AiCapabilities = AiCapabilities.NONE,
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -128,7 +130,7 @@ fun NoteEditorContent(
         derivedStateOf { checkListItems.sumOf { it.text.length } }
     }
     val charCount = titleState.richText.rawText.length + contentRichTextState.document.rawText.length + checklistCharCount
-    val showMagicButton = charCount > 400 && !isSuggestionTagsLoading
+    val showMagicButton = aiCapabilities.canAutoTag && charCount > 400 && !isSuggestionTagsLoading
 
     val lazyListState = rememberLazyListState()
 
@@ -271,7 +273,7 @@ fun NoteEditorContent(
                             onEvent(AddEditNoteEvent.RemoveImage(deletedUri))
                         },
                         onImageClick = { onEvent(AddEditNoteEvent.ToggleZoom(it)) },
-                        isAnalyzeImageSupported = true,
+                        isAnalyzeImageSupported = aiCapabilities.canAnalyzeImage,
                         onAnalyzeImageClicked = { onEvent(AddEditNoteEvent.ToggleZoom(attachedImages[0])) },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
@@ -350,7 +352,7 @@ fun NoteEditorContent(
                         onDelete = { deletedUri -> onEvent(AddEditNoteEvent.RemoveAudio(deletedUri)) },
                         onPlayPause = { uri -> onEvent(AddEditNoteEvent.UpdateNowPlaying(uri)) },
                         onTranscribe = { uri -> onEvent(AddEditNoteEvent.TranscribeAttachedAudio(uri)) },
-                        isTranscribeSupported = true
+                        isTranscribeSupported = aiCapabilities.canTranscribeAudio
                     )
 
                     reminderAttachmentSection(
