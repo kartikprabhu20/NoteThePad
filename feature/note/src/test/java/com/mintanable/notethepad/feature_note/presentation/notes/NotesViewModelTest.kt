@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.core.model.note.NoteOrder
@@ -52,6 +53,7 @@ class NotesViewModelTest {
     private val getSupaSyncSettings =  mockk<GetSupaSyncSettings>(relaxed = true)
     private val getSupaSyncStatus =  mockk<GetSupaSyncStatus>(relaxed = true)
     private val refreshSupaSync = mockk<RefreshSupaSync>(relaxed = true)
+    private val authRepository = mockk<AuthRepository>(relaxed = true)
 
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -73,7 +75,8 @@ class NotesViewModelTest {
             widgetRefresher = widgetRefresher,
             getSupaSyncSettings = getSupaSyncSettings,
             refreshSupaSync = refreshSupaSync,
-            getSupaSyncStatus = getSupaSyncStatus
+            getSupaSyncStatus = getSupaSyncStatus,
+            authRepository = authRepository
         )
     }
 

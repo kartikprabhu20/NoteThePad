@@ -10,12 +10,14 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.InvalidNoteException
+import com.mintanable.notethepad.database.db.repository.CollaborationRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.feature_ai.domain.use_cases.AnalyzeImageUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
@@ -74,6 +76,10 @@ class AddEditNoteViewModelTest {
     private val transcribeAudioFileUseCase = mockk<TranscribeAudioFileUseCase>(relaxed = true)
     private val analyzeImageUseCase = mockk<AnalyzeImageUseCase>(relaxed = true)
     private val queryImageUseCase = mockk<QueryImageUseCase>(relaxed = true)
+
+    private val authRepository = mockk<AuthRepository>(relaxed=true)
+    private val collaborationRepository = mockk<CollaborationRepository>(relaxed=true)
+
     private val appContext = mockk<Context>(relaxed = true)
 
     private lateinit var viewModel: AddEditNoteViewModel
@@ -82,7 +88,8 @@ class AddEditNoteViewModelTest {
         noteUseCases, handle, permissionUsecases, audioRecorder,
         fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler,
         tagUseCases, getAutoTagsUseCase, startLiveTranscription, stopLiveTranscription,
-        transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase, appContext
+        transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase,
+        authRepository, collaborationRepository, appContext
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
