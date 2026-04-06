@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -158,9 +159,6 @@ fun NoteEditorContent(
     val density = LocalDensity.current
     val imeBottom = WindowInsets.ime.getBottom(density)
     val navBottom = WindowInsets.navigationBars.getBottom(density)
-    val keyboardPadding = with(density) {
-        (if (imeBottom > navBottom) imeBottom - navBottom else 0).toDp()
-    }
 
     with(sharedTransitionScope) {
         Scaffold(
@@ -168,7 +166,7 @@ fun NoteEditorContent(
             containerColor = Color.Transparent,
             bottomBar = {
                 CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
-                    Box(modifier = Modifier.padding(bottom = keyboardPadding)) {
+                    Box(modifier = Modifier.imePadding()) {
                         AnimatedContent(
                             targetState = isRichTextBarActive,
                             label = "BottomBarSwitch"

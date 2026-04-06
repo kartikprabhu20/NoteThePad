@@ -147,9 +147,8 @@ fun NoteBottomAppBar(
                             SmallFloatingActionButton(
                                 onClick = { onActionClick(type) },
                                 shape = RoundedCornerShape(32.dp),
-                                modifier = Modifier.graphicsLayer {
-                                    rotationZ = wiggleAnim.value
-                                }
+                                modifier = Modifier.graphicsLayer { rotationZ = wiggleAnim.value },
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
                             ) {
                                 Icon(icon, contentDescription = label)
                             }
