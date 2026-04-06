@@ -92,11 +92,11 @@ class AiModelRepositoryImpl @Inject constructor(
             displayName = "None",
             info = "No AI assistance will be provided.",
         ),
-        AiModel(
-            name = "Gemini 3 Flash (Cloud)",
-            displayName = "Gemini 3 Flash (Cloud)",
-            info = "Fastest response, requires internet connection."
-        ),
+//        AiModel(
+//            name = "Gemini 3 Flash (Cloud)",
+//            displayName = "Gemini 3 Flash (Cloud)",
+//            info = "Fastest response, requires internet connection."
+//        ),
         AiModel(
             name = "Gemini Nano (System)",
             displayName = "Gemini Nano (System)",
