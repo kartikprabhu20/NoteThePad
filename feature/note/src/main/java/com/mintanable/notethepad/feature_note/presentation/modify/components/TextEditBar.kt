@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,6 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
@@ -35,9 +37,12 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.richtext.model.SpanType
 import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.SizePreviews
 import com.mintanable.notethepad.theme.ThemePreviews
 import kotlinx.coroutines.delay
 
@@ -80,17 +86,27 @@ fun TextEditBar(
     BottomAppBar(
         modifier = modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+        contentPadding = PaddingValues(0.dp),
         tonalElevation = 0.dp
     ) {
+        val scrollState = rememberScrollState()
+        val canScrollRight by remember {
+            derivedStateOf {
+                scrollState.maxValue > 0 && scrollState.value < scrollState.maxValue
+            }
+        }
+
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
             Row(
                 modifier = Modifier
-                    .horizontalScroll(rememberScrollState()),
+                    .weight(1f)
+                    .padding(start = 8.dp)
+                    .padding(vertical = 8.dp)
+                    .horizontalScroll(scrollState),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -146,17 +162,34 @@ fun TextEditBar(
                     onClick = { onStyleClick(SpanType.UNDERLINE) },
                     modifier = wiggleModifier
                 )
-
-                Spacer(modifier = Modifier.weight(1f))
             }
 
-            // Close
-            IconButton(onClick = onClose) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close formatting bar",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+            if (!canScrollRight){
+                Spacer(modifier = Modifier.width(6.dp))
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                if (canScrollRight) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "More",
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                // Close
+                IconButton(onClick = onClose) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close formatting bar",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }
@@ -220,6 +253,7 @@ private fun IconStyleButton(
     }
 }
 
+@SizePreviews
 @ThemePreviews
 @Composable
 fun TextEditBarPreview() {
