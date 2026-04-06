@@ -21,7 +21,10 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, pass).await()
             Result.success(result.user!!.toDomainUser())
-        } catch (e: Exception) { Result.failure(e) }
+        } catch (e: Exception) { 
+            Log.e("AuthRepository", "loginWithEmail error: ${e.localizedMessage}")
+            Result.failure(e) 
+        }
     }
 
     override suspend fun signInWithGoogle(token: String): Result<User> {
@@ -34,7 +37,10 @@ class AuthRepositoryImpl @Inject constructor(
             }else{
                 Result.failure(Exception("Firebase user is null"))
             }
-        } catch (e: Exception) { Result.failure(e) }
+        } catch (e: Exception) { 
+            Log.e("AuthRepository", "signInWithGoogle error: ${e.localizedMessage}")
+            Result.failure(e) 
+        }
     }
 
     override suspend fun signInWithFacebook(token: String): Result<User> {
@@ -42,12 +48,19 @@ class AuthRepositoryImpl @Inject constructor(
             val credential = FacebookAuthProvider.getCredential(token)
             val result = firebaseAuth.signInWithCredential(credential).await()
             Result.success(result.user!!.toDomainUser())
-        } catch (e: Exception) { Result.failure(e) }
+        } catch (e: Exception) { 
+            Log.e("AuthRepository", "signInWithFacebook error: ${e.localizedMessage}")
+            Result.failure(e) 
+        }
     }
 
     override fun getSignedInFirebaseUser(): Flow<User?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
-            this.trySend(auth.currentUser?.toDomainUser())
+            try {
+                this.trySend(auth.currentUser?.toDomainUser())
+            } catch (e: Exception) {
+                Log.e("AuthRepository", "AuthStateListener error: ${e.localizedMessage}")
+            }
         }
         firebaseAuth.addAuthStateListener(listener)
         awaitClose {
@@ -56,15 +69,19 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getFreshFirebaseToken(): String? {
-        return firebaseAuth.currentUser?.getIdToken(false)?.await()?.token
+        return try {
+            firebaseAuth.currentUser?.getIdToken(true)?.await()?.token
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "getFreshFirebaseToken failed: ${e.localizedMessage}")
+            null
+        }
     }
 
     override suspend fun signOut() {
         try {
             firebaseAuth.signOut()
-
-        } catch (e: ClearCredentialException) {
-            Log.e("Auth", "Couldn't clear user credentials: ${e.localizedMessage}")
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "signOut error: ${e.localizedMessage}")
         }
     }
 
