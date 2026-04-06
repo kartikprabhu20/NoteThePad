@@ -87,4 +87,7 @@ interface NoteDao {
 
     @Query("SELECT * FROM note_tag_cross_ref WHERE noteId = :noteId")
     suspend fun getCrossRefsForNote(noteId: String): List<NoteTagCrossRef>
+
+    @Query("SELECT tagId FROM note_tag_cross_ref WHERE noteId = :noteId AND isDeleted = 0")
+    suspend fun getActiveTagIdsForNote(noteId: String): List<String>
 }

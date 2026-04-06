@@ -74,8 +74,8 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDetailedNoteMapper(audioMetadataProvider: AudioMetadataProvider, dispatchers: DispatcherProvider): DetailedNoteMapper {
-        return DetailedNoteMapper(audioMetadataProvider, dispatchers)
+    fun provideDetailedNoteMapper(audioMetadataProvider: AudioMetadataProvider, dispatchers: DispatcherProvider, dbManager: DatabaseManager): DetailedNoteMapper {
+        return DetailedNoteMapper(audioMetadataProvider, dispatchers, dbManager.database.noteDao())
     }
 
     @Provides

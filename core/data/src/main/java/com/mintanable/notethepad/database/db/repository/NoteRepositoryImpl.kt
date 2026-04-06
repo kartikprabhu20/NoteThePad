@@ -90,26 +90,54 @@ class NoteRepositoryImpl @Inject constructor(
                 if(rowid == -1L) noteDao.updateNote(updatedNote) // Ensure update if IGNORE failed
                 val noteId = updatedNote.id
 
-                noteDao.deleteLinksForNote(noteId)
+                val tagOwnerId = noteUserId ?: userId
+                val now = System.currentTimeMillis()
+                val newTagIds = mutableSetOf<String>()
                 tagEntities.forEach { tag ->
-                    val updatedTag = tag.copy(
-                        userId = userId,
-                        lastUpdateTime = System.currentTimeMillis(),
+                    val existing = tagDao.getTagByNameIncludeDeleted(tag.tagName)
+                    val resolvedTag = existing?.copy(
+                        userId = tagOwnerId,
+                        lastUpdateTime = now,
                         isDeleted = false,
                         isSynced = false
                     )
-                    val tagRowid = tagDao.insertTag(updatedTag)
-                    if(tagRowid == -1L) tagDao.updateTag(updatedTag)
-                    
+                        ?: tag.copy(
+                            userId = tagOwnerId,
+                            lastUpdateTime = now,
+                            isDeleted = false,
+                            isSynced = false
+                        )
+
+                    if (existing != null) {
+                        tagDao.updateTag(resolvedTag)
+                    } else {
+                        tagDao.insertTag(resolvedTag)
+                    }
+                    newTagIds.add(resolvedTag.tagId)
+
                     val crossRef = NoteTagCrossRef(
                         noteId = noteId,
-                        tagId = updatedTag.tagId,
-                        userId = userId,
-                        lastUpdateTime = System.currentTimeMillis(),
+                        tagId = resolvedTag.tagId,
+                        userId = tagOwnerId,
+                        lastUpdateTime = now,
                         isDeleted = false
                     )
                     noteDao.insertNoteTagCrossRef(crossRef)
                 }
+
+                // Soft-delete cross-refs for tags that were removed from this note
+                val existingRefs = noteDao.getCrossRefsForNote(noteId)
+                existingRefs.forEach { ref ->
+                    if (ref.tagId !in newTagIds && !ref.isDeleted) {
+                        noteDao.insertNoteTagCrossRef(
+                            ref.copy(
+                                isDeleted = true,
+                                lastUpdateTime = now
+                            )
+                        )
+                    }
+                }
+
                 triggerSync()
                 noteId
             }
@@ -235,6 +263,10 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun getTagByName(tagName: String): TagEntity? {
         return tagDao.getTagByName(tagName)
+    }
+
+    override suspend fun getTagById(id: String): TagEntity? {
+        return tagDao.getTagById(id)
     }
 
     override suspend fun checkpoint(): File = withContext(Dispatchers.IO) {

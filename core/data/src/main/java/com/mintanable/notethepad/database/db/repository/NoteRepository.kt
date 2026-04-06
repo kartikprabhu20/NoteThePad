@@ -25,6 +25,7 @@ interface NoteRepository {
     suspend fun updateTag(tagEntity: TagEntity)
     suspend fun deleteTag(tagEntity: TagEntity)
     suspend fun getTagByName(tagName: String): TagEntity?
+    suspend fun getTagById(id: String): TagEntity?
     suspend fun checkpoint(): File
     suspend fun swapDatabase(dbFile: File)
     suspend fun triggerSync()

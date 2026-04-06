@@ -7,9 +7,11 @@ import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
+import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.GetTopNotes
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -28,10 +30,12 @@ class GetTopNotesTest {
     private val repository = mockk<NoteRepository>()
     private val audioProvider = mockk<AudioMetadataProvider>()
     private val testDispatcherProvider = TestDispatcherProvider()
+    private val mockNoteDao = mockk<NoteDao>()
 
     @Before
     fun setUp() {
-        mapper = DetailedNoteMapper(audioProvider, testDispatcherProvider)
+        coEvery { mockNoteDao.getActiveTagIdsForNote(any()) } returns emptyList()
+        mapper = DetailedNoteMapper(audioProvider, testDispatcherProvider, mockNoteDao)
         getTopNotes = GetTopNotes(repository, mapper)
     }
 

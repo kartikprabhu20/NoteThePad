@@ -9,13 +9,24 @@ class SaveTag(
     private val repository: NoteRepository
 ) {
     suspend operator fun invoke(tagEntity: TagEntity): String = withContext(Dispatchers.IO) {
-        var rowId = repository.insertTag(tagEntity)
-        var tagId = tagEntity.tagId
-
-        if (rowId == -1L) {
-            repository.updateTag(tagEntity)
-            tagId = repository.getTagByName(tagEntity.tagName)?.tagId  ?: tagId
+       val existingById = repository.getTagById(tagEntity.tagId)
+        if (existingById != null) {
+            repository.updateTag(
+                existingById.copy(
+                    tagName = tagEntity.tagName,
+                    lastUpdateTime = System.currentTimeMillis(),
+                    isDeleted = false
+                )
+            )
+            return@withContext existingById.tagId
         }
-        return@withContext tagId
+
+        val existingByName = repository.getTagByName(tagEntity.tagName)
+        if (existingByName != null) {
+            return@withContext existingByName.tagId
+        }
+
+        repository.insertTag(tagEntity)
+        return@withContext tagEntity.tagId
     }
 }

@@ -8,6 +8,7 @@ import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.database.db.entity.TagEntity
+import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.database.helper.DetailedNoteMapper
@@ -33,10 +34,12 @@ class GetDetailedNotesTest {
     private val repository = mockk<NoteRepository>()
     private val audioMetadataProvider = mockk<AudioMetadataProvider>()
     private val testDispatcherProvider = TestDispatcherProvider()
+    private val mockNoteDao = mockk<NoteDao>()
 
     @Before
     fun setUp() {
-        detailedNoteMapper = DetailedNoteMapper(audioMetadataProvider, testDispatcherProvider)
+        coEvery { mockNoteDao.getActiveTagIdsForNote(any()) } returns emptyList()
+        detailedNoteMapper = DetailedNoteMapper(audioMetadataProvider, testDispatcherProvider, mockNoteDao)
         getDetailedNotes = GetDetailedNotes(repository, detailedNoteMapper)
     }
 

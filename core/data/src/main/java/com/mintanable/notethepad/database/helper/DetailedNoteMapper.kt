@@ -4,6 +4,7 @@ import androidx.collection.LruCache
 import androidx.core.net.toUri
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.DispatcherProvider
+import com.mintanable.notethepad.database.db.dao.NoteDao
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.NoteEntity
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 class DetailedNoteMapper @Inject constructor(
     private val audioMetadataProvider: AudioMetadataProvider,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val noteDao: NoteDao
 ) {
 
     private val durationCache = LruCache<String, Long>(100)
@@ -46,6 +48,14 @@ class DetailedNoteMapper @Inject constructor(
 
         val isCheckbox = CheckboxConvertors.isContentCheckboxList(noteEntity.content)
 
+        // Filter tags by active (non-deleted) cross-refs to handle soft-deleted links
+        val activeTagIds = noteDao.getActiveTagIdsForNote(noteEntity.id).toSet()
+        val activeTags = if (activeTagIds.isNotEmpty()) {
+            tagEntities.filter { it.tagId in activeTagIds && !it.isDeleted }
+        } else {
+            tagEntities.filterNot { it.isDeleted }
+        }
+
         DetailedNote(
             id = noteEntity.id,
             title = noteEntity.title,
@@ -57,7 +67,7 @@ class DetailedNoteMapper @Inject constructor(
             reminderTime = noteEntity.reminderTime,
             checkListItems = if (isCheckbox) CheckboxConvertors.stringToCheckboxes(noteEntity.content) else emptyList(),
             isCheckboxListAvailable = isCheckbox,
-            tagEntities = tagEntities,
+            tagEntities = activeTags,
             backgroundImage = noteEntity.backgroundImage,
             lastUpdateTime = noteEntity.lastUpdateTime,
             isSynced = noteEntity.isSynced
