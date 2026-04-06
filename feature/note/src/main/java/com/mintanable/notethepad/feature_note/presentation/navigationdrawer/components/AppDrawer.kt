@@ -2,17 +2,20 @@ package com.mintanable.notethepad.feature_note.presentation.navigationdrawer.com
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
@@ -24,6 +27,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,8 +43,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -76,6 +83,14 @@ fun AppDrawer(
     appVersionProvider: AppVersionProvider?,
     isSyncing: Boolean = false
 ) {
+    val lazyListState = rememberLazyListState()
+    val canScrollUp by remember {
+        derivedStateOf { lazyListState.canScrollBackward }
+    }
+    val canScrollDown by remember {
+        derivedStateOf { lazyListState.canScrollForward }
+    }
+
     var isLabelEditing by rememberSaveable { mutableStateOf(false) }
     var pendingEdits by rememberSaveable { mutableStateOf(mapOf<String, String>()) }
 
@@ -85,121 +100,127 @@ fun AppDrawer(
             DrawerHeader(user = user, modifier = Modifier.fillMaxWidth(), isSyncing = isSyncing)
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                itemsIndexed(
-                    items = items,
-                    key = { _, item ->
-                        // Fix: Using item.route as key caused IllegalArgumentException when multiple items had the same route (e.g. Home and Reminders).
-                        // Switched to using unique identifiers for each item type.
-                        when(item) {
-                            is DrawerItem.NavigationDrawerItem -> "nav_${item.title}"
-                            is DrawerItem.TextDrawerItem -> "header_${item.title}"
-                            is DrawerItem.AddLabelDrawerItem -> "add_label_${item.title}"
-                            is DrawerItem.LabelDrawerItem -> "label_${item.tagEntity.tagId}_${item.tagEntity.tagName}"
-                        }
-                    }
-                ) { index, item ->
-
-                    when(item){
-                        is DrawerItem.NavigationDrawerItem -> {
-                            NavigationDrawerItem(
-                                label = { Text(text = item.title) },
-                                selected = index == selectedItemIndex,
-                                onClick = {
-                                    onItemSelected(index, item)
-                                },
-                                icon = {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.title
-                                    )
-                                },
-                                modifier = Modifier
-                                    .padding(NavigationDrawerItemDefaults.ItemPadding)
-                            )
-
-                        }
-
-                        is DrawerItem.LabelDrawerItem -> {
-                            val currentText = pendingEdits[item.tagEntity.tagId] ?: item.tagEntity.tagName
-
-                            LabelEditRow(
-                                item = item,
-                                index = index,
-                                selected = index==selectedItemIndex,
-                                isLabelEditing = isLabelEditing,
-                                currentText = currentText,
-                                onTextChanged = { newText ->
-                                    pendingEdits = pendingEdits + (item.tagEntity.tagId to newText)
-                                },
-                                onTagDeleted = { onTagDeleted(it) },
-                                onItemSelected = onItemSelected
-                            )
-                        }
-
-                        is DrawerItem.TextDrawerItem -> {
-                            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding(NavigationDrawerItemDefaults.ItemPadding),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    item.title,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 32.dp)
-                                        .padding(vertical = 8.dp)
-                                )
-                                IconButton(
-                                    onClick = {
-                                        if (isLabelEditing) {
-                                            pendingEdits.forEach { (tagId, newName) ->
-                                                if(newName.isNotEmpty())  onTagEdited(TagEntity(tagName = newName, tagId = tagId))
-                                            }
-                                            pendingEdits = emptyMap()
-                                        }
-                                        isLabelEditing = !isLabelEditing
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = if(!isLabelEditing)Icons.Default.Edit else Icons.Default.Check,
-                                        contentDescription = stringResource(R.string.content_description_edit_labels),
-                                        tint = if (isLabelEditing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    itemsIndexed(
+                        items = items,
+                        key = { _, item ->
+                            // Fix: Using item.route as key caused IllegalArgumentException when multiple items had the same route (e.g. Home and Reminders).
+                            // Switched to using unique identifiers for each item type.
+                            when(item) {
+                                is DrawerItem.NavigationDrawerItem -> "nav_${item.title}"
+                                is DrawerItem.TextDrawerItem -> "header_${item.title}"
+                                is DrawerItem.AddLabelDrawerItem -> "add_label_${item.title}"
+                                is DrawerItem.LabelDrawerItem -> "label_${item.tagEntity.tagId}_${item.tagEntity.tagName}"
                             }
                         }
+                    ) { index, item ->
 
-                        is DrawerItem.AddLabelDrawerItem -> {
-                            NavigationDrawerItem(
-                                label = { Text(text = item.title) },
-                                selected = index == selectedItemIndex,
-                                onClick = {
-                                    onItemSelected(index, item)
-                                },
-                                icon = {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.title
+                        when(item){
+                            is DrawerItem.NavigationDrawerItem -> {
+                                NavigationDrawerItem(
+                                    label = { Text(text = item.title) },
+                                    selected = index == selectedItemIndex,
+                                    onClick = {
+                                        onItemSelected(index, item)
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = item.icon,
+                                            contentDescription = item.title
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .padding(NavigationDrawerItemDefaults.ItemPadding)
+                                )
+
+                            }
+
+                            is DrawerItem.LabelDrawerItem -> {
+                                val currentText = pendingEdits[item.tagEntity.tagId] ?: item.tagEntity.tagName
+
+                                LabelEditRow(
+                                    item = item,
+                                    index = index,
+                                    selected = index==selectedItemIndex,
+                                    isLabelEditing = isLabelEditing,
+                                    currentText = currentText,
+                                    onTextChanged = { newText ->
+                                        pendingEdits = pendingEdits + (item.tagEntity.tagId to newText)
+                                    },
+                                    onTagDeleted = { onTagDeleted(it) },
+                                    onItemSelected = onItemSelected
+                                )
+                            }
+
+                            is DrawerItem.TextDrawerItem -> {
+                                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(NavigationDrawerItemDefaults.ItemPadding),
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        item.title,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 32.dp)
+                                            .padding(vertical = 8.dp)
                                     )
-                                },
-                                modifier = Modifier
-                                    .padding(start = 12.dp)
-                                    .padding(NavigationDrawerItemDefaults.ItemPadding)
-                            )
+                                    IconButton(
+                                        onClick = {
+                                            if (isLabelEditing) {
+                                                pendingEdits.forEach { (tagId, newName) ->
+                                                    if(newName.isNotEmpty())  onTagEdited(TagEntity(tagName = newName, tagId = tagId))
+                                                }
+                                                pendingEdits = emptyMap()
+                                            }
+                                            isLabelEditing = !isLabelEditing
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = if(!isLabelEditing)Icons.Default.Edit else Icons.Default.Check,
+                                            contentDescription = stringResource(R.string.content_description_edit_labels),
+                                            tint = if (isLabelEditing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
 
-                            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                            is DrawerItem.AddLabelDrawerItem -> {
+                                NavigationDrawerItem(
+                                    label = { Text(text = item.title) },
+                                    selected = index == selectedItemIndex,
+                                    onClick = {
+                                        onItemSelected(index, item)
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = item.icon,
+                                            contentDescription = item.title
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .padding(start = 12.dp)
+                                        .padding(NavigationDrawerItemDefaults.ItemPadding)
+                                )
+
+                                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                            }
                         }
                     }
-
-
                 }
+
+                ScrollIndicators(
+                    canScrollUp = canScrollUp,
+                    canScrollDown = canScrollDown
+                )
             }
 
             Column(
@@ -327,6 +348,36 @@ fun LabelEditRow(
             .padding(NavigationDrawerItemDefaults.ItemPadding)
             .padding(start = 12.dp)
     )
+}
+
+@Composable
+fun ScrollIndicators(
+    canScrollUp: Boolean,
+    canScrollDown: Boolean
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (canScrollUp) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowUp,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 4.dp)
+            )
+        }
+
+        if (canScrollDown) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 4.dp)
+            )
+        }
+    }
 }
 
 
