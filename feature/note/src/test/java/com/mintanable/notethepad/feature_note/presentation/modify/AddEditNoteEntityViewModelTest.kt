@@ -19,7 +19,9 @@ import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.InvalidNoteException
 import com.mintanable.notethepad.database.db.repository.CollaborationRepository
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_ai.domain.use_cases.AnalyzeImageUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAiModelByName
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.QueryImageUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.StartLiveTransctiption
@@ -79,6 +81,8 @@ class AddEditNoteViewModelTest {
 
     private val authRepository = mockk<AuthRepository>(relaxed=true)
     private val collaborationRepository = mockk<CollaborationRepository>(relaxed=true)
+    private val userPreferencesRepository = mockk<UserPreferencesRepository>(relaxed = true)
+    private val getAiModelByName = mockk<GetAiModelByName>(relaxed = true)
 
     private val appContext = mockk<Context>(relaxed = true)
 
@@ -89,7 +93,7 @@ class AddEditNoteViewModelTest {
         fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler,
         tagUseCases, getAutoTagsUseCase, startLiveTranscription, stopLiveTranscription,
         transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase,
-        authRepository, collaborationRepository, appContext
+        authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName,appContext
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
