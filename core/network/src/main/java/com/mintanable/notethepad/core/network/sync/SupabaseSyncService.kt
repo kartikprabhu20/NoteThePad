@@ -138,6 +138,58 @@ class SupabaseSyncService @Inject constructor(
         }
     }
 
+    /**
+     * Upsert a tag on a shared note via RPC so the collaborator can write
+     * to tag_table with the owner's user_id (bypasses RLS).
+     */
+    suspend fun upsertSharedTag(tagDto: TagDto): Boolean {
+        if (tagDto.userId == null) return false
+        return try {
+            val result = supabaseClient.postgrest.rpc(
+                "upsert_shared_tag",
+                buildJsonObject {
+                    put("p_tag_id", tagDto.tagId)
+                    put("p_tag_name", tagDto.tagName)
+                    put("p_user_id", tagDto.userId)
+                    put("p_last_update_time", tagDto.lastUpdateTime)
+                    put("p_is_deleted", tagDto.isDeleted)
+                }
+            )
+            val isSuccess = result.data != "[]" && result.data.isNotEmpty()
+            if (isSuccess) Log.d("SupabaseSync", "Shared tag upserted: ${tagDto.tagId}")
+            isSuccess
+        } catch (e: Exception) {
+            Log.e("SupabaseSync", "Shared tag upsert failed: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Upsert a cross-ref on a shared note via RPC so the collaborator can write
+     * to note_tag_cross_ref with the owner's user_id (bypasses RLS).
+     */
+    suspend fun upsertSharedCrossRef(crossRefDto: NoteTagCrossRefDto): Boolean {
+        if (crossRefDto.userId == null) return false
+        return try {
+            val result = supabaseClient.postgrest.rpc(
+                "upsert_shared_cross_ref",
+                buildJsonObject {
+                    put("p_note_id", crossRefDto.noteId)
+                    put("p_tag_id", crossRefDto.tagId)
+                    put("p_user_id", crossRefDto.userId)
+                    put("p_is_deleted", crossRefDto.isDeleted)
+                    put("p_last_update_time", crossRefDto.lastUpdateTime)
+                }
+            )
+            val isSuccess = result.data != "[]" && result.data.isNotEmpty()
+            if (isSuccess) Log.d("SupabaseSync", "Shared cross-ref upserted: ${crossRefDto.noteId} <-> ${crossRefDto.tagId}")
+            isSuccess
+        } catch (e: Exception) {
+            Log.e("SupabaseSync", "Shared cross-ref upsert failed: ${e.message}")
+            false
+        }
+    }
+
     suspend fun fetchNotes(userId: String): List<NoteDto> {
         return supabaseClient.postgrest["note_entity"]
             .select {
@@ -166,6 +218,38 @@ class SupabaseSyncService @Inject constructor(
                 }
             }
             .decodeList<NoteTagCrossRefDto>()
+    }
+
+    suspend fun fetchCrossRefsForNotes(noteIds: List<String>): List<NoteTagCrossRefDto> {
+        if (noteIds.isEmpty()) return emptyList()
+        return try {
+            supabaseClient.postgrest["note_tag_cross_ref"]
+                .select {
+                    filter {
+                        isIn("note_id", noteIds)
+                    }
+                }
+                .decodeList<NoteTagCrossRefDto>()
+        } catch (e: Exception) {
+            Log.e("SupabaseSync", "Failed to fetch cross-refs for shared notes: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun fetchTagsByIds(tagIds: List<String>): List<TagDto> {
+        if (tagIds.isEmpty()) return emptyList()
+        return try {
+            supabaseClient.postgrest["tag_table"]
+                .select {
+                    filter {
+                        isIn("tag_id", tagIds)
+                    }
+                }
+                .decodeList<TagDto>()
+        } catch (e: Exception) {
+            Log.e("SupabaseSync", "Failed to fetch tags by IDs: ${e.message}")
+            emptyList()
+        }
     }
 
     fun getSupabaseClient() = supabaseClient

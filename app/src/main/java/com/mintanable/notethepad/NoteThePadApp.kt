@@ -8,6 +8,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID
+import com.mintanable.notethepad.core.common.FeatureFlags
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class NoteThePadApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        FeatureFlags.init(collaboration = BuildConfig.ENABLE_COLLABORATION)
         createNotificationChannels()
     }
 

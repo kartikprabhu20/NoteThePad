@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.core.model.collaboration.Collaborator
 
@@ -17,13 +18,16 @@ fun LazyListScope.collaboratorsSection(
 ) {
     if (collaborators.isNotEmpty()) {
         item {
+            val sorted = remember(collaborators) {
+                collaborators.sortedByDescending { it.isOwner }
+            }
             FlowRow(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .clickable { onCollaboratorClick() },
                 horizontalArrangement = Arrangement.spacedBy((-8).dp)
             ) {
-                collaborators.forEach { collaborator ->
+                sorted.forEach { collaborator ->
                     CollaboratorAvatar(
                         displayName = collaborator.displayName,
                         photoUrl = collaborator.photoUrl,

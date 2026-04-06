@@ -7,6 +7,7 @@ import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.network.sync.CollaborationService
 import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
 import com.mintanable.notethepad.database.db.DatabaseManager
@@ -58,8 +59,8 @@ class SupaFetchWorker @AssistedInject constructor(
             supabaseSyncService.setSyncing(true)
             try {
                 val remoteNotes = supabaseSyncService.fetchNotes(userId)
-                val remoteTags = supabaseSyncService.fetchTags(userId)
-                val remoteRefs = supabaseSyncService.fetchCrossRefs(userId)
+                val remoteTags = supabaseSyncService.fetchTags(userId).toMutableList()
+                val remoteRefs = supabaseSyncService.fetchCrossRefs(userId).toMutableList()
 
                 Log.d("kptest", "remoteNotes size: ${remoteNotes.size}")
                 Log.d("kptest", "remoteTags size: ${remoteTags.size}")
@@ -86,73 +87,109 @@ class SupaFetchWorker @AssistedInject constructor(
                         val noteExists = noteDao.getNoteById(dto.noteId) != null
                         val tagExists = tagDao.getTagById(dto.tagId) != null
                         if (noteExists && tagExists) {
-                            noteDao.insertNoteTagCrossRef(dto.toEntity())
+                            val localRefs = noteDao.getCrossRefsForNote(dto.noteId)
+                            val localRef = localRefs.find { it.tagId == dto.tagId }
+                            // Only apply remote if it's newer than local
+                            if (localRef == null || dto.lastUpdateTime > localRef.lastUpdateTime) {
+                                noteDao.insertNoteTagCrossRef(dto.toEntity())
+                            }
                         }
                     }
                 }
 
-                // Fetch shared notes (notes others shared with this user)
-                val sharedNotes = collaborationService.fetchSharedNotes(userId)
-                Log.d("kptest", "sharedNotes size: ${sharedNotes.size}")
-                db.withTransaction {
-                    sharedNotes.forEach { dto ->
-                        val local = noteDao.getNoteById(dto.id)
-                        if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
-                            val rowid = noteDao.inserNote(dto.toEntity())
-                            if (rowid == -1L)
-                                noteDao.updateNote(dto.toEntity())
+                if (FeatureFlags.collaborationEnabled) {
+                    // Fetch shared notes (notes others shared with this user)
+                    val sharedNotes = collaborationService.fetchSharedNotes(userId)
+                    Log.d("kptest", "sharedNotes size: ${sharedNotes.size}")
+                    val sharedNoteIds = sharedNotes.map { it.id }
+
+                    // Fetch tags and cross-refs for shared notes (owned by others)
+                    val sharedCrossRefs = supabaseSyncService.fetchCrossRefsForNotes(sharedNoteIds)
+                    val sharedTagIds = sharedCrossRefs.map { it.tagId }.distinct()
+                    val sharedTags = supabaseSyncService.fetchTagsByIds(sharedTagIds)
+                    Log.d("kptest", "sharedTags size: ${sharedTags.size}, sharedCrossRefs size: ${sharedCrossRefs.size}")
+
+                    db.withTransaction {
+                        sharedNotes.forEach { dto ->
+                            val local = noteDao.getNoteById(dto.id)
+                            if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
+                                val rowid = noteDao.inserNote(dto.toEntity())
+                                if (rowid == -1L)
+                                    noteDao.updateNote(dto.toEntity())
+                            }
+                        }
+
+                        // Insert shared tags
+                        sharedTags.forEach { dto ->
+                            val local = tagDao.getTagById(dto.tagId)
+                            if (local == null || dto.lastUpdateTime > local.lastUpdateTime) {
+                                val rowid = tagDao.insertTag(dto.toEntity())
+                                if (rowid == -1L)
+                                    tagDao.updateTag(dto.toEntity())
+                            }
+                        }
+
+                        // Insert shared cross-refs
+                        sharedCrossRefs.forEach { dto ->
+                            val noteExists = noteDao.getNoteById(dto.noteId) != null
+                            val tagExists = tagDao.getTagById(dto.tagId) != null
+                            if (noteExists && tagExists) {
+                                val localRefs = noteDao.getCrossRefsForNote(dto.noteId)
+                                val localRef = localRefs.find { it.tagId == dto.tagId }
+                                if (localRef == null || dto.lastUpdateTime > localRef.lastUpdateTime) {
+                                    noteDao.insertNoteTagCrossRef(dto.toEntity())
+                                }
+                            }
                         }
                     }
-                }
 
-                // Sync collaborator records to local cache
-                val collaboratorDao = dbManager.database.collaboratorDao()
+                    // Sync collaborator records to local cache
+                    val collaboratorDao = dbManager.database.collaboratorDao()
 
-                // Snapshot current shared note IDs before replacing cache
-                val oldSharedNoteIds = collaboratorDao.getSharedNoteIdsOnce(userId).toSet()
+                    // Snapshot current shared note IDs before replacing cache
+                    val oldSharedNoteIds = collaboratorDao.getSharedNoteIdsOnce(userId).toSet()
 
-                val myCollaborations = collaborationService.getMyCollaborations(userId)
-                val notesIShared = collaborationService.getNotesIShared(userId)
-                val allCollaboratorDtos = (myCollaborations + notesIShared).distinctBy { it.id }
-                val collaboratorEntities = allCollaboratorDtos.filter { it.id != null }.map { dto ->
-                    CollaboratorEntity(
-                        id = dto.id!!,
-                        noteId = dto.noteId,
-                        ownerUserId = dto.ownerUserId,
-                        collaboratorUserId = dto.collaboratorUserId,
-                        collaboratorEmail = dto.collaboratorEmail,
-                        collaboratorDisplayName = dto.collaboratorDisplayName,
-                        collaboratorPhotoUrl = dto.collaboratorPhotoUrl
-                    )
-                }
-                db.withTransaction {
-                    collaboratorDao.deleteAll()
-                    collaboratorDao.insertAll(collaboratorEntities)
+                    val myCollaborations = collaborationService.getMyCollaborations(userId)
+                    val notesIShared = collaborationService.getNotesIShared(userId)
+                    val allCollaboratorDtos = (myCollaborations + notesIShared).distinctBy { it.id }
+                    val collaboratorEntities = allCollaboratorDtos.filter { it.id != null }.map { dto ->
+                        CollaboratorEntity(
+                            id = dto.id!!,
+                            noteId = dto.noteId,
+                            ownerUserId = dto.ownerUserId,
+                            collaboratorUserId = dto.collaboratorUserId,
+                            collaboratorEmail = dto.collaboratorEmail,
+                            collaboratorDisplayName = dto.collaboratorDisplayName,
+                            collaboratorPhotoUrl = dto.collaboratorPhotoUrl
+                        )
+                    }
+                    db.withTransaction {
+                        collaboratorDao.deleteAll()
+                        collaboratorDao.insertAll(collaboratorEntities)
 
-                    // Duplicate orphaned notes whose collaboration was severed
-                    val newSharedNoteIds = collaboratorEntities
-                        .filter { it.collaboratorUserId == userId || it.ownerUserId == userId }
-                        .map { it.noteId }
-                        .toSet()
-                    val removedNoteIds = oldSharedNoteIds - newSharedNoteIds
-                    for (noteId in removedNoteIds) {
-                        val local = noteDao.getNoteById(noteId)
-                        if (local != null && local.noteEntity.userId != userId) {
-                            // Create a personal copy with a new ID so it syncs under this user
-                            val duplicated = local.noteEntity.copy(
-                                id = java.util.UUID.randomUUID().toString(),
-                                userId = userId,
-                                lastUpdateTime = System.currentTimeMillis(),
-                                isSynced = false
-                            )
-                            noteDao.inserNote(duplicated)
-                            // Remove the original shared note from local DB
-                            noteDao.deleteNoteWithId(noteId)
-                            noteDao.deleteLinksForNote(noteId)
+                        // Duplicate orphaned notes whose collaboration was severed
+                        val newSharedNoteIds = collaboratorEntities
+                            .filter { it.collaboratorUserId == userId || it.ownerUserId == userId }
+                            .map { it.noteId }
+                            .toSet()
+                        val removedNoteIds = oldSharedNoteIds - newSharedNoteIds
+                        for (noteId in removedNoteIds) {
+                            val local = noteDao.getNoteById(noteId)
+                            if (local != null && local.noteEntity.userId != userId) {
+                                val duplicated = local.noteEntity.copy(
+                                    id = java.util.UUID.randomUUID().toString(),
+                                    userId = userId,
+                                    lastUpdateTime = System.currentTimeMillis(),
+                                    isSynced = false
+                                )
+                                noteDao.inserNote(duplicated)
+                                noteDao.deleteNoteWithId(noteId)
+                                noteDao.deleteLinksForNote(noteId)
+                            }
                         }
                     }
+                    Log.d("kptest", "collaborators synced: ${collaboratorEntities.size}")
                 }
-                Log.d("kptest", "collaborators synced: ${collaboratorEntities.size}")
 
             } catch (e: Exception) {
                 Log.e("Sync", "Pull failed: ${e.message}")

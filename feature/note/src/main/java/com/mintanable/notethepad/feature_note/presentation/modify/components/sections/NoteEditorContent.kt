@@ -66,6 +66,7 @@ import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.richtext.model.RichTextState
 import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.database.db.entity.TagEntity
@@ -366,10 +367,12 @@ fun NoteEditorContent(
                         onDelete = { tagName -> onEvent(AddEditNoteEvent.DeleteLabel(tagName)) },
                     )
 
-                    collaboratorsSection(
-                        collaborators = collaborators,
-                        onCollaboratorClick = { onEvent(AddEditNoteEvent.OpenCollaborateSheet) }
-                    )
+                    if (FeatureFlags.collaborationEnabled) {
+                        collaboratorsSection(
+                            collaborators = collaborators,
+                            onCollaboratorClick = { onEvent(AddEditNoteEvent.OpenCollaborateSheet) }
+                        )
+                    }
 
                     item {
                         SuggestedTagsRow(

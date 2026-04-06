@@ -51,6 +51,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.notes.util.NavigatationHelper
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
@@ -417,7 +418,9 @@ fun AddEditNoteScreen(
         when (uiState.currentSheetType) {
             BottomSheetType.ATTACH -> AttachmentOptions.entries
             BottomSheetType.REMINDER -> ReminderOptions.entries
-            BottomSheetType.MORE_SETTINGS -> MoreSettingsOptions.entries
+            BottomSheetType.MORE_SETTINGS -> MoreSettingsOptions.entries.filter {
+                it != MoreSettingsOptions.COLLABORATE || FeatureFlags.collaborationEnabled
+            }
             BottomSheetType.IMAGE_SOURCES -> ImageSourceOptions.entries
             BottomSheetType.VIDEO_SOURCES -> VideoSourceOptions.entries
             BottomSheetType.AUDIO_SOURCES -> AudioSourceOptions.entries

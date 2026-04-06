@@ -6,6 +6,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.network.sync.CollaborationService
 import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
 import com.mintanable.notethepad.database.db.DatabaseManager
@@ -65,28 +66,51 @@ class SupaSyncWorker @AssistedInject constructor(
             Log.d("kptest", "unsyncedTags size: ${unsyncedTags.size}")
             Log.d("kptest", "unsyncedDeletedTags size: ${unsyncedDeletedTags.size}")
 
+            val collaborationEnabled = FeatureFlags.collaborationEnabled
+
+            (unsyncedTags + unsyncedDeletedTags).forEach { tag ->
+                if (tag.userId != null) {
+                    val isSharedTag = collaborationEnabled && tag.userId != userId
+                    val success = if (isSharedTag) {
+                        supabaseSyncService.upsertSharedTag(tag.toDto())
+                    } else {
+                        supabaseSyncService.syncTag(tag.toDto())
+                    }
+                    if (success) {
+                        tagDao.updateTag(tag.copy(isSynced = true))
+                        Log.d("SupaSyncWorker", "Synced Tag: ${tag.tagId} (shared=$isSharedTag)")
+                    } else {
+                        allSuccessful = false
+                    }
+                }
+            }
+
             // Sync Notes
             (unsyncedNotes + unsyncedDeletedNotes).forEach { noteWithTags ->
                 val note = noteWithTags.noteEntity
                 if (note.userId != null) {
-                    // Use collaborator table to determine shared status — userId field
-                    // may have been corrupted to the collaborator's ID by a prior save.
-                    val collabs = collaboratorDao.getCollaboratorsForNoteOnce(note.id)
-                    val ownerFromCollab = collabs.firstOrNull()?.ownerUserId
-                    val isSharedNote = ownerFromCollab != null && ownerFromCollab != userId
-                    Log.d("kptest", "Syncing note ${note.id}, userId=${note.userId}, currentUser=$userId, isShared=$isSharedNote, owner=$ownerFromCollab")
+                    val isSharedNote = if (collaborationEnabled) {
+                        val collabs = collaboratorDao.getCollaboratorsForNoteOnce(note.id)
+                        val ownerFromCollab = collabs.firstOrNull()?.ownerUserId
+                        ownerFromCollab != null && ownerFromCollab != userId
+                    } else false
+
+                    Log.d("kptest", "Syncing note ${note.id}, userId=${note.userId}, currentUser=$userId, isShared=$isSharedNote")
                     val success = if (isSharedNote) {
-                        // updateSharedNote strips user_id from the payload
                         supabaseSyncService.updateSharedNote(note.toDto())
                     } else {
                         supabaseSyncService.syncNote(note.toDto())
                     }
                     if (success) {
-                        // Sync associated cross-refs to ensure linkages are uploaded
                         val crossRefs = noteDao.getCrossRefsForNote(note.id)
                         var crossRefsSuccess = true
                         for (crossRef in crossRefs) {
-                            if (!supabaseSyncService.syncCrossRef(crossRef.toDto())) {
+                            val crossRefSuccess = if (isSharedNote) {
+                                supabaseSyncService.upsertSharedCrossRef(crossRef.toDto())
+                            } else {
+                                supabaseSyncService.syncCrossRef(crossRef.toDto())
+                            }
+                            if (!crossRefSuccess) {
                                 crossRefsSuccess = false
                             }
                         }
@@ -103,32 +127,21 @@ class SupaSyncWorker @AssistedInject constructor(
                 }
             }
 
-            // Sync Tags
-            (unsyncedTags + unsyncedDeletedTags).forEach { tag ->
-                if (tag.userId != null) {
-                    val success = supabaseSyncService.syncTag(tag.toDto())
-                    if (success) {
-                        tagDao.updateTag(tag.copy(isSynced = true))
-                        Log.d("SupaSyncWorker", "Synced Tag: ${tag.tagId}")
+            // Upsert current user profile (only needed for collaboration)
+            if (collaborationEnabled) {
+                val userEmail = user.email
+                if (userEmail != null) {
+                    val isUserUploaded = collaborationService.upsertUserProfile(
+                        userId = userId,
+                        email = userEmail,
+                        displayName = user.displayName,
+                        photoUrl = user.photoUrl
+                    )
+                    if (isUserUploaded) {
+                        Log.d("SupaSyncWorker", "Synced userprofile")
                     } else {
                         allSuccessful = false
                     }
-                }
-            }
-
-            // Upsert current user profile
-            val userEmail = user.email
-            if (userEmail != null) {
-                val isUserUploaded = collaborationService.upsertUserProfile(
-                    userId = userId,
-                    email = userEmail,
-                    displayName = user.displayName,
-                    photoUrl = user.photoUrl
-                )
-                if(isUserUploaded){
-                    Log.d("SupaSyncWorker", "Synced userprofile")
-                } else {
-                    allSuccessful = false
                 }
             }
 
