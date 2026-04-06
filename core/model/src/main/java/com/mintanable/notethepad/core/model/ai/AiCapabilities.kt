@@ -14,12 +14,14 @@ data class AiCapabilities(
     val canAutoTag: Boolean,
     val canAnalyzeImage: Boolean,
     val canTranscribeAudio: Boolean,
+    val isLiveTranscriptionSupported: Boolean,
 ) {
     companion object {
         val NONE = AiCapabilities(
             canAutoTag = false,
             canAnalyzeImage = false,
             canTranscribeAudio = false,
+            isLiveTranscriptionSupported = false,
         )
     }
 }

@@ -50,6 +50,7 @@ import com.mintanable.notethepad.theme.ThemePreviews
 fun AudioRecorderUI(
     isRecording: Boolean,
     amplitude: Int = 0,
+    isLiveTranscriptionSupported: Boolean = false,
     onStartRecordingClicked: (Boolean) -> Unit,
     onStopRecordingClicked: (Boolean) -> Unit,
     transcriptionText: String = ""
@@ -85,27 +86,35 @@ fun AudioRecorderUI(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            FilledTonalIconButton(
-                onClick = { isTranscribeEnabled = !isTranscribeEnabled },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.size(42.dp),
-                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    containerColor = if (isTranscribeEnabled)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (isTranscribeEnabled)
-                        MaterialTheme.colorScheme.onPrimary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            ){
-                Icon(
-                    painter = painterResource(id = R.drawable.speech_to_text_24px),
-                    contentDescription = "Transcribe",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            MagicButton(
+                isVisible = isLiveTranscriptionSupported,
+                painter = painterResource(R.drawable.speech_to_text_24px),
+                shape = RoundedCornerShape(4.dp),
+                onButtonClicked =  { isTranscribeEnabled = !isTranscribeEnabled }
+            )
+
+//            FilledTonalIconButton(
+//                onClick = { if (isLiveTranscriptionSupported) isTranscribeEnabled = !isTranscribeEnabled },
+//                enabled = isLiveTranscriptionSupported,
+//                shape = RoundedCornerShape(12.dp),
+//                modifier = Modifier.size(42.dp),
+//                colors = IconButtonDefaults.filledTonalIconButtonColors(
+//                    containerColor = if (isTranscribeEnabled)
+//                        MaterialTheme.colorScheme.primary
+//                    else
+//                        MaterialTheme.colorScheme.surfaceVariant,
+//                    contentColor = if (isTranscribeEnabled)
+//                        MaterialTheme.colorScheme.onPrimary
+//                    else
+//                        MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//            ){
+//                Icon(
+//                    painter = painterResource(id = R.drawable.speech_to_text_24px),
+//                    contentDescription = "Transcribe",
+//                    modifier = Modifier.size(24.dp)
+//                )
+//            }
         }
 
 
@@ -192,7 +201,7 @@ fun PreviewAudioRecorderUI(){
 fun PreviewAudioRecorderUINotRecording(){
     NoteThePadTheme {
         Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
-            AudioRecorderUI(isRecording = false, onStartRecordingClicked = {}, onStopRecordingClicked = {})
+            AudioRecorderUI(isRecording = false, onStartRecordingClicked = {}, onStopRecordingClicked = {}, isLiveTranscriptionSupported = true)
         }
     }
 }

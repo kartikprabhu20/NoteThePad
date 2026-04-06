@@ -131,7 +131,7 @@ class GeminiNanoDataSource @Inject constructor() {
             recognizer.startRecognition(request).collect { response ->
                 when (response) {
                     is SpeechRecognizerResponse.PartialTextResponse -> {
-                        onTranscription(response.text)
+//                        onTranscription(response.text)
                     }
                     is SpeechRecognizerResponse.FinalTextResponse -> {
                         onTranscription(response.text)

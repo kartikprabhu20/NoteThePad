@@ -135,7 +135,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     ) {
         when (modelName) {
             "Gemini Nano (System)" -> {
-                val path = Uri.parse(uri)?.path ?: return
+                val path = uri.toUri().path ?: return
                 geminiNanoDataSource.transcribeAudioFile(File(path), onTranscription)
             }
 

@@ -74,7 +74,7 @@ half4 main(float2 fragCoord) {
     
     // --- 3. Final Color Integration ---
     vec3 basePalette = palette(angle + iTime * 0.5);
-    vec3 finalCol = basePalette * coreMask * verticalMask;
+    vec3 finalCol = basePalette * coreMask;
     
     // White hot center
     float centerHotspotCircle = smoothstep(radius * 0.7, radius * 0.35, dist);

@@ -462,6 +462,7 @@ fun AddEditNoteScreen(
                 AudioRecorderUI(
                     isRecording = uiState.isRecording,
                     amplitude = uiState.recordingAmplitude,
+                    isLiveTranscriptionSupported = aiCapabilities.isLiveTranscriptionSupported,
                     onStartRecordingClicked = {
                         viewModel.onEvent(AddEditNoteEvent.ToggleAudioRecording(it))
                     },
