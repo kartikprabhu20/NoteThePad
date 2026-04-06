@@ -83,12 +83,23 @@ class NoteAssistantRepositoryImpl @Inject constructor(
 
     private fun createFewShotTagPrompt(title: String, content: String, existingTags: List<String>): String {
         val prompt = """
-            NOTE DATA:
-            - Title: $title
-            - Content: $content
-            - Existing Tags: ${existingTags.joinToString(", ")}
+             You are an expert organizational assistant for the app "NoteThePad".
 
-            Tags:
+            TASK: Analyze the note below and suggest 3-5 relevant one-word tags.
+
+            CONTEXT:
+            - Note Title: $title
+            - Note Content: $content
+            - User's Existing Tags: ${existingTags.joinToString(", ")}
+
+            CRITICAL RULES:
+            1. If a suggested tag matches an 'Existing Tag' semantically, use the EXACT name from the existing list.
+            2. Return ONLY a comma-separated list of words.
+            3. No hashtags, no explanations.
+
+            Example Output: Work, Finance, Urgent
+            
+            Output:
             """.trimIndent()
         return prompt
     }
