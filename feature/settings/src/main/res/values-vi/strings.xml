@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">Xóa mô hình AI?</string>
     <string name="dialog_delete_ai_model_description">Bạn có chắc chắn muốn xóa mô hình \'%1$s\' không? Điều này sẽ giải phóng %2$s không gian lưu trữ.</string>
     <string name="setting_ai_model_selection_title">Chọn mô hình AI</string>
+    <string name="ai_model_device_not_supported">(thiết bị không được hỗ trợ)</string>
 </resources>

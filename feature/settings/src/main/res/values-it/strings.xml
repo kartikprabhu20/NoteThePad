@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">Eliminare modello IA?</string>
     <string name="dialog_delete_ai_model_description">Sei sicuro di voler eliminare il modello \'%1$s\'? Questo libererà %2$s di spazio di archiviazione.</string>
     <string name="setting_ai_model_selection_title">Seleziona modello IA</string>
+    <string name="ai_model_device_not_supported">(dispositivo non supportato)</string>
 </resources>

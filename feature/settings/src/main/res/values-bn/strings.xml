@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">AI মডেল কি মুছে ফেলতে চান?</string>
     <string name="dialog_delete_ai_model_description">আপনি কি নিশ্চিত যে আপনি \'%1$s\' মডেলটি মুছে ফেলতে চান? এটি %2$s স্টোরেজ খালি করবে।</string>
     <string name="setting_ai_model_selection_title">AI মডেল নির্বাচন করুন</string>
+    <string name="ai_model_device_not_supported">(ডিভাইস সমর্থিত নয়)</string>
 </resources>

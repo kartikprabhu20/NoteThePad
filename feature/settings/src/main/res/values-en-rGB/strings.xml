@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">Delete AI Model?</string>
     <string name="dialog_delete_ai_model_description">Are you sure you want to delete the model \'%1$s\'? This will free up %2$s of storage space.</string>
     <string name="setting_ai_model_selection_title">Select AI Model</string>
+    <string name="ai_model_device_not_supported">(device not supported)</string>
 </resources>

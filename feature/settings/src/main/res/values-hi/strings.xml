@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">AI मॉडल हटाएं?</string>
     <string name="dialog_delete_ai_model_description">क्या आप वाकई \'%1$s\' मॉडल को हटाना चाहते हैं? इससे %2$s स्टोरेज खाली हो जाएगा।</string>
     <string name="setting_ai_model_selection_title">AI मॉडल चुनें</string>
+    <string name="ai_model_device_not_supported">(डिवाइस समर्थित नहीं है)</string>
 </resources>

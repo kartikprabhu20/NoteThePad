@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">Yapay Zeka Modelini Sil?</string>
     <string name="dialog_delete_ai_model_description">\'%1$s\' modelini silmek istediğinizden emin misiniz? Bu işlem %2$s depolama alanı boşaltacaktır.</string>
     <string name="setting_ai_model_selection_title">Yapay Zeka Modeli Seç</string>
+    <string name="ai_model_device_not_supported">(cihaz desteklenmiyor)</string>
 </resources>

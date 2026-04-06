@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">هل ترغب في حذف نموذج الذكاء الاصطناعي؟</string>
     <string name="dialog_delete_ai_model_description">هل أنت متأكد أنك تريد حذف النموذج \'%1$s\'؟ سيؤدي ذلك إلى توفير مساحة تخزين تبلغ %2$s.</string>
     <string name="setting_ai_model_selection_title">اختر نموذج الذكاء الاصطناعي</string>
+    <string name="ai_model_device_not_supported">(الجهاز غير مدعوم)</string>
 </resources>

@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">AI 모델을 삭제하시겠습니까?</string>
     <string name="dialog_delete_ai_model_description">\'%1$s\' 모델을 삭제하시겠습니까? 삭제 시 %2$s의 저장 공간이 확보됩니다.</string>
     <string name="setting_ai_model_selection_title">AI 모델 선택</string>
+    <string name="ai_model_device_not_supported">(지원되지 않는 장치)</string>
 </resources>

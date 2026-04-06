@@ -69,4 +69,5 @@
     <string name="dialog_delete_ai_model_title">KI-Modell löschen?</string>
     <string name="dialog_delete_ai_model_description">Sind Sie sicher, dass Sie das Modell \'%1$s\' löschen möchten? Dies wird %2$s Speicherplatz freigeben.</string>
     <string name="setting_ai_model_selection_title">KI-Modell auswählen</string>
- </resources>
+     <string name="ai_model_device_not_supported">(Gerät wird nicht unterstützt)</string>
+</resources>
