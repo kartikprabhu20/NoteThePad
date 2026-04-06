@@ -24,7 +24,11 @@ import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
+import com.mintanable.notethepad.core.model.ai.AiCapabilities
+import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.feature_ai.domain.toCapabilities
 import com.mintanable.notethepad.feature_ai.domain.use_cases.AnalyzeImageUseCase
+import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAiModelByName
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.QueryImageUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.StartLiveTransctiption
@@ -55,7 +59,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.Job
@@ -83,6 +89,8 @@ class AddEditNoteViewModel @Inject constructor(
     private val queryImageUseCase: QueryImageUseCase,
     private val authRepository: AuthRepository,
     private val collaborationRepository: CollaborationRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val getAiModelByName: GetAiModelByName,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private var imageQueryJob: Job? = null
@@ -164,6 +172,17 @@ class AddEditNoteViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = AddEditNoteUiState()
     )
+
+    val aiCapabilities: StateFlow<AiCapabilities> = userPreferencesRepository
+        .settingsFlow
+        .map { it.aiModelName }
+        .distinctUntilChanged()
+        .map { name -> getAiModelByName(name).toCapabilities() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AiCapabilities.NONE
+        )
 
     val existingTags = tagUseCases.getAllTags().stateIn(
             scope = viewModelScope,
