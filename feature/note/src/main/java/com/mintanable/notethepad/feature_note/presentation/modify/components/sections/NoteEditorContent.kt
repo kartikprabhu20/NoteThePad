@@ -334,7 +334,8 @@ fun NoteEditorContent(
                     if (summary.isNotEmpty()) {
                         summarySection(
                             summary = summary,
-                            onEvent = onEvent
+                            onEvent = onEvent,
+                            onDelete = { onEvent(AddEditNoteEvent.DeleteSummary) }
                         )
                     }
 
