@@ -351,7 +351,11 @@ fun NoteEditorContent(
                         onDelete = { deletedUri -> onEvent(AddEditNoteEvent.RemoveAudio(deletedUri)) },
                         onPlayPause = { uri -> onEvent(AddEditNoteEvent.UpdateNowPlaying(uri)) },
                         onTranscribe = { uri -> onEvent(AddEditNoteEvent.TranscribeAttachedAudio(uri)) },
-                        isTranscribeSupported = aiCapabilities.canTranscribeAudio
+                        isTranscribeSupported = aiCapabilities.canTranscribeAudio,
+                        onAppendToNote = { result ->
+                            onEvent(AddEditNoteEvent.AttachTranscript(result))
+                            onEvent(AddEditNoteEvent.ClearImageQueryResult)
+                        },
                     )
 
                     reminderAttachmentSection(

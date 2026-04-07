@@ -18,6 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,7 +52,8 @@ fun AudioPlayerUI(
     onPlayPauseClicked: (String) -> Unit,
     onTranscribeClicked: (String) -> Unit,
     isTranscribing: Boolean = false,
-    isTranscribeSupported: Boolean = false
+    isTranscribeSupported: Boolean = false,
+    onAppendToNote: (String) -> Unit = {}
 ) {
 
     val uri = attachment.uri
@@ -79,30 +82,42 @@ fun AudioPlayerUI(
         }
 
         if(transcriptionText.isNotEmpty()) {
-            OutlinedCard(
-                modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp),
-                shape = RoundedCornerShape(
-                    topStart = 0.dp,
-                    topEnd = 0.dp,
-                    bottomStart = 12.dp,
-                    bottomEnd = 12.dp
-                ),
-                colors = CardDefaults.outlinedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                )
-            ) {
+            Column {
+                OutlinedCard(
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp),
+                    shape = RoundedCornerShape(0.dp),
+                    colors = CardDefaults.outlinedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        Text(
+                            text = transcriptionText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (transcriptionText.isEmpty())
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            else
+                                MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+
                 Box(
                     modifier = Modifier
-                        .padding(12.dp)
-                        .verticalScroll(rememberScrollState())
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                        .clip(RoundedCornerShape(0.dp,0.dp,16.dp, 16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable(onClick = { onAppendToNote(transcriptionText) }),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = transcriptionText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (transcriptionText.isEmpty())
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        else
-                            MaterialTheme.colorScheme.onSurface
+                        stringResource(R.string.btn_add_to_note),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
