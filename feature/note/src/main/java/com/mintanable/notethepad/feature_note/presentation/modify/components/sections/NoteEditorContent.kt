@@ -143,7 +143,7 @@ fun NoteEditorContent(
     val charCount =
         titleState.richText.rawText.length + contentRichTextState.document.rawText.length + checklistCharCount
     val showMagicButton = aiCapabilities.canAutoTag && charCount > 400 && !isSuggestionTagsLoading
-    val showSummarizeButton = aiCapabilities.canSummarize && charCount > 100
+    val showSummarizeButton = aiCapabilities.canSummarize && (charCount > 100 || attachedImages.isNotEmpty() || attachedAudios.isNotEmpty())
 
     val lazyListState = rememberLazyListState()
 
