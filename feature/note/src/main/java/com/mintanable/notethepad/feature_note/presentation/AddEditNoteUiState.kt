@@ -56,5 +56,6 @@ data class AddEditNoteUiState(
     val collaborators: List<Collaborator> = emptyList(),
     val isLoadingCollaborators: Boolean = false,
     val collaboratorError: String? = null,
-    val isOwner: Boolean = true
+    val isOwner: Boolean = true,
+    val summary: String = ""
 )

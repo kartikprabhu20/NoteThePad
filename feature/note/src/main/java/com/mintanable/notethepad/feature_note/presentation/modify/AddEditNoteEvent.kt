@@ -56,4 +56,6 @@ sealed class AddEditNoteEvent {
     data class InviteCollaborator(val email: String) : AddEditNoteEvent()
     data class RemoveCollaborator(val collaboratorUserId: String) : AddEditNoteEvent()
     data object LeaveNote : AddEditNoteEvent()
+    data object SummarizeNote : AddEditNoteEvent()
+    data class EditSummary(val text: String) : AddEditNoteEvent()
 }
