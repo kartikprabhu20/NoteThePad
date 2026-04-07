@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,7 +31,11 @@ class AiModelRepositoryImpl @Inject constructor(
 ) : AiModelRepository {
 
     private val _cachedModels = MutableStateFlow<List<AiModel>>(emptyList())
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
     private val gson = Gson()
 
     override fun getModels(): Flow<List<AiModel>> = flow {

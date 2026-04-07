@@ -229,9 +229,13 @@ class SettingsViewModel @Inject constructor(
     )
 
     init {
+        var hasSeenProgress = false
         _aiModelDownloadStatus
             .onEach { status ->
-                if (status is LoadStatus.Error) {
+                if (status is LoadStatus.Progress) {
+                    hasSeenProgress = true
+                }
+                if (status is LoadStatus.Error && hasSeenProgress) {
                     dataStore.updateAiModel(NONE_MODEL_NAME)
                 }
             }
@@ -254,7 +258,6 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ConfirmDownloadAiModel -> confirmDownloadAiModel(event.aiModel, event.onFailure)
             SettingsEvent.DismissDownloadDialog -> {
                 _downloadDialogModel.value = null
-                viewModelScope.launch { dataStore.updateAiModel(NONE_MODEL_NAME) }
             }
             SettingsEvent.SignOut -> signOut()
             is SettingsEvent.ClearAppData -> clearAppData(event.onFailure)
