@@ -17,7 +17,8 @@ data class DetailedNote (
     val tagEntities: List<TagEntity> = emptyList(),
     val backgroundImage: Int = -1,
     val lastUpdateTime: Long = 0L,
-    val isSynced: Boolean = false
+    val isSynced: Boolean = false,
+    val summary: String = ""
 ){
     fun toNote(): NoteEntity{
         val json = JSONObject()
@@ -35,7 +36,8 @@ data class DetailedNote (
             reminderTime = reminderTime,
             audioTranscriptions = json.toString(),
             backgroundImage = backgroundImage,
-            isSynced = isSynced
+            isSynced = isSynced,
+            summary = summary
         )
     }
 }

@@ -311,4 +311,8 @@ class NoteRepositoryImpl @Inject constructor(
             enqueueFetch()
         }
     }
+
+    override suspend fun updateSummary(noteId: String, summary: String) {
+        noteDao.updateSummary(noteId, summary, System.currentTimeMillis())
+    }
 }

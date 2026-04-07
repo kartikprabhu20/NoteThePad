@@ -21,7 +21,7 @@ import com.mintanable.notethepad.database.db.util.NoteConverters
         NoteTagCrossRef::class,
         CollaboratorEntity::class
     ],
-    version = 16
+    version = 17
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase : RoomDatabase() {
@@ -156,6 +156,12 @@ abstract class NoteDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_note_collaborators_local_collaboratorUserId` ON `note_collaborators_local` (`collaboratorUserId`)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_note_collaborators_local_ownerUserId` ON `note_collaborators_local` (`ownerUserId`)")
                 database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_note_collaborators_local_noteId_collaboratorUserId` ON `note_collaborators_local` (`noteId`, `collaboratorUserId`)")
+            }
+        }
+
+        val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE NoteEntity ADD COLUMN summary TEXT NOT NULL DEFAULT ''")
             }
         }
     }

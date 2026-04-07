@@ -90,4 +90,7 @@ interface NoteDao {
 
     @Query("SELECT tagId FROM note_tag_cross_ref WHERE noteId = :noteId AND isDeleted = 0")
     suspend fun getActiveTagIdsForNote(noteId: String): List<String>
+
+    @Query("UPDATE NoteEntity SET summary = :summary, lastUpdateTime = :lastUpdateTime WHERE id = :noteId")
+    suspend fun updateSummary(noteId: String, summary: String, lastUpdateTime: Long)
 }

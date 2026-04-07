@@ -70,7 +70,8 @@ class DetailedNoteMapper @Inject constructor(
             tagEntities = activeTags,
             backgroundImage = noteEntity.backgroundImage,
             lastUpdateTime = noteEntity.lastUpdateTime,
-            isSynced = noteEntity.isSynced
+            isSynced = noteEntity.isSynced,
+            summary = noteEntity.summary
         )
     }
 }

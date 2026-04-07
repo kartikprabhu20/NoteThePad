@@ -63,7 +63,10 @@ data class NoteEntity(
     val isDeleted: Boolean = false,
 
     @SerialName("is_synced")
-    val isSynced: Boolean = false
+    val isSynced: Boolean = false,
+
+    @SerialName("summary")
+    val summary: String = ""
 )
 
 class InvalidNoteException(message: String): Exception(message)
