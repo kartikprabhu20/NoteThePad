@@ -61,7 +61,11 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun createTagPrompt(title: String, content: String, existingTags: List<String>): String {
+    private fun createTagPrompt(
+        title: String,
+        content: String,
+        existingTags: List<String>
+    ): String {
         return """
             You are an expert organizational assistant for the app "NoteThePad".
 
@@ -81,7 +85,11 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         """.trimIndent()
     }
 
-    private fun createFewShotTagPrompt(title: String, content: String, existingTags: List<String>): String {
+    private fun createFewShotTagPrompt(
+        title: String,
+        content: String,
+        existingTags: List<String>
+    ): String {
         val prompt = """
              You are an expert organizational assistant for the app "NoteThePad".
 
@@ -139,9 +147,10 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 geminiNanoDataSource.transcribeAudioFile(File(path), onTranscription)
             }
 
-            "Gemini 3 Flash (Cloud)" -> { /* Handle Cloud if needed */ }
+            "Gemini 3 Flash (Cloud)" -> { /* Handle Cloud if needed */
+            }
 
-            "None" -> { }
+            "None" -> {}
 
             else -> {
                 // Gemma models
@@ -158,14 +167,22 @@ class NoteAssistantRepositoryImpl @Inject constructor(
 
                     val chunks = splitPcmIntoChunks(pcmData, chunkDurationSeconds = 10)
                     Log.d("kptest", "Gemma audio: ${pcmData.size} bytes PCM, ${chunks.size} chunks")
-
-                    for ((index, chunkWav) in chunks.withIndex()) {
-                        val callback: (String) -> Unit = if (index == 0) {
-                            onTranscription
-                        } else {
-                            { text -> onTranscription(" $text") }
+                    try {
+                        gemmaLocalDataSource.prepareForAudio(selectedModel)
+                        for ((index, chunkWav) in chunks.withIndex()) {
+                            val callback: (String) -> Unit = if (index == 0) {
+                                onTranscription
+                            } else {
+                                { text -> onTranscription(" $text") }
+                            }
+                            gemmaLocalDataSource.transcribeAudioFile(chunkWav, callback)
+                            gemmaLocalDataSource.resetConversation()
                         }
-                        gemmaLocalDataSource.transcribeAudioFile(selectedModel, chunkWav, callback)
+                    } catch (e: Exception) {
+                        Log.e("kptest", "Batch failed", e)
+                    } finally {
+                        // Close the engine ONCE at the very end
+                        gemmaLocalDataSource.cleanup()
                     }
                 }
             }
@@ -181,8 +198,12 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.llmSupportImage) {
-                    val response = gemmaLocalDataSource.analyzeImage(imageBytes, selectedModel.downloadFileName)
-                    response?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.take(3) ?: emptyList()
+                    val response = gemmaLocalDataSource.analyzeImage(
+                        imageBytes,
+                        selectedModel.downloadFileName
+                    )
+                    response?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.take(3)
+                        ?: emptyList()
                 } else {
                     emptyList()
                 }
@@ -199,7 +220,11 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.llmSupportImage) {
-                    gemmaLocalDataSource.queryImage(imageBytes, query, selectedModel.downloadFileName)
+                    gemmaLocalDataSource.queryImage(
+                        imageBytes,
+                        query,
+                        selectedModel.downloadFileName
+                    )
                         .onCompletion { gemmaLocalDataSource.cleanup() }
                         .collect { emit(it) }
                 }

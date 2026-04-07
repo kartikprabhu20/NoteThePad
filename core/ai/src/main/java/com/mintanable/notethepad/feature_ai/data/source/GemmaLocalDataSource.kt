@@ -260,19 +260,19 @@ class GemmaLocalDataSource @Inject constructor(
 
     // ── Task: Transcribe Audio ────────────────────────────────────────────
 
+    suspend fun prepareForAudio(selectedModel: AiModel) {
+        initialize(
+            fileName = selectedModel.downloadFileName,
+            supportAudio = true,
+            supportImage = false,
+            samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
+        )
+    }
     suspend fun transcribeAudioFile(
-        selectedModel: AiModel,
         processedAudio: ByteArray?,
         onTranscription: (String) -> Unit,
     ) {
         try {
-            initialize(
-                fileName = selectedModel.downloadFileName,
-                supportAudio = true,
-                supportImage = false,
-                samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
-            )
-
             withTimeout(60_000L) {
                 runInference(
                     prompt = "Transcribe this audio:",
@@ -285,8 +285,26 @@ class GemmaLocalDataSource @Inject constructor(
             Log.e(TAG, "Audio transcription timed out")
         } catch (e: Exception) {
             Log.e(TAG, "Audio transcription failed: ${e.message}")
-        } finally {
-            cleanup()
+        }
+//         finally {
+//            cleanup()
+//        }
+    }
+
+    suspend fun resetConversation(systemInstruction: String? = null) {
+        mutex.withLock {
+            val instance = activeInstance ?: return
+
+            // Close the old conversation to free its specific memory buffers
+            try { instance.conversation.close() } catch (_: Exception) {}
+
+            // Create a brand new one using the same Engine
+            instance.conversation = instance.engine.createConversation(
+                ConversationConfig(
+                    samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
+                    systemInstruction = systemInstruction?.let { Contents.of(it) }
+                )
+            )
         }
     }
 
