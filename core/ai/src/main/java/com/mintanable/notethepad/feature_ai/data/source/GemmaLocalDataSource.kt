@@ -108,7 +108,7 @@ class GemmaLocalDataSource @Inject constructor(
                         backend = mainBackend,
                         visionBackend = if (supportImage) Backend.GPU() else null,
                         audioBackend = if (supportAudio) Backend.CPU() else null,
-                        maxNumTokens = maxNumTokens,
+                        maxNumTokens = if (supportAudio) 512 else maxNumTokens,
                         cacheDir = if (modelPath.startsWith("/data/local/tmp"))
                             context.getExternalFilesDir(null)?.absolutePath else null,
                     )

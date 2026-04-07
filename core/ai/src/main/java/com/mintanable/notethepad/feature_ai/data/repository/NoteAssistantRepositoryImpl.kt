@@ -1,12 +1,12 @@
 package com.mintanable.notethepad.feature_ai.data.repository
 
 import android.content.Context
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
+import android.util.Log
 import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
-import com.mintanable.notethepad.core.common.utils.genByteArrayForWav
+import com.mintanable.notethepad.core.common.utils.splitPcmIntoChunks
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.feature_ai.data.source.GeminiDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
@@ -149,15 +149,23 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val selectedModel = models.find { it.name == modelName }
 
                 if (selectedModel != null) {
-                    // Convert URI to clean PCM ByteArray (Gemma requirement)
-                    val processedAudio = convertWavToMonoWithMaxSeconds(
+                    // Normalize audio to 16kHz mono 16-bit PCM (no duration limit)
+                    val pcmData = convertWavToMonoWithMaxSeconds(
                         context = context,
                         stereoUri = uri.toUri(),
-                        maxSeconds = 30
-                    )?.genByteArrayForWav()
+                        maxSeconds = Int.MAX_VALUE / 16000 // no trim — chunking handles it
+                    ) ?: return
 
-                    if (processedAudio != null) {
-                        gemmaLocalDataSource.transcribeAudioFile(selectedModel, processedAudio, onTranscription)
+                    val chunks = splitPcmIntoChunks(pcmData, chunkDurationSeconds = 10)
+                    Log.d("kptest", "Gemma audio: ${pcmData.size} bytes PCM, ${chunks.size} chunks")
+
+                    for ((index, chunkWav) in chunks.withIndex()) {
+                        val callback: (String) -> Unit = if (index == 0) {
+                            onTranscription
+                        } else {
+                            { text -> onTranscription(" $text") }
+                        }
+                        gemmaLocalDataSource.transcribeAudioFile(selectedModel, chunkWav, callback)
                     }
                 }
             }

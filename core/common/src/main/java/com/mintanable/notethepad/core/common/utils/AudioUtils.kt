@@ -145,12 +145,33 @@ private fun resample(
     return resampledData
 }
 
+fun splitPcmIntoChunks(
+    pcmData: ByteArray,
+    chunkDurationSeconds: Int = 30
+): List<ByteArray> {
+    val bytesPerSecond = SAMPLE_RATE * 2 // 16-bit mono = 2 bytes per sample
+    val chunkSize = chunkDurationSeconds * bytesPerSecond
+
+    if (pcmData.isEmpty()) return emptyList()
+    if (pcmData.size <= chunkSize) return listOf(pcmData.genByteArrayForWav())
+
+    val chunks = mutableListOf<ByteArray>()
+    var offset = 0
+    while (offset < pcmData.size) {
+        val end = minOf(offset + chunkSize, pcmData.size)
+        val chunkPcm = pcmData.copyOfRange(offset, end)
+        chunks.add(chunkPcm.genByteArrayForWav())
+        offset = end
+    }
+    return chunks
+}
+
 fun ByteArray.genByteArrayForWav(): ByteArray {
     val sampleRate = SAMPLE_RATE
     val header = ByteArray(44)
 
     val pcmDataSize = this.size
-    val wavFileSize = pcmDataSize + 44 // 44 bytes for the header
+    val wavFileSize = pcmDataSize + 36 // RIFF chunk size = file size - 8
     val channels = 1 // Mono
     val bitsPerSample: Short = 16
     val byteRate = sampleRate * channels * bitsPerSample / 8
