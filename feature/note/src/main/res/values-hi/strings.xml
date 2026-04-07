@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">लॉग आउट करें?</string>
     <string name="dialog_logout_message">क्या आप वाकई लॉग आउट करना चाहते हैं?</string>
     <string name="btn_logout">लॉग आउट</string>
+    <string name="btn_summarize">सारांशित करें</string>
+    <string name="summery_title">सारांश</string>
+    <string name="msg_summarization_background">सारांश पृष्ठभूमि में चलेगा</string>
+    <string name="msg_save_before_summarize">सारांशित करने से पहले कृपया नोट सहेजें</string>
+    <string name="btn_analyse">विश्लेषण करें</string>
+    <string name="hint_image_query">क्वेरी दर्ज करें (अधिकतम 50 वर्ण)…</string>
 </resources>

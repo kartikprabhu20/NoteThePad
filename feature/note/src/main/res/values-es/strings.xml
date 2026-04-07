@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">¿Cerrar sesión?</string>
     <string name="dialog_logout_message">¿Estás seguro de que quieres cerrar sesión?</string>
     <string name="btn_logout">Cerrar sesión</string>
+    <string name="btn_summarize">Resumir</string>
+    <string name="summery_title">Resumen</string>
+    <string name="msg_summarization_background">El resumen se ejecutará en segundo plano</string>
+    <string name="msg_save_before_summarize">Guarde la nota antes de resumir</string>
+    <string name="btn_analyse">Analizar</string>
+    <string name="hint_image_query">Ingrese la consulta (máximo 50 caracteres)…</string>
 </resources>

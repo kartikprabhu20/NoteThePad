@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">退出登录？</string>
     <string name="dialog_logout_message">您确定要退出登录吗？</string>
     <string name="btn_logout">退出登录</string>
+    <string name="btn_summarize">总结</string>
+    <string name="summery_title">摘要</string>
+    <string name="msg_summarization_background">总结将在后台运行</string>
+    <string name="msg_save_before_summarize">请在总结前保存笔记</string>
+    <string name="btn_analyse">分析</string>
+    <string name="hint_image_query">输入查询（最多 50 个字符）…</string>
 </resources>

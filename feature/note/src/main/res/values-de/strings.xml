@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">Abmelden?</string>
     <string name="dialog_logout_message">Sind Sie sicher, dass Sie sich abmelden möchten?</string>
     <string name="btn_logout">Abmelden</string>
+    <string name="btn_summarize">Zusammenfassen</string>
+    <string name="summery_title">Zusammenfassung</string>
+    <string name="msg_summarization_background">Die Zusammenfassung wird im Hintergrund ausgeführt</string>
+    <string name="msg_save_before_summarize">Bitte speichern Sie die Notiz vor der Zusammenfassung</string>
+    <string name="btn_analyse">Analysieren</string>
+    <string name="hint_image_query">Suchanfrage eingeben (maximal 50 Zeichen)…</string>
 </resources>

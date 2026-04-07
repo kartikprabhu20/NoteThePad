@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">ログアウトしますか？</string>
     <string name="dialog_logout_message">ログアウトしてもよろしいですか？</string>
     <string name="btn_logout">ログアウト</string>
+    <string name="btn_summarize">要約する</string>
+    <string name="summery_title">要約</string>
+    <string name="msg_summarization_background">要約はバックグラウンドで実行されます</string>
+    <string name="msg_save_before_summarize">要約する前にメモを保存してください</string>
+    <string name="btn_analyse">分析する</string>
+    <string name="hint_image_query">クエリを入力してください (最大 50 文字)…</string>
 </resources>

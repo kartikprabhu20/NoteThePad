@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">Đăng xuất?</string>
     <string name="dialog_logout_message">Bạn có chắc chắn muốn đăng xuất không?</string>
     <string name="btn_logout">Đăng xuất</string>
+    <string name="btn_summarize">Tóm tắt</string>
+    <string name="summery_title">Bản tóm tắt</string>
+    <string name="msg_summarization_background">Quá trình tóm tắt sẽ chạy trong nền</string>
+    <string name="msg_save_before_summarize">Vui lòng lưu ghi chú trước khi tóm tắt</string>
+    <string name="btn_analyse">Phân tích</string>
+    <string name="hint_image_query">Nhập truy vấn (tối đa 50 ký tự)…</string>
 </resources>

@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">Logout?</string>
     <string name="dialog_logout_message">Sei sicuro di voler uscire?</string>
     <string name="btn_logout">Logout</string>
+    <string name="btn_summarize">Riassumi</string>
+    <string name="summery_title">Riassunto</string>
+    <string name="msg_summarization_background">La sintesi verrà eseguita in background</string>
+    <string name="msg_save_before_summarize">Salva la nota prima di riassumere</string>
+    <string name="btn_analyse">Analizza</string>
+    <string name="hint_image_query">Inserisci query (massimo 50 caratteri)…</string>
 </resources>

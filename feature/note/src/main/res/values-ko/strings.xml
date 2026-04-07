@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">로그아웃하시겠습니까?</string>
     <string name="dialog_logout_message">정말 로그아웃하시겠습니까?</string>
     <string name="btn_logout">로그아웃</string>
+    <string name="btn_summarize">요약하기</string>
+    <string name="summery_title">요약</string>
+    <string name="msg_summarization_background">요약이 백그라운드에서 실행됩니다</string>
+    <string name="msg_save_before_summarize">요약하기 전에 메모를 저장해 주세요</string>
+    <string name="btn_analyse">분석하기</string>
+    <string name="hint_image_query">쿼리 입력(최대 50자)…</string>
 </resources>

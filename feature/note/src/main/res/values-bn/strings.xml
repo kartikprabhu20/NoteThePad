@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">লগ আউট করবেন?</string>
     <string name="dialog_logout_message">আপনি কি নিশ্চিত যে আপনি লগ আউট করতে চান?</string>
     <string name="btn_logout">লগ আউট</string>
+    <string name="btn_summarize">সারসংক্ষেপ</string>
+    <string name="summery_title">সারাংশ</string>
+    <string name="msg_summarization_background">সারসংক্ষেপ ব্যাকগ্রাউন্ডে চলবে</string>
+    <string name="msg_save_before_summarize">সারসংক্ষেপ করার আগে অনুগ্রহ করে নোটটি সেভ করুন</string>
+    <string name="btn_analyse">বিশ্লেষণ</string>
+    <string name="hint_image_query">কোয়েরি লিখুন (সর্বোচ্চ ৫০টি অক্ষর)…</string>
 </resources>

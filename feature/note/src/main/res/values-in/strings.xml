@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">Keluar?</string>
     <string name="dialog_logout_message">Apakah Anda yakin ingin keluar?</string>
     <string name="btn_logout">Keluar</string>
+    <string name="btn_summarize">Ringkas</string>
+    <string name="summery_title">Ringkasan</string>
+    <string name="msg_summarization_background">Peringkasan akan berjalan di latar belakang</string>
+    <string name="msg_save_before_summarize">Harap simpan catatan sebelum meringkas</string>
+    <string name="btn_analyse">Analisis</string>
+    <string name="hint_image_query">Masukkan kueri (maksimal 50 karakter)…</string>
 </resources>

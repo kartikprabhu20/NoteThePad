@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">Oturumu kapat?</string>
     <string name="dialog_logout_message">Oturumu kapatmak istediğinizden emin misiniz?</string>
     <string name="btn_logout">Oturumu kapat</string>
+    <string name="btn_summarize">Özetle</string>
+    <string name="summery_title">Özet</string>
+    <string name="msg_summarization_background">Özetleme arka planda çalışacak</string>
+    <string name="msg_save_before_summarize">Lütfen özetlemeden önce notu kaydedin</string>
+    <string name="btn_analyse">Analiz Et</string>
+    <string name="hint_image_query">Sorguyu girin (maksimum 50 karakter)…</string>
 </resources>

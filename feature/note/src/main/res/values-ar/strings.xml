@@ -114,4 +114,10 @@
     <string name="dialog_logout_title">تسجيل الخروج؟</string>
     <string name="dialog_logout_message">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
     <string name="btn_logout">تسجيل الخروج</string>
+    <string name="btn_summarize">تلخيص</string>
+    <string name="summery_title">ملخص</string>
+    <string name="msg_summarization_background">سيتم تشغيل التلخيص في الخلفية</string>
+    <string name="msg_save_before_summarize">يرجى حفظ الملاحظة قبل التلخيص</string>
+    <string name="btn_analyse">تحليل</string>
+    <string name="hint_image_query">أدخل الاستعلام (بحد أقصى 50 حرفًا)…</string>
 </resources>
