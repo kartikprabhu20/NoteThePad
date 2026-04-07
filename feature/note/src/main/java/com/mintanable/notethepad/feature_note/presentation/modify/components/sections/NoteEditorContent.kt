@@ -155,7 +155,6 @@ fun NoteEditorContent(
 
     val extraBottomPadding by animateDpAsState(
         targetValue = when {
-            showMagicButton && showSummarizeButton -> 112.dp
             showMagicButton || showSummarizeButton -> 56.dp
             else -> 0.dp
         },
@@ -229,7 +228,7 @@ fun NoteEditorContent(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                 ) {
                     MagicButton(
                         title = stringResource(R.string.btn_auto_tag),
