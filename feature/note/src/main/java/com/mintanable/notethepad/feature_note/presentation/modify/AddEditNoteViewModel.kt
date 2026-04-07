@@ -48,6 +48,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
 import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.database.db.repository.CollaborationRepository
+import com.mintanable.notethepad.feature_ai.data.SummarizeNoteWorker
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.modify.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -242,7 +243,8 @@ class AddEditNoteViewModel @Inject constructor(
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,
                         isCheckboxListAvailable = detailedNote.isCheckboxListAvailable,
-                        tagEntities = detailedNote.tagEntities
+                        tagEntities = detailedNote.tagEntities,
+                        summary = detailedNote.summary
                     )
                 }
                 observeCollaborators(id)
@@ -894,6 +896,51 @@ class AddEditNoteViewModel @Inject constructor(
                     }
                 }
             }
+
+           is AddEditNoteEvent.SummarizeNote -> {
+                viewModelScope.launch {
+                    // Save note first so worker has latest data
+                    val noteId = if (currentNoteId.isNotBlank()) {
+                        saveNote(currentNoteId).getOrNull() ?: currentNoteId
+                    } else {
+                        val result = saveNote(currentNoteId)
+                        val savedId = result.getOrNull()
+                        if (savedId != null) {
+                            currentNoteId = savedId
+                            savedId
+                        } else {
+                            _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_save_before_summarize)))
+                            return@launch
+                        }
+                    }
+
+                    // Enqueue the worker
+                    val workRequest = androidx.work.OneTimeWorkRequestBuilder<SummarizeNoteWorker>()
+                        .setInputData(androidx.work.workDataOf("note_id" to noteId))
+                        .build()
+                    val workManager = androidx.work.WorkManager.getInstance(appContext)
+                    workManager.enqueue(workRequest)
+                    _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_summarization_background)))
+
+                    // Observe completion to update UI
+                    workManager.getWorkInfoByIdFlow(workRequest.id).collect { workInfo ->
+                        if (workInfo?.state == androidx.work.WorkInfo.State.SUCCEEDED) {
+                            noteUseCases.getDetailedNote(noteId)?.let { refreshedNote ->
+                                _uiState.update { it.copy(summary = refreshedNote.summary) }
+                            }
+                            return@collect
+                        }
+                    }
+                }
+            }
+
+            is AddEditNoteEvent.EditSummary -> {
+                _uiState.update { it.copy(summary = event.text) }
+            }
+
+            is AddEditNoteEvent.DeleteSummary -> {
+                _uiState.update { it.copy(summary = "") }
+            }
         }
     }
 
@@ -1109,7 +1156,8 @@ class AddEditNoteViewModel @Inject constructor(
             reminderTime = state.reminderTime,
             checkboxItems = state.checkListItems,
             tagEntities = state.tagEntities,
-            backgroundImage = state.backgroundImage
+            backgroundImage = state.backgroundImage,
+            summary = state.summary
         )
     }
 
