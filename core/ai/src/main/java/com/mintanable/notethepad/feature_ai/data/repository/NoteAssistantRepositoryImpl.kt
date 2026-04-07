@@ -211,6 +211,36 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun describeImage(imageBytes: ByteArray, modelName: String): String? {
+        return when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> geminiDataSource.describeImage(imageBytes)
+            "Gemini Nano (System)" -> null // Nano doesn't support images
+            "None" -> null
+            else -> {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.llmSupportImage) {
+                    gemmaLocalDataSource.describeImage(imageBytes, selectedModel.downloadFileName)
+                } else null
+            }
+        }
+    }
+
+    override suspend fun summarizeNote(prompt: String, modelName: String): String? {
+        return when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> geminiDataSource.summarizeNote(prompt)
+            "Gemini Nano (System)" -> geminiNanoDataSource.summarizeNote(prompt)
+            "None" -> null
+            else -> {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.isLlm) {
+                    gemmaLocalDataSource.summarizeNote(prompt, selectedModel.downloadFileName)
+                } else null
+            }
+        }
+    }
+
     override fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String> {
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.queryImage(imageBytes, query)

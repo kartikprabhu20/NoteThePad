@@ -71,6 +71,27 @@ class GeminiDataSource(private val apiKey: String) {
         }
     }
 
+    suspend fun describeImage(imageBytes: ByteArray): String? {
+        return try {
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size) ?: return null
+            val inputContent = content {
+                image(bitmap)
+                text("Describe this image in 10-20 words or convert to text if it contains text.")
+            }
+            visionModel.generateContent(inputContent).text?.trim()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun summarizeNote(prompt: String): String? {
+        return try {
+            model.generateContent(prompt).text?.trim()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     suspend fun generateTags(title: String, content: String, existingTags: List<String>): List<String> {
         val prompt = """
             You are an expert organizational assistant for the app "NoteThePad".

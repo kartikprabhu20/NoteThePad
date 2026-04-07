@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.google.ai.edge.litertlm.ExperimentalApi
 import com.google.mlkit.genai.common.FeatureStatus
 import com.google.mlkit.genai.common.audio.AudioSource
 import com.google.mlkit.genai.prompt.Generation
@@ -12,10 +13,15 @@ import com.google.mlkit.genai.speechrecognition.SpeechRecognizer
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerOptions
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerRequest
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerResponse
+import com.google.mlkit.genai.summarization.Summarization
+import com.google.mlkit.genai.summarization.SummarizationRequest
+import com.google.mlkit.genai.summarization.SummarizerOptions
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
@@ -246,6 +252,21 @@ class GeminiNanoDataSource @Inject constructor(
             try { _speechRecognizer?.close() } catch (_: Exception) {}
             _speechRecognizer = null
         }
+    }
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun summarizeNote(textToSummarize: String): String? = withContext(Dispatchers.IO) {
+        val summarizerOptions = SummarizerOptions.builder(context)
+            .setInputType(SummarizerOptions.InputType.ARTICLE)
+            .setOutputType(SummarizerOptions.OutputType.THREE_BULLETS)
+            .setLanguage(SummarizerOptions.Language.ENGLISH)
+            .build()
+
+        val summarizationClient = Summarization.getClient(summarizerOptions)
+        val summarizationRequest = SummarizationRequest.builder(textToSummarize).build()
+        val summarizationResult = summarizationClient.runInference(summarizationRequest).get().summary
+
+        return@withContext summarizationResult
     }
 
     companion object {

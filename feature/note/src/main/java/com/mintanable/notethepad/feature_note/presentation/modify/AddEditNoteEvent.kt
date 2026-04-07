@@ -58,4 +58,5 @@ sealed class AddEditNoteEvent {
     data object LeaveNote : AddEditNoteEvent()
     data object SummarizeNote : AddEditNoteEvent()
     data class EditSummary(val text: String) : AddEditNoteEvent()
+    data object DeleteSummary: AddEditNoteEvent()
 }

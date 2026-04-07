@@ -20,4 +20,7 @@ interface NoteAssistantRepository {
 
     suspend fun analyzeImage(imageBytes: ByteArray, modelName: String): List<String>
     fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String>
+    suspend fun describeImage(imageBytes: ByteArray, modelName: String): String?
+
+    suspend fun summarizeNote(prompt: String, modelName: String): String?
 }

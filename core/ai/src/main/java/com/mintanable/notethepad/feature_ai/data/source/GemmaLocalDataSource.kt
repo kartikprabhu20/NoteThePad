@@ -312,11 +312,44 @@ class GemmaLocalDataSource @Inject constructor(
 
     @OptIn(ExperimentalApi::class)
     suspend fun summarizeNote(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
+        val maxChunkChars = 12_000 //roughly 3072 tokens
+
+        try {
+            if (prompt.length <= maxChunkChars) {
+                return@withContext summarizeChunk(prompt, fileName)
+            }
+
+            // MAP PHASE: Split long text into chunks and summarize each
+            val chunks = prompt.chunked(maxChunkChars)
+            val partialSummaries = chunks.map { chunk ->
+                summarizeChunk("Summarize this section: $chunk", fileName) ?: ""
+            }.filter { it.isNotBlank() }
+
+            // REDUCE PHASE: Combine partial summaries
+            val combinedSummaries = partialSummaries.joinToString("\n\n")
+
+            // Unify the summaries
+            return@withContext summarizeChunk(
+                prompt = "Synthesize these summaries into a final 2-sentence overview: $combinedSummaries",
+                fileName = fileName
+            )
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Summarization failed: ${e.message}")
+            null
+        } finally {
+            cleanup()
+        }
+    }
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun summarizeChunk(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
         try {
             initialize(
                 fileName = fileName,
                 supportAudio = false,
                 supportImage = false,
+                maxNumTokens = 4096,
                 samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
                 systemInstruction = "Summarize this note in 2 sentences."
             )
@@ -328,6 +361,38 @@ class GemmaLocalDataSource @Inject constructor(
             summary.trim()
         } catch (e: Exception) {
             Log.e(TAG, "Summarization failed: ${e.message}")
+            null
+        } finally {
+            cleanup()
+        }
+    }
+
+    // ── Task: Describe Image (short description) ──────────────────────────
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun describeImage(imageBytes: ByteArray, fileName: String): String? = withContext(Dispatchers.IO) {
+        try {
+            initialize(
+                fileName = fileName,
+                supportAudio = false,
+                supportImage = true,
+                maxNumTokens = 256,
+                samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.3),
+                systemInstruction = "Describe images concisely in 10-20 words or convert to text if it contains text."
+            )
+
+            var response = ""
+            withTimeout(30_000L) {
+                runInference(
+                    prompt = "Describe this image in 10-20 words",
+                    imageData = imageBytes
+                ).collect { chunk ->
+                    response += chunk
+                }
+            }
+            response.trim()
+        } catch (e: Exception) {
+            Log.e(TAG, "Image description failed: ${e.message}")
             null
         } finally {
             cleanup()

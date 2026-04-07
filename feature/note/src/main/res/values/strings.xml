@@ -27,6 +27,10 @@
     <string name="enter_content_hint">Enter some content…</string>
 
     <string name="btn_auto_tag">Auto-Tag</string>
+    <string name="btn_summarize">Summarize</string>
+    <string name="summery_title">Summary</string>
+    <string name="msg_summarization_background">Summarization will run in the background</string>
+    <string name="msg_save_before_summarize">Please save the note before summarizing</string>
     <string name="msg_saving_note">Saving Note…</string>
     <string name="title_ai_suggestions">AI tag suggestions</string>
     <string name="label_more_items">+ %1$d more</string>
@@ -129,6 +133,8 @@
     <string name="content_description_restore">Restore</string>
     <string name="content_description_delete_permanently">Delete Permanently</string>
     <string name="analyze_images">Analyze Images</string>
+    <string name="btn_analyse">Analyse</string>
+    <string name="hint_image_query">Enter query (maximum 50 characters)…</string>
     <string name="dialog_stop_ai_title">Stop AI Process?</string>
     <string name="dialog_stop_ai_message">The AI is still responding. Do you want to stop it and go back?</string>
     <string name="btn_stop">Stop &amp; Go Back</string>
