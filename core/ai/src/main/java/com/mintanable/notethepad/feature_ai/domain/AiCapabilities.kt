@@ -18,12 +18,14 @@ fun AiModel?.toCapabilities(): AiCapabilities {
             canAnalyzeImage = true,
             canTranscribeAudio = false, // not implemented for cloud
             isLiveTranscriptionSupported = false,
+            canSummarize = true,
         )
         "Gemini Nano (System)" -> AiCapabilities(
             canAutoTag = true,
             canAnalyzeImage = false,    // Nano doesn't accept images
             canTranscribeAudio = true,  // gated to Android 12+ at callsite
             isLiveTranscriptionSupported = true,
+            canSummarize = true,
         )
         else -> AiCapabilities(
             // Gemma-family local LLMs — read metadata from catalog
@@ -31,6 +33,7 @@ fun AiModel?.toCapabilities(): AiCapabilities {
             canAnalyzeImage = llmSupportImage,
             canTranscribeAudio = llmSupportAudio,
             isLiveTranscriptionSupported = false,
+            canSummarize = isLlm,
         )
     }
 }

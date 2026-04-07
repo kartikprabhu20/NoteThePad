@@ -15,6 +15,7 @@ data class AiCapabilities(
     val canAnalyzeImage: Boolean,
     val canTranscribeAudio: Boolean,
     val isLiveTranscriptionSupported: Boolean,
+    val canSummarize: Boolean,
 ) {
     companion object {
         val NONE = AiCapabilities(
@@ -22,6 +23,7 @@ data class AiCapabilities(
             canAnalyzeImage = false,
             canTranscribeAudio = false,
             isLiveTranscriptionSupported = false,
+            canSummarize = false,
         )
     }
 }
