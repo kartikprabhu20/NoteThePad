@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.NoteColors
@@ -119,11 +121,13 @@ fun SuggestedTagsRow(
 @ThemePreviews
 @Composable
 fun PreviewSuggestedTagsRow() {
-    NoteThePadTheme {
+    val isDark = isSystemInDarkTheme()
+    NoteThePadTheme(darkTheme = isDark) {
         Box(modifier = Modifier
             .fillMaxSize()
+            .background(NoteColors.resolveDisplayColor( NoteColors.colors[1].toArgb(), isDark))
             .padding(8.dp)
-            .background(NoteColors.colors[1])){
+        ){
             SuggestedTagsRow(
                 suggestions = listOf("test","abc","shopping","finance","sport"),
                 onTagAccepted = {},

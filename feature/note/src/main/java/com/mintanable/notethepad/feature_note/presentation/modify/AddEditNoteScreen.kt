@@ -294,6 +294,7 @@ fun AddEditNoteScreen(
             isSuggestionTagsLoading = uiState.isTagSuggestionLoading,
             collaborators = uiState.collaborators,
             aiCapabilities = aiCapabilities,
+            summary = uiState.summary,
             onEvent = onEvent,
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,

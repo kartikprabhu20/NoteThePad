@@ -15,14 +15,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
@@ -31,6 +34,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckBox
@@ -38,8 +43,10 @@ import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -50,6 +57,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
@@ -102,6 +110,7 @@ fun NoteEditorContent(
     isSuggestionTagsLoading: Boolean = false,
     collaborators: List<Collaborator> = emptyList(),
     aiCapabilities: AiCapabilities = AiCapabilities.NONE,
+    summary: String = "",
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -131,8 +140,10 @@ fun NoteEditorContent(
     val checklistCharCount by remember(checkListItems) {
         derivedStateOf { checkListItems.sumOf { it.text.length } }
     }
-    val charCount = titleState.richText.rawText.length + contentRichTextState.document.rawText.length + checklistCharCount
+    val charCount =
+        titleState.richText.rawText.length + contentRichTextState.document.rawText.length + checklistCharCount
     val showMagicButton = aiCapabilities.canAutoTag && charCount > 400 && !isSuggestionTagsLoading
+    val showSummarizeButton = aiCapabilities.canSummarize && charCount > 100
 
     val lazyListState = rememberLazyListState()
 
@@ -143,7 +154,11 @@ fun NoteEditorContent(
     }
 
     val extraBottomPadding by animateDpAsState(
-        targetValue = if (showMagicButton) 56.dp else 0.dp,
+        targetValue = when {
+            showMagicButton && showSummarizeButton -> 112.dp
+            showMagicButton || showSummarizeButton -> 56.dp
+            else -> 0.dp
+        },
         animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
         label = "fab_padding_animation"
     )
@@ -211,14 +226,28 @@ fun NoteEditorContent(
             },
             modifier = Modifier.fillMaxSize(),
             floatingActionButton = {
-                MagicButton(
-                    title = stringResource(R.string.btn_auto_tag),
-                    isVisible = showMagicButton,
-                    modifier = Modifier,
-                    onButtonClicked = { onEvent(AddEditNoteEvent.ShowSuggestions)},
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    MagicButton(
+                        title = stringResource(R.string.btn_auto_tag),
+                        isVisible = showMagicButton,
+                        modifier = Modifier,
+                        onButtonClicked = { onEvent(AddEditNoteEvent.ShowSuggestions) },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+
+                    MagicButton(
+                        title = stringResource(R.string.btn_summarize),
+                        isVisible = showSummarizeButton,
+                        onButtonClicked = { onEvent(AddEditNoteEvent.SummarizeNote) },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
             }
         ) { paddingValue ->
 
@@ -301,7 +330,16 @@ fun NoteEditorContent(
                                     resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
                                 ),
                         )
+                    }
 
+                    if (summary.isNotEmpty()) {
+                        summarySection(
+                            summary = summary,
+                            onEvent = onEvent
+                        )
+                    }
+
+                    item {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (!isCheckboxListAvailable) {

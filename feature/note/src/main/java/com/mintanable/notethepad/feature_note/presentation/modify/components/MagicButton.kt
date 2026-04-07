@@ -62,6 +62,7 @@ fun MagicButton(
     isVisible: Boolean,
     modifier: Modifier = Modifier,
     shape: Shape = CircleShape,
+    showMagicBorder: Boolean = true,
     onButtonClicked: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null
@@ -102,11 +103,13 @@ fun MagicButton(
             tonalElevation = 0.dp,
             modifier = contentModifier
                 .then(buttonModifier)
-                .magicBorder(
-                width = 3.dp,
-                shimmerOffset = shimmerOffset.value,
-                shape = shape
-            )
+                .let {
+                    if (showMagicBorder) it.magicBorder(
+                        width = 3.dp,
+                        shimmerOffset = shimmerOffset.value,
+                        shape = shape
+                    ) else it
+                }
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
