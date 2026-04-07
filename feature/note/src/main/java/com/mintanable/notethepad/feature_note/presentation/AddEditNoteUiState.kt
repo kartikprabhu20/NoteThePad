@@ -39,6 +39,7 @@ data class AddEditNoteUiState(
     val showMicrophoneRationale: Boolean = false,
     val showAlarmPermissionRationale: Boolean = false,
     val zoomedImageUri: Uri? = null,
+    val zoomedImageIndex: Int = 0,
     val mediaState: MediaState? = null,
     val showDataAndTimePicker: Boolean = false,
     val showAddNewTagDialog: Boolean = false,

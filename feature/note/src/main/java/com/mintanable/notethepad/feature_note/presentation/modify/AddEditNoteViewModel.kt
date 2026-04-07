@@ -445,10 +445,24 @@ class AddEditNoteViewModel @Inject constructor(
                 if (attachmentType == AttachmentType.VIDEO) {
                     mediaPlayer.playPause(event.uri)
                 }
-                _uiState.update { it.copy(zoomedImageUri = event.uri) }
-
-                if (attachmentType != AttachmentType.VIDEO) {
-                    analyzeImage(event.uri)
+                val images = _uiState.value.attachedImages
+                val index = images.indexOf(event.uri).coerceAtLeast(0)
+                val cacheKey = event.uri.toString()
+                val cached = imageSuggestionsCache[cacheKey]
+                if (cached != null && cachedImageBytes == null) {
+                    viewModelScope.launch {
+                        cachedImageBytes = withContext(Dispatchers.IO) { readUriBytes(event.uri) }
+                    }
+                }
+                _uiState.update {
+                    it.copy(
+                        zoomedImageUri = event.uri,
+                        zoomedImageIndex = index,
+                        imageSuggestions = cached ?: emptyList(),
+                        isAnalyzingImage = false,
+                        imageQueryResult = "",
+                        isImageQueryLoading = false
+                    )
                 }
             }
 
@@ -465,6 +479,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         zoomedImageUri = null,
+                        zoomedImageIndex = 0,
                         imageSuggestions = emptyList(),
                         imageQueryResult = "",
                         isImageQueryLoading = false,
@@ -482,6 +497,7 @@ class AddEditNoteViewModel @Inject constructor(
                             isImageQueryLoading = false,
                             showStopAIConfirmation = false,
                             zoomedImageUri = null,
+                            zoomedImageIndex = 0,
                             imageSuggestions = emptyList(),
                             imageQueryResult = "",
                             isAnalyzingImage = false
@@ -681,6 +697,47 @@ class AddEditNoteViewModel @Inject constructor(
                     isImageQueryLoading = false,
                     isAnalyzingImage = false
                 )
+            }
+
+            is AddEditNoteEvent.AnalyzeCurrentImage -> {
+                val uri = _uiState.value.zoomedImageUri ?: return
+                analyzeImage(uri)
+            }
+
+            is AddEditNoteEvent.NavigateZoomedImage -> {
+                val images = _uiState.value.attachedImages
+                if (images.size <= 1) return
+                val currentIndex = _uiState.value.zoomedImageIndex
+                val newIndex = (currentIndex + event.direction).coerceIn(0, images.lastIndex)
+                if (newIndex == currentIndex) return
+
+                imageQueryJob?.cancel()
+
+                val newUri = images[newIndex]
+                val cacheKey = newUri.toString()
+                val cached = imageSuggestionsCache[cacheKey]
+
+                val attachmentType = AttachmentHelper.getAttachmentType(appContext, newUri)
+                if (attachmentType == AttachmentType.VIDEO) {
+                    mediaPlayer.playPause(newUri)
+                } else {
+                    mediaPlayer.stop()
+                }
+
+                viewModelScope.launch {
+                    cachedImageBytes = withContext(Dispatchers.IO) { readUriBytes(newUri) }
+                }
+
+                _uiState.update {
+                    it.copy(
+                        zoomedImageUri = newUri,
+                        zoomedImageIndex = newIndex,
+                        imageSuggestions = cached ?: emptyList(),
+                        isAnalyzingImage = false,
+                        imageQueryResult = "",
+                        isImageQueryLoading = false
+                    )
+                }
             }
 
             is AddEditNoteEvent.ClearImageQueryResult -> {

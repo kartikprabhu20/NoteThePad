@@ -313,6 +313,8 @@ fun AddEditNoteScreen(
         if (uiState.zoomedImageUri != null) {
             ZoomedImageOverlay(
                 uri = uiState.zoomedImageUri!!,
+                attachedImages = uiState.attachedImages,
+                currentIndex = uiState.zoomedImageIndex,
                 playerEngine = viewModel.videoPlayerEngine,
                 onClick = { viewModel.onEvent(AddEditNoteEvent.StopMedia) },
                 imageSuggestions = uiState.imageSuggestions,
@@ -324,6 +326,9 @@ fun AddEditNoteScreen(
                     viewModel.onEvent(AddEditNoteEvent.AttachTranscript(result))
                     viewModel.onEvent(AddEditNoteEvent.ClearImageQueryResult)
                 },
+                onAnalyzeClicked = { viewModel.onEvent(AddEditNoteEvent.AnalyzeCurrentImage) },
+                onNavigate = { viewModel.onEvent(AddEditNoteEvent.NavigateZoomedImage(it)) },
+                onCustomQuerySubmitted = { viewModel.onEvent(AddEditNoteEvent.ExecuteImageQuery(it)) },
                 canAnalyzeImage = aiCapabilities.canAnalyzeImage,
                 transitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope

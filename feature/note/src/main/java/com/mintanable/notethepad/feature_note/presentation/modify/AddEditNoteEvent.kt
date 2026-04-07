@@ -48,6 +48,8 @@ sealed class AddEditNoteEvent {
     data class ConfirmStopImageQuery(val shouldStop: Boolean) : AddEditNoteEvent()
     data object ClearImageSuggestions : AddEditNoteEvent()
     data object ClearImageQueryResult : AddEditNoteEvent()
+    data object AnalyzeCurrentImage : AddEditNoteEvent()
+    data class NavigateZoomedImage(val direction: Int) : AddEditNoteEvent()
     data object ToggleRichTextBar : AddEditNoteEvent()
     data object ShareNote : AddEditNoteEvent()
     data object OpenCollaborateSheet : AddEditNoteEvent()

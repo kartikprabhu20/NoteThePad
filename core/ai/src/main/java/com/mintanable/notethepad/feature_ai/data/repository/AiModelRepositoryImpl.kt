@@ -118,7 +118,7 @@ class AiModelRepositoryImpl @Inject constructor(
 
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    val gistResponse = response.body?.string()
+                    val gistResponse = response.body.string()
 
                     if (!gistResponse.isNullOrEmpty()) {
                         val wrapper = gson.fromJson(gistResponse, GistWrapper::class.java)
@@ -133,7 +133,7 @@ class AiModelRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Log.e("kptest", "Failed to fetch catalog from Gist", e)
+            Log.e("kptest", "Failed to fetch catalog from Gist $e")
         }
     }
 

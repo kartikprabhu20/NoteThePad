@@ -7,6 +7,8 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -15,6 +17,8 @@ import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -27,13 +31,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,8 +50,11 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -72,9 +80,12 @@ import com.mintanable.notethepad.feature_note.presentation.notes.util.Attachment
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ZoomedImageOverlay(
     uri: Uri,
+    attachedImages: List<Uri> = emptyList(),
+    currentIndex: Int = 0,
     playerEngine: ExoPlayer?,
     onClick: () -> Unit,
     imageSuggestions: List<String> = emptyList(),
@@ -83,6 +94,9 @@ fun ZoomedImageOverlay(
     isImageQueryLoading: Boolean = false,
     onSuggestionClicked: (String) -> Unit = {},
     onAppendToNote: (String) -> Unit = {},
+    onAnalyzeClicked: () -> Unit = {},
+    onNavigate: (Int) -> Unit = {},
+    onCustomQuerySubmitted: (String) -> Unit = {},
     canAnalyzeImage: Boolean = false,
     transitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -90,6 +104,16 @@ fun ZoomedImageOverlay(
     val context = LocalContext.current
     val attachmentType = rememberSaveable(uri) { AttachmentHelper.getAttachmentType(context, uri) }
     val isImage = attachmentType != AttachmentType.VIDEO
+    val showNavigation = attachedImages.size > 1
+
+    // Shimmer animation for magic border on query input
+    val shimmerOffset = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        shimmerOffset.animateTo(
+            targetValue = 2000f,
+            animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)
+        )
+    }
 
     // Back gesture / button closes overlay
     BackHandler { onClick() }
@@ -195,14 +219,14 @@ fun ZoomedImageOverlay(
                             }
                         }
 
-                        // Show suggestion buttons
+                        // Show suggestion buttons in FlowRow + custom query input
                         imageSuggestions.isNotEmpty() -> {
-                            LazyColumn(
+                            FlowRow(
                                 modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(imageSuggestions) { suggestion ->
+                                imageSuggestions.forEach { suggestion ->
                                     MagicButton(
                                         title = suggestion,
                                         isVisible = true,
@@ -212,8 +236,112 @@ fun ZoomedImageOverlay(
                                     )
                                 }
                             }
+
+                            // Custom query input
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            var customQuery by rememberSaveable(uri) { mutableStateOf("") }
+
+                            OutlinedCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .magicBorder(
+                                        width = 2.dp,
+                                        shimmerOffset = shimmerOffset.value,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.outlinedCardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                                )
+                            ) {
+                                OutlinedTextField(
+                                    value = customQuery,
+                                    onValueChange = { if (it.length <= 50) customQuery = it },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    placeholder = {
+                                        Text(
+                                            text = stringResource(R.string.hint_image_query),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    },
+                                    textStyle = MaterialTheme.typography.bodySmall,
+                                    singleLine = true,
+                                    trailingIcon = {
+                                        if (customQuery.isNotEmpty()) {
+                                            IconButton(onClick = {
+                                                onCustomQuerySubmitted(customQuery)
+                                                customQuery = ""
+                                            }) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                                    contentDescription = "Submit query",
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        }
+                                    },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color.Transparent,
+                                        unfocusedBorderColor = Color.Transparent
+                                    )
+                                )
+                            }
+                        }
+
+                        // No suggestions, not analyzing — show Analyse button
+                        else -> {
+                            MagicButton(
+                                title = stringResource(R.string.btn_analyse),
+                                isVisible = true,
+                                onButtonClicked = onAnalyzeClicked,
+                                sharedTransitionScope = transitionScope,
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
                         }
                     }
+                }
+            }
+
+            // Left navigation arrow
+            if (showNavigation && currentIndex > 0) {
+                IconButton(
+                    onClick = { onNavigate(-1) },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(8.dp)
+                        .size(36.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.5f),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Previous",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            // Right navigation arrow
+            if (showNavigation && currentIndex < attachedImages.lastIndex) {
+                IconButton(
+                    onClick = { onNavigate(1) },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(8.dp)
+                        .size(36.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.5f),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Next",
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
 
