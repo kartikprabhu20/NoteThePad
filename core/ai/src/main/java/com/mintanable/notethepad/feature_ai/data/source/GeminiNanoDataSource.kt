@@ -266,6 +266,7 @@ class GeminiNanoDataSource @Inject constructor(
         val summarizationRequest = SummarizationRequest.builder(textToSummarize).build()
         val summarizationResult = summarizationClient.runInference(summarizationRequest).get().summary
 
+        summarizationClient.close()
         return@withContext summarizationResult
     }
 
