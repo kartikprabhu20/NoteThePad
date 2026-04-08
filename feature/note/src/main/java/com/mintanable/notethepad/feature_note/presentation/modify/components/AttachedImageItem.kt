@@ -39,9 +39,10 @@ import com.mintanable.notethepad.theme.NoteThePadTheme
 @Composable
 fun AttachedImageItem(
     uri: Uri,
-    onDelete: (Uri) -> Unit,
-    onClick: (Uri) -> Unit,
-    modifier: Modifier = Modifier
+    onDelete: (Uri) -> Unit = {},
+    onClick: (Uri) -> Unit = {},
+    modifier: Modifier = Modifier,
+    showClose: Boolean = true
 ) {
 
     val context = LocalContext.current
@@ -85,21 +86,23 @@ fun AttachedImageItem(
             }
         }
 
-        Surface(
-            color = Color.Black.copy(alpha = 0.6f),
-            shape = CircleShape,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(4.dp)
-                .size(24.dp)
-                .clickable { onDelete(uri) }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.content_description_remove),
-                tint = Color.White,
-                modifier = Modifier.padding(4.dp)
-            )
+        if(showClose) {
+            Surface(
+                color = Color.Black.copy(alpha = 0.6f),
+                shape = CircleShape,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .size(24.dp)
+                    .clickable { onDelete(uri) }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.content_description_remove),
+                    tint = Color.White,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
         }
     }
 }

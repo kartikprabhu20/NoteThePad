@@ -38,12 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.components.drawNoteShape
 import com.mintanable.notethepad.components.drawNoteWithImage
@@ -104,12 +104,16 @@ fun NoteItemUI(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 16.dp)
-                .padding(horizontal = 8.dp)
-                .padding(bottom = 8.dp)
+                .padding(8.dp)
         ) {
 
             with(sharedTransitionScope) {
+
+                if(note.imageUris.isNotEmpty()){
+                    ImageCollectionUI(imageUris = note.imageUris)
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
                 Text(
                     text = note.title,
                     style = MaterialTheme.typography.titleLarge,
@@ -161,7 +165,7 @@ fun NoteItemUI(
                         text = contentAnnotated,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 10,
+                        maxLines = 5,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .sharedElement(
@@ -261,6 +265,15 @@ fun NoteItemUI(
 @ThemePreviews
 @Composable
 fun NoteItemUIPreviewCheckboxes() {
+
+    val context = LocalContext.current
+    val mockImages = listOf("android.resource://${context.packageName}/${R.drawable.ic_launcher_background}",
+        "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=3",
+        "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=2",
+        "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=4",
+        "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=5"
+    )
+
     val isDark = isSystemInDarkTheme()
     NoteThePadTheme(darkTheme = isDark) {
         SharedTransitionLayout {
@@ -282,7 +295,7 @@ fun NoteItemUIPreviewCheckboxes() {
                                 timestamp = System.currentTimeMillis(),
                                 color = RedOrange.toArgb(),
                                 id = "1",
-                                imageUris = listOf("image"),
+                                imageUris = mockImages,
                                 audioAttachments = listOf(Attachment("x", 123)),
                                 reminderTime = 1,
                                 checkListItems = listOf(CheckboxItem(text = "abc")),
