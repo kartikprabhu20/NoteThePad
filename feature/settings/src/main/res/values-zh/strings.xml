@@ -62,8 +62,8 @@
     <string name="dialog_download_audio_transcriber_description">将通过 Wi-Fi 下载设备端音频转写模型。是否继续？</string>
     <string name="msg_downloading_audio_model">正在下载音频 AI 模型：%1$d%%</string>
 
-    <string name="supasync_title">SupaSync</string>
-    <string name="supasync_description">与 Supabase 实时同步（需要登录）</string>
+    <string name="supasync_title">CloudSync</string>
+    <string name="supasync_description">与 Supabase 实时同步（需要登录）。图像、视频、音频目前未同步。</string>
     <string name="dialog_ai_model_downloaded">已下载</string>
     <string name="content_description_delete_model">删除 AI 模型</string>
     <string name="dialog_delete_ai_model_title">删除 AI 模型？</string>

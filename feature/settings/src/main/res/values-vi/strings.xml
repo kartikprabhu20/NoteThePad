@@ -62,8 +62,8 @@
     <string name="dialog_download_audio_transcriber_description">Mô hình chuyển đổi âm thanh sẽ được tải xuống thiết bị qua Wi-Fi. Bạn có muốn tiếp tục không?</string>
     <string name="msg_downloading_audio_model">Đang tải mô hình AI âm thanh: %1$d%%</string>
 
-    <string name="supasync_title">SupaSync</string>
-    <string name="supasync_description">Đồng bộ hóa thời gian thực với Supabase (yêu cầu Đăng nhập)</string>
+    <string name="supasync_title">CloudSync</string>
+    <string name="supasync_description">Đồng bộ hóa thời gian thực với Supabase (yêu cầu Đăng nhập). Hình ảnh, video, âm thanh hiện không được đồng bộ hóa.</string>
     <string name="dialog_ai_model_downloaded">Đã tải xuống</string>
     <string name="content_description_delete_model">Xóa mô hình AI</string>
     <string name="dialog_delete_ai_model_title">Xóa mô hình AI?</string>

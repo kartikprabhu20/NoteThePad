@@ -313,7 +313,7 @@ class GemmaLocalDataSource @Inject constructor(
                 supportImage = false,
                 maxNumTokens = 4096,
                 samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
-                systemInstruction = "Summarize this note in 2 sentences."
+                systemInstruction = "Summarize this note in 2 or 3 sentences."
             )
             var summary = ""
             runInference(prompt).collect { chunk -> summary += chunk }

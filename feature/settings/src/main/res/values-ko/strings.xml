@@ -62,8 +62,8 @@
     <string name="dialog_download_audio_transcriber_description">Wi-Fi를 통해 기기에 오디오 변환 모델을 다운로드합니다. 계속하시겠습니까?</string>
     <string name="msg_downloading_audio_model">오디오 AI 모델 다운로드 중: %1$d%%</string>
 
-    <string name="supasync_title">SupaSync</string>
-    <string name="supasync_description">Supabase와 실시간 동기화 (로그인 필요)</string>
+    <string name="supasync_title">CloudSync</string>
+    <string name="supasync_description">Supabase와의 실시간 동기화(로그인 필요). 이미지, 비디오, 오디오는 현재 동기화되지 않습니다.</string>
     <string name="dialog_ai_model_downloaded">다운로드됨</string>
     <string name="content_description_delete_model">AI 모델 삭제</string>
     <string name="dialog_delete_ai_model_title">AI 모델을 삭제하시겠습니까?</string>

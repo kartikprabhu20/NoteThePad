@@ -105,7 +105,7 @@ class AiModelRepositoryImpl @Inject constructor(
         AiModel(
             name = "Gemini Nano (System)",
             displayName = "Gemini Nano (System)",
-            info = "On-device privacy and performance. Only on supported devices.",
+            info = "On-device privacy and performance for text and audio features. Live transcription is key feature. Only on supported devices.",
         )
     )
 

@@ -62,8 +62,8 @@
     <string name="dialog_download_audio_transcriber_description">এটি Wi-Fi এর মাধ্যমে ডিভাইসে অডিও ট্রান্সক্রাইবার মডেল ডাউনলোড করবে। আপনি কি চালিয়ে যেতে চান?</string>
     <string name="msg_downloading_audio_model">অডিও AI মডেল ডাউনলোড হচ্ছে: %1$d%%</string>
 
-    <string name="supasync_title">SupaSync</string>
-    <string name="supasync_description">সুপাবেসের সাথে রিয়েল-টাইম সিঙ্ক (লগইন প্রয়োজন)</string>
+    <string name="supasync_title">CloudSync</string>
+    <string name="supasync_description">Supabase-এর সাথে সরাসরি সিঙ্ক (লগইন প্রয়োজন)। ছবি, ভিডিও, অডিও বর্তমানে সিঙ্ক করা হয় না।</string>
     <string name="dialog_ai_model_downloaded">ডাউনলোড করা হয়েছে</string>
     <string name="content_description_delete_model">AI মডেল মুছে ফেলুন</string>
     <string name="dialog_delete_ai_model_title">AI মডেল কি মুছে ফেলতে চান?</string>
