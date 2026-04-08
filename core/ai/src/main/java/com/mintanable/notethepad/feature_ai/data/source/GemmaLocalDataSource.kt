@@ -13,12 +13,12 @@ import com.google.ai.edge.litertlm.ExperimentalApi
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.MessageCallback
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -33,16 +33,11 @@ import javax.inject.Inject
 
 private const val TAG = "GemmaLocalDataSource"
 
-/**
- * Manages on-device Gemma inference via LiteRT.
- *
- * Each task follows a strict **Initialize → Inference → Cleanup** lifecycle,
- * No engine state is carried between tasks — this avoids GPU OOM crashes
- * that occurred when switching engine capabilities (e.g. text → vision).
- */
 class GemmaLocalDataSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    private val crashlytics = FirebaseCrashlytics.getInstance()
+
     private data class ActiveInstance(
         val engine: Engine,
         var conversation: Conversation
@@ -82,26 +77,23 @@ class GemmaLocalDataSource @Inject constructor(
     ) {
         withContext(Dispatchers.IO) {
             mutex.withLock {
-                // Always start clean — close any leftover engine from a previous task.
+                crashlytics.log("$TAG: Init start ($fileName). Audio: $supportAudio, Image: $supportImage")
                 closeInstanceInternal()
 
                 val modelFile = File(context.getExternalFilesDir(null), fileName)
                 val modelPath = modelFile.absolutePath
 
                 try {
-                    // Reclaim native/GPU memory before allocating the new engine.
+                    val runtime = Runtime.getRuntime()
+                    val availableMem = (runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory())) / 1024 / 1024
+                    crashlytics.setCustomKey("pre_init_mem_mb", availableMem)
+
                     System.gc()
                     Runtime.getRuntime().gc()
                     kotlinx.coroutines.delay(if (supportImage || supportAudio) 500 else 200)
 
-                    // Use CPU for the main text backend when vision or audio needs GPU/CPU
-                    // resources. Running both the LLM and vision encoder on GPU simultaneously
-                    // causes native OOM on devices with limited GPU memory (scudo allocation
-                    // failures in nativeCreateEngine). Gallery can get away with dual-GPU
-                    // because it initializes the engine once at screen open with minimal UI
-                    // overhead; NoteThePad has heavier concurrent GPU usage from Compose
-                    // (SharedTransitionLayout, zoomed images, animations).
                     val mainBackend = if (supportImage || supportAudio) Backend.CPU() else Backend.GPU()
+                    crashlytics.setCustomKey("active_backend", if (mainBackend is Backend.CPU) "CPU" else "GPU")
 
                     val engineConfig = EngineConfig(
                         modelPath = modelPath,
@@ -126,7 +118,8 @@ class GemmaLocalDataSource @Inject constructor(
                     activeInstance = ActiveInstance(engine, conversation)
                     Log.d(TAG, "Engine initialized (audio=$supportAudio, image=$supportImage)")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to initialize: ${e.message}")
+                    crashlytics.log("$TAG: Init Failed - ${e.message}")
+                    crashlytics.recordException(e)
                     closeInstanceInternal()
                     throw e
                 }
@@ -142,6 +135,7 @@ class GemmaLocalDataSource @Inject constructor(
         imageData: ByteArray? = null
     ): Flow<String> = flow {
         val instance = activeInstance ?: throw IllegalStateException("Engine not initialized")
+        crashlytics.log("$TAG: Inference run. Prompt: ${prompt.take(50)}...")
 
         val contents = mutableListOf<Content>()
         audioData?.let { contents.add(Content.AudioBytes(it)) }
@@ -157,7 +151,6 @@ class GemmaLocalDataSource @Inject constructor(
             object : MessageCallback {
                 override fun onMessage(message: Message) {
                     val text = message.toString()
-                    // Filter Gemma control tokens (e.g. "<ctrl99>").
                     if (!text.startsWith("<ctrl")) {
                         responseChannel.trySend(text)
                     }
@@ -173,7 +166,8 @@ class GemmaLocalDataSource @Inject constructor(
                     if (throwable is CancellationException) {
                         responseChannel.close()
                     } else {
-                        Log.e(TAG, "Inference Error", throwable)
+                        crashlytics.log("$TAG: Native Inference Error")
+                        crashlytics.recordException(throwable)
                         responseChannel.close(throwable)
                     }
                 }
@@ -200,16 +194,13 @@ class GemmaLocalDataSource @Inject constructor(
 
     private suspend fun closeInstanceInternal() {
         val inst = activeInstance ?: return
+        crashlytics.log("$TAG: Internal close instance")
         cancelAndAwaitInference(inst.conversation)
         try { inst.conversation.close() } catch (_: Exception) { }
         try { inst.engine.close() } catch (_: Exception) { }
         activeInstance = null
     }
 
-    /**
-     * Public cleanup — releases engine + conversation.
-     * Safe to call from any thread. No-op if nothing is active.
-     */
     suspend fun cleanup() {
         withContext(Dispatchers.IO) {
             mutex.withLock {
@@ -239,17 +230,11 @@ class GemmaLocalDataSource @Inject constructor(
                     Example Output: Work, Finance, Urgent
                 """.trimIndent()
             )
-
             var textResponse = ""
             withTimeout(20_000L) {
-                runInference(prompt).collect { chunk ->
-                    textResponse += chunk
-                }
+                runInference(prompt).collect { chunk -> textResponse += chunk }
             }
             textResponse.trim()
-        } catch (e: TimeoutCancellationException) {
-            Log.e(TAG, "Tag inference timed out")
-            null
         } catch (e: Exception) {
             Log.e(TAG, "Tag generation failed: ${e.message}")
             null
@@ -268,37 +253,27 @@ class GemmaLocalDataSource @Inject constructor(
             samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
         )
     }
+
     suspend fun transcribeAudioFile(
         processedAudio: ByteArray?,
         onTranscription: (String) -> Unit,
     ) {
         try {
             withTimeout(60_000L) {
-                runInference(
-                    prompt = "Transcribe this audio:",
-                    audioData = processedAudio
-                ).collect { chunk ->
+                runInference(prompt = "Transcribe this audio:", audioData = processedAudio).collect { chunk ->
                     onTranscription(chunk)
                 }
             }
-        } catch (e: TimeoutCancellationException) {
-            Log.e(TAG, "Audio transcription timed out")
         } catch (e: Exception) {
             Log.e(TAG, "Audio transcription failed: ${e.message}")
+            crashlytics.log("$TAG: Transcription error")
         }
-//         finally {
-//            cleanup()
-//        }
     }
 
     suspend fun resetConversation(systemInstruction: String? = null) {
         mutex.withLock {
             val instance = activeInstance ?: return
-
-            // Close the old conversation to free its specific memory buffers
             try { instance.conversation.close() } catch (_: Exception) {}
-
-            // Create a brand new one using the same Engine
             instance.conversation = instance.engine.createConversation(
                 ConversationConfig(
                     samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
@@ -313,29 +288,16 @@ class GemmaLocalDataSource @Inject constructor(
     @OptIn(ExperimentalApi::class)
     suspend fun summarizeNote(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
         val maxChunkChars = 12_000 //roughly 3072 tokens
-
         try {
             if (prompt.length <= maxChunkChars) {
                 return@withContext summarizeChunk(prompt, fileName)
             }
-
-            // MAP PHASE: Split long text into chunks and summarize each
             val chunks = prompt.chunked(maxChunkChars)
-            val partialSummaries = chunks.map { chunk ->
-                summarizeChunk("Summarize this section: $chunk", fileName) ?: ""
-            }.filter { it.isNotBlank() }
-
-            // REDUCE PHASE: Combine partial summaries
-            val combinedSummaries = partialSummaries.joinToString("\n\n")
-
-            // Unify the summaries
-            return@withContext summarizeChunk(
-                prompt = "Synthesize these summaries into a final 2-sentence overview: $combinedSummaries",
-                fileName = fileName
-            )
-
+            val partialSummaries = chunks.map { summarizeChunk("Summarize: $it", fileName) ?: "" }.filter { it.isNotBlank() }
+            return@withContext summarizeChunk("Synthesize these summaries into a final 2-3 sentences overview:: ${partialSummaries.joinToString(" ")}", fileName)
         } catch (e: Exception) {
             Log.e(TAG, "Summarization failed: ${e.message}")
+            crashlytics.log("$TAG: Summarization failed errpr")
             null
         } finally {
             cleanup()
@@ -353,14 +315,11 @@ class GemmaLocalDataSource @Inject constructor(
                 samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
                 systemInstruction = "Summarize this note in 2 sentences."
             )
-
             var summary = ""
-            runInference(prompt).collect { chunk ->
-                summary += chunk
-            }
+            runInference(prompt).collect { chunk -> summary += chunk }
             summary.trim()
         } catch (e: Exception) {
-            Log.e(TAG, "Summarization failed: ${e.message}")
+            Log.e(TAG, "Chunk Summarization failed: ${e.message}")
             null
         } finally {
             cleanup()
@@ -381,7 +340,7 @@ class GemmaLocalDataSource @Inject constructor(
                 systemInstruction = "Describe images concisely in 10-20 words or convert to text if it contains text."
             )
 
-            var response = ""
+                var response = ""
             withTimeout(30_000L) {
                 runInference(
                     prompt = "Describe this image in 10-20 words",
@@ -438,9 +397,6 @@ class GemmaLocalDataSource @Inject constructor(
                 }
             }
             response.trim()
-        } catch (e: TimeoutCancellationException) {
-            Log.e(TAG, "Image analysis timed out")
-            null
         } catch (e: Exception) {
             Log.e(TAG, "Image analysis failed: ${e.message}")
             null
@@ -451,10 +407,6 @@ class GemmaLocalDataSource @Inject constructor(
 
     // ── Task: Query Image (streaming) ─────────────────────────────────────
 
-    /**
-     * Initialize for image query and return a streaming Flow.
-     * Caller MUST call [cleanup] when done collecting.
-     */
     @OptIn(ExperimentalApi::class)
     suspend fun queryImage(imageBytes: ByteArray, query: String, fileName: String): Flow<String> {
         initialize(

@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import android.util.Log
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
 import com.mintanable.notethepad.core.common.utils.splitPcmIntoChunks
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
@@ -30,12 +31,17 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     private val aiModelRepository: AiModelRepository,
 ) : NoteAssistantRepository {
 
+    private val crashlytics = FirebaseCrashlytics.getInstance()
+
     override suspend fun suggestTags(
         title: String,
         content: String,
         existingTags: List<String>,
         modelName: String
     ): List<String> {
+        crashlytics.log("NoteAssistantRepositoryImpl: Suggesting tags. Model: $modelName")
+        crashlytics.setCustomKey("last_ai_model", modelName)
+
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.generateTags(title, content, existingTags)
             "Gemini Nano (System)" -> {
@@ -46,7 +52,6 @@ class NoteAssistantRepositoryImpl @Inject constructor(
 
             "None" -> emptyList()
             else -> {
-                //Gemma models
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.url.isNotEmpty()) {
@@ -55,6 +60,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                         gemmaLocalDataSource.generateTags(prompt, selectedModel.downloadFileName)
                     parseResponse(response)
                 } else {
+                    crashlytics.log("NoteAssistantRepositoryImpl: Gemma model selection failed or URL empty")
                     emptyList()
                 }
             }
@@ -68,19 +74,15 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     ): String {
         return """
             You are an expert organizational assistant for the app "NoteThePad".
-
             TASK: Analyze the note below and suggest 3-5 relevant one-word tags.
-
             CONTEXT:
             - Note Title: $title
             - Note Content: $content
             - User's Existing Tags: ${existingTags.joinToString(", ")}
-
             CRITICAL RULES:
             1. If a suggested tag matches an 'Existing Tag' semantically, use the EXACT name from the existing list.
             2. Return ONLY a comma-separated list of words.
             3. No hashtags, no explanations.
-
             Example Output: Work, Finance, Urgent
         """.trimIndent()
     }
@@ -90,26 +92,20 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         content: String,
         existingTags: List<String>
     ): String {
-        val prompt = """
+        return """
              You are an expert organizational assistant for the app "NoteThePad".
-
             TASK: Analyze the note below and suggest 3-5 relevant one-word tags.
-
             CONTEXT:
             - Note Title: $title
             - Note Content: $content
             - User's Existing Tags: ${existingTags.joinToString(", ")}
-
             CRITICAL RULES:
             1. If a suggested tag matches an 'Existing Tag' semantically, use the EXACT name from the existing list.
             2. Return ONLY a comma-separated list of words.
             3. No hashtags, no explanations.
-
             Example Output: Work, Finance, Urgent
-            
             Output:
             """.trimIndent()
-        return prompt
     }
 
     private fun parseResponse(response: String?): List<String> {
@@ -125,10 +121,12 @@ class NoteAssistantRepositoryImpl @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.S)
     override suspend fun startLiveTranscription(onTranscription: (String) -> Unit) {
+        crashlytics.log("NoteAssistantRepositoryImpl: Starting Live Transcription")
         return geminiNanoDataSource.startTranscriptionStream(onTranscription)
     }
 
     override suspend fun stopLiveTranscription() {
+        crashlytics.log("NoteAssistantRepositoryImpl: Stopping Live Transcription")
         return geminiNanoDataSource.stopTranscription()
     }
 
@@ -141,32 +139,31 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         modelName: String,
         onTranscription: (String) -> Unit
     ) {
+        crashlytics.log("NoteAssistantRepositoryImpl: Transcribe file request. Model: $modelName")
         when (modelName) {
             "Gemini Nano (System)" -> {
                 val path = uri.toUri().path ?: return
                 geminiNanoDataSource.transcribeAudioFile(File(path), onTranscription)
             }
-
-            "Gemini 3 Flash (Cloud)" -> { /* Handle Cloud if needed */
-            }
-
+            "Gemini 3 Flash (Cloud)" -> { }
             "None" -> {}
-
             else -> {
-                // Gemma models
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
 
                 if (selectedModel != null) {
-                    // Normalize audio to 16kHz mono 16-bit PCM (no duration limit)
                     val pcmData = convertWavToMonoWithMaxSeconds(
                         context = context,
                         stereoUri = uri.toUri(),
-                        maxSeconds = Int.MAX_VALUE / 16000 // no trim — chunking handles it
-                    ) ?: return
+                        maxSeconds = Int.MAX_VALUE / 16000
+                    ) ?: run {
+                        crashlytics.log("NoteAssistantRepositoryImpl: PCM conversion returned null")
+                        return
+                    }
 
                     val chunks = splitPcmIntoChunks(pcmData, chunkDurationSeconds = 10)
-                    Log.d("kptest", "Gemma audio: ${pcmData.size} bytes PCM, ${chunks.size} chunks")
+                    crashlytics.setCustomKey("audio_chunks", chunks.size)
+
                     try {
                         gemmaLocalDataSource.prepareForAudio(selectedModel)
                         for ((index, chunkWav) in chunks.withIndex()) {
@@ -179,9 +176,10 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                             gemmaLocalDataSource.resetConversation()
                         }
                     } catch (e: Exception) {
+                        crashlytics.log("NoteAssistantRepositoryImpl: Error during chunked transcription")
+                        crashlytics.recordException(e)
                         Log.e("kptest", "Batch failed", e)
                     } finally {
-                        // Close the engine ONCE at the very end
                         gemmaLocalDataSource.cleanup()
                     }
                 }
@@ -190,9 +188,10 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     override suspend fun analyzeImage(imageBytes: ByteArray, modelName: String): List<String> {
+        crashlytics.log("NoteAssistantRepositoryImpl: Analyze Image. Bytes: ${imageBytes.size}")
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.analyzeImage(imageBytes)
-            "Gemini Nano (System)" -> emptyList() // Nano doesn't support images
+            "Gemini Nano (System)" -> emptyList()
             "None" -> emptyList()
             else -> {
                 val models = aiModelRepository.getModels().first()
@@ -212,9 +211,10 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     override suspend fun describeImage(imageBytes: ByteArray, modelName: String): String? {
+        crashlytics.log("NoteAssistantRepositoryImpl: Describe Image. Bytes: ${imageBytes.size}")
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.describeImage(imageBytes)
-            "Gemini Nano (System)" -> null // Nano doesn't support images
+            "Gemini Nano (System)" -> null
             "None" -> null
             else -> {
                 val models = aiModelRepository.getModels().first()
@@ -227,6 +227,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     override suspend fun summarizeNote(prompt: String, modelName: String): String? {
+        crashlytics.log("NoteAssistantRepositoryImpl: Summarize. Length: ${prompt.length}")
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.summarizeNote(prompt)
             "Gemini Nano (System)" -> geminiNanoDataSource.summarizeNote(prompt)
@@ -242,6 +243,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     }
 
     override fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String> {
+        crashlytics.log("NoteAssistantRepositoryImpl: Query Image. Query: $query")
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.queryImage(imageBytes, query)
             "Gemini Nano (System)" -> emptyFlow()
@@ -261,5 +263,4 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             }
         }
     }
-
 }
