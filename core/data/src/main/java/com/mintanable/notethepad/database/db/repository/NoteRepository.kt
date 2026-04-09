@@ -31,4 +31,5 @@ interface NoteRepository {
     suspend fun triggerSync()
     suspend fun fetchCloudData()
     suspend fun updateSummary(noteId: String, summary: String)
+    suspend fun updateReminderTime(noteId: String, reminderTime: Long)
 }

@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.mintanable.notethepad.database.db.repository.NoteRepository
-import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
+import com.mintanable.notethepad.core.common.ReminderScheduler
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

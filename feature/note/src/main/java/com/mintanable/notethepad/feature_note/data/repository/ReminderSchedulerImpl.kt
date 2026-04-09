@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresPermission
-import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
+import com.mintanable.notethepad.core.common.ReminderScheduler
 import com.mintanable.notethepad.feature_note.presentation.notes.util.ReminderReceiver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

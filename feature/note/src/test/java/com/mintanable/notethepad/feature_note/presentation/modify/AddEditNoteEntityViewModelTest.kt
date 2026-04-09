@@ -29,7 +29,7 @@ import com.mintanable.notethepad.feature_ai.domain.use_cases.StopLiveTranscripti
 import com.mintanable.notethepad.feature_ai.domain.use_cases.TranscribeAudioFileUseCase
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
-import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
+import com.mintanable.notethepad.core.common.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases

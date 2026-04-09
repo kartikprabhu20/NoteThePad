@@ -93,4 +93,7 @@ interface NoteDao {
 
     @Query("UPDATE NoteEntity SET summary = :summary, lastUpdateTime = :lastUpdateTime WHERE id = :noteId")
     suspend fun updateSummary(noteId: String, summary: String, lastUpdateTime: Long)
+
+    @Query("UPDATE NoteEntity SET reminderTime = :reminderTime, lastUpdateTime = :lastUpdateTime WHERE id = :noteId")
+    suspend fun updateReminderTime(noteId: String, reminderTime: Long, lastUpdateTime: Long)
 }

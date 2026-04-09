@@ -315,4 +315,8 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun updateSummary(noteId: String, summary: String) {
         noteDao.updateSummary(noteId, summary, System.currentTimeMillis())
     }
+
+    override suspend fun updateReminderTime(noteId: String, reminderTime: Long) {
+        noteDao.updateReminderTime(noteId, reminderTime, System.currentTimeMillis())
+    }
 }
