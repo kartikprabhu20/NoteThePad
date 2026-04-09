@@ -38,4 +38,5 @@ sealed class Screen(val route:String){
     data object LogOut : Screen("logout")
     data object SettingsScreen : Screen("settings_screen")
     data object AiModelSelectionScreen : Screen("ai_model_selection_screen")
+    data object OnboardingScreen : Screen("onboarding_screen")
 }

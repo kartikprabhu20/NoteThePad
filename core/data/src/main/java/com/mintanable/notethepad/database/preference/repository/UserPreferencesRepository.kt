@@ -36,6 +36,7 @@ class UserPreferencesRepository @Inject constructor(
         val BACKUP_MEDIA = booleanPreferencesKey("backup_media")
         val NOTE_SHAPE = stringPreferencesKey("note_shape")
         val SUPASYNC_ENABLED = booleanPreferencesKey("supasync_enabled")
+        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
     val settingsFlow: Flow<Settings> = context.dataStore.data
@@ -53,6 +54,7 @@ class UserPreferencesRepository @Inject constructor(
             val backupMedia = preferences[PreferencesKeys.BACKUP_MEDIA] ?: false
             val noteShape = preferences[PreferencesKeys.NOTE_SHAPE] ?: NoteShape.DEFAULT.name
             val supaSyncEnabled = preferences[PreferencesKeys.SUPASYNC_ENABLED] ?: false
+            val onboardingCompleted = preferences[PreferencesKeys.ONBOARDING_COMPLETED] ?: false
 
             Settings(
                 backupEnabled = backupEnabled,
@@ -66,7 +68,8 @@ class UserPreferencesRepository @Inject constructor(
                     backupMedia = backupMedia
                 ),
                 aiModelName = aiModelName,
-                noteShape = NoteShape.valueOf(noteShape)
+                noteShape = NoteShape.valueOf(noteShape),
+                onboardingCompleted = onboardingCompleted
             )
         }
 
@@ -125,6 +128,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun updateSupaSync(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.SUPASYNC_ENABLED] = enabled
+        }
+    }
+
+    suspend fun updateOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.ONBOARDING_COMPLETED] = completed
         }
     }
 }

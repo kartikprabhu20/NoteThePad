@@ -75,6 +75,7 @@ fun SettingsScreen(
     state: SettingsState,
     onBackPressed: () -> Unit,
     onNavigateToAiModelSelection: () -> Unit,
+    onViewOnboarding: () -> Unit = {},
     onEvent: (SettingsEvent) -> Unit,
     showToast: (String) -> Unit
 ) {
@@ -320,6 +321,11 @@ fun SettingsScreen(
                     title = stringResource(R.string.setting_note_shape),
                     subtitle = noteShapeDisplayName(currentSettings.noteShape),
                     onClick = { showNoteShapeDialog = true }
+                )
+                SettingItem(
+                    title = "View Onboarding",
+                    subtitle = "See the app introduction again",
+                    onClick = onViewOnboarding
                 )
             }
         }

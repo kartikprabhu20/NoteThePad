@@ -47,6 +47,7 @@ import com.mintanable.notethepad.feature_settings.SettingsViewModel
 import com.mintanable.notethepad.feature_settings.presentation.SettingsEvent
 import com.mintanable.notethepad.feature_settings.presentation.SettingsScreen
 import com.mintanable.notethepad.feature_settings.presentation.AiModelSelectionScreen
+import com.mintanable.notethepad.feature_settings.presentation.OnboardingScreen
 import com.mintanable.notethepad.feature_note.presentation.archive.ArchiveScreen
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -116,10 +117,13 @@ class MainActivity : AppCompatActivity() {
                         }
                     )
 
+                    val startDestination = if (state.settings.onboardingCompleted)
+                        Screen.NotesScreen.route else Screen.OnboardingScreen.route
+
                     SharedTransitionLayout {
                         NavHost(
                             navController = navController,
-                            startDestination = Screen.NotesScreen.route
+                            startDestination = startDestination
                         ) {
                             composable(
                                 route = Screen.NotesScreen.route,
@@ -265,6 +269,17 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 )
                             }
+                            composable(route = Screen.OnboardingScreen.route) {
+                                OnboardingScreen(
+                                    isDarkTheme = isDarkTheme,
+                                    onComplete = {
+                                        settingsViewModel.onEvent(SettingsEvent.CompleteOnboarding)
+                                        navController.navigate(Screen.NotesScreen.route) {
+                                            popUpTo(Screen.OnboardingScreen.route) { inclusive = true }
+                                        }
+                                    }
+                                )
+                            }
                             composable(route = Screen.SettingsScreen.route) {
                                 SettingsScreen(
                                     state = state,
@@ -273,6 +288,9 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     onNavigateToAiModelSelection = {
                                         navController.navigate(Screen.AiModelSelectionScreen.route)
+                                    },
+                                    onViewOnboarding = {
+                                        navController.navigate(Screen.OnboardingScreen.route)
                                     },
                                     onEvent = { event ->
                                         if (event is SettingsEvent.UpdateBackupSettings) {

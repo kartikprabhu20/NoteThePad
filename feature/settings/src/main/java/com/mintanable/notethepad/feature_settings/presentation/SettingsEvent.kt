@@ -35,4 +35,5 @@ sealed class SettingsEvent {
     data class UpdateNoteShape(val noteShape: NoteShape) : SettingsEvent()
     data class UpdateSupaSync(val enabled: Boolean) : SettingsEvent()
     data class DeleteAiModel(val aiModel: AiModel) : SettingsEvent()
+    data object CompleteOnboarding : SettingsEvent()
 }

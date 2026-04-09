@@ -7,6 +7,9 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,15 +83,21 @@ fun LazyListScope.attachedImagesSection(
                     }
                 }
 
-                MagicButton(
-                    title = stringResource(R.string.analyze_images),
-                    isVisible = isAnalyzeImageSupported,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(0.dp,0.dp,16.dp, 16.dp),
-                    onButtonClicked = onAnalyzeImageClicked,
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
+                with(animatedVisibilityScope) {
+                    MagicButton(
+                        title = stringResource(R.string.analyze_images),
+                        isVisible = isAnalyzeImageSupported,
+                        modifier = Modifier.fillMaxWidth()
+                            .animateEnterExit(
+                                enter = fadeIn(tween(300)),
+                                exit = fadeOut(tween(100)) // Keep the exit fast
+                            ),
+                        shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
+                        onButtonClicked = onAnalyzeImageClicked,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
             }
         }
     }

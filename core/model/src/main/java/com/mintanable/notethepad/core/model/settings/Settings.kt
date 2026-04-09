@@ -8,7 +8,8 @@ data class Settings(
     val googleAccount: String? = null,
     val backupSettings: BackupSettings = BackupSettings(),
     val aiModelName: String = "None",
-    val noteShape: NoteShape = NoteShape.DEFAULT
+    val noteShape: NoteShape = NoteShape.DEFAULT,
+    val onboardingCompleted: Boolean = true
 )
 
 data class BackupSettings(

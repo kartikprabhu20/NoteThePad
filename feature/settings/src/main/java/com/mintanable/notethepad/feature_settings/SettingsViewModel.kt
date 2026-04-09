@@ -267,6 +267,13 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.UpdateNoteShape -> updateNoteShape(event.noteShape)
             is SettingsEvent.UpdateSupaSync -> updateSupaSync(event.enabled)
             is SettingsEvent.DeleteAiModel -> deleteAiModel(event.aiModel)
+            is SettingsEvent.CompleteOnboarding -> completeOnboarding()
+        }
+    }
+
+    private fun completeOnboarding() {
+        viewModelScope.launch {
+            dataStore.updateOnboardingCompleted(true)
         }
     }
 
