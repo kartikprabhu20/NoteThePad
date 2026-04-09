@@ -57,7 +57,6 @@ import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.R
-import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioPlayerUI
 import com.mintanable.notethepad.feature_note.presentation.modify.components.SimpleAudioPlayerUI
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.RedOrange
@@ -103,7 +102,6 @@ fun NoteItemUI(
                 drawNoteShape(noteShape, resolvedColor)
             }
         }
-
 
         Column(
             modifier = Modifier
@@ -165,28 +163,32 @@ fun NoteItemUI(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (!note.isCheckboxListAvailable) {
-                    val contentAnnotated = remember(note.content) {
-                        RichTextAnnotator.toAnnotatedString(RichTextSerializer.deserialize(note.content))
+                        val contentAnnotated = remember(note.content) {
+                            RichTextAnnotator.toAnnotatedString(RichTextSerializer.deserialize(note.content))
+                        }
+                    if (contentAnnotated.text.isNotEmpty()) {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = contentAnnotated,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 5,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .sharedElement(
+                                    sharedContentState = rememberSharedContentState(key = "note-content-${note.id}"),
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                        )
                     }
-                    Text(
-                        text = contentAnnotated,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 5,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .sharedElement(
-                                sharedContentState = rememberSharedContentState(key = "note-content-${note.id}"),
-                                animatedVisibilityScope = animatedVisibilityScope
-                            )
-                    )
                 } else {
+                    Spacer(modifier = Modifier.height(8.dp))
                     SimpleCheckboxList(checklist = note.checkListItems)
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
                 if (note.audioAttachments.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
                     SimpleAudioPlayerUI(
                         totalDuration = note.audioAttachments[0].duration
                     )
