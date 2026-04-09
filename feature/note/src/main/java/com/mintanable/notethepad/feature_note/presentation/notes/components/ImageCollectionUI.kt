@@ -33,7 +33,7 @@ fun ImageCollectionUI(
     imageUris: List<String> = emptyList()
 ) {
     if (imageUris.isEmpty()) return
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -51,22 +51,26 @@ fun ImageCollectionUI(
             )
         } else {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth().padding(2.dp,2.dp, 2.dp, 0.dp)) {
                     GridItem(uri = imageUris[0], modifier = Modifier.weight(1f))
                     GridItem(uri = imageUris[1], modifier = Modifier.weight(1f))
                 }
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth().padding(2.dp,0.dp, 2.dp, 2.dp)) {
                     GridItem(uri = imageUris[2], modifier = Modifier.weight(1f))
 
                     // The 4th item with a potential overlay
-                    Box(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f).clip(shape=shape)) {
                         GridItem(uri = imageUris[3], modifier = Modifier.fillMaxWidth())
 
                         if (imageUris.size > 4) {
                             Box(
                                 modifier = Modifier
+                                    .padding(4.dp)
                                     .matchParentSize()
-                                    .background(Color.Black.copy(alpha = 0.5f)),
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                                        shape = shape
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -97,10 +101,11 @@ fun GridItem(uri: String, modifier: Modifier = Modifier) {
 
 @ThemePreviews
 @Composable
-fun PreviewImageCollectionUI(){
+fun PreviewImageCollectionUI() {
     val isDark = isSystemInDarkTheme()
     val context = LocalContext.current
-    val mockImages = listOf("android.resource://${context.packageName}/${R.drawable.ic_launcher_background}",
+    val mockImages = listOf(
+        "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}",
         "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=3",
         "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=2",
         "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=4",

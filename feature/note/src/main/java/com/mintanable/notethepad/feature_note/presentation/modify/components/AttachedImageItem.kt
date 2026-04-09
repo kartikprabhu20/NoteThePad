@@ -40,7 +40,7 @@ import com.mintanable.notethepad.theme.NoteThePadTheme
 fun AttachedImageItem(
     uri: Uri,
     onDelete: (Uri) -> Unit = {},
-    onClick: (Uri) -> Unit = {},
+    onClick: ((Uri) -> Unit)? = null,
     modifier: Modifier = Modifier,
     showClose: Boolean = true
 ) {
@@ -65,9 +65,14 @@ fun AttachedImageItem(
             },
             contentDescription = stringResource(R.string.content_description_attached_image),
             contentScale = ContentScale.Crop,
-            modifier = Modifier.clickable {
-                onClick(uri)
-            }.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .then(
+                    if (onClick != null) {
+                        Modifier.clickable { onClick(uri) }
+                    } else {
+                        Modifier
+                    }
+                )
         )
 
         if (attachmentType == AttachmentType.VIDEO) {

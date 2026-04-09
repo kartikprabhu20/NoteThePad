@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.components.drawNoteShape
 import com.mintanable.notethepad.components.drawNoteWithImage
@@ -55,6 +57,8 @@ import com.mintanable.notethepad.database.db.entity.Attachment
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioPlayerUI
+import com.mintanable.notethepad.feature_note.presentation.modify.components.SimpleAudioPlayerUI
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.RedOrange
 import com.mintanable.notethepad.theme.ThemePreviews
@@ -105,14 +109,10 @@ fun NoteItemUI(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
+                .zIndex(1f)
         ) {
 
             with(sharedTransitionScope) {
-
-                if(note.imageUris.isNotEmpty()){
-                    ImageCollectionUI(imageUris = note.imageUris)
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
 
                 Text(
                     text = note.title,
@@ -148,11 +148,18 @@ fun NoteItemUI(
                             Icon(
                                 imageVector = Icons.Default.CloudOff,
                                 contentDescription = "Sync pending",
-                                modifier = Modifier.size(14.dp).alpha(0.7f),
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .alpha(0.7f),
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
+                }
+
+                if (note.imageUris.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ImageCollectionUI(imageUris = note.imageUris)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -176,84 +183,93 @@ fun NoteItemUI(
                 } else {
                     SimpleCheckboxList(checklist = note.checkListItems)
                 }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (note.imageUris.isNotEmpty()) {
+                if (note.audioAttachments.isNotEmpty()) {
+                    SimpleAudioPlayerUI(
+                        totalDuration = note.audioAttachments[0].duration
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (note.imageUris.isNotEmpty()) {
+                    Icon(
+                        imageVector = Icons.Default.Collections,
+                        contentDescription = stringResource(R.string.content_description_images_attached),
+                        modifier = Modifier.alpha(alpha = 0.5f),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+                if (note.audioAttachments.isNotEmpty()) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = stringResource(R.string.content_description_audio_attached),
+                        modifier = Modifier.alpha(alpha = 0.5f),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+                if (note.reminderTime > -1) {
+                    Icon(
+                        imageVector = if (note.reminderTime > System.currentTimeMillis())
+                            Icons.Default.Notifications
+                        else
+                            Icons.Default.NotificationsOff,
+                        contentDescription = stringResource(R.string.content_description_reminder_set),
+                        modifier = Modifier.alpha(alpha = 0.5f),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+
+                if (note.checkListItems.isNotEmpty()) {
+                    Icon(
+                        imageVector = Icons.Default.Checklist,
+                        contentDescription = stringResource(R.string.content_description_checkboxes_available),
+                        modifier = Modifier.alpha(alpha = 0.5f),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+
+                if (note.tagEntities.isNotEmpty()) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Label,
+                        contentDescription = stringResource(R.string.content_description_tags_available),
+                        modifier = Modifier.alpha(alpha = 0.5f),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if (enableDeleteIcon) {
+                    IconButton(
+                        onClick = onPinClick,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(2.dp)
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.Collections,
-                            contentDescription = stringResource(R.string.content_description_images_attached),
-                            modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                    if (note.audioAttachments.isNotEmpty()) {
-                        Icon(
-                            imageVector = Icons.Default.Mic,
-                            contentDescription = stringResource(R.string.content_description_audio_attached),
-                            modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-                    if (note.reminderTime > -1) {
-                        Icon(
-                            imageVector = if (note.reminderTime > System.currentTimeMillis())
-                                Icons.Default.Notifications
-                            else
-                                Icons.Default.NotificationsOff,
-                            contentDescription = stringResource(R.string.content_description_reminder_set),
-                            modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            imageVector = Icons.Default.PushPin,
+                            contentDescription = stringResource(R.string.content_description_pin_note),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
-                    if (note.checkListItems.isNotEmpty()) {
+                    IconButton(
+                        onClick = onDeleteClick,
+                        modifier = Modifier.size(24.dp)
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.Checklist,
-                            contentDescription = stringResource(R.string.content_description_checkboxes_available),
-                            modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.content_description_delete_note),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
-                    }
-
-                    if (note.tagEntities.isNotEmpty()) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Label,
-                            contentDescription = stringResource(R.string.content_description_tags_available),
-                            modifier = Modifier.alpha(alpha = 0.5f),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    if (enableDeleteIcon) {
-                        IconButton(
-                            onClick = onPinClick,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .padding(2.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PushPin,
-                                contentDescription = stringResource(R.string.content_description_pin_note),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        IconButton(
-                            onClick = onDeleteClick,
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.content_description_delete_note),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
                     }
                 }
             }
@@ -267,7 +283,8 @@ fun NoteItemUI(
 fun NoteItemUIPreviewCheckboxes() {
 
     val context = LocalContext.current
-    val mockImages = listOf("android.resource://${context.packageName}/${R.drawable.ic_launcher_background}",
+    val mockImages = listOf(
+        "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}",
         "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=3",
         "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=2",
         "android.resource://${context.packageName}/${R.drawable.ic_launcher_background}?id=4",
@@ -296,7 +313,7 @@ fun NoteItemUIPreviewCheckboxes() {
                                 color = RedOrange.toArgb(),
                                 id = "1",
                                 imageUris = mockImages,
-                                audioAttachments = listOf(Attachment("x", 123)),
+                                audioAttachments = listOf(Attachment("x", 123), Attachment("y", 321)),
                                 reminderTime = 1,
                                 checkListItems = listOf(CheckboxItem(text = "abc")),
                                 isCheckboxListAvailable = true,
@@ -343,7 +360,7 @@ fun NoteItemUIPreview() {
                                 color = RedOrange.toArgb(),
                                 id = "1",
                                 imageUris = listOf("image"),
-                                audioAttachments = listOf(Attachment("x", 123)),
+                                audioAttachments = listOf(Attachment("x", 123), Attachment("y", 321)),
                                 reminderTime = 1,
                                 tagEntities = listOf(TagEntity("abc")),
                                 lastUpdateTime = 1775018420480
@@ -388,7 +405,7 @@ fun NoteItemUIBackgrroundImagePreview() {
                                 color = -1,
                                 id = "1",
                                 imageUris = listOf("image"),
-                                audioAttachments = listOf(Attachment("x", 123)),
+                                audioAttachments = listOf(Attachment("x", 123), Attachment("y", 321)),
                                 reminderTime = 1,
                                 tagEntities = listOf(TagEntity("abc")),
                                 backgroundImage = 2,
