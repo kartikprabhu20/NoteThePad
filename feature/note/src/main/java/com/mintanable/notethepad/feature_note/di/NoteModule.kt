@@ -10,7 +10,7 @@ import com.mintanable.notethepad.feature_note.data.repository.AndroidMediaPlayer
 import com.mintanable.notethepad.feature_note.data.repository.ReminderSchedulerImpl
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
-import com.mintanable.notethepad.feature_note.domain.repository.ReminderScheduler
+import com.mintanable.notethepad.core.common.ReminderScheduler
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.CreateFile
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.CreateUri
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.DeleteFiles

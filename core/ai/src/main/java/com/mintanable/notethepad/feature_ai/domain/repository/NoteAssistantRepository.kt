@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_ai.domain.repository
 
+import com.google.ai.edge.litertlm.ToolSet
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import kotlinx.coroutines.flow.Flow
 
@@ -22,5 +23,5 @@ interface NoteAssistantRepository {
     fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String>
     suspend fun describeImage(imageBytes: ByteArray, modelName: String): String?
 
-    suspend fun summarizeNote(prompt: String, modelName: String): String?
+    suspend fun summarizeNote(prompt: String, modelName: String, tools: List<ToolSet>): String?
 }

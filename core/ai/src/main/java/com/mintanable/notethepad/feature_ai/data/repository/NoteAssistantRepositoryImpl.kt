@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import android.util.Log
+import com.google.ai.edge.litertlm.ToolSet
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mintanable.notethepad.core.common.utils.convertWavToMonoWithMaxSeconds
 import com.mintanable.notethepad.core.common.utils.splitPcmIntoChunks
@@ -226,7 +227,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun summarizeNote(prompt: String, modelName: String): String? {
+    override suspend fun summarizeNote(prompt: String, modelName: String, tools: List<ToolSet>): String? {
         crashlytics.log("NoteAssistantRepositoryImpl: Summarize. Length: ${prompt.length}")
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.summarizeNote(prompt)
@@ -236,7 +237,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.isLlm) {
-                    gemmaLocalDataSource.summarizeNote(prompt, selectedModel.downloadFileName)
+                    gemmaLocalDataSource.summarizeNote(prompt, selectedModel.downloadFileName, tools)
                 } else null
             }
         }

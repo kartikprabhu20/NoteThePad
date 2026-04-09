@@ -13,6 +13,9 @@ import com.google.ai.edge.litertlm.ExperimentalApi
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.MessageCallback
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.google.ai.edge.litertlm.ToolProvider
+import com.google.ai.edge.litertlm.ToolSet
+import com.google.ai.edge.litertlm.tool
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
@@ -74,6 +77,7 @@ class GemmaLocalDataSource @Inject constructor(
         maxNumTokens: Int = 1024,
         samplerConfig: SamplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 1.0),
         systemInstruction: String? = null,
+        tools: List<ToolProvider> = listOf()
     ) {
         withContext(Dispatchers.IO) {
             mutex.withLock {
@@ -111,7 +115,8 @@ class GemmaLocalDataSource @Inject constructor(
                     val conversation = engine.createConversation(
                         ConversationConfig(
                             samplerConfig = samplerConfig,
-                            systemInstruction = systemInstruction?.let { Contents.of(it) }
+                            systemInstruction = systemInstruction?.let { Contents.of(it) },
+                            tools = tools
                         )
                     )
 
@@ -286,15 +291,15 @@ class GemmaLocalDataSource @Inject constructor(
     // ── Task: Summarize Note (text-only) ──────────────────────────────────
 
     @OptIn(ExperimentalApi::class)
-    suspend fun summarizeNote(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
+    suspend fun summarizeNote(prompt: String, fileName: String, tools: List<ToolSet>): String? = withContext(Dispatchers.IO) {
         val maxChunkChars = 12_000 //roughly 3072 tokens
         try {
             if (prompt.length <= maxChunkChars) {
-                return@withContext summarizeChunk(prompt, fileName)
+                return@withContext summarizeChunk(prompt, fileName, tools)
             }
             val chunks = prompt.chunked(maxChunkChars)
-            val partialSummaries = chunks.map { summarizeChunk("Summarize: $it", fileName) ?: "" }.filter { it.isNotBlank() }
-            return@withContext summarizeChunk("Synthesize these summaries into a final 2-3 sentences overview:: ${partialSummaries.joinToString(" ")}", fileName)
+            val partialSummaries = chunks.map { summarizeChunk("Summarize: $it", fileName, tools) ?: "" }.filter { it.isNotBlank() }
+            return@withContext summarizeChunk("Synthesize these summaries into a final 2-3 sentences overview:: ${partialSummaries.joinToString(" ")}", fileName, tools)
         } catch (e: Exception) {
             Log.e(TAG, "Summarization failed: ${e.message}")
             crashlytics.log("$TAG: Summarization failed errpr")
@@ -305,7 +310,7 @@ class GemmaLocalDataSource @Inject constructor(
     }
 
     @OptIn(ExperimentalApi::class)
-    suspend fun summarizeChunk(prompt: String, fileName: String): String? = withContext(Dispatchers.IO) {
+    suspend fun summarizeChunk(prompt: String, fileName: String, tools: List<ToolSet>): String? = withContext(Dispatchers.IO) {
         try {
             initialize(
                 fileName = fileName,
@@ -313,7 +318,18 @@ class GemmaLocalDataSource @Inject constructor(
                 supportImage = false,
                 maxNumTokens = 4096,
                 samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
-                systemInstruction = "Summarize this note in 2 or 3 sentences."
+                systemInstruction = """
+                    You are a Note Assistant for NoteThePad.
+                    1. Summarize the note content concisely.
+                    2. If the note mentions a time-sensitive task, reminder, deadline, or event:
+                       a. Call 'get_current_time_ms' to get the current UTC time in milliseconds.
+                       b. Use the current date/time provided in the prompt plus any dates mentioned in the note to calculate the target reminder time in UTC milliseconds.
+                       c. Call 'add_reminder' with a short descriptive title and the calculated UTC milliseconds.
+                    3. For relative dates like "tomorrow", "next week", "in 2 hours", calculate from the current time.
+                    4. For absolute dates like "April 15", combine with a reasonable time (e.g., 9:00 AM) if no time is specified.
+                    5. Always produce a summary even if you also set a reminder.
+                """.trimIndent(),
+                tools = tools.map { tool(it) }
             )
             var summary = ""
             runInference(prompt).collect { chunk -> summary += chunk }
