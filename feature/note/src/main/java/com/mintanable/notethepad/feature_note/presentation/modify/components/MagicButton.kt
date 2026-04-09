@@ -65,7 +65,8 @@ fun MagicButton(
     showMagicBorder: Boolean = true,
     onButtonClicked: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
-    animatedVisibilityScope: AnimatedVisibilityScope? = null
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    disableAnimation: Boolean = true
 ) {
     val transition = animatedVisibilityScope?.transition
     val isExiting = transition?.targetState?.let { it != EnterExitState.Visible } ?: false
@@ -78,11 +79,15 @@ fun MagicButton(
     } ?: rememberUpdatedState(1f)
 
     val shimmerOffset = remember { Animatable(0f) }
-    LaunchedEffect (Unit) {
-        shimmerOffset.animateTo(
-            targetValue = 2000f,
-            animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)
-        )
+    LaunchedEffect (disableAnimation) {
+        if (!disableAnimation) {
+            shimmerOffset.animateTo(
+                targetValue = 2000f,
+                animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)
+            )
+        } else {
+            shimmerOffset.snapTo(0f)
+        }
     }
 
     val isIconOnly = title.isNullOrBlank()

@@ -89,7 +89,7 @@ class GemmaLocalDataSource @Inject constructor(
 
                 try {
                     val runtime = Runtime.getRuntime()
-                    val availableMem = (runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory())) / 1024 / 1024
+                    val availableMem =(runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory())) / 1024 / 1024
                     crashlytics.setCustomKey("pre_init_mem_mb", availableMem)
 
                     System.gc()
@@ -310,37 +310,38 @@ class GemmaLocalDataSource @Inject constructor(
     }
 
     @OptIn(ExperimentalApi::class)
-    suspend fun summarizeChunk(prompt: String, fileName: String, tools: List<ToolSet>): String? = withContext(Dispatchers.IO) {
-        try {
-            initialize(
-                fileName = fileName,
-                supportAudio = false,
-                supportImage = false,
-                maxNumTokens = 4096,
-                samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
-                systemInstruction = """
-                    You are a Note Assistant for NoteThePad.
-                    1. Summarize the note content concisely.
-                    2. If the note mentions a time-sensitive task, reminder, deadline, or event:
-                       a. Call 'get_current_time_ms' to get the current UTC time in milliseconds.
-                       b. Use the current date/time provided in the prompt plus any dates mentioned in the note to calculate the target reminder time in UTC milliseconds.
-                       c. Call 'add_reminder' with a short descriptive title and the calculated UTC milliseconds.
-                    3. For relative dates like "tomorrow", "next week", "in 2 hours", calculate from the current time.
-                    4. For absolute dates like "April 15", combine with a reasonable time (e.g., 9:00 AM) if no time is specified.
-                    5. Always produce a summary even if you also set a reminder.
-                """.trimIndent(),
-                tools = tools.map { tool(it) }
-            )
-            var summary = ""
-            runInference(prompt).collect { chunk -> summary += chunk }
-            summary.trim()
-        } catch (e: Exception) {
-            Log.e(TAG, "Chunk Summarization failed: ${e.message}")
-            null
-        } finally {
-            cleanup()
+    suspend fun summarizeChunk(prompt: String, fileName: String, tools: List<ToolSet>): String? =
+        withContext(Dispatchers.IO) {
+            try {
+                initialize(
+                    fileName = fileName,
+                    supportAudio = false,
+                    supportImage = false,
+                    maxNumTokens = 4096,
+                    samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
+                    systemInstruction = """
+                        You are a Note Assistant for NoteThePad.
+                        CRITICAL INSTRUCTIONS:
+                        1. If the note mentions a task, date, or "tomorrow/next week", you MUST call 'add_reminder'. 
+                        2. Do NOT just write "I set a reminder" in the text. You MUST execute the 'add_reminder' tool.
+                        3. To set a reminder:
+                            a. First, call 'get_current_time_ms' to know what 'today' is.
+                            b. Use 'get_timestamp_for_instruction' to calculate the future date.
+                            c. Finally, call 'add_reminder'.
+                        4. Summarize the note content after calling your tools.
+                    """.trimIndent(),
+                            tools = tools . map { tool(it) }
+                )
+                var summary = ""
+                runInference(prompt).collect { chunk -> summary += chunk }
+                summary.trim()
+            } catch (e: Exception) {
+                Log.e(TAG, "Chunk Summarization failed: ${e.message}")
+                null
+            } finally {
+                cleanup()
+            }
         }
-    }
 
     // ── Task: Describe Image (short description) ──────────────────────────
 
