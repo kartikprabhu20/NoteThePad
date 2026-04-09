@@ -9,7 +9,9 @@ import androidx.work.WorkerParameters
 import com.mintanable.notethepad.core.common.utils.readAndProcessImage
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.core.common.ReminderScheduler
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
+import com.mintanable.notethepad.feature_ai.tools.ReminderTools
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,7 @@ class SummarizeNoteWorker @AssistedInject constructor(
     private val noteRepository: NoteRepository,
     private val assistantRepository: NoteAssistantRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val reminderScheduler: ReminderScheduler,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -108,6 +111,10 @@ class SummarizeNoteWorker @AssistedInject constructor(
             val prompt = buildString {
                 appendLine("Summarize this note concisely in 5-6 sentences maximum.")
                 appendLine()
+                val now = java.time.LocalDateTime.now()
+                val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy HH:mm")
+                appendLine("Current date and time: ${now.format(formatter)}")
+                appendLine()
                 appendLine("Title: ${note.title}")
                 appendLine("Content: ${note.content}")
                 if (allImageDescriptions.isNotBlank()) {
@@ -122,8 +129,14 @@ class SummarizeNoteWorker @AssistedInject constructor(
             }
             Log.d(TAG, "Prompt built (${prompt.length} chars)")
 
+            var pendingReminder: Pair<String, Long>? = null
+            val tools = listOf(ReminderTools { title, time ->
+                Log.d(TAG, "Reminder requested: '$title' at $time")
+                pendingReminder = title to time
+            })
+
             // Generate summary
-            val summary = assistantRepository.summarizeNote(prompt, modelName)
+            val summary = assistantRepository.summarizeNote(prompt, modelName, tools)
             if (summary.isNullOrBlank()) {
                 Log.e(TAG, "Summarization returned empty result")
                 return@withContext Result.failure()
@@ -133,6 +146,22 @@ class SummarizeNoteWorker @AssistedInject constructor(
             // Save summary to DB
             noteRepository.updateSummary(noteId, summary)
             Log.d(TAG, "Summary saved to DB for note: $noteId")
+
+            // Schedule reminder if the LLM requested one
+            pendingReminder?.let { (title, reminderTimeMs) ->
+                if (reminderTimeMs > System.currentTimeMillis()) {
+                    noteRepository.updateReminderTime(noteId, reminderTimeMs)
+                    reminderScheduler.schedule(
+                        id = noteId.hashCode().toLong(),
+                        title = title,
+                        content = note.content.take(200),
+                        reminderTime = reminderTimeMs
+                    )
+                    Log.d(TAG, "Reminder scheduled: '$title' at $reminderTimeMs")
+                } else {
+                    Log.w(TAG, "Ignoring past reminder: $reminderTimeMs")
+                }
+            }
 
             Result.success()
         } catch (e: Exception) {
