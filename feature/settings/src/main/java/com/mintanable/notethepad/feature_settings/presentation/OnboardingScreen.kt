@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -110,7 +111,7 @@ fun OnboardingScreen(
                     .padding(top = 48.dp, end = 16.dp)
             ) {
                 Text(
-                    "Skip",
+                    stringResource(R.string.onboarding_skip),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
@@ -168,7 +169,7 @@ fun OnboardingScreen(
                 )
             ) {
                 Text(
-                    text = if (pagerState.currentPage < pageCount - 1) "Next" else "Get Started",
+                    text = if (pagerState.currentPage < pageCount - 1) stringResource(R.string.onboarding_next) else stringResource(R.string.onboarding_get_started),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
@@ -210,7 +211,7 @@ private fun WelcomePage(isDarkTheme: Boolean) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Welcome to",
+            text = stringResource(R.string.onboarding_welcome_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
@@ -229,7 +230,7 @@ private fun WelcomePage(isDarkTheme: Boolean) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Your intelligent note-taking companion powered by on-device AI",
+            text = stringResource(R.string.onboarding_welcome_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -243,13 +244,13 @@ private fun WelcomePage(isDarkTheme: Boolean) {
 private fun AgenticAiPage() {
     OnboardingPageLayout(
         icon = Icons.Filled.AutoAwesome,
-        title = "Agentic AI",
-        subtitle = "AI that acts on your behalf"
+        title = stringResource(R.string.onboarding_ai_title),
+        subtitle = stringResource(R.string.onboarding_ai_subtitle)
     ) {
-        FeatureBullet("Auto-Tagging", "Analyzes content and assigns labels automatically")
-        FeatureBullet("Smart Summaries", "Generates concise summaries from text, audio, and images")
-        FeatureBullet("Agentic Reminders", "Detects \"remind me tomorrow\" and schedules alarms autonomously")
-        FeatureBullet("On-Device Privacy", "Gemma models run locally - your data never leaves your phone")
+        FeatureBullet(stringResource(R.string.onboarding_feature_autotag_title), stringResource(R.string.onboarding_feature_autotag_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_summaries_title), stringResource(R.string.onboarding_feature_summaries_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_reminders_title), stringResource(R.string.onboarding_feature_reminders_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_privacy_title), stringResource(R.string.onboarding_feature_privacy_desc))
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -261,15 +262,15 @@ private fun AgenticAiPage() {
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
-                    "Supported Models",
+                    stringResource(R.string.onboarding_models_supported),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                ModelTierRow("Gemini 3 Flash", "Cloud")
-                ModelTierRow("Gemini Nano", "On-device")
-                ModelTierRow("Gemma (LiteRT)", "Downloadable")
+                ModelTierRow("Gemini 3 Flash", stringResource(R.string.onboarding_model_tier_cloud))
+                ModelTierRow("Gemini Nano", stringResource(R.string.onboarding_model_tier_on_device))
+                ModelTierRow("Gemma (LiteRT)", stringResource(R.string.onboarding_model_tier_downloadable))
             }
         }
     }
@@ -302,15 +303,15 @@ private fun ModelTierRow(name: String, tier: String) {
 private fun MultimediaPage() {
     OnboardingPageLayout(
         icon = Icons.Filled.Mic,
-        title = "Rich Multimedia",
-        subtitle = "More than just text"
+        title = stringResource(R.string.onboarding_multimedia_title),
+        subtitle = stringResource(R.string.onboarding_multimedia_subtitle)
     ) {
-        FeatureBullet("Rich Attachments", "Attach photos, audio, and video directly to notes")
-        FeatureBullet("Audio Transcription", "Record voice memos and get automatic text transcription")
-        FeatureBullet("Image Analysis", "AI describes your images and suggests actions")
-        FeatureBullet("OCR", "Extract text from photos of documents and handwriting")
-        FeatureBullet("Image Query", "Ask questions about any image with streaming AI responses")
-        FeatureBullet("Rich Text", "Customize the texts with different styles, headers, paragrap and the classics: bold, italic, underline")
+        FeatureBullet(stringResource(R.string.onboarding_feature_attachments_title), stringResource(R.string.onboarding_feature_attachments_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_transcription_title), stringResource(R.string.onboarding_feature_transcription_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_image_analysis_title), stringResource(R.string.onboarding_feature_image_analysis_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_ocr_title), stringResource(R.string.onboarding_feature_ocr_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_image_query_title), stringResource(R.string.onboarding_feature_image_query_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_rich_text_title), stringResource(R.string.onboarding_feature_rich_text_desc))
     }
 }
 
@@ -320,13 +321,13 @@ private fun MultimediaPage() {
 private fun CloudSyncPage() {
     OnboardingPageLayout(
         icon = Icons.Filled.Cloud,
-        title = "Cloud & Sync",
-        subtitle = "Your notes, everywhere"
+        title = stringResource(R.string.onboarding_cloud_title),
+        subtitle = stringResource(R.string.onboarding_cloud_subtitle)
     ) {
-        FeatureBullet("Google Drive Backup", "Automated daily, weekly, or monthly backups")
-        FeatureBullet("SupaSync", "Real-time cloud sync across devices")
-        FeatureBullet("Media Backup", "Optionally include images, audio, and video")
-        FeatureBullet("Secure", "Encrypted storage with Google Tink")
+        FeatureBullet(stringResource(R.string.onboarding_feature_backup_title), stringResource(R.string.onboarding_feature_backup_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_supasync_title), stringResource(R.string.onboarding_feature_supasync_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_media_backup_title), stringResource(R.string.onboarding_feature_media_backup_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_secure_title), stringResource(R.string.onboarding_feature_secure_desc))
     }
 }
 
@@ -337,12 +338,12 @@ private fun CloudSyncPage() {
 private fun ThemingPage(isDarkTheme: Boolean) {
     OnboardingPageLayout(
         icon = Icons.Filled.Palette,
-        title = "Beautiful Theming",
-        subtitle = "Make it yours"
+        title = stringResource(R.string.onboarding_theming_title),
+        subtitle = stringResource(R.string.onboarding_theming_subtitle)
     ) {
         // Live demo: Color palette
         Text(
-            "11 Note Colors",
+            stringResource(R.string.onboarding_colors_count),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -374,7 +375,7 @@ private fun ThemingPage(isDarkTheme: Boolean) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            "12 Background images",
+            stringResource(R.string.onboarding_bg_images_count),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -411,7 +412,7 @@ private fun ThemingPage(isDarkTheme: Boolean) {
 
         // Live demo: Note shapes
         Text(
-            "13 Note Shapes",
+            stringResource(R.string.onboarding_shapes_count),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -457,7 +458,7 @@ private fun ThemingPage(isDarkTheme: Boolean) {
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Light & dark mode with 12 background patterns",
+            stringResource(R.string.onboarding_modes_desc),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
@@ -472,13 +473,13 @@ private fun ThemingPage(isDarkTheme: Boolean) {
 private fun CalendarWidgetsPage() {
     OnboardingPageLayout(
         icon = Icons.Filled.CalendarMonth,
-        title = "Calendar & Widgets",
-        subtitle = "Stay organized"
+        title = stringResource(R.string.onboarding_calendar_title),
+        subtitle = stringResource(R.string.onboarding_calendar_subtitle)
     ) {
-        FeatureBullet("Calendar View", "Browse notes by date with a visual calendar")
-        FeatureBullet("Reminders", "Set per-note reminders with alarm notifications")
-        FeatureBullet("Home Widgets", "Pin single notes or recent notes list to your home screen")
-        FeatureBullet("Quick Capture", "Create notes directly from widgets")
+        FeatureBullet(stringResource(R.string.onboarding_feature_calendar_view_title), stringResource(R.string.onboarding_feature_calendar_view_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_reminders_list_title), stringResource(R.string.onboarding_feature_reminders_list_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_widgets_title), stringResource(R.string.onboarding_feature_widgets_desc))
+        FeatureBullet(stringResource(R.string.onboarding_feature_capture_title), stringResource(R.string.onboarding_feature_capture_desc))
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -489,11 +490,11 @@ private fun CalendarWidgetsPage() {
         ) {
             WidgetPreview(
                 icon = Icons.Filled.Edit,
-                label = "Single Note"
+                label = stringResource(R.string.onboarding_widget_single_note)
             )
             WidgetPreview(
                 icon = Icons.Filled.Widgets,
-                label = "Notes List"
+                label = stringResource(R.string.onboarding_widget_notes_list)
             )
         }
     }
