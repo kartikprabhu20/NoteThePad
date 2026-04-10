@@ -20,7 +20,7 @@
 
 |                  **Rich Text**                   |                  **Agentic AI**                  |                 **Magic Button**                 |                   **Widgets**                    |
 |:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-| <img src="metadata/playstore_5.png" width="250"> | <img src="metadata/playstore_6.jpg" width="250"> | <img src="metadata/playstore_7.jpg" width="250"> | <img src="metadata/playstore_8.jpg" width="250"> |
+| <img src="metadata/playstore_5.png" width="250"> | <img src="metadata/playstore_6.png" width="250"> | <img src="metadata/playstore_7.png" width="250"> | <img src="metadata/playstore_8.png" width="250"> |
 |      *Header, Paragraphs, Bullets, B, I, U*      |       *Summarize text, recordings, images*       |              *One-click assistance*              |      *Single or Notelist, for quick access*      |
 
 ---
