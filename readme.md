@@ -13,15 +13,15 @@
 
 ## Screenshots
 
-|             **Beautiful Interfaces**              |                **Rich Multimedia**                |               **Smart Checklists**                |
-|:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|
-| <img src="metadata/Screenshot_1.png" width="250"> | <img src="metadata/Screenshot_2.png" width="250"> | <img src="metadata/Screenshot_3.png" width="250"> |
-|                 *Dynamic Theming*                 |             *Images, Videos, Audios*              |            *Actionable Tasks, Labels*             |
+|             **Beautiful Interfaces**             |               **Rich Multimedia**                |               **Smart Checklists**               |                   **Calendar**                   |
+|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+| <img src="metadata/playstore_1.png" width="250"> | <img src="metadata/playstore_2.png" width="250"> | <img src="metadata/playstore_3.png" width="250"> | <img src="metadata/playstore_4.png" width="250"> |
+|                *Dynamic Theming*                 |             *Images, Videos, Audios*             |            *Actionable Tasks, Labels*            |    *Sync with calendar and timely reminders*     |
 
-|                 **Quick Filters**                 |                    **Widgets**                    |
-|:-------------------------------------------------:|:-------------------------------------------------:|
-| <img src="metadata/Screenshot_4.png" width="250"> | <img src="metadata/Screenshot_5.jpg" width="250"> |
-|              *Sort, Search, Filter*               |              *Single, Recent Notes*               |
+|                   **Rich Text**                   |                  **Agentic AI**                  |                 **Magic Button**                 |                   **Widgets**                    |
+|:-------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+| <img src="metadata/Screenshot_5.png" width="250"> | <img src="metadata/playstore_6.jpg" width="250"> | <img src="metadata/playstore_7.jpg" width="250"> | <img src="metadata/playstore_8.jpg" width="250"> |
+|      *Header, Paragraphs, Bullets, B, I, U*       |       *Summarize text, recordings, images*       |              *One-click assistance*              |      *Single or Notelist, for quick access*      |
 
 ---
 
