@@ -35,6 +35,7 @@ android {
         }
 
         buildConfigField("Boolean", "ENABLE_COLLABORATION", "false")
+        resConfigs "en", "en-rGB", "ar", "bn", "de", "es", "fr", "hi", "in", "it", "ja", "ko", "pt", "ru", "tr", "vi", "zh"
     }
     signingConfigs {
         create("release") {
@@ -48,10 +49,15 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             signingConfig = signingConfigs.getByName("release")
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {  }
+        debug {
+            ndk {
+                abiFilters "arm64-v8a", "x86_64"
+            }
+        }
         create("canary") {
             initWith(getByName("debug"))
             signingConfig signingConfigs.debug

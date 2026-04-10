@@ -26,6 +26,7 @@ import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthState
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthViewModel
 import com.mintanable.notethepad.feature_firebase.R
+import com.mintanable.notethepad.core.ui.R as UiR
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 
@@ -79,7 +80,7 @@ fun LoginScreenContent(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painter = painterResource(
-                    id = if(darkTheme) R.drawable.google_signin_dark else R.drawable.google_signin_light
+                    id = if(darkTheme) UiR.drawable.google_signin_dark else UiR.drawable.google_signin_light
                 ),
                 contentDescription = stringResource(R.string.content_description_google_signin),
                 modifier = Modifier
