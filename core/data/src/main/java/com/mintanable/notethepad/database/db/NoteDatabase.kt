@@ -19,7 +19,8 @@ import com.mintanable.notethepad.database.db.util.NoteConverters
         NoteTagCrossRef::class,
         CollaboratorEntity::class
     ],
-    version = 17
+    version = 17,
+    exportSchema = true
 )
 @TypeConverters(NoteConverters::class)
 abstract class NoteDatabase : RoomDatabase() {
