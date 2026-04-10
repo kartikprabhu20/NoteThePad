@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -76,7 +75,8 @@ fun NoteItemUI(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedContentScope,
     isDarkTheme: Boolean = false,
-    isSyncEnabled: Boolean = false
+    isSyncEnabled: Boolean = false,
+    columnCount: Int = 2
 ) {
     Box(
         modifier = modifier.height(IntrinsicSize.Min)
@@ -190,7 +190,8 @@ fun NoteItemUI(
                 if (note.audioAttachments.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     SimpleAudioPlayerUI(
-                        totalDuration = note.audioAttachments[0].duration
+                        totalDuration = note.audioAttachments[0].duration,
+                        columnCount = columnCount
                     )
                 }
             }
@@ -327,7 +328,7 @@ fun NoteItemUIPreviewCheckboxes() {
                             onPinClick = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
-                            isDarkTheme = isDark
+                            isDarkTheme = isDark,
                         )
                     }
                 }
@@ -372,7 +373,7 @@ fun NoteItemUIPreview() {
                             onPinClick = {},
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
-                            isDarkTheme = isDark
+                            isDarkTheme = isDark,
                         )
                     }
                 }
@@ -420,7 +421,7 @@ fun NoteItemUIBackgrroundImagePreview() {
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this@AnimatedContent,
                             isDarkTheme = isDark,
-                            isSyncEnabled = true
+                            isSyncEnabled = true,
                         )
                     }
                 }

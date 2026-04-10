@@ -27,10 +27,15 @@ import kotlin.random.Random
 @Composable
 fun SimpleAudioPlayerUI(
     totalDuration: Long,
+    columnCount: Int = 2,
 ) {
 
+    val numberOfBars = if(columnCount==2){ 20 }
+    else if(columnCount == 1){40}
+    else{8}
+
     val mockAmplitudes = remember {
-        List(20) { Random.nextDouble(0.2, 1.0).toFloat() }
+        List(numberOfBars) { Random.nextDouble(0.2, 1.0).toFloat() }
     }
 
     Box(
@@ -74,6 +79,6 @@ fun SimpleAudioPlayerUI(
 @Composable
 fun PreviewSimpleAudioPlayerUi() {
     NoteThePadTheme {
-        SimpleAudioPlayerUI(totalDuration = 1234567L)
+        SimpleAudioPlayerUI(totalDuration = 1234567L,)
     }
 }

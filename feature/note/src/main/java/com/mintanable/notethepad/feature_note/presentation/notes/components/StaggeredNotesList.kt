@@ -134,7 +134,8 @@ fun StaggeredNotesList(
                                 sharedTransitionScope = sharedTransitionScope,
                                 animatedVisibilityScope = animatedVisibilityScope,
                                 isDarkTheme = isDarkTheme,
-                                isSyncEnabled = isSyncEnabled
+                                isSyncEnabled = isSyncEnabled,
+                                columnCount = columnCount
                             )
                         }
                     }
