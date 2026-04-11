@@ -149,7 +149,7 @@ Create `local.properties` in the project root with:
 # AI (core:ai module)
 GEMINI_API_KEY=your_gemini_api_key
 HUGGING_FACE_AUTH_TOKEN=your_hf_token
-GITHUB_GIST_ACCESS_TOKEN=your_github_token
+GIST_ACCESS_TOKEN=your_github_token
 AI_CATELOG_GIST_URL=your_gist_url
 
 # Cloud Sync (core:network module)

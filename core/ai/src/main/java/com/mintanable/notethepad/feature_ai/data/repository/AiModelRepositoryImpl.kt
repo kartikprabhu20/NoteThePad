@@ -113,7 +113,7 @@ class AiModelRepositoryImpl @Inject constructor(
         try {
             val request = Request.Builder()
                 .url(BuildConfig.AI_CATELOG_GIST_URL)
-                .addHeader("Authorization", "token ${BuildConfig.GITHUB_GIST_ACCESS_TOKEN}")
+                .addHeader("Authorization", "token ${BuildConfig.GIST_ACCESS_TOKEN}")
                 .build()
 
             client.newCall(request).execute().use { response ->
