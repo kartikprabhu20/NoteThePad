@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tablet_pane_select_note_placeholder">एक नोट चुनें</string>
     <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">ऑटो-टैग</string>
     <string name="btn_cancel">रद्द करें</string>

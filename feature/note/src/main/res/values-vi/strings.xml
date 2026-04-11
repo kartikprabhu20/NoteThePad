@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tablet_pane_select_note_placeholder">Chọn một ghi chú</string>
     <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">Tự động gắn thẻ</string>
     <string name="btn_cancel">Hủy</string>

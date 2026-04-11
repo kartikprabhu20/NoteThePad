@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tablet_pane_select_note_placeholder">Pilih catatan</string>
     <string name="app_name">NoteThePad</string>
     <string name="btn_auto_tag">Auto-Tag</string>
     <string name="btn_cancel">Batal</string>
