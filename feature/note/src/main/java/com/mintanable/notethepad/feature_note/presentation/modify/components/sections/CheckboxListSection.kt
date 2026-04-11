@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.NoteColors
@@ -158,7 +160,7 @@ fun CheckboxRow(
             value = item.text,
             onValueChange = { onItemChanged(item.copy(text = it)) },
             singleLine = isSingleLine,
-            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
+            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp),
             modifier = Modifier
                 .padding(top = 14.dp, bottom = 8.dp)
                 .padding(horizontal = 4.dp)
@@ -167,6 +169,7 @@ fun CheckboxRow(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next
             ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             keyboardActions = KeyboardActions(
                 onNext = { onEnterPressed(item) }
             ),
