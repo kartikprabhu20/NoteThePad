@@ -48,6 +48,9 @@ android {
 
     buildTypes {
         release {
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
             minifyEnabled true
             shrinkResources true
             signingConfig = signingConfigs.getByName("release")
