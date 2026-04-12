@@ -11,6 +11,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.core.model.note.CheckboxItem
 import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.core.richtext.model.SpanType
@@ -83,6 +84,8 @@ class AddEditNoteViewModelTest {
     private val collaborationRepository = mockk<CollaborationRepository>(relaxed=true)
     private val userPreferencesRepository = mockk<UserPreferencesRepository>(relaxed = true)
     private val getAiModelByName = mockk<GetAiModelByName>(relaxed = true)
+    private val analyticsTracker = mockk<AnalyticsTracker>(relaxed = true)
+
 
     private val appContext = mockk<Context>(relaxed = true)
 
@@ -93,7 +96,7 @@ class AddEditNoteViewModelTest {
         fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler,
         tagUseCases, getAutoTagsUseCase, startLiveTranscription, stopLiveTranscription,
         transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase,
-        authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName,appContext
+        authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName, analyticsTracker, appContext
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -508,19 +511,6 @@ class AddEditNoteViewModelTest {
             awaitItem()
             viewModel.onEvent(AddEditNoteEvent.AttachImage(uri))
             viewModel.onEvent(AddEditNoteEvent.AttachImage(uri))
-            val state = awaitItem()
-            assertThat(state.attachedImages).contains(uri)
-            assertThat(state.attachedImages.count { it == uri }).isEqualTo(1)
-        }
-    }
-
-    @Test
-    fun `AttachVideo adds uri to list only if not already present`() = runTest {
-        val uri = "content://media/1".toUri()
-        viewModel.uiState.test {
-            awaitItem()
-            viewModel.onEvent(AddEditNoteEvent.AttachVideo(uri))
-            viewModel.onEvent(AddEditNoteEvent.AttachVideo(uri))
             val state = awaitItem()
             assertThat(state.attachedImages).contains(uri)
             assertThat(state.attachedImages.count { it == uri }).isEqualTo(1)

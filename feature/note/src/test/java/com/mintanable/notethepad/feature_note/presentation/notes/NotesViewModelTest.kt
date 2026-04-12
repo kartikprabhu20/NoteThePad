@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mintanable.notethepad.TestDispatcherProvider
 import com.mintanable.notethepad.auth.repository.AuthRepository
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.core.model.note.NoteOrder
@@ -54,7 +55,7 @@ class NotesViewModelTest {
     private val getSupaSyncStatus =  mockk<GetSupaSyncStatus>(relaxed = true)
     private val refreshSupaSync = mockk<RefreshSupaSync>(relaxed = true)
     private val authRepository = mockk<AuthRepository>(relaxed = true)
-
+    private val analyticsTracker = mockk<AnalyticsTracker>(relaxed = true)
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val testDispatcherProvider = TestDispatcherProvider(testDispatcher)
@@ -76,7 +77,8 @@ class NotesViewModelTest {
             getSupaSyncSettings = getSupaSyncSettings,
             refreshSupaSync = refreshSupaSync,
             getSupaSyncStatus = getSupaSyncStatus,
-            authRepository = authRepository
+            authRepository = authRepository,
+            analyticsTracker = analyticsTracker
         )
     }
 
