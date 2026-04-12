@@ -23,13 +23,13 @@ import com.mintanable.notethepad.core.analytics.AnalyticsEvent
 import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.feature_backup.R
 import com.mintanable.notethepad.file.FileManager
+import org.json.JSONObject
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 
 @HiltWorker
@@ -140,6 +140,13 @@ class DownloadWorker @AssistedInject constructor(
                 analyticsTracker.track(AnalyticsEvent.RestoreResult(true, System.currentTimeMillis() - startTime, "media_partial"))
                 return@withContext Result.success()
             }
+            try {
+                remapMediaPaths()
+                Log.d("kptest", "Media paths remapped successfully")
+            } catch (e: Exception) {
+                Log.e("kptest", "Error remapping media paths: ${e.message}")
+            }
+
             setForeground(createForegroundInfo(100))
             setProgress(workDataOf("percent" to 100))
 
@@ -153,6 +160,69 @@ class DownloadWorker @AssistedInject constructor(
         } catch (e: Exception) {
             analyticsTracker.track(AnalyticsEvent.RestoreResult(false, System.currentTimeMillis() - startTime, e::class.simpleName))
             return@withContext Result.failure()
+        }
+    }
+
+    private suspend fun remapMediaPaths() {
+        val currentMediaDir = fileManager.getMediaDir()
+        val notes = noteRepository.getNotesWithMedia()
+
+        for (note in notes) {
+            var changed = false
+
+            val newImageUris = note.imageUris.map { oldPath ->
+                val fileName = File(oldPath).name
+                val newFile = File(currentMediaDir, fileName)
+                if (newFile.absolutePath != oldPath && newFile.exists()) {
+                    changed = true
+                    newFile.absolutePath
+                } else {
+                    oldPath
+                }
+            }
+
+            val newAudioUris = note.audioUris.map { oldPath ->
+                val fileName = File(oldPath).name
+                val newFile = File(currentMediaDir, fileName)
+                if (newFile.absolutePath != oldPath && newFile.exists()) {
+                    changed = true
+                    newFile.absolutePath
+                } else {
+                    oldPath
+                }
+            }
+
+            var newTranscriptions = note.audioTranscriptions
+            if (note.audioTranscriptions.isNotBlank()) {
+                try {
+                    val oldJson = JSONObject(note.audioTranscriptions)
+                    val newJson = JSONObject()
+                    oldJson.keys().forEach { oldKey ->
+                        val fileName = File(oldKey).name
+                        val newFile = File(currentMediaDir, fileName)
+                        val newKey = if (newFile.absolutePath != oldKey && newFile.exists()) {
+                            changed = true
+                            newFile.absolutePath
+                        } else {
+                            oldKey
+                        }
+                        newJson.put(newKey, oldJson.getString(oldKey))
+                    }
+                    newTranscriptions = newJson.toString()
+                } catch (e: Exception) {
+                    Log.e("kptest", "Error remapping transcriptions for note ${note.id}: ${e.message}")
+                }
+            }
+
+            if (changed) {
+                noteRepository.updateNoteEntity(
+                    note.copy(
+                        imageUris = newImageUris,
+                        audioUris = newAudioUris,
+                        audioTranscriptions = newTranscriptions
+                    )
+                )
+            }
         }
     }
 

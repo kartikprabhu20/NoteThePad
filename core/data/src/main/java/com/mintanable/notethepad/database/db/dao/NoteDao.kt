@@ -73,6 +73,9 @@ interface NoteDao {
     @Update
     suspend fun updateNote(noteEntity: NoteEntity)
 
+    @Query("SELECT * FROM noteEntity WHERE imageUris != '' OR audioUris != ''")
+    suspend fun getNotesWithMedia(): List<NoteEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef)
 

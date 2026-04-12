@@ -32,4 +32,6 @@ interface NoteRepository {
     suspend fun fetchCloudData()
     suspend fun updateSummary(noteId: String, summary: String)
     suspend fun updateReminderTime(noteId: String, reminderTime: Long)
+    suspend fun getNotesWithMedia(): List<NoteEntity>
+    suspend fun updateNoteEntity(noteEntity: NoteEntity)
 }
