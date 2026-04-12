@@ -4,11 +4,13 @@ import android.content.Context
 import android.util.Base64
 import android.util.Log
 import com.google.crypto.tink.Aead
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.AesGcmKeyManager
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import java.security.GeneralSecurityException
 import java.security.KeyStore
+import androidx.core.content.edit
 
 class CryptoManager(private val context: Context) {
     init {
@@ -36,11 +38,11 @@ class CryptoManager(private val context: Context) {
             .withMasterKeyUri("android-keystore://master_key")
             .build()
             .keysetHandle
-        return keysetHandle.getPrimitive(Aead::class.java)
+        return keysetHandle.getPrimitive(RegistryConfiguration.get(), Aead::class.java)
     }
 
     private fun handleKeyCorruption() {
-        context.getSharedPreferences("tink_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+        context.getSharedPreferences("tink_prefs", Context.MODE_PRIVATE).edit { clear() }
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
         keyStore.deleteEntry("master_key")
