@@ -6,116 +6,116 @@ sealed class AnalyticsEvent(
 ) {
     // region AI
     class AiAutoTagTriggered(model: String, contentLen: Int) : AnalyticsEvent(
-        "ai_auto_tag_triggered",
-        mapOf("model" to model, "content_len" to contentLen),
+        Event.AI_AUTO_TAG_TRIGGERED,
+        mapOf(Param.MODEL to model, Param.CONTENT_LEN to contentLen),
     )
 
     class AiAutoTagResult(success: Boolean, tagCount: Int, errorType: String? = null) : AnalyticsEvent(
-        "ai_auto_tag_result",
-        mapOf("success" to success, "tag_count" to tagCount, "error_type" to errorType),
+        Event.AI_AUTO_TAG_RESULT,
+        mapOf(Param.SUCCESS to success, Param.TAG_COUNT to tagCount, Param.ERROR_TYPE to errorType),
     )
 
     class AiSummarizeTriggered(model: String, contentLen: Int, attachmentCount: Int) : AnalyticsEvent(
-        "ai_summarize_triggered",
+        Event.AI_SUMMARIZE_TRIGGERED,
         mapOf(
-            "model" to model,
-            "content_len" to contentLen,
-            "attachment_count" to attachmentCount,
+            Param.MODEL to model,
+            Param.CONTENT_LEN to contentLen,
+            Param.ATTACHMENT_COUNT to attachmentCount,
         ),
     )
 
     class AiSummarizeResult(success: Boolean, summaryLen: Int, durationMs: Long) : AnalyticsEvent(
-        "ai_summarize_result",
+        Event.AI_SUMMARIZE_RESULT,
         mapOf(
-            "success" to success,
-            "summary_len" to summaryLen,
-            "duration_ms" to durationMs,
+            Param.SUCCESS to success,
+            Param.SUMMARY_LEN to summaryLen,
+            Param.DURATION_MS to durationMs,
         ),
     )
 
     class AiImageAnalyzeTriggered(imageBytes: Int) : AnalyticsEvent(
-        "ai_image_analyze_triggered",
-        mapOf("image_bytes" to imageBytes),
+        Event.AI_IMAGE_ANALYZE_TRIGGERED,
+        mapOf(Param.IMAGE_BYTES to imageBytes),
     )
 
     class AiImageAnalyzeResult(success: Boolean, suggestionCount: Int) : AnalyticsEvent(
-        "ai_image_analyze_result",
-        mapOf("success" to success, "suggestion_count" to suggestionCount),
+        Event.AI_IMAGE_ANALYZE_RESULT,
+        mapOf(Param.SUCCESS to success, Param.SUGGESTION_COUNT to suggestionCount),
     )
 
     class AiImageQuerySubmitted(queryLen: Int) : AnalyticsEvent(
-        "ai_image_query_submitted",
-        mapOf("query_len" to queryLen),
+        Event.AI_IMAGE_QUERY_SUBMITTED,
+        mapOf(Param.QUERY_LEN to queryLen),
     )
 
     class AiImageQueryResult(success: Boolean, chunkCount: Int, resultLen: Int) : AnalyticsEvent(
-        "ai_image_query_result",
+        Event.AI_IMAGE_QUERY_RESULT,
         mapOf(
-            "success" to success,
-            "chunk_count" to chunkCount,
-            "result_len" to resultLen,
+            Param.SUCCESS to success,
+            Param.CHUNK_COUNT to chunkCount,
+            Param.RESULT_LEN to resultLen,
         ),
     )
 
     class AiAudioTranscribeTriggered(audioDurationMs: Long) : AnalyticsEvent(
-        "ai_audio_transcribe_triggered",
-        mapOf("audio_duration_ms" to audioDurationMs),
+        Event.AI_AUDIO_TRANSCRIBE_TRIGGERED,
+        mapOf(Param.AUDIO_DURATION_MS to audioDurationMs),
     )
 
     class AiLiveTranscriptionToggled(enabled: Boolean) : AnalyticsEvent(
-        "ai_live_transcription_toggled",
-        mapOf("enabled" to enabled),
+        Event.AI_LIVE_TRANSCRIPTION_TOGGLED,
+        mapOf(Param.ENABLED to enabled),
     )
 
     class AiModelSelected(model: String) : AnalyticsEvent(
-        "ai_model_selected",
-        mapOf("model" to model),
+        Event.AI_MODEL_SELECTED,
+        mapOf(Param.MODEL to model),
     )
     // endregion
 
     // region Attachments
     class AttachmentAdded(type: String, source: String) : AnalyticsEvent(
-        "attachment_added",
-        mapOf("type" to type, "source" to source),
+        Event.ATTACHMENT_ADDED,
+        mapOf(Param.TYPE to type, Param.SOURCE to source),
     )
 
     class AttachmentRemoved(type: String) : AnalyticsEvent(
-        "attachment_removed",
-        mapOf("type" to type),
+        Event.ATTACHMENT_REMOVED,
+        mapOf(Param.TYPE to type),
     )
 
     class AttachmentAudioRecorded(durationMs: Long) : AnalyticsEvent(
-        "attachment_audio_recorded",
-        mapOf("duration_ms" to durationMs),
+        Event.ATTACHMENT_AUDIO_RECORDED,
+        mapOf(Param.DURATION_MS to durationMs),
     )
 
     class AttachmentImageZoomed(hasTranscription: Boolean, hasSummary: Boolean) : AnalyticsEvent(
-        "attachment_image_zoomed",
-        mapOf("has_transcription" to hasTranscription, "has_summary" to hasSummary),
+        Event.ATTACHMENT_IMAGE_ZOOMED,
+        mapOf(Param.HAS_TRANSCRIPTION to hasTranscription, Param.HAS_SUMMARY to hasSummary),
     )
     // endregion
 
     // region Theme
     class ThemeChanged(mode: String, previousMode: String) : AnalyticsEvent(
-        "theme_changed",
-        mapOf("mode" to mode, "previous_mode" to previousMode),
+        Event.THEME_CHANGED,
+        mapOf(Param.MODE to mode, Param.PREVIOUS_MODE to previousMode),
     )
     // endregion
 
     // region Backup
     class BackupSettingsChanged(frequency: String, backupMedia: Boolean) : AnalyticsEvent(
-        "backup_settings_changed",
-        mapOf("frequency" to frequency, "backup_media" to backupMedia),
+        Event.BACKUP_SETTINGS_CHANGED,
+        mapOf(Param.FREQUENCY to frequency, Param.BACKUP_MEDIA to backupMedia),
     )
 
     class BackupNowRequested(mediaIncluded: Boolean) : AnalyticsEvent(
-        "backup_now_requested",
-        mapOf("media_included" to mediaIncluded),
+        Event.BACKUP_NOW_REQUESTED,
+        mapOf(Param.MEDIA_INCLUDED to mediaIncluded),
     )
 
     class BackupStarted(trigger: String) : AnalyticsEvent(
-        "backup_started",
-        mapOf("trigger" to trigger),
+        Event.BACKUP_STARTED,
+        mapOf(Param.TRIGGER to trigger),
     )
 
     class BackupResult(
@@ -124,27 +124,27 @@ sealed class AnalyticsEvent(
         attempt: Int,
         errorType: String? = null,
     ) : AnalyticsEvent(
-        "backup_result",
+        Event.BACKUP_RESULT,
         mapOf(
-            "success" to success,
-            "duration_ms" to durationMs,
-            "attempt" to attempt,
-            "error_type" to errorType,
+            Param.SUCCESS to success,
+            Param.DURATION_MS to durationMs,
+            Param.ATTEMPT to attempt,
+            Param.ERROR_TYPE to errorType,
         ),
     )
 
-    object RestoreStarted : AnalyticsEvent("restore_started", emptyMap())
+    object RestoreStarted : AnalyticsEvent(Event.RESTORE_STARTED, emptyMap())
 
     class RestoreResult(
         success: Boolean,
         durationMs: Long,
         errorType: String? = null,
     ) : AnalyticsEvent(
-        "restore_result",
+        Event.RESTORE_RESULT,
         mapOf(
-            "success" to success,
-            "duration_ms" to durationMs,
-            "error_type" to errorType,
+            Param.SUCCESS to success,
+            Param.DURATION_MS to durationMs,
+            Param.ERROR_TYPE to errorType,
         ),
     )
     // endregion
@@ -156,32 +156,32 @@ sealed class AnalyticsEvent(
         audioCount: Int,
         tagCount: Int,
     ) : AnalyticsEvent(
-        "note_shared",
+        Event.NOTE_SHARED,
         mapOf(
-            "has_attachments" to hasAttachments,
-            "image_count" to imageCount,
-            "audio_count" to audioCount,
-            "tag_count" to tagCount,
+            Param.HAS_ATTACHMENTS to hasAttachments,
+            Param.IMAGE_COUNT to imageCount,
+            Param.AUDIO_COUNT to audioCount,
+            Param.TAG_COUNT to tagCount,
         ),
     )
 
     class CollaboratorInvited(success: Boolean) : AnalyticsEvent(
-        "collaborator_invited",
-        mapOf("success" to success),
+        Event.COLLABORATOR_INVITED,
+        mapOf(Param.SUCCESS to success),
     )
 
-    object CollaboratorRemoved : AnalyticsEvent("collaborator_removed", emptyMap())
+    object CollaboratorRemoved : AnalyticsEvent(Event.COLLABORATOR_REMOVED, emptyMap())
     // endregion
 
     // region Rich text
     class RichTextFormatApplied(spanType: String) : AnalyticsEvent(
-        "richtext_format_applied",
-        mapOf("span_type" to spanType),
+        Event.RICHTEXT_FORMAT_APPLIED,
+        mapOf(Param.SPAN_TYPE to spanType),
     )
 
     class RichTextBarToggled(shown: Boolean) : AnalyticsEvent(
-        "richtext_bar_toggled",
-        mapOf("shown" to shown),
+        Event.RICHTEXT_BAR_TOGGLED,
+        mapOf(Param.SHOWN to shown),
     )
     // endregion
 
@@ -193,13 +193,13 @@ sealed class AnalyticsEvent(
         contentLen: Int,
         isChecklist: Boolean,
     ) : AnalyticsEvent(
-        "note_created",
+        Event.NOTE_CREATED,
         mapOf(
-            "has_attachments" to hasAttachments,
-            "attachment_count" to attachmentCount,
-            "tag_count" to tagCount,
-            "content_len" to contentLen,
-            "is_checklist" to isChecklist,
+            Param.HAS_ATTACHMENTS to hasAttachments,
+            Param.ATTACHMENT_COUNT to attachmentCount,
+            Param.TAG_COUNT to tagCount,
+            Param.CONTENT_LEN to contentLen,
+            Param.IS_CHECKLIST to isChecklist,
         ),
     )
 
@@ -210,43 +210,122 @@ sealed class AnalyticsEvent(
         contentLen: Int,
         isChecklist: Boolean,
     ) : AnalyticsEvent(
-        "note_updated",
+        Event.NOTE_UPDATED,
         mapOf(
-            "has_attachments" to hasAttachments,
-            "attachment_count" to attachmentCount,
-            "tag_count" to tagCount,
-            "content_len" to contentLen,
-            "is_checklist" to isChecklist,
+            Param.HAS_ATTACHMENTS to hasAttachments,
+            Param.ATTACHMENT_COUNT to attachmentCount,
+            Param.TAG_COUNT to tagCount,
+            Param.CONTENT_LEN to contentLen,
+            Param.IS_CHECKLIST to isChecklist,
         ),
     )
 
     class NoteDeleted(count: Int = 1) : AnalyticsEvent(
-        "note_deleted",
-        mapOf("count" to count),
+        Event.NOTE_DELETED,
+        mapOf(Param.COUNT to count),
     )
 
     class NotePinned(pinned: Boolean) : AnalyticsEvent(
-        "note_pinned",
-        mapOf("pinned" to pinned),
+        Event.NOTE_PINNED,
+        mapOf(Param.PINNED to pinned),
     )
 
     class NoteArchived(archived: Boolean) : AnalyticsEvent(
-        "note_archived",
-        mapOf("archived" to archived),
+        Event.NOTE_ARCHIVED,
+        mapOf(Param.ARCHIVED to archived),
     )
     // endregion
 
     // region Auth
     class AuthSignInAttempted(method: String) : AnalyticsEvent(
-        "auth_sign_in_attempted",
-        mapOf("method" to method),
+        Event.AUTH_SIGN_IN_ATTEMPTED,
+        mapOf(Param.METHOD to method),
     )
 
     class AuthSignInResult(success: Boolean, errorType: String? = null) : AnalyticsEvent(
-        "auth_sign_in_result",
-        mapOf("success" to success, "error_type" to errorType),
+        Event.AUTH_SIGN_IN_RESULT,
+        mapOf(Param.SUCCESS to success, Param.ERROR_TYPE to errorType),
     )
 
-    object AuthSignOut : AnalyticsEvent("auth_sign_out", emptyMap())
+    object AuthSignOut : AnalyticsEvent(Event.AUTH_SIGN_OUT, emptyMap())
     // endregion
+
+    companion object {
+        object Event {
+            const val AI_AUTO_TAG_TRIGGERED = "ai_auto_tag_triggered"
+            const val AI_AUTO_TAG_RESULT = "ai_auto_tag_result"
+            const val AI_SUMMARIZE_TRIGGERED = "ai_summarize_triggered"
+            const val AI_SUMMARIZE_RESULT = "ai_summarize_result"
+            const val AI_IMAGE_ANALYZE_TRIGGERED = "ai_image_analyze_triggered"
+            const val AI_IMAGE_ANALYZE_RESULT = "ai_image_analyze_result"
+            const val AI_IMAGE_QUERY_SUBMITTED = "ai_image_query_submitted"
+            const val AI_IMAGE_QUERY_RESULT = "ai_image_query_result"
+            const val AI_AUDIO_TRANSCRIBE_TRIGGERED = "ai_audio_transcribe_triggered"
+            const val AI_LIVE_TRANSCRIPTION_TOGGLED = "ai_live_transcription_toggled"
+            const val AI_MODEL_SELECTED = "ai_model_selected"
+            const val ATTACHMENT_ADDED = "attachment_added"
+            const val ATTACHMENT_REMOVED = "attachment_removed"
+            const val ATTACHMENT_AUDIO_RECORDED = "attachment_audio_recorded"
+            const val ATTACHMENT_IMAGE_ZOOMED = "attachment_image_zoomed"
+            const val THEME_CHANGED = "theme_changed"
+            const val BACKUP_SETTINGS_CHANGED = "backup_settings_changed"
+            const val BACKUP_NOW_REQUESTED = "backup_now_requested"
+            const val BACKUP_STARTED = "backup_started"
+            const val BACKUP_RESULT = "backup_result"
+            const val RESTORE_STARTED = "restore_started"
+            const val RESTORE_RESULT = "restore_result"
+            const val NOTE_SHARED = "note_shared"
+            const val COLLABORATOR_INVITED = "collaborator_invited"
+            const val COLLABORATOR_REMOVED = "collaborator_removed"
+            const val RICHTEXT_FORMAT_APPLIED = "richtext_format_applied"
+            const val RICHTEXT_BAR_TOGGLED = "richtext_bar_toggled"
+            const val NOTE_CREATED = "note_created"
+            const val NOTE_UPDATED = "note_updated"
+            const val NOTE_DELETED = "note_deleted"
+            const val NOTE_PINNED = "note_pinned"
+            const val NOTE_ARCHIVED = "note_archived"
+            const val AUTH_SIGN_IN_ATTEMPTED = "auth_sign_in_attempted"
+            const val AUTH_SIGN_IN_RESULT = "auth_sign_in_result"
+            const val AUTH_SIGN_OUT = "auth_sign_out"
+        }
+
+        object Param {
+            const val MODEL = "model"
+            const val CONTENT_LEN = "content_len"
+            const val SUCCESS = "success"
+            const val TAG_COUNT = "tag_count"
+            const val ERROR_TYPE = "error_type"
+            const val ATTACHMENT_COUNT = "attachment_count"
+            const val SUMMARY_LEN = "summary_len"
+            const val DURATION_MS = "duration_ms"
+            const val IMAGE_BYTES = "image_bytes"
+            const val SUGGESTION_COUNT = "suggestion_count"
+            const val QUERY_LEN = "query_len"
+            const val CHUNK_COUNT = "chunk_count"
+            const val RESULT_LEN = "result_len"
+            const val AUDIO_DURATION_MS = "audio_duration_ms"
+            const val ENABLED = "enabled"
+            const val TYPE = "type"
+            const val SOURCE = "source"
+            const val HAS_TRANSCRIPTION = "has_transcription"
+            const val HAS_SUMMARY = "has_summary"
+            const val MODE = "mode"
+            const val PREVIOUS_MODE = "previous_mode"
+            const val FREQUENCY = "frequency"
+            const val BACKUP_MEDIA = "backup_media"
+            const val MEDIA_INCLUDED = "media_included"
+            const val TRIGGER = "trigger"
+            const val ATTEMPT = "attempt"
+            const val HAS_ATTACHMENTS = "has_attachments"
+            const val IMAGE_COUNT = "image_count"
+            const val AUDIO_COUNT = "audio_count"
+            const val SPAN_TYPE = "span_type"
+            const val SHOWN = "shown"
+            const val IS_CHECKLIST = "is_checklist"
+            const val COUNT = "count"
+            const val PINNED = "pinned"
+            const val ARCHIVED = "archived"
+            const val METHOD = "method"
+        }
+    }
 }
