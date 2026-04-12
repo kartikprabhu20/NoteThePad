@@ -105,6 +105,7 @@ const MODULES = [
   { id: ':core:template', label: ':core:template', type: 'core' },
   { id: ':core:richtext', label: ':core:richtext', type: 'core' },
   { id: ':core:network', label: ':core:network', type: 'core' },
+  { id: ':core:analytics', label: ':core:analytics', type: 'core' },
 ];
 
 // [from, to, isApi]
@@ -114,6 +115,7 @@ const EDGES = [
   [':app',                          ':core:ui',                    false],
   [':app',                          ':core:data',                  false],
   [':app',                          ':core:network',               false],
+  [':app',                          ':core:analytics',             false],
   [':app',                          ':feature:note',               false],
   [':app',                          ':feature:auth',               false],
   [':app',                          ':feature:widgets',            false],
@@ -127,19 +129,23 @@ const EDGES = [
   [':core:ai',                      ':core:model',                 false],
   [':core:ai',                      ':core:data',                  false],
   [':core:ai',                      ':core:common',                false],
+  [':core:ai',                      ':core:analytics',             false],
   [':feature:note',                 ':core:model',                 false],
   [':feature:note',                 ':core:data',                  false],
   [':feature:note',                 ':core:common',                false],
   [':feature:note',                 ':core:ui',                    false],
   [':feature:note',                 ':core:ai',                    false],
   [':feature:note',                 ':core:richtext',              false],
+  [':feature:note',                 ':core:analytics',             false],
   [':core:backup',                  ':core:model',                 false],
   [':core:backup',                  ':core:common',                false],
   [':core:backup',                  ':core:data',                  false],
+  [':core:backup',                  ':core:analytics',             false],
   [':feature:auth',                 ':core:model',                 false],
   [':feature:auth',                 ':core:common',                false],
   [':feature:auth',                 ':core:ui',                    false],
   [':feature:auth',                 ':core:data',                  false],
+  [':feature:auth',                 ':core:analytics',             false],
   [':feature:widgets',              ':core:model',                 false],
   [':feature:widgets',              ':core:common',                false],
   [':feature:widgets',              ':core:data',                  false],
@@ -151,10 +157,13 @@ const EDGES = [
   [':feature:settings',             ':core:ui',                    false],
   [':feature:settings',             ':core:ai',                    false],
   [':feature:settings',             ':core:backup',                false],
+  [':feature:settings',             ':core:analytics',             false],
   [':feature:calendar',             ':core:model',                 false],
   [':feature:calendar',             ':core:data',                  false],
   [':feature:calendar',             ':core:common',                false],
   [':feature:calendar',             ':core:ui',                    false],
+  [':core:analytics',               ':core:model',                 false],
+  [':core:analytics',               ':core:common',                false],
 ];
 
 const NODE_W = 152, NODE_H = 36;
@@ -162,20 +171,21 @@ const COL = 168, ROW = 120, PX = 36, PY = 48;
 
 const DEFAULT_POS = {
   ':app':                            { col: 1.5, row: 0 },
-  ':core:model':                     { col: 3, row: 3 },
-  ':core:common':                    { col: 1, row: 3 },
-  ':core:data':                      { col: 2, row: 3 },
-  ':core:ui':                        { col: 4, row: 2 },
-  ':core:ai':                        { col: 0, row: 2 },
+  ':core:model':                     { col: 2, row: 4 },
+  ':core:common':                    { col: 1.5, row: 3 },
+  ':core:data':                      { col: 2.5, row: 3 },
+  ':core:ui':                        { col: 3.5, row: 2 },
+  ':core:ai':                        { col: 0.5, row: 2 },
   ':feature:note':                   { col: 2, row: 1 },
-  ':core:backup':                    { col: 1, row: 2 },
+  ':core:backup':                    { col: 1.5, row: 2 },
   ':feature:auth':                   { col: 0, row: 1 },
   ':feature:widgets':                { col: 4, row: 1 },
   ':feature:settings':               { col: 3, row: 1 },
   ':feature:calendar':               { col: 1, row: 1 },
   ':core:template':                  { col: 2.5, row: 0 },
-  ':core:richtext':                  { col: 3, row: 2 },
-  ':core:network':                   { col: 2, row: 2 },
+  ':core:richtext':                  { col: 2.5, row: 2 },
+  ':core:network':                   { col: 3.5, row: 3 },
+  ':core:analytics':                 { col: 0.5, row: 3 },
 };
 
 function defaultXY(id) {
