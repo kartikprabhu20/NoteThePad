@@ -14,6 +14,7 @@ import com.mintanable.notethepad.database.db.DatabaseManager
 import com.mintanable.notethepad.database.db.entity.CollaboratorEntity
 import com.mintanable.notethepad.database.db.util.toEntity
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.file.FileManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -26,7 +27,8 @@ class SupaFetchWorker @AssistedInject constructor(
     private val supabaseSyncService: SupabaseSyncService,
     private val collaborationService: CollaborationService,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val fileManager: FileManager
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -50,6 +52,7 @@ class SupaFetchWorker @AssistedInject constructor(
             val noteDao = dbManager.database.noteDao()
             val tagDao = dbManager.database.tagDao()
             val db = dbManager.database
+            val mediaDir = fileManager.getMediaDir()
 
             // Ensure Auth is valid
             supabaseSyncService.ensureAuthenticated(authRepository.getFreshFirebaseToken())
@@ -70,9 +73,10 @@ class SupaFetchWorker @AssistedInject constructor(
                     remoteNotes.forEach { dto ->
                         val local = noteDao.getNoteById(dto.id)
                         if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
-                            val rowid = noteDao.inserNote(dto.toEntity())
+                            val entity = dto.toEntity(mediaDir)
+                            val rowid = noteDao.inserNote(entity)
                             if(rowid == -1L)
-                                noteDao.updateNote(dto.toEntity())
+                                noteDao.updateNote(entity)
                         }
                     }
                     remoteTags.forEach { dto ->
@@ -113,9 +117,10 @@ class SupaFetchWorker @AssistedInject constructor(
                         sharedNotes.forEach { dto ->
                             val local = noteDao.getNoteById(dto.id)
                             if (local == null || dto.lastUpdateTime > local.noteEntity.lastUpdateTime) {
-                                val rowid = noteDao.inserNote(dto.toEntity())
+                                val entity = dto.toEntity(mediaDir)
+                                val rowid = noteDao.inserNote(entity)
                                 if (rowid == -1L)
-                                    noteDao.updateNote(dto.toEntity())
+                                    noteDao.updateNote(entity)
                             }
                         }
 
