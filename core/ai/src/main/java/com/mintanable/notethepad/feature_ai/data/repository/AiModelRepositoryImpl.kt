@@ -6,6 +6,8 @@ import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelCatalog
 import com.mintanable.notethepad.feature_ai.BuildConfig
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
@@ -78,6 +80,7 @@ class AiModelRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("kptest", "Error processing remote AI catalog", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }.flowOn(dispatcherProvider.io)
 
@@ -125,19 +128,34 @@ class AiModelRepositoryImpl @Inject constructor(
                     val gistResponse = response.body.string()
 
                     if (!gistResponse.isNullOrEmpty()) {
-                        val wrapper = json.decodeFromString<GistWrapper>(gistResponse)
-                        val content = wrapper.files?.get(MODEL_CATALOG_FILENAME)?.content
+                        try {
+                            val wrapper = json.decodeFromString<GistWrapper>(gistResponse)
+                            val content = wrapper.files?.get(MODEL_CATALOG_FILENAME)?.content
 
-                        if (content != null) {
-                            val internalFile = File(context.filesDir, MODEL_CATALOG_FILENAME)
-                            internalFile.writeText(content)
-                            Log.d("kptest", "Catalog updated from Gist")
+                            if (content != null) {
+                                val internalFile = File(context.filesDir, MODEL_CATALOG_FILENAME)
+                                internalFile.writeText(content)
+                                Log.d("kptest", "Catalog updated from Gist")
+                            } else {
+                                Log.w("kptest", "Catalog content is null for $MODEL_CATALOG_FILENAME")
+                                FirebaseCrashlytics.getInstance().log("Gist catalog content is null for $MODEL_CATALOG_FILENAME")
+                            }
+                        } catch (e: Exception) {
+                            Log.e("kptest", "Failed to parse Gist response", e)
+                            FirebaseCrashlytics.getInstance().apply {
+                                log("Failed to parse Gist response: $gistResponse")
+                                recordException(e)
+                            }
                         }
                     }
+                } else {
+                    Log.e("kptest", "Gist fetch unsuccessful: ${response.code}")
+                    FirebaseCrashlytics.getInstance().log("Gist fetch unsuccessful: ${response.code}")
                 }
             }
         } catch (e: Exception) {
             Log.e("kptest", "Failed to fetch catalog from Gist $e")
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
 
@@ -149,6 +167,7 @@ class AiModelRepositoryImpl @Inject constructor(
             } else null
         } catch (e: Exception) {
             Log.e("kptest", "Failed to parse internal catalog", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             null
         }
     }
@@ -161,6 +180,7 @@ class AiModelRepositoryImpl @Inject constructor(
                 .let { json.decodeFromString<AiModelCatalog>(it) }
         } catch (e: Exception) {
             Log.e("kptest", "Failed to parse assets catalog", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             null
         }
     }
@@ -168,10 +188,10 @@ class AiModelRepositoryImpl @Inject constructor(
 
 @Serializable
 data class GistWrapper(
-    val files: Map<String, GistFile>? = null
+    @SerialName("files") val files: Map<String, GistFile>? = null
 )
 
 @Serializable
 data class GistFile(
-    val content: String? = null
+    @SerialName("content") val content: String? = null
 )

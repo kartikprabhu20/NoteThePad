@@ -29,6 +29,8 @@ android {
         buildConfigField("String", "HUGGING_FACE_AUTH_TOKEN", getSecret("HUGGING_FACE_AUTH_TOKEN"))
         buildConfigField("String", "GIST_ACCESS_TOKEN", getSecret("GIST_ACCESS_TOKEN"))
         buildConfigField("String", "AI_CATELOG_GIST_URL", getSecret("AI_CATELOG_GIST_URL"))
+
+        consumerProguardFiles "proguard-rules.pro"
     }
 
     compileOptions {
