@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">直接从小部件创建笔记</string>
     <string name="onboarding_widget_single_note">单条笔记</string>
     <string name="onboarding_widget_notes_list">笔记列表</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">隐私</string>
+    <string name="setting_analytics_toggle">共享使用情况数据</string>
+    <string name="setting_analytics_description">通过共享匿名使用情况数据帮助改进 NoteThePad</string>
 </resources>

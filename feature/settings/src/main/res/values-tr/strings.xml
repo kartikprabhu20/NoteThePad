@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">Doğrudan widgetlardan notlar oluşturun</string>
     <string name="onboarding_widget_single_note">Tek Not</string>
     <string name="onboarding_widget_notes_list">Not Listesi</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">Gizlilik</string>
+    <string name="setting_analytics_toggle">Kullanım verilerini paylaş</string>
+    <string name="setting_analytics_description">Anonim kullanım verilerini paylaşarak NoteThePad\'in geliştirilmesine yardımcı olun</string>
 </resources>

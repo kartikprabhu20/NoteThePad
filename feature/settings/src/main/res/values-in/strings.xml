@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">Buat catatan langsung dari widget</string>
     <string name="onboarding_widget_single_note">Catatan Tunggal</string>
     <string name="onboarding_widget_notes_list">Daftar Catatan</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">Privasi</string>
+    <string name="setting_analytics_toggle">Bagikan data penggunaan</string>
+    <string name="setting_analytics_description">Bantu tingkatkan NoteThePad dengan membagikan data penggunaan anonim</string>
 </resources>

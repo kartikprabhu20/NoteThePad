@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">위젯에서 직접 노트를 생성하세요</string>
     <string name="onboarding_widget_single_note">단일 노트</string>
     <string name="onboarding_widget_notes_list">노트 목록</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">개인정보 보호</string>
+    <string name="setting_analytics_toggle">사용 데이터 공유</string>
+    <string name="setting_analytics_description">익명 사용 데이터를 공유하여 NoteThePad 개선에 참여해 주세요</string>
 </resources>

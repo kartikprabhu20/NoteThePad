@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">ウィジェットから直接ノートを作成できます</string>
     <string name="onboarding_widget_single_note">単一のノート</string>
     <string name="onboarding_widget_notes_list">ノート一覧</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">プライバシー</string>
+    <string name="setting_analytics_toggle">使用状況データを共有する</string>
+    <string name="setting_analytics_description">匿名の使用状況データを共有して NoteThePad の改善にご協力ください</string>
 </resources>

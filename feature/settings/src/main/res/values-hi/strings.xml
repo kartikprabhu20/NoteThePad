@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">विजेट से सीधे नोट्स बनाएं</string>
     <string name="onboarding_widget_single_note">एकल नोट</string>
     <string name="onboarding_widget_notes_list">नोट्स सूची</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">गोपनीयता</string>
+    <string name="setting_analytics_toggle">उपयोग डेटा साझा करें</string>
+    <string name="setting_analytics_description">अनाम उपयोग डेटा साझा करके NoteThePad को बेहतर बनाने में सहायता करें</string>
 </resources>

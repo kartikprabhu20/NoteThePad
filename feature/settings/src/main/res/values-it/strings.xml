@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">Crea note direttamente dai widget</string>
     <string name="onboarding_widget_single_note">Nota singola</string>
     <string name="onboarding_widget_notes_list">Elenco note</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">Privacy</string>
+    <string name="setting_analytics_toggle">Condividi dati di utilizzo</string>
+    <string name="setting_analytics_description">Aiuta a migliorare NoteThePad condividendo dati di utilizzo anonimi</string>
 </resources>

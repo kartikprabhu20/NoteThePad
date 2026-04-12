@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">সরাসরি উইজেট থেকে নোট তৈরি করুন</string>
     <string name="onboarding_widget_single_note">একক নোট</string>
     <string name="onboarding_widget_notes_list">নোট তালিকা</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">গোপনীয়তা</string>
+    <string name="setting_analytics_toggle">ব্যবহারের তথ্য শেয়ার করুন</string>
+    <string name="setting_analytics_description">বেনামী ব্যবহারের ডেটা শেয়ার করে NoteThePad উন্নত করতে সাহায্য করুন</string>
 </resources>

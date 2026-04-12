@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">Создавайте заметки прямо из виджетов</string>
     <string name="onboarding_widget_single_note">Одна заметка</string>
     <string name="onboarding_widget_notes_list">Список заметок</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">Конфиденциальность</string>
+    <string name="setting_analytics_toggle">Отправлять данные об использовании</string>
+    <string name="setting_analytics_description">Помогите улучшить NoteThePad, делясь анонимными данными об использовании</string>
 </resources>

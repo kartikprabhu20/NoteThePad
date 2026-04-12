@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">أنشئ ملاحظات مباشرة من الأدوات</string>
     <string name="onboarding_widget_single_note">ملاحظة واحدة</string>
     <string name="onboarding_widget_notes_list">قائمة الملاحظات</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">الخصوصية</string>
+    <string name="setting_analytics_toggle">مشاركة بيانات الاستخدام</string>
+    <string name="setting_analytics_description">ساعد في تحسين NoteThePad من خلال مشاركة بيانات الاستخدام المجهولة</string>
 </resources>

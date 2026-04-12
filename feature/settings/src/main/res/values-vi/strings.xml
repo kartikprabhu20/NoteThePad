@@ -133,4 +133,9 @@
     <string name="onboarding_feature_capture_desc">Tạo ghi chú trực tiếp từ widget</string>
     <string name="onboarding_widget_single_note">Ghi chú đơn</string>
     <string name="onboarding_widget_notes_list">Danh sách ghi chú</string>
+
+    <!-- Privacy -->
+    <string name="setting_privacy">Quyền riêng tư</string>
+    <string name="setting_analytics_toggle">Chia sẻ dữ liệu sử dụng</string>
+    <string name="setting_analytics_description">Giúp cải thiện NoteThePad bằng cách chia sẻ dữ liệu sử dụng ẩn danh</string>
 </resources>
