@@ -18,7 +18,10 @@ android {
             localProperties.load(localPropertiesFile.newInputStream())
         }
 
-        buildConfigField("String", "MIXPANEL_TOKEN", "\"${localProperties.getProperty("MIXPANEL_TOKEN") ?: ""}\"")
+        def getSecret = { key ->
+            return "\"" + (localProperties.getProperty(key) ?: System.getenv(key) ?: "") + "\""
+        }
+        buildConfigField("String", "MIXPANEL_TOKEN", getSecret("MIXPANEL_TOKEN"))
 
         consumerProguardFiles "consumer-rules.pro"
     }

@@ -18,9 +18,11 @@ android {
         if (localPropertiesFile.exists()) {
             localProperties.load(localPropertiesFile.newInputStream())
         }
-
-        buildConfigField("String", "SUPABASE_URL", "\"${localProperties.getProperty("SUPABASE_URL") ?: ""}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProperties.getProperty("SUPABASE_ANON_KEY") ?: ""}\"")
+        def getSecret = { key ->
+            return "\"" + (localProperties.getProperty(key) ?: System.getenv(key) ?: "") + "\""
+        }
+        buildConfigField("String", "SUPABASE_URL", getSecret("SUPABASE_URL"))
+        buildConfigField("String", "SUPABASE_ANON_KEY", getSecret("SUPABASE_ANON_KEY"))
 
     }
 
