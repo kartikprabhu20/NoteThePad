@@ -34,6 +34,7 @@ dependencies {
     implementation project(':core:ui')
     implementation project(':core:ai')
     implementation project(':core:richtext')
+    implementation project(':core:analytics')
 
     //Material
     implementation 'com.google.android.material:material:1.11.0'

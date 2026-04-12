@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
+}
+
+android {
+    namespace 'com.mintanable.notethepad.core.analytics'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 26
+
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.newInputStream())
+        }
+
+        buildConfigField("String", "MIXPANEL_TOKEN", "\"${localProperties.getProperty("MIXPANEL_TOKEN") ?: ""}\"")
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation project(':core:model')
+    implementation project(':core:common')
+
+    // Mixpanel
+    implementation 'com.mixpanel.android:mixpanel-android:7.5.2'
+
+    // DataStore for deviceId + opt-out flag
+    implementation "androidx.datastore:datastore-preferences:1.2.0"
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:2.57"
+    ksp "com.google.dagger:hilt-android-compiler:2.57"
+}
