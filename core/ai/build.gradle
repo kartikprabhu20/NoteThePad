@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 android {
@@ -65,7 +66,7 @@ dependencies {
 
     // AI & Network
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
-    implementation("com.google.code.gson:gson:2.13.2")
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
 
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
     implementation("com.google.mlkit:common:18.11.0")

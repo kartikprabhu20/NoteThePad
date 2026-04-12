@@ -2,11 +2,12 @@ package com.mintanable.notethepad.feature_ai.data.repository
 
 import android.content.Context
 import android.util.Log
-import com.google.gson.Gson
 import com.mintanable.notethepad.core.common.DispatcherProvider
 import com.mintanable.notethepad.core.model.ai.AiModel
 import com.mintanable.notethepad.core.model.ai.AiModelCatalog
 import com.mintanable.notethepad.feature_ai.BuildConfig
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,10 @@ class AiModelRepositoryImpl @Inject constructor(
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
-    private val gson = Gson()
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
 
     override fun getModels(): Flow<List<AiModel>> = flow {
         if (_cachedModels.value.isNotEmpty()) {
@@ -121,8 +125,8 @@ class AiModelRepositoryImpl @Inject constructor(
                     val gistResponse = response.body.string()
 
                     if (!gistResponse.isNullOrEmpty()) {
-                        val wrapper = gson.fromJson(gistResponse, GistWrapper::class.java)
-                        val content = wrapper?.files?.get(MODEL_CATALOG_FILENAME)?.content
+                        val wrapper = json.decodeFromString<GistWrapper>(gistResponse)
+                        val content = wrapper.files?.get(MODEL_CATALOG_FILENAME)?.content
 
                         if (content != null) {
                             val internalFile = File(context.filesDir, MODEL_CATALOG_FILENAME)
@@ -141,7 +145,7 @@ class AiModelRepositoryImpl @Inject constructor(
         return try {
             val file = File(context.filesDir, MODEL_CATALOG_FILENAME)
             if (file.exists()) {
-                file.readText().let { gson.fromJson(it, AiModelCatalog::class.java) }
+                file.readText().let { json.decodeFromString<AiModelCatalog>(it) }
             } else null
         } catch (e: Exception) {
             Log.e("kptest", "Failed to parse internal catalog", e)
@@ -154,7 +158,7 @@ class AiModelRepositoryImpl @Inject constructor(
             context.assets.open(MODEL_CATALOG_FILENAME)
                 .bufferedReader()
                 .use { it.readText() }
-                .let { gson.fromJson(it, AiModelCatalog::class.java) }
+                .let { json.decodeFromString<AiModelCatalog>(it) }
         } catch (e: Exception) {
             Log.e("kptest", "Failed to parse assets catalog", e)
             null
@@ -162,10 +166,12 @@ class AiModelRepositoryImpl @Inject constructor(
     }
 }
 
+@Serializable
 data class GistWrapper(
     val files: Map<String, GistFile>? = null
 )
 
+@Serializable
 data class GistFile(
     val content: String? = null
 )
