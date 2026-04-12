@@ -39,6 +39,9 @@ import com.mintanable.notethepad.feature_settings.presentation.SettingsState
 import com.mintanable.notethepad.feature_settings.presentation.getLoadStatusFLow
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.feature_ai.data.GeminiAudioModelDownloadWorker
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
+import com.mintanable.notethepad.core.analytics.internal.AnalyticsPreferences
 import com.mintanable.notethepad.feature_settings.domain.use_case.DeleteFileUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -86,7 +89,9 @@ class SettingsViewModel @Inject constructor(
     private val getNanoStatus: GetNanoStatus,
     private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase,
     private val noteRepository: NoteRepository,
-    private val deleteFileUsecase: DeleteFileUsecase
+    private val deleteFileUsecase: DeleteFileUsecase,
+    private val analyticsTracker: AnalyticsTracker,
+    private val analyticsPreferences: AnalyticsPreferences
 ) : ViewModel() {
 
     companion object {
@@ -170,6 +175,8 @@ class SettingsViewModel @Inject constructor(
             }
         }
 
+    private val _analyticsEnabledFlow = analyticsPreferences.analyticsEnabledFlow
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _aiModelsFlow = refreshTrigger.flatMapLatest { getSupportedAiModels() }
 
@@ -186,7 +193,8 @@ class SettingsViewModel @Inject constructor(
         _audioTranscriberStatusFlow,
         _showDownloadAudioTranscriberDialog,
         _audioDownloadStatus,
-        _nanoStatusFlow
+        _nanoStatusFlow,
+        _analyticsEnabledFlow
         ) { args: Array<Any?> ->
         val settings = args[0] as Settings
         val metadata = args[1] as BackupUiState
@@ -201,6 +209,7 @@ class SettingsViewModel @Inject constructor(
         val showAudioTranscriberDialog = args[9] as Boolean
         val audioModelStatus = args[10] as LoadStatus
         val nanoStatus = args[11] as AiModelDownloadStatus
+        val analyticsEnabled = args[12] as Boolean
 
         val activeTransferStatus = when {
             download is LoadStatus.Progress -> download
@@ -220,7 +229,8 @@ class SettingsViewModel @Inject constructor(
             audioTranscriberStatus = audioTranscriberStatus,
             showDownloadAudioTranscriberDialog = showAudioTranscriberDialog,
             audioModelStatus = audioModelStatus,
-            nanoStatus = nanoStatus
+            nanoStatus = nanoStatus,
+            analyticsEnabled = analyticsEnabled
         )
     }.stateIn(
         scope = viewModelScope,
@@ -268,6 +278,7 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.UpdateSupaSync -> updateSupaSync(event.enabled)
             is SettingsEvent.DeleteAiModel -> deleteAiModel(event.aiModel)
             is SettingsEvent.CompleteOnboarding -> completeOnboarding()
+            is SettingsEvent.UpdateAnalyticsEnabled -> analyticsTracker.setEnabled(event.enabled)
         }
     }
 
@@ -293,6 +304,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun selectAiModel(aiModel: AiModel) {
+        analyticsTracker.track(AnalyticsEvent.AiModelSelected(aiModel.name))
         viewModelScope.launch {
             if (aiModel.url.isEmpty()) {
                 withContext(Dispatchers.IO) { dataStore.updateAiModel(aiModel.name) }
@@ -353,6 +365,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun updateTheme(mode: ThemeMode) {
+        val previous = state.value.settings.themeMode.name.lowercase()
+        analyticsTracker.track(AnalyticsEvent.ThemeChanged(mode.name.lowercase(), previous))
         viewModelScope.launch { dataStore.updateTheme(mode) }
     }
 
@@ -397,6 +411,13 @@ class SettingsViewModel @Inject constructor(
         onFailure: (String) -> Unit
     ) {
         viewModelScope.launch {
+            analyticsTracker.track(AnalyticsEvent.BackupSettingsChanged(
+                backupSettings.backupFrequency.name.lowercase(),
+                backupSettings.backupMedia
+            ))
+            if (backupNow) {
+                analyticsTracker.track(AnalyticsEvent.BackupNowRequested(backupSettings.backupMedia))
+            }
             dataStore.updateBackupSettings(backupSettings)
 
             if (!canPerformNetworkTask(onFailure)) return@launch

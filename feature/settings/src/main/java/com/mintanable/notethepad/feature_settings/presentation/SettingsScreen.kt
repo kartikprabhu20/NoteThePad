@@ -328,6 +328,25 @@ fun SettingsScreen(
                     onClick = onViewOnboarding
                 )
             }
+
+            item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                Text(
+                    text = stringResource(R.string.setting_privacy),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                SettingSwitchItem(
+                    title = stringResource(R.string.setting_analytics_toggle),
+                    subtitle = stringResource(R.string.setting_analytics_description),
+                    checked = state.analyticsEnabled,
+                    enableSettings = true,
+                    onCheckedChange = { checked ->
+                        onEvent(SettingsEvent.UpdateAnalyticsEnabled(checked))
+                    }
+                )
+            }
         }
 
         if(showIntervalDialog){
