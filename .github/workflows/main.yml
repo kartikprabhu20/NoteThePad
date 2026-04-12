@@ -58,12 +58,26 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           DRIVE_CLIENT_ID: ${{ secrets.DRIVE_CLIENT_ID }}
           DRIVE_CLIENT_SECRET: ${{ secrets.DRIVE_CLIENT_SECRET }}
+          MIXPANEL_TOKEN: ${{ secrets.MIXPANEL_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HUGGING_FACE_AUTH_TOKEN: ${{ secrets.HUGGING_FACE_AUTH_TOKEN }}
+          GIST_ACCESS_TOKEN: ${{ secrets.GIST_ACCESS_TOKEN }}
+          AI_CATELOG_GIST_URL: ${{ secrets.AI_CATELOG_GIST_URL }}
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug
         env:
           DRIVE_CLIENT_ID: ${{ secrets.DRIVE_CLIENT_ID }}
           DRIVE_CLIENT_SECRET: ${{ secrets.DRIVE_CLIENT_SECRET }}
+          MIXPANEL_TOKEN: ${{ secrets.MIXPANEL_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HUGGING_FACE_AUTH_TOKEN: ${{ secrets.HUGGING_FACE_AUTH_TOKEN }}
+          GIST_ACCESS_TOKEN: ${{ secrets.GIST_ACCESS_TOKEN }}
+          AI_CATELOG_GIST_URL: ${{ secrets.AI_CATELOG_GIST_URL }}
 
       - name: Upload Artifacts to Actions Tab
         uses: actions/upload-artifact@v4
