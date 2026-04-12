@@ -88,11 +88,6 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    LaunchedEffect(navController) {
-                        navController.currentBackStackEntryFlow.collect { entry ->
-                            entry.destination.route?.let { analyticsTracker.screenView(it) }
-                        }
-                    }
                     LaunchedEffect(currentIntent) {
                         val noteId = currentIntent?.getStringExtra(NavigationConstants.EXTRA_NOTE_ID)
                         if (!noteId.isNullOrBlank()) {
