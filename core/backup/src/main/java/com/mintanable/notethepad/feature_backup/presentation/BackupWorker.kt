@@ -23,6 +23,8 @@ import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepo
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.database.db.repository.NoteRepository
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.feature_backup.R
 import com.mintanable.notethepad.file.FileManager
 import dagger.assisted.Assisted
@@ -41,10 +43,14 @@ class BackupWorker @AssistedInject constructor(
     private val userPrefs: UserPreferencesRepository,
     private val noteRepository: NoteRepository,
     private val fileManager: FileManager,
-    private val dbManager: DatabaseManager
+    private val dbManager: DatabaseManager,
+    private val analyticsTracker: AnalyticsTracker
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO){
+        val startTime = System.currentTimeMillis()
+        val trigger = inputData.getString("trigger") ?: "scheduled"
+        analyticsTracker.track(AnalyticsEvent.BackupStarted(trigger))
         try {
             val refreshToken =
                 googleAuthRepository.getDecryptedRefreshToken() ?: return@withContext Result.failure()
@@ -99,13 +105,18 @@ class BackupWorker @AssistedInject constructor(
                 }
             }
 
-            if (!uploadSuccess) return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
+            if (!uploadSuccess) {
+                analyticsTracker.track(AnalyticsEvent.BackupResult(false, System.currentTimeMillis() - startTime, runAttemptCount, "upload_failed"))
+                return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
+            }
 
             backupScheduler.onWorkCompleted(inputData)
+            analyticsTracker.track(AnalyticsEvent.BackupResult(true, System.currentTimeMillis() - startTime, runAttemptCount))
             return@withContext Result.success()
 
         } catch (e: Exception) {
             Log.e("kptest", "Error: ${e.message}")
+            analyticsTracker.track(AnalyticsEvent.BackupResult(false, System.currentTimeMillis() - startTime, runAttemptCount, e::class.simpleName))
             return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
         }
     }

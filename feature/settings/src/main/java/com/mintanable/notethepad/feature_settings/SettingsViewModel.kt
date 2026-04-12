@@ -346,6 +346,7 @@ class SettingsViewModel @Inject constructor(
                 }
             }
             if (!isNetworkReady) return@launch
+            analyticsTracker.track(AnalyticsEvent.AiModelDownloadStarted(aiModel.name, aiModel.sizeInBytes))
             dataStore.updateAiModel(aiModel.name)
             downloadAiModelUseCase(aiModel.url, aiModel.downloadFileName)
         }

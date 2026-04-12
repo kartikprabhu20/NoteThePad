@@ -25,7 +25,7 @@ internal class MixpanelAnalyticsTracker(
         scope.launch {
             val deviceId = preferences.getDeviceId()
             mixpanel.identify(deviceId)
-            mixpanel.people.set("device_id", deviceId)
+            mixpanel.people.set(PROPERTY_DEVICE_ID, deviceId)
         }
         scope.launch {
             preferences.analyticsEnabledFlow
@@ -46,7 +46,7 @@ internal class MixpanelAnalyticsTracker(
     override fun screenView(screen: String) {
         if (!enabledState.value) return
         runCatching {
-            mixpanel.track("screen_view", JSONObject().put("screen", screen))
+            mixpanel.track(EVENT_SCREEN_VIEW, JSONObject().put(PARAM_SCREEN, screen))
         }.onFailure { Log.w(TAG, "screen_view $screen failed", it) }
     }
 
@@ -72,5 +72,8 @@ internal class MixpanelAnalyticsTracker(
 
     private companion object {
         const val TAG = "MixpanelTracker"
+        const val EVENT_SCREEN_VIEW = "screen_view"
+        const val PARAM_SCREEN = "screen"
+        const val PROPERTY_DEVICE_ID = "device_id"
     }
 }

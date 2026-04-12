@@ -19,6 +19,8 @@ import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncStatus
 import com.mintanable.notethepad.feature_note.domain.use_case.RefreshSupaSync
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesViewModel.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +57,8 @@ class NotesViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val widgetRefresher: WidgetRefresher,
     private val refreshSupaSync: RefreshSupaSync,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val analyticsTracker: AnalyticsTracker
 ) : ViewModel() {
 
     companion object {
@@ -183,6 +186,7 @@ class NotesViewModel @Inject constructor(
             }
 
             is NotesEvent.DeleteNote -> {
+                analyticsTracker.track(AnalyticsEvent.NoteDeleted())
                 viewModelScope.launch {
                     fileIOUseCases.deleteFiles(event.detailedNote.imageUris.map { it.toString() })
                     noteUseCases.deleteNote(event.detailedNote.toNote())

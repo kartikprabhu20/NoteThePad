@@ -19,6 +19,8 @@ import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleAuthRepository
 import com.mintanable.notethepad.feature_backup.domain.repository.GoogleDriveRepository
 import com.mintanable.notethepad.database.db.repository.NoteRepository
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.feature_backup.R
 import com.mintanable.notethepad.file.FileManager
 import dagger.assisted.Assisted
@@ -37,10 +39,13 @@ class DownloadWorker @AssistedInject constructor(
     private val googleDriveRepository: GoogleDriveRepository,
     private val googleAuthRepository: GoogleAuthRepository,
     private val noteRepository: NoteRepository,
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val analyticsTracker: AnalyticsTracker
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        val startTime = System.currentTimeMillis()
+        analyticsTracker.track(AnalyticsEvent.RestoreStarted)
         try {
             setForeground(createForegroundInfo(0))
 
@@ -70,7 +75,10 @@ class DownloadWorker @AssistedInject constructor(
                     }
                 }
 
-            if (!dbDownloaded || !tempDBFile.exists()) return@withContext Result.failure()
+            if (!dbDownloaded || !tempDBFile.exists()) {
+                analyticsTracker.track(AnalyticsEvent.RestoreResult(false, System.currentTimeMillis() - startTime, "db_download_failed"))
+                return@withContext Result.failure()
+            }
 
             noteRepository.swapDatabase(tempDBFile)
             delay(1000) // Give the system a moment to realize the file handles have changed
@@ -129,15 +137,21 @@ class DownloadWorker @AssistedInject constructor(
                     "Media restoration encountered an error, but DB is safe: ${e.message}"
                 )
                 // We return success because the Database (the notes) are already swapped!
+                analyticsTracker.track(AnalyticsEvent.RestoreResult(true, System.currentTimeMillis() - startTime, "media_partial"))
                 return@withContext Result.success()
             }
             setForeground(createForegroundInfo(100))
             setProgress(workDataOf("percent" to 100))
 
-            if (!downloadSuccess) return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
+            if (!downloadSuccess) {
+                analyticsTracker.track(AnalyticsEvent.RestoreResult(false, System.currentTimeMillis() - startTime, "media_download_failed"))
+                return@withContext if (runAttemptCount < 3) Result.retry() else Result.failure()
+            }
 
+            analyticsTracker.track(AnalyticsEvent.RestoreResult(true, System.currentTimeMillis() - startTime))
             return@withContext Result.success()
         } catch (e: Exception) {
+            analyticsTracker.track(AnalyticsEvent.RestoreResult(false, System.currentTimeMillis() - startTime, e::class.simpleName))
             return@withContext Result.failure()
         }
     }

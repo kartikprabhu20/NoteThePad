@@ -17,6 +17,8 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_MODEL_NOTIFICATION_ID
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.feature_ai.R
 import com.mintanable.notethepad.feature_ai.domain.DownloadCancelReceiver
 import dagger.assisted.Assisted
@@ -32,7 +34,8 @@ import java.security.MessageDigest
 @HiltWorker
 class ModelDownloadWorker @AssistedInject constructor(
     @Assisted context: Context,
-    @Assisted params: WorkerParameters
+    @Assisted params: WorkerParameters,
+    private val analyticsTracker: AnalyticsTracker
 ) : CoroutineWorker(context, params) {
 
     companion object {
@@ -50,6 +53,7 @@ class ModelDownloadWorker @AssistedInject constructor(
 
     @SuppressLint("Range", "RestrictedApi")
     override suspend fun doWork(): Result {
+        val startTime = System.currentTimeMillis()
         val modelUrl = inputData.getString(MODEL_URL) ?: return Result.failure()
         val fileName = inputData.getString(MODEL_FILE_NAME) ?: return Result.failure()
         val token = inputData.getString(HF_TOKEN) ?: ""
@@ -100,6 +104,7 @@ class ModelDownloadWorker @AssistedInject constructor(
                             val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
                             val errorMessage = getDownloadErrorMessage(reason)
                             Log.e("kptest", "STATUS_FAILED: $errorMessage (Code: $reason)")
+                            analyticsTracker.track(AnalyticsEvent.AiModelDownloadResult(fileName, false, System.currentTimeMillis() - startTime, errorMessage))
                             isDownloading = false
                             result = Result.failure(workDataOf("ERROR" to errorMessage))
                         }
@@ -142,9 +147,11 @@ class ModelDownloadWorker @AssistedInject constructor(
 
             return if (downloadedSize == expectedContentSize) {
                 Log.d("kptest", "Size match verified!")
+                analyticsTracker.track(AnalyticsEvent.AiModelDownloadResult(fileName, true, System.currentTimeMillis() - startTime))
                 Result.success()
             } else {
                 Log.e("kptest", "File size mismatch! Actual: $downloadedSize, Expected: $expectedContentSize")
+                analyticsTracker.track(AnalyticsEvent.AiModelDownloadResult(fileName, false, System.currentTimeMillis() - startTime, "size_mismatch"))
                 downloadedFile.delete()
                 Result.failure(workDataOf("ERROR" to "Checksum verification failed, File corrupted during download"))
             }

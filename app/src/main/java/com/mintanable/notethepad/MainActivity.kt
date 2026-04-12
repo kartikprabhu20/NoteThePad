@@ -31,6 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.core.model.settings.ThemeMode
 import com.mintanable.notethepad.feature_firebase.presentation.auth.AuthEvent
@@ -50,6 +51,7 @@ import com.mintanable.notethepad.feature_settings.presentation.AiModelSelectionS
 import com.mintanable.notethepad.feature_settings.presentation.OnboardingScreen
 import com.mintanable.notethepad.feature_note.presentation.archive.ArchiveScreen
 import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,6 +61,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
+
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private lateinit var credentialHelper: GoogleClientHelper
     private var intentState = mutableStateOf<Intent?>(null)
@@ -83,6 +88,11 @@ class MainActivity : AppCompatActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+                    LaunchedEffect(navController) {
+                        navController.currentBackStackEntryFlow.collect { entry ->
+                            entry.destination.route?.let { analyticsTracker.screenView(it) }
+                        }
+                    }
                     LaunchedEffect(currentIntent) {
                         val noteId = currentIntent?.getStringExtra(NavigationConstants.EXTRA_NOTE_ID)
                         if (!noteId.isNullOrBlank()) {
@@ -164,6 +174,7 @@ class MainActivity : AppCompatActivity() {
                                             SingleNoteWidgetReceiver::class.java
                                         )
                                         if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                            analyticsTracker.track(AnalyticsEvent.NotePinned(true))
                                             val callback = Intent(
                                                 this@MainActivity,
                                                 SingleNoteWidgetReceiver::class.java
@@ -184,6 +195,7 @@ class MainActivity : AppCompatActivity() {
                                                 pendingIntent
                                             )
                                         } else {
+                                            analyticsTracker.track(AnalyticsEvent.NotePinned(false))
                                             Toast.makeText(
                                                 this@MainActivity,
                                                 "Pinned widgets are not supported on this launcher",

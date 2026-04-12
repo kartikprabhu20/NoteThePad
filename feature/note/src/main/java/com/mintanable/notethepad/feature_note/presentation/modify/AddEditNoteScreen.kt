@@ -119,7 +119,7 @@ fun AddEditNoteScreen(
         onResult = { success ->
             if (success) {
                 cameraImageUri?.let { uri ->
-                    viewModel.onEvent(AddEditNoteEvent.AttachImage(uri))
+                    viewModel.onEvent(AddEditNoteEvent.AttachImage(uri, "camera"))
                 }
             }
         }
@@ -131,7 +131,7 @@ fun AddEditNoteScreen(
         onResult = { success ->
             if (success) {
                 cameraVideoUri?.let { uri ->
-                    viewModel.onEvent(AddEditNoteEvent.AttachImage(uri))
+                    viewModel.onEvent(AddEditNoteEvent.AttachImage(uri, "camera"))
                 }
             }
         }
