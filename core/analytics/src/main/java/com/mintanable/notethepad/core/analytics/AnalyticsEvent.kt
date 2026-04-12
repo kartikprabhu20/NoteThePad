@@ -33,9 +33,9 @@ sealed class AnalyticsEvent(
         ),
     )
 
-    class AiImageAnalyzeTriggered(imageBytes: Int) : AnalyticsEvent(
+    class AiImageAnalyzeTriggered(imageBytes: Int, model: String) : AnalyticsEvent(
         Event.AI_IMAGE_ANALYZE_TRIGGERED,
-        mapOf(Param.IMAGE_BYTES to imageBytes),
+        mapOf(Param.IMAGE_BYTES to imageBytes, Param.MODEL to model),
     )
 
     class AiImageAnalyzeResult(success: Boolean, suggestionCount: Int) : AnalyticsEvent(
@@ -43,9 +43,9 @@ sealed class AnalyticsEvent(
         mapOf(Param.SUCCESS to success, Param.SUGGESTION_COUNT to suggestionCount),
     )
 
-    class AiImageQuerySubmitted(queryLen: Int) : AnalyticsEvent(
+    class AiImageQuerySubmitted(queryLen: Int, model: String) : AnalyticsEvent(
         Event.AI_IMAGE_QUERY_SUBMITTED,
-        mapOf(Param.QUERY_LEN to queryLen),
+        mapOf(Param.QUERY_LEN to queryLen, Param.MODEL to model),
     )
 
     class AiImageQueryResult(success: Boolean, chunkCount: Int, resultLen: Int) : AnalyticsEvent(
@@ -57,9 +57,9 @@ sealed class AnalyticsEvent(
         ),
     )
 
-    class AiAudioTranscribeTriggered(audioDurationMs: Long) : AnalyticsEvent(
+    class AiAudioTranscribeTriggered(audioDurationMs: Long, model: String) : AnalyticsEvent(
         Event.AI_AUDIO_TRANSCRIBE_TRIGGERED,
-        mapOf(Param.AUDIO_DURATION_MS to audioDurationMs),
+        mapOf(Param.AUDIO_DURATION_MS to audioDurationMs, Param.MODEL to model),
     )
 
     class AiLiveTranscriptionToggled(enabled: Boolean) : AnalyticsEvent(
@@ -70,6 +70,16 @@ sealed class AnalyticsEvent(
     class AiModelSelected(model: String) : AnalyticsEvent(
         Event.AI_MODEL_SELECTED,
         mapOf(Param.MODEL to model),
+    )
+
+    class AiModelDownloadStarted(model: String, sizeBytes: Long) : AnalyticsEvent(
+        Event.AI_MODEL_DOWNLOAD_STARTED,
+        mapOf(Param.MODEL to model, Param.SIZE_BYTES to sizeBytes),
+    )
+
+    class AiModelDownloadResult(model: String, success: Boolean, durationMs: Long, errorType: String? = null) : AnalyticsEvent(
+        Event.AI_MODEL_DOWNLOAD_RESULT,
+        mapOf(Param.MODEL to model, Param.SUCCESS to success, Param.DURATION_MS to durationMs, Param.ERROR_TYPE to errorType),
     )
     // endregion
 
@@ -89,10 +99,6 @@ sealed class AnalyticsEvent(
         mapOf(Param.DURATION_MS to durationMs),
     )
 
-    class AttachmentImageZoomed(hasTranscription: Boolean, hasSummary: Boolean) : AnalyticsEvent(
-        Event.ATTACHMENT_IMAGE_ZOOMED,
-        mapOf(Param.HAS_TRANSCRIPTION to hasTranscription, Param.HAS_SUMMARY to hasSummary),
-    )
     // endregion
 
     // region Theme
@@ -263,6 +269,8 @@ sealed class AnalyticsEvent(
             const val AI_AUDIO_TRANSCRIBE_TRIGGERED = "ai_audio_transcribe_triggered"
             const val AI_LIVE_TRANSCRIPTION_TOGGLED = "ai_live_transcription_toggled"
             const val AI_MODEL_SELECTED = "ai_model_selected"
+            const val AI_MODEL_DOWNLOAD_STARTED = "ai_model_download_started"
+            const val AI_MODEL_DOWNLOAD_RESULT = "ai_model_download_result"
             const val ATTACHMENT_ADDED = "attachment_added"
             const val ATTACHMENT_REMOVED = "attachment_removed"
             const val ATTACHMENT_AUDIO_RECORDED = "attachment_audio_recorded"
@@ -326,6 +334,7 @@ sealed class AnalyticsEvent(
             const val PINNED = "pinned"
             const val ARCHIVED = "archived"
             const val METHOD = "method"
+            const val SIZE_BYTES = "size_bytes"
         }
     }
 }
