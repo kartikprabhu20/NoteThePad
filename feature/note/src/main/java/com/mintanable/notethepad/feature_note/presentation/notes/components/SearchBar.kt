@@ -110,7 +110,7 @@ fun SearchBar(
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
         ),
         placeholder = {
-            Text(hint)
+            Text(text = hint, maxLines = 1)
         },
         singleLine = isSingleLine,
         textStyle = textStyle
