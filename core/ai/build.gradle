@@ -52,6 +52,7 @@ dependencies {
     implementation project(':core:data')
     implementation project(':core:common')
     implementation project(':core:analytics')
+    implementation project(':core:backup')
 
     // Compose
     def composeBom = platform('androidx.compose:compose-bom:2026.03.00')
