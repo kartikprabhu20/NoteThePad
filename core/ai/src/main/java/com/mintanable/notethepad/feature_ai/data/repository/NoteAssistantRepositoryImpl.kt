@@ -121,14 +121,31 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    override suspend fun startLiveTranscription(onTranscription: (String) -> Unit) {
+    override suspend fun startLiveTranscription(
+        onTranscription: (String) -> Unit,
+        aiModelName: String
+    ) {
         crashlytics.log("NoteAssistantRepositoryImpl: Starting Live Transcription")
-        return geminiNanoDataSource.startTranscriptionStream(onTranscription)
+
+        when (aiModelName) {
+            "Gemini 3 Flash (Cloud)", "None" -> return
+            "Gemini Nano (System)" -> {
+                return geminiNanoDataSource.startTranscriptionStream(onTranscription)
+            }
+            else -> return gemmaLocalDataSource.startTranscriptionStream(onTranscription)
+        }
     }
 
-    override suspend fun stopLiveTranscription() {
+    override suspend fun stopLiveTranscription(aiModelName: String) {
         crashlytics.log("NoteAssistantRepositoryImpl: Stopping Live Transcription")
-        return geminiNanoDataSource.stopTranscription()
+        when (aiModelName) {
+            "Gemini 3 Flash (Cloud)", "None" -> return
+            "Gemini Nano (System)" -> {
+                return geminiNanoDataSource.stopTranscription()
+            }
+
+            else -> return gemmaLocalDataSource.stopTranscription()
+        }
     }
 
     override suspend fun checkAudioTransciberStatus(modelName: String): Flow<AiModelDownloadStatus> {
@@ -227,7 +244,11 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun summarizeNote(prompt: String, modelName: String, tools: List<ToolSet>): String? {
+    override suspend fun summarizeNote(
+        prompt: String,
+        modelName: String,
+        tools: List<ToolSet>
+    ): String? {
         crashlytics.log("NoteAssistantRepositoryImpl: Summarize. Length: ${prompt.length}")
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.summarizeNote(prompt)
@@ -237,7 +258,11 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                 val models = aiModelRepository.getModels().first()
                 val selectedModel = models.find { it.name == modelName }
                 if (selectedModel != null && selectedModel.isLlm) {
-                    gemmaLocalDataSource.summarizeNote(prompt, selectedModel.downloadFileName, tools)
+                    gemmaLocalDataSource.summarizeNote(
+                        prompt,
+                        selectedModel.downloadFileName,
+                        tools
+                    )
                 } else null
             }
         }

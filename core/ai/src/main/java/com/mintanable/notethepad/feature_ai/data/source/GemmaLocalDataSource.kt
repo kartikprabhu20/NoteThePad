@@ -38,7 +38,7 @@ private const val TAG = "GemmaLocalDataSource"
 
 class GemmaLocalDataSource @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+): GenericDataSource() {
     private val crashlytics = FirebaseCrashlytics.getInstance()
 
     private data class ActiveInstance(

@@ -301,6 +301,27 @@ fun SettingsScreen(
                     AiModelDownloadStatus.Downloadable -> stringResource(R.string.audio_transcriber_status_downloadable)
                     AiModelDownloadStatus.Unavailable -> stringResource(R.string.audio_transcriber_status_unavailable)
                 }
+                SettingItem(
+                    title = stringResource(R.string.setting_audio_transcriber),
+                    subtitle = audioTranscriberSubtitle,
+                    onClick = {
+                        if (state.audioTranscriberStatus == AiModelDownloadStatus.Downloadable) {
+                            onEvent(SettingsEvent.RequestDownloadAudioTranscriber)
+                        }
+                    }
+                )
+                if (state.audioModelStatus is LoadStatus.Progress) {
+                    Text(stringResource(R.string.msg_downloading_model, state.audioModelStatus.percentage),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    )
+                    LinearProgressIndicator(
+                        progress = { state.audioModelStatus.percentage / 100f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
             }
 
             item {
