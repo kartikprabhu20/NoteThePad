@@ -233,11 +233,12 @@ class GemmaLocalDataSource @Inject constructor(
                      2. Return ONLY a comma-separated list of words.
                      3. No hashtags, no explanations, no conversational filler.
                     Example Output: Work, Finance, Urgent
-                """.trimIndent()
+                """.trimIndent(),
+                maxNumTokens = 4096
             )
             var textResponse = ""
             withTimeout(20_000L) {
-                runInference(prompt).collect { chunk -> textResponse += chunk }
+                runInference(prompt.take(12000)).collect { chunk -> textResponse += chunk }
             }
             textResponse.trim()
         } catch (e: Exception) {
