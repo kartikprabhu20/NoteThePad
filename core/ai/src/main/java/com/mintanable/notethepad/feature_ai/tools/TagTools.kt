@@ -52,20 +52,22 @@ class TagTools @Inject constructor(
         tag.tagId
     }
 
-    @Tool(description = "Attaches a tag (by name) to a note. Creates the tag if missing. Returns 'ok' or 'note_not_found'.")
+    @Tool(description = "Attaches a tag (by name) to a note. AUTO-CREATES the tag if it does not exist — do NOT call create_tag first. Returns 'ok', 'note_not_found', or 'add_failed'.")
     fun addTagToNote(
         @ToolParam(description = "Note id") noteId: String,
         @ToolParam(description = "Tag name") tagName: String,
     ): String = runBlocking(Dispatchers.IO) {
         val note = noteRepository.getNoteById(noteId) ?: return@runBlocking "note_not_found"
-        if (note.tagEntities.any { it.tagName.equals(tagName, ignoreCase = true) }) {
-            return@runBlocking "ok"
-        }
         val tag = noteRepository.getTagByName(tagName)?.copy(isDeleted = false)
             ?: TagEntity(tagName = tagName)
-        val merged = note.tagEntities + tag
+        val alreadyAttached = note.tagEntities.any { it.tagName.equals(tagName, ignoreCase = true) }
+        val merged = if (alreadyAttached) note.tagEntities else note.tagEntities + tag
         noteRepository.insertNote(note.noteEntity, merged)
-        "ok"
+
+        val verified = noteRepository.getNoteById(noteId)
+            ?.tagEntities
+            ?.any { it.tagName.equals(tagName, ignoreCase = true) } == true
+        if (verified) "ok" else "add_failed"
     }
 
     @Tool(description = "Removes a tag (by name) from a note. Returns 'ok' or 'note_not_found'.")

@@ -3,8 +3,10 @@ package com.mintanable.notethepad.feature_ai.tools
 import com.google.ai.edge.litertlm.Tool
 import com.google.ai.edge.litertlm.ToolParam
 import com.google.ai.edge.litertlm.ToolSet
+import com.mintanable.notethepad.core.model.note.NoteColorPalette
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
+import com.mintanable.notethepad.core.richtext.plaintext.extractPlaintext
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +22,7 @@ class SearchTools @Inject constructor(
     private val noteRepository: NoteRepository,
 ) : ToolSet {
 
-    @Tool(description = "Finds notes whose title or content contains the given substring (case-insensitive). Returns JSON array.")
+    @Tool(description = "Finds notes whose title or body text contains the given substring (case-insensitive). Searches the plaintext of rich content, not the raw JSON. Returns JSON array.")
     fun searchNotesByText(
         @ToolParam(description = "Substring to match") query: String,
         @ToolParam(description = "Max results (1-50)") limit: Int,
@@ -29,8 +31,9 @@ class SearchTools @Inject constructor(
         val notes = noteRepository.getNotes(NoteOrder.Date(OrderType.Descending)).first()
         val q = query.trim().lowercase()
         val hits = notes.filter {
-            it.noteEntity.title.lowercase().contains(q) ||
-                it.noteEntity.content.lowercase().contains(q)
+            val titleMatch = it.noteEntity.title.contains(q, ignoreCase = true)
+            val bodyMatch = extractPlaintext(it.noteEntity.content).contains(q, ignoreCase = true)
+            titleMatch || bodyMatch
         }.take(limit.coerceIn(1, 50))
         notesToJson(hits)
     }
@@ -67,13 +70,18 @@ class SearchTools @Inject constructor(
         notesToJson(hits)
     }
 
-    @Tool(description = "Returns notes matching the given color integer. Returns JSON array.")
+    @Tool(description = "Returns notes matching a named color (e.g. 'yellow', 'redOrange', 'babyBlue'). Valid names: white, redOrange, redPink, babyBlue, violet, lightGreen, peachPuff, skyBlue, lavender, mintGreen, lemonYellow. Common aliases like 'yellow', 'blue', 'green' are also accepted. Returns JSON array.")
     fun listNotesByColor(
-        @ToolParam(description = "ARGB color int") color: Int,
+        @ToolParam(description = "Color name, e.g. 'yellow' or 'lemonYellow'") colorName: String,
         @ToolParam(description = "Max results (1-50)") limit: Int,
     ): String = runBlocking(Dispatchers.IO) {
+        val argb = NoteColorPalette.findArgb(colorName)
+            ?: return@runBlocking JSONObject().apply {
+                put("error", "unknown_color")
+                put("valid", JSONArray(NoteColorPalette.validNames))
+            }.toString()
         val notes = noteRepository.getNotes(NoteOrder.Date(OrderType.Descending)).first()
-        val hits = notes.filter { it.noteEntity.color == color }
+        val hits = notes.filter { it.noteEntity.color == argb }
             .take(limit.coerceIn(1, 50))
         notesToJson(hits)
     }

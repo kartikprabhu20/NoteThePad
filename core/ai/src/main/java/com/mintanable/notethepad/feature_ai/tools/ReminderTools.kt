@@ -21,19 +21,25 @@ class ReminderTools(
         return System.currentTimeMillis().toDouble()
     }
 
-    @Tool(description = "Calculates the timestamp for a specific day and time. Use this for 'Next Sunday' or 'Tomorrow'.")
-    fun getTimestampForInstruction(dayOffset: Int, hour: Int, minute: Int): Double {
+    @Tool(description = "Calculates the timestamp in milliseconds for a relative day/time. Use this for 'Next Sunday' or 'Tomorrow at 4pm'. Returns a Double you must pass to add_reminder.")
+    fun getTimestampForInstruction(
+        @ToolParam(description = "Days from today (0=today, 1=tomorrow, 7=next week)") dayOffset: Int,
+        @ToolParam(description = "Hour in 24h format (0-23)") hour: Int,
+        @ToolParam(description = "Minute (0-59)") minute: Int,
+    ): Double {
         val calendar = java.util.Calendar.getInstance()
         calendar.add(java.util.Calendar.DAY_OF_YEAR, dayOffset)
         calendar.set(java.util.Calendar.HOUR_OF_DAY, hour)
         calendar.set(java.util.Calendar.MINUTE, minute)
+        calendar.set(java.util.Calendar.SECOND, 0)
+        calendar.set(java.util.Calendar.MILLISECOND, 0)
         return calendar.timeInMillis.toDouble()
     }
 
-    @Tool(description = "Sets a reminder for a specific date and time.")
+    @Tool(description = "Sets a reminder. The reminderMs parameter MUST be the Double returned by get_timestamp_for_instruction or get_current_time_ms — never a hand-written numeric literal, and never contain words or non-digit characters.")
     fun addReminder(
         @ToolParam(description = "The title or subject of the reminder") title: String,
-        @ToolParam(description = "The target time in UTC milliseconds") reminderMs: Double
+        @ToolParam(description = "Target time as UTC milliseconds Double — use the value returned by get_timestamp_for_instruction") reminderMs: Double
     ): String {
         onReminderRequested(title, reminderMs.toLong())
         return "Reminder set successfully for $reminderMs"
