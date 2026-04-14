@@ -4,6 +4,7 @@ import com.google.ai.edge.litertlm.Tool
 import com.google.ai.edge.litertlm.ToolParam
 import com.google.ai.edge.litertlm.ToolSet
 import com.mintanable.notethepad.core.common.ReminderScheduler
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,7 @@ class NoteTools @Inject constructor(
             reminderScheduler.schedule(
                 id = noteId.hashCode().toLong(),
                 title = title,
-                content = content.take(200),
+                content = RichTextSerializer.deserialize(content).rawText.take(200),
                 reminderTime = reminder,
             )
         }
@@ -80,7 +81,7 @@ class NoteTools @Inject constructor(
                 reminderScheduler.schedule(
                     id = alarmId,
                     title = updated.title,
-                    content = updated.content.take(200),
+                    content = RichTextSerializer.deserialize(updated.content).rawText.take(200),
                     reminderTime = newReminder,
                 )
             } else {
