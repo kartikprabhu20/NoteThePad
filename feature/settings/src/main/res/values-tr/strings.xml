@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">Ses yazıcıyı indir</string>
     <string name="dialog_download_audio_transcriber_description">Cihaz üzerindeki ses yazıcı modeli Wi-Fi üzerinden indirilecektir. Devam etmek istiyor musunuz?</string>
     <string name="msg_downloading_audio_model">Ses AI modeli indiriliyor: %1$d%%</string>
+    <string name="enable_ai_assistant_title">Yapay Zeka Asistanını Etkinleştir</string>
+    <string name="enable_ai_assistant_subtitle">Deneysel</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">Supabase ile gerçek zamanlı senkronizasyon (Giriş gerektirir). Resimler, videolar ve sesler şu anda senkronize edilmiyor.</string>

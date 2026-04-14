@@ -6,6 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.core.common.ReminderScheduler
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -23,7 +24,7 @@ class RescheduleAlarmsWorker @AssistedInject constructor(
         notesToRemind.forEach { noteWithTags ->
             val note = noteWithTags.noteEntity
             val longId = note.id.hashCode().toLong()
-            scheduler.schedule(id = longId, note.title, note.content, note.reminderTime)
+            scheduler.schedule(id = longId, note.title, RichTextSerializer.deserialize(note.content).rawText.take(200), note.reminderTime)
         }
 
         return Result.success()

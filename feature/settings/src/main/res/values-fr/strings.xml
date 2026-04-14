@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">Télécharger le transcripteur audio</string>
     <string name="dialog_download_audio_transcriber_description">Le modèle de transcription audio sera téléchargé sur l\'appareil via Wi-Fi. Voulez-vous continuer ?</string>
     <string name="msg_downloading_audio_model">Téléchargement du modèle IA audio : %1$d%%</string>
+    <string name="enable_ai_assistant_title">Activer l\'assistant IA</string>
+    <string name="enable_ai_assistant_subtitle">Expérimental</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">Synchronisation en temps réel avec Supabase (connexion requise). Les images, vidéos et fichiers audio ne sont pas synchronisés pour le moment.</string>

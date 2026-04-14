@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">Загрузить транскрибатор аудио</string>
     <string name="dialog_download_audio_transcriber_description">Модель транскрибатора аудио будет загружена на устройство через Wi-Fi. Продолжить?</string>
     <string name="msg_downloading_audio_model">Загрузка аудио модели ИИ: %1$d%%</string>
+    <string name="enable_ai_assistant_title">Включить ИИ-ассистента</string>
+    <string name="enable_ai_assistant_subtitle">Экспериментально</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">Синхронизация в реальном времени с Supabase (требуется вход). Изображения, видео и аудио в настоящее время не синхронизируются.</string>

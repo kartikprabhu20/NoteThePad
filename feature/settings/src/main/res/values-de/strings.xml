@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">Audio-Transkription herunterladen</string>
     <string name="dialog_download_audio_transcriber_description">Das Audio-Transkriptionsmodell wird über WLAN auf das Gerät heruntergeladen. Möchten Sie fortfahren?</string>
     <string name="msg_downloading_audio_model">Audio-KI-Modell wird heruntergeladen: %1$d%%</string>
+    <string name="enable_ai_assistant_title">KI-Assistent aktivieren</string>
+    <string name="enable_ai_assistant_subtitle">Experimentell</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">Echtzeitsynchronisierung mit Supabase (Anmeldung erforderlich). Bilder, Videos und Audio werden derzeit nicht synchronisiert.</string>

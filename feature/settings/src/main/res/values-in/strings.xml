@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">Unduh pentranskripsi audio</string>
     <string name="dialog_download_audio_transcriber_description">Model pentranskripsi audio akan diunduh ke perangkat melalui Wi-Fi. Apakah Anda ingin melanjutkan?</string>
     <string name="msg_downloading_audio_model">Mengunduh model AI audio: %1$d%%</string>
+    <string name="enable_ai_assistant_title">Aktifkan Asisten AI</string>
+    <string name="enable_ai_assistant_subtitle">Eksperimental</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">Sinkronisasi real-time dengan Supabase (memerlukan Login). Gambar, video, audio saat ini tidak disinkronkan.</string>

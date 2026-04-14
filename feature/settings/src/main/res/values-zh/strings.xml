@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">下载音频转写器</string>
     <string name="dialog_download_audio_transcriber_description">将通过 Wi-Fi 下载设备端音频转写模型。是否继续？</string>
     <string name="msg_downloading_audio_model">正在下载音频 AI 模型：%1$d%%</string>
+    <string name="enable_ai_assistant_title">启用人工智能助手</string>
+    <string name="enable_ai_assistant_subtitle">实验性</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">与 Supabase 实时同步（需要登录）。图像、视频、音频目前未同步。</string>

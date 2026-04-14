@@ -61,6 +61,8 @@
     <string name="dialog_download_audio_transcriber_title">音声文字起こしをダウンロード</string>
     <string name="dialog_download_audio_transcriber_description">Wi-Fi経由でデバイスに音声文字起こしモデルをダウンロードします。続行しますか？</string>
     <string name="msg_downloading_audio_model">音声AIモデルをダウンロード中: %1$d%%</string>
+    <string name="enable_ai_assistant_title">AI アシスタントを有効にする</string>
+    <string name="enable_ai_assistant_subtitle">試験的</string>
 
     <string name="supasync_title">CloudSync</string>
     <string name="supasync_description">Supabaseとのリアルタイム同期（ログインが必要）。画像、ビデオ、オーディオは現在同期されません。</string>
