@@ -36,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -63,9 +64,13 @@ import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.DrawerItem
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.settings.User
+import com.mintanable.notethepad.feature_ai.BuildConfig
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.assistant.AiAssistantDialog
+import com.mintanable.notethepad.feature_note.presentation.assistant.AiAssistantViewModel
+import com.mintanable.notethepad.feature_note.presentation.modify.components.HomeActionButtons
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EditTextDialog
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EvenHandler
 import com.mintanable.notethepad.feature_note.presentation.notes.components.OrderSection
@@ -79,6 +84,7 @@ fun NotesScreen(
     navController: NavController,
     notesViewModel: NotesViewModel = hiltViewModel(),
     navigationDrawerViewModel: NavigationDrawerViewModel = hiltViewModel(),
+    aiAssistantViewModel: AiAssistantViewModel = hiltViewModel(),
     user: User? = null,
     isDarkTheme: Boolean,
     onLogOut: suspend () -> Unit,
@@ -99,6 +105,9 @@ fun NotesScreen(
     val existingTags by navigationDrawerViewModel.existingTags.collectAsStateWithLifecycle()
     val supaSyncEnabled by notesViewModel.supaSyncEnabled.collectAsStateWithLifecycle()
     val isSupaSyncing by notesViewModel.isSupaSyncing.collectAsStateWithLifecycle()
+    val aiAssistantState by aiAssistantViewModel.state.collectAsStateWithLifecycle()
+    val aiAssistantEnabled by notesViewModel.aiAssistantEnabled.collectAsStateWithLifecycle()
+    val isAiAssistantSupported = BuildConfig.ENABLE_AI_ASSISTANCE && aiAssistantEnabled
 
     val scope = rememberCoroutineScope()
     var showLogoutConfirmation by rememberSaveable { mutableStateOf(false) }
@@ -127,6 +136,15 @@ fun NotesScreen(
             onDismiss = { notesViewModel.onEvent(NotesEvent.DismissLabelDialog) },
             onConfirm = { notesViewModel.onEvent(NotesEvent.AddLabel(it)) },
             tagEntities = existingTags
+        )
+    }
+
+    if (isAiAssistantSupported) {
+        AiAssistantDialog(
+            state = aiAssistantState,
+            onPromptChange = aiAssistantViewModel::onPromptChange,
+            onSubmit = aiAssistantViewModel::submit,
+            onDismiss = aiAssistantViewModel::dismiss,
         )
     }
 
@@ -226,24 +244,30 @@ fun NotesScreen(
                     )
                 },
                 floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = {
-                            navController.navigate(Screen.AddEditNoteScreen.passArgs())
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .sharedBounds(
-                                sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "notescreens_fab"),
-                                animatedVisibilityScope = animatedVisibilityScope,
-                                exit = fadeOut(tween(durationMillis = 100)),
-                                boundsTransform = { _, _ ->
-                                    spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
-                                },
-                                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                            )
-                            .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 2f)
+                    HomeActionButtons(
+                        modifier = Modifier,
+                        isAiAssitantSupported = isAiAssistantSupported,
+                        onAssitantClicked = { aiAssistantViewModel.show() }
                     ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.content_description_add_note))
+                        FloatingActionButton(
+                            onClick = {
+                                navController.navigate(Screen.AddEditNoteScreen.passArgs())
+                            },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .sharedBounds(
+                                    sharedContentState = sharedTransitionScope.rememberSharedContentState(key = "notescreens_fab"),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    exit = fadeOut(tween(durationMillis = 100)),
+                                    boundsTransform = { _, _ ->
+                                        spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow)
+                                    },
+                                    resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                                )
+                                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 2f)
+                        ) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(R.string.content_description_add_note))
+                        }
                     }
                 },
                 snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -327,7 +351,7 @@ fun NotesScreen(
             title = { Text(stringResource(R.string.dialog_logout_title)) },
             text = { Text(stringResource(R.string.dialog_logout_message)) },
             confirmButton = {
-                androidx.compose.material3.TextButton(
+                TextButton(
                     onClick = {
                         showLogoutConfirmation = false
                         scope.launch {
@@ -339,7 +363,7 @@ fun NotesScreen(
                 }
             },
             dismissButton = {
-                androidx.compose.material3.TextButton(
+                TextButton(
                     onClick = { showLogoutConfirmation = false }
                 ) {
                     Text(stringResource(R.string.btn_cancel))

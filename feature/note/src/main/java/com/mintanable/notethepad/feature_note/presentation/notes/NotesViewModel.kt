@@ -13,6 +13,7 @@ import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
+import com.mintanable.notethepad.feature_note.domain.use_case.GetAiAssistantSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
@@ -53,6 +54,7 @@ class NotesViewModel @Inject constructor(
     getNoteShapeSettings: GetNoteShapeSettings,
     getSupaSyncSettings: GetSupaSyncSettings,
     getSupaSyncStatus: GetSupaSyncStatus,
+    getAiAssistantSettings: GetAiAssistantSettings,
     private val fileIOUseCases: FileIOUseCases,
     private val dispatchers: DispatcherProvider,
     private val widgetRefresher: WidgetRefresher,
@@ -154,6 +156,13 @@ class NotesViewModel @Inject constructor(
         )
 
     val supaSyncEnabled: StateFlow<Boolean> = getSupaSyncSettings()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val aiAssistantEnabled: StateFlow<Boolean> = getAiAssistantSettings()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

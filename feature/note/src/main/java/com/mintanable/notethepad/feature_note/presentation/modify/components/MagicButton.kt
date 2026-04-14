@@ -110,7 +110,7 @@ fun MagicButton(
                 .then(buttonModifier)
                 .let {
                     if (showMagicBorder) it.magicBorder(
-                        width = 3.dp,
+                        width = 4.dp,
                         shimmerOffset = shimmerOffset.value,
                         shape = shape
                     ) else it
@@ -247,7 +247,7 @@ fun PreviewMagicBorderIcon() {
                             isVisible = true,
                             painter = painterResource(R.drawable.speech_to_text_24px),
                             modifier = Modifier.align(Alignment.CenterVertically),
-                            shape = RoundedCornerShape(6.dp),
+                            shape = RoundedCornerShape(16.dp),
                             onButtonClicked = {}
                         )
                     }

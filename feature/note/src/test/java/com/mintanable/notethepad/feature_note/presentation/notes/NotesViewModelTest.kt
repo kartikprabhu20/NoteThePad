@@ -14,6 +14,7 @@ import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.TagEntity
+import com.mintanable.notethepad.feature_note.domain.use_case.GetAiAssistantSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncStatus
@@ -53,6 +54,7 @@ class NotesViewModelTest {
     private val widgetRefresher = mockk< WidgetRefresher>(relaxed = true)
     private val getSupaSyncSettings =  mockk<GetSupaSyncSettings>(relaxed = true)
     private val getSupaSyncStatus =  mockk<GetSupaSyncStatus>(relaxed = true)
+    private val getAiAssistantSettings = mockk<GetAiAssistantSettings>(relaxed = true)
     private val refreshSupaSync = mockk<RefreshSupaSync>(relaxed = true)
     private val authRepository = mockk<AuthRepository>(relaxed = true)
     private val analyticsTracker = mockk<AnalyticsTracker>(relaxed = true)
@@ -77,6 +79,7 @@ class NotesViewModelTest {
             getSupaSyncSettings = getSupaSyncSettings,
             refreshSupaSync = refreshSupaSync,
             getSupaSyncStatus = getSupaSyncStatus,
+            getAiAssistantSettings = getAiAssistantSettings,
             authRepository = authRepository,
             analyticsTracker = analyticsTracker
         )
