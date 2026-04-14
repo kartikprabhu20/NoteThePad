@@ -24,4 +24,10 @@ interface NoteAssistantRepository {
     suspend fun describeImage(imageBytes: ByteArray, modelName: String): String?
 
     suspend fun summarizeNote(prompt: String, modelName: String, tools: List<ToolSet>): String?
+
+    fun runAiAssistant(
+        prompt: String,
+        modelName: String,
+        extraTools: List<ToolSet> = emptyList(),
+    ): Flow<String>
 }

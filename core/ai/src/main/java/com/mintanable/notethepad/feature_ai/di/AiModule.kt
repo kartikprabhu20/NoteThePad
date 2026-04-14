@@ -12,6 +12,11 @@ import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAutoTagsUseCase
+import com.mintanable.notethepad.feature_ai.tools.BackupTools
+import com.mintanable.notethepad.feature_ai.tools.MediaTools
+import com.mintanable.notethepad.feature_ai.tools.NoteTools
+import com.mintanable.notethepad.feature_ai.tools.SearchTools
+import com.mintanable.notethepad.feature_ai.tools.TagTools
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import dagger.Module
 import dagger.Provides
@@ -49,14 +54,24 @@ object AiModule {
         geminiDataSource: GeminiDataSource,
         gemmaLocalDataSource: GemmaLocalDataSource,
         geminiNanoDataSource: GeminiNanoDataSource,
-        aiModelRepository: AiModelRepository
+        aiModelRepository: AiModelRepository,
+        noteTools: NoteTools,
+        searchTools: SearchTools,
+        tagTools: TagTools,
+        mediaTools: MediaTools,
+        backupTools: BackupTools,
     ): NoteAssistantRepository {
         return NoteAssistantRepositoryImpl(
             context,
             geminiDataSource,
             gemmaLocalDataSource,
             geminiNanoDataSource,
-            aiModelRepository
+            aiModelRepository,
+            noteTools,
+            searchTools,
+            tagTools,
+            mediaTools,
+            backupTools,
         )
     }
 

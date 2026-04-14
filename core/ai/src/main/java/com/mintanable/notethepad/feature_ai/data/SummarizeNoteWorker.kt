@@ -10,6 +10,7 @@ import com.mintanable.notethepad.core.common.utils.readAndProcessImage
 import com.mintanable.notethepad.database.db.repository.NoteRepository
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import com.mintanable.notethepad.core.common.ReminderScheduler
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
 import com.mintanable.notethepad.feature_ai.tools.ReminderTools
 import dagger.assisted.Assisted
@@ -130,10 +131,16 @@ class SummarizeNoteWorker @AssistedInject constructor(
             Log.d(TAG, "Prompt built (${prompt.length} chars)")
 
             var pendingReminder: Pair<String, Long>? = null
-            val tools = listOf(ReminderTools { title, time ->
-                Log.d(TAG, "Reminder requested: '$title' at $time")
-                pendingReminder = title to time
-            })
+            val tools = listOf(
+                ReminderTools(
+                    onReminderRequested = { title, time ->
+                        Log.d(TAG, "Reminder requested: '$title' at $time")
+                        pendingReminder = title to time
+                    },
+                    noteRepository = noteRepository,
+                    reminderScheduler = reminderScheduler,
+                )
+            )
 
             // Generate summary
             val summary = assistantRepository.summarizeNote(prompt, modelName, tools)
@@ -154,7 +161,7 @@ class SummarizeNoteWorker @AssistedInject constructor(
                     reminderScheduler.schedule(
                         id = noteId.hashCode().toLong(),
                         title = title,
-                        content = note.content.take(200),
+                        content = RichTextSerializer.deserialize(note.content).rawText.take(200),
                         reminderTime = reminderTimeMs
                     )
                     Log.d(TAG, "Reminder scheduled: '$title' at $reminderTimeMs")

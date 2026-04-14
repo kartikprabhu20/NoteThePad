@@ -15,6 +15,11 @@ import com.mintanable.notethepad.feature_ai.data.source.GeminiNanoDataSource
 import com.mintanable.notethepad.feature_ai.data.source.GemmaLocalDataSource
 import com.mintanable.notethepad.feature_ai.domain.repository.AiModelRepository
 import com.mintanable.notethepad.feature_ai.domain.repository.NoteAssistantRepository
+import com.mintanable.notethepad.feature_ai.tools.BackupTools
+import com.mintanable.notethepad.feature_ai.tools.MediaTools
+import com.mintanable.notethepad.feature_ai.tools.NoteTools
+import com.mintanable.notethepad.feature_ai.tools.SearchTools
+import com.mintanable.notethepad.feature_ai.tools.TagTools
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -30,7 +35,15 @@ class NoteAssistantRepositoryImpl @Inject constructor(
     private val gemmaLocalDataSource: GemmaLocalDataSource,
     private val geminiNanoDataSource: GeminiNanoDataSource,
     private val aiModelRepository: AiModelRepository,
+    private val noteTools: NoteTools,
+    private val searchTools: SearchTools,
+    private val tagTools: TagTools,
+    private val mediaTools: MediaTools,
+    private val backupTools: BackupTools,
 ) : NoteAssistantRepository {
+
+    private val stableTools: List<ToolSet>
+        get() = listOf(noteTools, searchTools, tagTools, mediaTools, backupTools)
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
 
@@ -250,6 +263,7 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         tools: List<ToolSet>
     ): String? {
         crashlytics.log("NoteAssistantRepositoryImpl: Summarize. Length: ${prompt.length}")
+        val composedTools = tools + stableTools
         return when (modelName) {
             "Gemini 3 Flash (Cloud)" -> geminiDataSource.summarizeNote(prompt)
             "Gemini Nano (System)" -> geminiNanoDataSource.summarizeNote(prompt)
@@ -264,6 +278,29 @@ class NoteAssistantRepositoryImpl @Inject constructor(
                         tools
                     )
                 } else null
+            }
+        }
+    }
+
+    override fun runAiAssistant(
+        prompt: String,
+        modelName: String,
+        extraTools: List<ToolSet>,
+    ): Flow<String> {
+        crashlytics.log("NoteAssistantRepositoryImpl: Assistant. Prompt len: ${prompt.length}, model: $modelName")
+        val composedTools = extraTools + stableTools
+        return when (modelName) {
+            "None", "Gemini 3 Flash (Cloud)", "Gemini Nano (System)" -> emptyFlow()
+            else -> flow {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.isLlm) {
+                    gemmaLocalDataSource.runAssistant(
+                        prompt = prompt,
+                        fileName = selectedModel.downloadFileName,
+                        tools = composedTools,
+                    ).collect { emit(it) }
+                }
             }
         }
     }
