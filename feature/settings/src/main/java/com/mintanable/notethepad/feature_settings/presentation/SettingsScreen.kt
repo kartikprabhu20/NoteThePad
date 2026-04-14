@@ -55,6 +55,7 @@ import com.mintanable.notethepad.core.model.settings.BackupFrequency
 import com.mintanable.notethepad.core.model.settings.BackupSettings
 import com.mintanable.notethepad.core.model.settings.Settings
 import com.mintanable.notethepad.core.model.settings.ThemeMode
+import com.mintanable.notethepad.feature_ai.BuildConfig
 import com.mintanable.notethepad.feature_settings.R
 import com.mintanable.notethepad.feature_settings.presentation.components.BackupStatusUI
 import com.mintanable.notethepad.feature_settings.presentation.components.NoteShapePickerDialog
@@ -320,6 +321,18 @@ fun SettingsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
+                if (BuildConfig.ENABLE_AI_ASSISTANCE) {
+                    SettingSwitchItem(
+                        title = stringResource(R.string.enable_ai_assistant_title),
+                        subtitle = stringResource(R.string.enable_ai_assistant_subtitle),
+                        checked = currentSettings.aiAssistantEnabled,
+                        enableSettings = true,
+                        onCheckedChange = { checked ->
+                            onEvent(SettingsEvent.EnableAIAssistant(checked))
+                        }
                     )
                 }
             }

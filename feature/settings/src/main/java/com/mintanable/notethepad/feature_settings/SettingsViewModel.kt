@@ -274,6 +274,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.RequestDownloadAudioTranscriber -> _showDownloadAudioTranscriberDialog.value = true
             SettingsEvent.ConfirmDownloadAudioTranscriber -> confirmDownloadAudioTranscriber()
             SettingsEvent.DismissDownloadAudioTranscriberDialog -> _showDownloadAudioTranscriberDialog.value = false
+            is SettingsEvent.EnableAIAssistant -> updateAiAssistantEnabled(event.enabled)
             is SettingsEvent.UpdateNoteShape -> updateNoteShape(event.noteShape)
             is SettingsEvent.UpdateSupaSync -> updateSupaSync(event.enabled)
             is SettingsEvent.DeleteAiModel -> deleteAiModel(event.aiModel)
@@ -376,7 +377,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun updateSupaSync(enabled: Boolean) {
-        viewModelScope.launch { 
+        viewModelScope.launch {
             dataStore.updateSupaSync(enabled)
             if (enabled) {
                 noteRepository.fetchCloudData()
@@ -384,6 +385,10 @@ class SettingsViewModel @Inject constructor(
 //                noteRepository.startRealtimeSync()
             }
         }
+    }
+
+    private fun updateAiAssistantEnabled(enabled: Boolean) {
+        viewModelScope.launch { dataStore.updateAiAssistantEnabled(enabled) }
     }
 
     private fun signOut() {

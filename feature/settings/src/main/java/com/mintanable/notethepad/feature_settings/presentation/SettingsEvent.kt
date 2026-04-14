@@ -37,4 +37,5 @@ sealed class SettingsEvent {
     data class DeleteAiModel(val aiModel: AiModel) : SettingsEvent()
     data object CompleteOnboarding : SettingsEvent()
     data class UpdateAnalyticsEnabled(val enabled: Boolean) : SettingsEvent()
+    data class EnableAIAssistant(val enabled: Boolean) : SettingsEvent()
 }
