@@ -254,6 +254,11 @@ sealed class AnalyticsEvent(
     )
 
     object AuthSignOut : AnalyticsEvent(Event.AUTH_SIGN_OUT, emptyMap())
+ 
+    class PermissionDenied(permission: String) : AnalyticsEvent(
+        Event.PERMISSION_DENIED,
+        mapOf(Param.PERMISSION_NAME to permission),
+    )
     // endregion
 
     companion object {
@@ -295,6 +300,7 @@ sealed class AnalyticsEvent(
             const val AUTH_SIGN_IN_ATTEMPTED = "auth_sign_in_attempted"
             const val AUTH_SIGN_IN_RESULT = "auth_sign_in_result"
             const val AUTH_SIGN_OUT = "auth_sign_out"
+            const val PERMISSION_DENIED = "permission_denied"
         }
 
         object Param {
@@ -335,6 +341,7 @@ sealed class AnalyticsEvent(
             const val ARCHIVED = "archived"
             const val METHOD = "method"
             const val SIZE_BYTES = "size_bytes"
+            const val PERMISSION_NAME = "permission_name"
         }
     }
 }

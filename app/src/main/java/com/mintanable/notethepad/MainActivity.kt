@@ -1,11 +1,13 @@
 package com.mintanable.notethepad
 
+import android.Manifest
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -118,6 +120,21 @@ class MainActivity : AppCompatActivity() {
                                 )
                             } else {
                                 settingsViewModel.onEvent(SettingsEvent.AuthCancelled)
+                            }
+                        }
+                    )
+ 
+                    val permissionLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = { permissions ->
+                            val denied = permissions.filterValues { !it }
+                            if (denied.isNotEmpty()) {
+                                Log.d("MainActivity", "Permissions denied: ${denied.keys}")
+                                denied.keys.forEach { permission ->
+                                    analyticsTracker.track(AnalyticsEvent.PermissionDenied(permission))
+                                }
+                            } else {
+                                Log.d("MainActivity", "All permissions granted")
                             }
                         }
                     )
@@ -280,6 +297,17 @@ class MainActivity : AppCompatActivity() {
                                 OnboardingScreen(
                                     isDarkTheme = isDarkTheme,
                                     onComplete = {
+                                        if (!state.settings.onboardingCompleted) {
+                                            val permissions = mutableListOf(
+                                                Manifest.permission.CAMERA,
+                                                Manifest.permission.RECORD_AUDIO
+                                            )
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                                            }
+                                            permissionLauncher.launch(permissions.toTypedArray())
+                                        }
+ 
                                         settingsViewModel.onEvent(SettingsEvent.CompleteOnboarding)
                                         navController.navigate(Screen.NotesScreen.route) {
                                             popUpTo(Screen.OnboardingScreen.route) { inclusive = true }
