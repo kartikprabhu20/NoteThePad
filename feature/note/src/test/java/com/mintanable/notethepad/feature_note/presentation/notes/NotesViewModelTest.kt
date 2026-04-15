@@ -14,6 +14,8 @@ import com.mintanable.notethepad.core.model.settings.NoteShape
 import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.database.db.entity.TagEntity
+import com.mintanable.notethepad.feature_ai.domain.AiAction
+import com.mintanable.notethepad.feature_ai.domain.AiActionBus
 import com.mintanable.notethepad.feature_note.domain.use_case.GetAiAssistantSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetSupaSyncSettings
@@ -28,6 +30,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -58,6 +62,8 @@ class NotesViewModelTest {
     private val refreshSupaSync = mockk<RefreshSupaSync>(relaxed = true)
     private val authRepository = mockk<AuthRepository>(relaxed = true)
     private val analyticsTracker = mockk<AnalyticsTracker>(relaxed = true)
+    private val aiActionBus = mockk<AiActionBus>(relaxed = true)
+
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val testDispatcherProvider = TestDispatcherProvider(testDispatcher)
@@ -67,7 +73,17 @@ class NotesViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        
+        // Explicitly stub all flows collected or transformed during ViewModel initialization
         every { getNoteShapeSettings() } returns flowOf(NoteShape.DEFAULT)
+        every { getSupaSyncStatus() } returns flowOf(false)
+        every { getAiAssistantSettings() } returns flowOf(false)
+        every { getSupaSyncSettings() } returns flowOf(false)
+        every { authRepository.getSignedInFirebaseUser() } returns flowOf(null)
+        every { aiActionBus.events } returns MutableSharedFlow<AiAction>().asSharedFlow()
+        every { noteUseCases.getDetailedNotes(any()) } returns flowOf(emptyList())
+        every { noteUseCases.getNotesWithTags(any(), any()) } returns flowOf(emptyList())
+
         viewModel = NotesViewModel(
             savedStateHandle = savedStateHandle,
             noteUseCases = noteUseCases,
@@ -81,7 +97,8 @@ class NotesViewModelTest {
             getSupaSyncStatus = getSupaSyncStatus,
             getAiAssistantSettings = getAiAssistantSettings,
             authRepository = authRepository,
-            analyticsTracker = analyticsTracker
+            analyticsTracker = analyticsTracker,
+            aiActionBus = aiActionBus
         )
     }
 
