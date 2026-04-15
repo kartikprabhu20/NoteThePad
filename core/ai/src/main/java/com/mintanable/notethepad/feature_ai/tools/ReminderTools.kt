@@ -21,7 +21,7 @@ class ReminderTools(
         return System.currentTimeMillis().toDouble()
     }
 
-    @Tool(description = "Returns the current date and day of the week. CALL THIS FIRST to calculate day offsets for reminders.")
+    @Tool(description = "Returns current date, day of week, and time. Call this first for any question involving dates, days, or time durations (e.g. 'how many days until...').")
     fun getSystemDateTime(): String {
         val sdf = java.text.SimpleDateFormat("EEEE, MMMM dd, yyyy", java.util.Locale.US)
         return "Today is " + sdf.format(java.util.Date())

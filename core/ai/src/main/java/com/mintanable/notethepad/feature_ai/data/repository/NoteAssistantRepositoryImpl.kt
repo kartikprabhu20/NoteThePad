@@ -331,11 +331,15 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         gemmaLocalDataSource.resetSession()
     }
  
-    override suspend fun prepareAssistant(modelName: String) {
+    override suspend fun prepareAssistant(modelName: String, extraTools: List<ToolSet>) {
         val models = aiModelRepository.getModels().first()
         val selectedModel = models.find { it.name == modelName }
         if (selectedModel != null) {
-            gemmaLocalDataSource.prepareAssistant(selectedModel.downloadFileName)
+            val composedTools = extraTools + stableTools
+            gemmaLocalDataSource.prepareAssistant(
+                fileName = selectedModel.downloadFileName,
+                tools = composedTools,
+            )
         }
     }
  

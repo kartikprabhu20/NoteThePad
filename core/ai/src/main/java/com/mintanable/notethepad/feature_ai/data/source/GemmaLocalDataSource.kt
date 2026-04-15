@@ -46,7 +46,10 @@ class GemmaLocalDataSource @Inject constructor(
         var conversation: Conversation,
         val fileName: String,
         val supportAudio: Boolean,
-        val supportImage: Boolean
+        val supportImage: Boolean,
+        var systemInstruction: String?,
+        var tools: List<ToolProvider>,
+        var samplerConfig: SamplerConfig,
     )
 
     private var activeInstance: ActiveInstance? = null
@@ -87,7 +90,25 @@ class GemmaLocalDataSource @Inject constructor(
                 val current = activeInstance
                 if (current != null && current.fileName == fileName &&
                     current.supportAudio == supportAudio && current.supportImage == supportImage) {
-                    crashlytics.log("$TAG: Reusing existing instance ($fileName)")
+                    val needsReconfig =
+                        current.tools.size != tools.size ||
+                        current.systemInstruction != systemInstruction
+                    if (needsReconfig) {
+                        crashlytics.log("$TAG: Reconfiguring conversation on existing engine ($fileName). tools=${tools.size}")
+                        try { current.conversation.close() } catch (_: Exception) {}
+                        current.conversation = current.engine.createConversation(
+                            ConversationConfig(
+                                samplerConfig = samplerConfig,
+                                systemInstruction = systemInstruction?.let { Contents.of(it) },
+                                tools = tools
+                            )
+                        )
+                        current.systemInstruction = systemInstruction
+                        current.tools = tools
+                        current.samplerConfig = samplerConfig
+                    } else {
+                        crashlytics.log("$TAG: Reusing existing instance ($fileName)")
+                    }
                     return@withLock
                 }
 
@@ -135,7 +156,10 @@ class GemmaLocalDataSource @Inject constructor(
                         conversation = conversation,
                         fileName = fileName,
                         supportAudio = supportAudio,
-                        supportImage = supportImage
+                        supportImage = supportImage,
+                        systemInstruction = systemInstruction,
+                        tools = tools,
+                        samplerConfig = samplerConfig,
                     )
                     Log.d(TAG, "Engine initialized (audio=$supportAudio, image=$supportImage)")
                 } catch (e: Exception) {
@@ -303,23 +327,28 @@ class GemmaLocalDataSource @Inject constructor(
         mutex.withLock {
             val instance = activeInstance ?: return
             try { instance.conversation.close() } catch (_: Exception) {}
+            val newSystemInstruction = systemInstruction ?: instance.systemInstruction
             instance.conversation = instance.engine.createConversation(
                 ConversationConfig(
-                    samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.2),
-                    systemInstruction = systemInstruction?.let { Contents.of(it) }
+                    samplerConfig = instance.samplerConfig,
+                    systemInstruction = newSystemInstruction?.let { Contents.of(it) },
+                    tools = instance.tools,
                 )
             )
+            instance.systemInstruction = newSystemInstruction
         }
     }
 
     suspend fun resetSession() {
         mutex.withLock {
             val instance = activeInstance ?: return
-            crashlytics.log("$TAG: Resetting session conversation")
+            crashlytics.log("$TAG: Resetting session conversation. tools=${instance.tools.size}")
             try { instance.conversation.close() } catch (_: Exception) {}
             instance.conversation = instance.engine.createConversation(
                 ConversationConfig(
-                    samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.4),
+                    samplerConfig = instance.samplerConfig,
+                    systemInstruction = instance.systemInstruction?.let { Contents.of(it) },
+                    tools = instance.tools,
                 )
             )
         }
@@ -471,26 +500,6 @@ class GemmaLocalDataSource @Inject constructor(
         fileName: String,
         tools: List<ToolSet>,
     ): Flow<String> = flow {
-        try {
-            initialize(
-                fileName = fileName,
-                supportAudio = false,
-                supportImage = false,
-                maxNumTokens = 4096,
-                samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.4),
-                systemInstruction = ASSISTANT_SYSTEM_PROMPT_GENERAL,
-                tools = tools.map { tool(it) },
-            )
-            runInference(prompt).collect { emit(it) }
-        } catch (e: Exception) {
-            Log.e(TAG, "Assistant run failed: ${e.message}")
-            Log.e(TAG, "Offending prompt: $prompt")
-            crashlytics.log("$TAG: Assistant run failed prompt=$prompt")
-        }
-    }.flowOn(Dispatchers.IO)
-
-    @OptIn(ExperimentalApi::class)
-    suspend fun prepareAssistant(fileName: String) {
         initialize(
             fileName = fileName,
             supportAudio = false,
@@ -498,6 +507,21 @@ class GemmaLocalDataSource @Inject constructor(
             maxNumTokens = 4096,
             samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.4),
             systemInstruction = ASSISTANT_SYSTEM_PROMPT_GENERAL,
+            tools = tools.map { tool(it) },
+        )
+        runInference(prompt).collect { emit(it) }
+    }.flowOn(Dispatchers.IO)
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun prepareAssistant(fileName: String, tools: List<ToolSet> = emptyList()) {
+        initialize(
+            fileName = fileName,
+            supportAudio = false,
+            supportImage = false,
+            maxNumTokens = 4096,
+            samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.4),
+            systemInstruction = ASSISTANT_SYSTEM_PROMPT_GENERAL,
+            tools = tools.map { tool(it) },
         )
     }
 }
