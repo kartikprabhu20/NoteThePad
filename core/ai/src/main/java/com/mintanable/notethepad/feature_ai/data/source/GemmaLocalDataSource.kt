@@ -43,7 +43,10 @@ class GemmaLocalDataSource @Inject constructor(
 
     private data class ActiveInstance(
         val engine: Engine,
-        var conversation: Conversation
+        var conversation: Conversation,
+        val fileName: String,
+        val supportAudio: Boolean,
+        val supportImage: Boolean
     )
 
     private var activeInstance: ActiveInstance? = null
@@ -81,6 +84,13 @@ class GemmaLocalDataSource @Inject constructor(
     ) {
         withContext(Dispatchers.IO) {
             mutex.withLock {
+                val current = activeInstance
+                if (current != null && current.fileName == fileName &&
+                    current.supportAudio == supportAudio && current.supportImage == supportImage) {
+                    crashlytics.log("$TAG: Reusing existing instance ($fileName)")
+                    return@withLock
+                }
+
                 crashlytics.log("$TAG: Init start ($fileName). Audio: $supportAudio, Image: $supportImage")
                 closeInstanceInternal()
 
@@ -120,7 +130,13 @@ class GemmaLocalDataSource @Inject constructor(
                         )
                     )
 
-                    activeInstance = ActiveInstance(engine, conversation)
+                    activeInstance = ActiveInstance(
+                        engine = engine,
+                        conversation = conversation,
+                        fileName = fileName,
+                        supportAudio = supportAudio,
+                        supportImage = supportImage
+                    )
                     Log.d(TAG, "Engine initialized (audio=$supportAudio, image=$supportImage)")
                 } catch (e: Exception) {
                     crashlytics.log("$TAG: Init Failed - ${e.message}")
@@ -289,6 +305,19 @@ class GemmaLocalDataSource @Inject constructor(
         }
     }
 
+    suspend fun resetSession() {
+        mutex.withLock {
+            val instance = activeInstance ?: return
+            crashlytics.log("$TAG: Resetting session conversation")
+            try { instance.conversation.close() } catch (_: Exception) {}
+            instance.conversation = instance.engine.createConversation(
+                ConversationConfig(
+                    samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.4),
+                )
+            )
+        }
+    }
+
     // ── Task: Summarize Note (text-only) ──────────────────────────────────
 
     @OptIn(ExperimentalApi::class)
@@ -343,7 +372,7 @@ class GemmaLocalDataSource @Inject constructor(
                 fileName = fileName,
                 supportAudio = false,
                 supportImage = true,
-                maxNumTokens = 256,
+                maxNumTokens = 512,
                 samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.3),
                 systemInstruction = "Describe images concisely in 10-20 words or convert to text if it contains text."
             )
@@ -450,15 +479,13 @@ class GemmaLocalDataSource @Inject constructor(
             Log.e(TAG, "Assistant run failed: ${e.message}")
             Log.e(TAG, "Offending prompt: $prompt")
             crashlytics.log("$TAG: Assistant run failed prompt=$prompt")
-        } finally {
-            cleanup()
         }
     }.flowOn(Dispatchers.IO)
 }
 
 private val TOOL_CATALOG = """
     You have access to tools grouped by category:
-    - REMINDERS: get_current_time_ms, get_timestamp_for_instruction, add_reminder, clear_reminder, list_upcoming_reminders
+    - REMINDERS: get_current_time_ms,get_system_date_time, get_timestamp_for_instruction, add_reminder, clear_reminder, list_upcoming_reminders
     - NOTE CRUD: create_note, update_note, delete_note, get_note, list_recent_notes
     - SEARCH: search_notes_by_text, search_notes_by_tag, list_notes_with_reminders, list_notes_by_color
     - TAGS: list_all_tags, create_tag, add_tag_to_note, remove_tag_from_note, suggest_tags
@@ -479,7 +506,7 @@ private val TOOL_CATALOG = """
 
     Tool selection rules:
     1. Prefer specific tools over general ones (e.g. search_notes_by_tag over list_recent_notes when filtering).
-    2. For reminders: ALWAYS call get_timestamp_for_instruction first, then pass its Double result to add_reminder. Never type a number literal for reminder_ms.
+    2. For reminders: ALWAYS call get_system_date_time to know the current date, day and time, and then get_timestamp_for_instruction for time in milliseconds, then pass its Double result to add_reminder. Never type a number literal for reminder_ms.
     3. Never fabricate note ids — look them up with search or list tools first.
     4. Tools return JSON strings or plain status codes; parse them before acting.
     5. For list_notes_by_color, the color parameter is a NAME ("yellow", "redOrange"), not an integer.
@@ -494,9 +521,10 @@ private val ASSISTANT_SYSTEM_PROMPT_SUMMARIZE = """
     1. If the note mentions a task, date, or "tomorrow/next week", you MUST call add_reminder.
     2. Do NOT just write "I set a reminder" in the text. You MUST execute the add_reminder tool.
     3. To set a reminder:
-        a. First, call get_current_time_ms to know what 'today' is.
-        b. Use get_timestamp_for_instruction to calculate the future date.
-        c. Finally, call add_reminder.
+        a. First, call get_system_date_time to know the current day of the week and date.
+        b. Based on that, calculate the 'dayOffset' (e.g., if today is Tuesday and the user says 'Friday', offset is 3).
+        c. Call get_timestamp_for_instruction with the calculated offset.
+        d. Finally, call add_reminder with that result.
     4. Summarize the note content after calling your tools.
 """.trimIndent()
 

@@ -145,6 +145,7 @@ fun NotesScreen(
             onPromptChange = aiAssistantViewModel::onPromptChange,
             onSubmit = aiAssistantViewModel::submit,
             onDismiss = aiAssistantViewModel::dismiss,
+            onToggleTranscription = aiAssistantViewModel::toggleLiveTranscription
         )
     }
 

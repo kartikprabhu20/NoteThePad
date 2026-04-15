@@ -21,6 +21,12 @@ class ReminderTools(
         return System.currentTimeMillis().toDouble()
     }
 
+    @Tool(description = "Returns the current date and day of the week. CALL THIS FIRST to calculate day offsets for reminders.")
+    fun getSystemDateTime(): String {
+        val sdf = java.text.SimpleDateFormat("EEEE, MMMM dd, yyyy", java.util.Locale.US)
+        return "Today is " + sdf.format(java.util.Date())
+    }
+
     @Tool(description = "Calculates the timestamp in milliseconds for a relative day/time. Use this for 'Next Sunday' or 'Tomorrow at 4pm'. Returns a Double you must pass to add_reminder.")
     fun getTimestampForInstruction(
         @ToolParam(description = "Days from today (0=today, 1=tomorrow, 7=next week)") dayOffset: Int,

@@ -30,4 +30,6 @@ interface NoteAssistantRepository {
         modelName: String,
         extraTools: List<ToolSet> = emptyList(),
     ): Flow<String>
+
+    suspend fun resetAiAssistantSession()
 }

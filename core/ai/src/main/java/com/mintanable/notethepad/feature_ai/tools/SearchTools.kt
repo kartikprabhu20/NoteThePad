@@ -9,6 +9,8 @@ import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.core.richtext.plaintext.extractPlaintext
 import com.mintanable.notethepad.database.db.entity.NoteWithTags
 import com.mintanable.notethepad.database.db.repository.NoteRepository
+import com.mintanable.notethepad.feature_ai.domain.AiAction
+import com.mintanable.notethepad.feature_ai.domain.AiActionBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -20,6 +22,7 @@ import javax.inject.Singleton
 @Singleton
 class SearchTools @Inject constructor(
     private val noteRepository: NoteRepository,
+    private val aiActionBus: AiActionBus,
 ) : ToolSet {
 
     @Tool(description = "Finds notes whose title or body text contains the given substring (case-insensitive). Searches the plaintext of rich content, not the raw JSON. Returns JSON array.")
@@ -35,6 +38,8 @@ class SearchTools @Inject constructor(
             val bodyMatch = extractPlaintext(it.noteEntity.content).contains(q, ignoreCase = true)
             titleMatch || bodyMatch
         }.take(limit.coerceIn(1, 50))
+        
+        aiActionBus.tryEmit(AiAction.Search(query))
         notesToJson(hits)
     }
 
@@ -48,6 +53,12 @@ class SearchTools @Inject constructor(
         val hits = notes.filter { nwt ->
             nwt.tagEntities.any { it.tagName.equals(tagName, ignoreCase = true) }
         }.take(limit.coerceIn(1, 50))
+
+        val hitTag = hits.firstOrNull()?.tagEntities?.find { it.tagName.equals(tagName, ignoreCase = true) }
+        if (hitTag != null) {
+            aiActionBus.tryEmit(AiAction.FilterByTag(hitTag.tagId, hitTag.tagName))
+        }
+
         notesToJson(hits)
     }
 
@@ -83,6 +94,8 @@ class SearchTools @Inject constructor(
         val notes = noteRepository.getNotes(NoteOrder.Date(OrderType.Descending)).first()
         val hits = notes.filter { it.noteEntity.color == argb }
             .take(limit.coerceIn(1, 50))
+
+        aiActionBus.tryEmit(AiAction.FilterByColor(argb))
         notesToJson(hits)
     }
 

@@ -12,6 +12,8 @@ import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.database.db.entity.TagEntity
+import com.mintanable.notethepad.feature_ai.domain.AiAction
+import com.mintanable.notethepad.feature_ai.domain.AiActionBus
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.GetAiAssistantSettings
 import com.mintanable.notethepad.feature_note.domain.use_case.GetNoteShapeSettings
@@ -60,7 +62,8 @@ class NotesViewModel @Inject constructor(
     private val widgetRefresher: WidgetRefresher,
     private val refreshSupaSync: RefreshSupaSync,
     private val authRepository: AuthRepository,
-    private val analyticsTracker: AnalyticsTracker
+    private val analyticsTracker: AnalyticsTracker,
+    private val aiActionBus: AiActionBus,
 ) : ViewModel() {
 
     companion object {
@@ -122,18 +125,50 @@ class NotesViewModel @Inject constructor(
     val searchInputText = _searchInputText.asStateFlow()
     private val _debouncedSearchQuery = _searchInputText.debounce(300L).distinctUntilChanged()
 
+    private val _selectedColorCode = MutableStateFlow<Int?>(null)
+    val selectedColorCode = _selectedColorCode.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            aiActionBus.events.collect { action ->
+                handleAiAction(action)
+            }
+        }
+    }
+
+    private fun handleAiAction(action: AiAction) {
+        when (action) {
+            is AiAction.Search -> {
+                _searchInputText.value = action.query
+            }
+            is AiAction.FilterByColor -> {
+                _selectedColorCode.value = action.colorCode
+            }
+            is AiAction.FilterByTag -> {
+                updateFilter(NotesFilterType.TAGS.filter, action.tagId, action.tagName)
+            }
+            is AiAction.ClearFilters -> {
+                _searchInputText.value = ""
+                _selectedColorCode.value = null
+                updateFilter(NotesFilterType.ALL.filter)
+            }
+        }
+    }
 
     val state: StateFlow<NotesState> = combine(
         _notesFromDb,
         _debouncedSearchQuery,
-    ) { notes, query ->
-        val filtered = if (query.isBlank()) {
-            notes
-        } else {
-            notes.filter {
+        _selectedColorCode
+    ) { notes, query, color ->
+        var filtered = notes
+        if (query.isNotBlank()) {
+            filtered = filtered.filter {
                 it.title.contains(query, ignoreCase = true) ||
                         it.content.contains(query, ignoreCase = true)
             }
+        }
+        if (color != null) {
+            filtered = filtered.filter { it.color == color }
         }
 
         NotesState(notes = filtered)

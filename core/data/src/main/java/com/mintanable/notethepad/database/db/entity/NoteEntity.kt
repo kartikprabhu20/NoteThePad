@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.database.db.entity
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
@@ -36,7 +38,7 @@ data class NoteEntity(
     val timestamp: Long,
 
     @SerialName("color")
-    val color: Int,
+    val color: Int = Color(0xffffab91).toArgb(),
 
     @SerialName("image_uris")
     val imageUris: List<String> = emptyList(),

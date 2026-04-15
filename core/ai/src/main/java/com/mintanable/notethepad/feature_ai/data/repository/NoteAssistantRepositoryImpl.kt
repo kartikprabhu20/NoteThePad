@@ -326,4 +326,8 @@ class NoteAssistantRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun resetAiAssistantSession() {
+        gemmaLocalDataSource.resetSession()
+    }
 }

@@ -24,17 +24,15 @@ class NoteTools @Inject constructor(
     @Tool(description = "Creates a new note. Returns the new note's id.")
     fun createNote(
         @ToolParam(description = "Short title") title: String,
-        @ToolParam(description = "Main text body") content: String,
-        @ToolParam(description = "ARGB color int; 0 for default") color: Int,
-        @ToolParam(description = "Reminder time in UTC ms; 0 for none") reminderMs: Double,
-    ): String = runBlocking(Dispatchers.IO) {
+        @ToolParam(description = "Main text body") content: String = "",
+        @ToolParam(description = "Reminder time in UTC ms") reminderMs: Double = -1.0
+    ): String  = runBlocking(Dispatchers.IO) {
+        val reminder = reminderMs?.toLong() ?:  -1L
         val now = System.currentTimeMillis()
-        val reminder = reminderMs.toLong().takeIf { it > 0 } ?: -1L
         val entity = NoteEntity(
             title = title,
             content = content,
             timestamp = now,
-            color = color,
             reminderTime = reminder,
             lastUpdateTime = now,
         )
