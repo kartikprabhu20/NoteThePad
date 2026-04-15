@@ -32,4 +32,6 @@ interface NoteAssistantRepository {
     ): Flow<String>
 
     suspend fun resetAiAssistantSession()
+    suspend fun prepareAssistant(modelName: String)
+    suspend fun stopAssistantInference()
 }

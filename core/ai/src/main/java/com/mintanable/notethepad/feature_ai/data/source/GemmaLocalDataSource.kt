@@ -231,6 +231,13 @@ class GemmaLocalDataSource @Inject constructor(
         Log.d(TAG, "Cleanup done.")
     }
 
+    suspend fun stopInference() {
+        mutex.withLock {
+            val inst = activeInstance ?: return
+            cancelAndAwaitInference(inst.conversation)
+        }
+    }
+
     // ── Task: Generate Tags (text-only) ──────────────────────────────────
 
     @OptIn(ExperimentalApi::class)
@@ -481,11 +488,23 @@ class GemmaLocalDataSource @Inject constructor(
             crashlytics.log("$TAG: Assistant run failed prompt=$prompt")
         }
     }.flowOn(Dispatchers.IO)
+
+    @OptIn(ExperimentalApi::class)
+    suspend fun prepareAssistant(fileName: String) {
+        initialize(
+            fileName = fileName,
+            supportAudio = false,
+            supportImage = false,
+            maxNumTokens = 4096,
+            samplerConfig = SamplerConfig(topK = 64, topP = 0.95, temperature = 0.4),
+            systemInstruction = ASSISTANT_SYSTEM_PROMPT_GENERAL,
+        )
+    }
 }
 
 private val TOOL_CATALOG = """
     You have access to tools grouped by category:
-    - REMINDERS: get_current_time_ms,get_system_date_time, get_timestamp_for_instruction, add_reminder, clear_reminder, list_upcoming_reminders
+    - REMINDERS: get_current_time_ms, get_system_date_time, get_timestamp_for_instruction, add_reminder, clear_reminder, list_upcoming_reminders
     - NOTE CRUD: create_note, update_note, delete_note, get_note, list_recent_notes
     - SEARCH: search_notes_by_text, search_notes_by_tag, list_notes_with_reminders, list_notes_by_color
     - TAGS: list_all_tags, create_tag, add_tag_to_note, remove_tag_from_note, suggest_tags
@@ -543,6 +562,11 @@ private val ASSISTANT_SYSTEM_PROMPT_GENERAL = """
     Tagging workflow:
     - To tag a note: call add_tag_to_note(noteId, tagName) ONCE. It auto-creates the tag if it doesn't exist. Do NOT call create_tag first.
     - If add_tag_to_note returns "add_failed", tell the user it couldn't be attached — do not silently retry more than once.
+
+    Date/Time Intelligence (CRITICAL):
+    - For questions about days, dates, or time durations (e.g. "How many days until Sunday?"), ALWAYS call get_system_date_time first to know today's context.
+    - Calculate the answer based on the tool's return value (e.g. if today is Wednesday (3) and user asks for Sunday (7), the result is 4 days).
+    - If calculating a future timestamp for a reminder, use get_system_date_time to find the day offset, then get_timestamp_for_instruction.
 
     Multi-step workflow:
     1. For multi-note queries (e.g. "summarize my work notes"): call a search/list tool, then get_note for each id you need to read, then produce your final answer.

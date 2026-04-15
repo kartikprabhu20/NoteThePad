@@ -33,17 +33,31 @@ class AiAssistantViewModel @Inject constructor(
 
     fun show() {
         _state.value = _state.value.copy(visible = true)
+        viewModelScope.launch {
+            val modelName = userPreferencesRepository.settingsFlow.first().aiModelName
+            if (modelName != "None" && modelName.isNotBlank()) {
+                assistantRepository.prepareAssistant(modelName)
+            }
+        }
     }
 
     fun dismiss() {
-        streamJob?.cancel()
-        streamJob = null
+        stopStreaming()
         transcriptionJob?.cancel()
         transcriptionJob = null
         viewModelScope.launch {
             assistantRepository.resetAiAssistantSession()
         }
         _state.value = AiAssistantState()
+    }
+ 
+    fun stopStreaming() {
+        streamJob?.cancel()
+        streamJob = null
+        viewModelScope.launch {
+            assistantRepository.stopAssistantInference()
+        }
+        _state.value = _state.value.copy(isStreaming = false)
     }
 
     fun onPromptChange(value: TextFieldValue) {
@@ -148,7 +162,8 @@ class AiAssistantViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        streamJob?.cancel()
+        stopStreaming()
+        transcriptionJob?.cancel()
         super.onCleared()
     }
 }

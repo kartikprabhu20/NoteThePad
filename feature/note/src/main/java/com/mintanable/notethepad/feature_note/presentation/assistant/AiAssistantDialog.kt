@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicNone
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +51,7 @@ fun AiAssistantDialog(
     onSubmit: () -> Unit,
     onDismiss: () -> Unit,
     onToggleTranscription: () -> Unit = {},
+    onStop: () -> Unit = {},
 ) {
     if (!state.visible) return
 
@@ -124,24 +126,41 @@ fun AiAssistantDialog(
                         }
                     )
 
-                    IconButton(
-                        onClick = onSubmit,
-                        enabled = state.prompt.text.isNotBlank() && !state.isStreaming,
-                        modifier = Modifier
-                            .background(
-                                color = if (state.prompt.text.isNotBlank() && !state.isStreaming) 
-                                    MaterialTheme.colorScheme.primary 
-                                else MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(24.dp)
+                    if (state.isStreaming) {
+                        IconButton(
+                            onClick = onStop,
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.errorContainer,
+                                    shape = RoundedCornerShape(24.dp)
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Stop,
+                                contentDescription = "Stop",
+                                tint = MaterialTheme.colorScheme.onErrorContainer
                             )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Send,
-                            contentDescription = "Send",
-                            tint = if (state.prompt.text.isNotBlank() && !state.isStreaming)
-                                MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = onSubmit,
+                            enabled = state.prompt.text.isNotBlank(),
+                            modifier = Modifier
+                                .background(
+                                    color = if (state.prompt.text.isNotBlank())
+                                        MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = RoundedCornerShape(24.dp)
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Send,
+                                contentDescription = "Send",
+                                tint = if (state.prompt.text.isNotBlank())
+                                    MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

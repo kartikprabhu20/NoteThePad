@@ -282,6 +282,28 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String> {
+        crashlytics.log("NoteAssistantRepositoryImpl: Query Image. Query: $query")
+        return when (modelName) {
+            "Gemini 3 Flash (Cloud)" -> geminiDataSource.queryImage(imageBytes, query)
+            "Gemini Nano (System)" -> emptyFlow()
+            "None" -> emptyFlow()
+            else -> flow {
+                val models = aiModelRepository.getModels().first()
+                val selectedModel = models.find { it.name == modelName }
+                if (selectedModel != null && selectedModel.llmSupportImage) {
+                    gemmaLocalDataSource.queryImage(
+                        imageBytes,
+                        query,
+                        selectedModel.downloadFileName
+                    )
+                        .onCompletion { gemmaLocalDataSource.cleanup() }
+                        .collect { emit(it) }
+                }
+            }
+        }
+    }
+
     override fun runAiAssistant(
         prompt: String,
         modelName: String,
@@ -305,29 +327,19 @@ class NoteAssistantRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun queryImage(imageBytes: ByteArray, query: String, modelName: String): Flow<String> {
-        crashlytics.log("NoteAssistantRepositoryImpl: Query Image. Query: $query")
-        return when (modelName) {
-            "Gemini 3 Flash (Cloud)" -> geminiDataSource.queryImage(imageBytes, query)
-            "Gemini Nano (System)" -> emptyFlow()
-            "None" -> emptyFlow()
-            else -> flow {
-                val models = aiModelRepository.getModels().first()
-                val selectedModel = models.find { it.name == modelName }
-                if (selectedModel != null && selectedModel.llmSupportImage) {
-                    gemmaLocalDataSource.queryImage(
-                        imageBytes,
-                        query,
-                        selectedModel.downloadFileName
-                    )
-                        .onCompletion { gemmaLocalDataSource.cleanup() }
-                        .collect { emit(it) }
-                }
-            }
-        }
-    }
-
     override suspend fun resetAiAssistantSession() {
         gemmaLocalDataSource.resetSession()
+    }
+ 
+    override suspend fun prepareAssistant(modelName: String) {
+        val models = aiModelRepository.getModels().first()
+        val selectedModel = models.find { it.name == modelName }
+        if (selectedModel != null) {
+            gemmaLocalDataSource.prepareAssistant(selectedModel.downloadFileName)
+        }
+    }
+ 
+    override suspend fun stopAssistantInference() {
+        gemmaLocalDataSource.stopInference()
     }
 }
