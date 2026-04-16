@@ -246,10 +246,6 @@ fun AddEditNoteScreen(
     }
 
     BackHandler {
-        viewModel.onEvent(AddEditNoteEvent.StopMedia)
-        if (uiState.zoomedImageUri == null) {
-            navController.navigateUp()
-        }
         when {
             uiState.zoomedImageUri != null -> {
                 viewModel.onEvent(AddEditNoteEvent.StopMedia)
@@ -265,8 +261,10 @@ fun AddEditNoteScreen(
             }
 
             else -> {
-                viewModel.onEvent(AddEditNoteEvent.StopMedia)
-                navController.navigateUp()
+                if (!uiState.isSaving) {
+                    viewModel.onEvent(AddEditNoteEvent.StopMedia)
+                    viewModel.onEvent(AddEditNoteEvent.SaveNote)
+                }
             }
         }
     }

@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">हम आपको अपलोड प्रगति दिखाने के लिए सूचनाओं का उपयोग करते हैं। इसके बिना, आपको पता नहीं चलेगा कि बैकअप सफलतापूर्वक समाप्त हुआ है या नहीं।</string>
     <string name="permission_notification_title">सूचना अनुमति</string>
     <string name="placeholder_tag_example">जैसे: व्यक्तिगत</string>
+    <string name="untitled_note_fallback">बिना शीर्षक</string>
 </resources>

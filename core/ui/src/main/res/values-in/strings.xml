@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Kami menggunakan notifikasi untuk menunjukkan progres unggahan kepada Anda. Tanpa ini, Anda tidak akan tahu apakah pencadangan selesai dengan sukses saat aplikasi berada di latar belakang.</string>
     <string name="permission_notification_title">Izin notifikasi</string>
     <string name="placeholder_tag_example">misal: Pribadi</string>
+    <string name="untitled_note_fallback">Tanpa judul</string>
 </resources>

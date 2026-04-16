@@ -37,11 +37,8 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -74,7 +71,6 @@ fun NoteBottomAppBar(
     isRichTextEnabled: Boolean = false,
     onActionClick: (BottomSheetType) -> Unit,
     onRichTextClick: () -> Unit = {},
-    onSaveClick: () -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
@@ -181,17 +177,6 @@ fun NoteBottomAppBar(
                     }
                 }
             },
-            floatingActionButton = {
-                FloatingActionButton(
-                    modifier = Modifier.graphicsLayer {
-                        rotationZ = wiggleAnim.value
-                    },
-                    onClick = onSaveClick,
-                    containerColor = BottomAppBarDefaults.bottomAppBarFabColor
-                ) {
-                    Icon(imageVector = Icons.Default.Save, contentDescription = "Save Note")
-                }
-            }
         )
     }
 }
@@ -241,7 +226,6 @@ fun PreviewBottomAppBar(){
                                     isRichTextEnabled = true,
                                     onActionClick = { },
                                     onRichTextClick = { },
-                                    onSaveClick = { },
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this@AnimatedContent
                                 )

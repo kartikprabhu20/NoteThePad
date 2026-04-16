@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Usamos notificaciones para mostrarte el progreso de la carga. Sin esto, no sabrás si la copia de seguridad finaliza con éxito mientras la aplicación está en segundo plano.</string>
     <string name="permission_notification_title">Permiso de notificación</string>
     <string name="placeholder_tag_example">ej. Personal</string>
+    <string name="untitled_note_fallback">Sin título</string>
 </resources>

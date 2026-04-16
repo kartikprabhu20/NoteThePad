@@ -39,6 +39,7 @@
     <string name="label_more_items">+ %1$d more</string>
     <string name="msg_note_deleted">Note deleted</string>
     <string name="msg_save_failed">Save Failed</string>
+    <string name="untitled_note_fallback">Untitled</string>
     <string name="msg_pin_failed">Save Failed, can\'t pin to homescreen</string>
     <string name="msg_save_failed_sharing">Save Failed before sharing</string>
     <string name="msg_save_before_invite">Please save the note before inviting collaborators</string>

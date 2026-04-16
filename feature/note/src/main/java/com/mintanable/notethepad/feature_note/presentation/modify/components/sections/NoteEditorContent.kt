@@ -214,7 +214,6 @@ fun NoteEditorContent(
                                         }
                                     },
                                     onRichTextClick = { onEvent(AddEditNoteEvent.ToggleRichTextBar) },
-                                    onSaveClick = { onEvent(AddEditNoteEvent.SaveNote) },
                                     sharedTransitionScope = sharedTransitionScope,
                                     animatedVisibilityScope = animatedVisibilityScope
                                 )

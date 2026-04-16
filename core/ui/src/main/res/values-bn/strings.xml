@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">আমরা আপনাকে আপলোডের অগ্রগতি দেখাতে বিজ্ঞপ্তিগুলি ব্যবহার করি। এটি ছাড়া, অ্যাপটি ব্যাকগ্রাউন্ডে থাকাকালীন ব্যাকআপ সফলভাবে শেষ হয়েছে কিনা তা আপনি জানতে পারবেন না।</string>
     <string name="permission_notification_title">নোটিফিকেশন অনুমতি</string>
     <string name="placeholder_tag_example">যেমন: ব্যক্তিগত</string>
+    <string name="untitled_note_fallback">শিরোনামহীন</string>
 </resources>

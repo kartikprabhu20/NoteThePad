@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Chúng tôi sử dụng thông báo để hiển thị cho bạn tiến trình tải lên. Nếu không có điều này, bạn sẽ không biết liệu bản sao lưu có kết thúc thành công hay không khi ứng dụng đang ở chế độ nền.</string>
     <string name="permission_notification_title">Quyền thông báo</string>
     <string name="placeholder_tag_example">ví dụ: Cá nhân</string>
+    <string name="untitled_note_fallback">Không có tiêu đề</string>
 </resources>

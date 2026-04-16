@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Nous utilisons les notifications pour vous montrer la progression du téléchargement. Sans cela, vous ne saurez pas si la sauvegarde se termine avec succès pendant que l\'application est en arrière-plan.</string>
     <string name="permission_notification_title">Autorisation de notification</string>
     <string name="placeholder_tag_example">ex. Personnel</string>
+    <string name="untitled_note_fallback">Sans titre</string>
 </resources>

@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">نستخدم التنبيهات لنوضح لك تقدم الرفع. بدون هذا، لن تعرف ما إذا كان النسخ الاحتياطي قد انتهى بنجاح بينما يكون التطبيق في الخلفية.</string>
     <string name="permission_notification_title">إذن التنبيهات</string>
     <string name="placeholder_tag_example">مثال: شخصي</string>
+    <string name="untitled_note_fallback">بدون عنوان</string>
 </resources>

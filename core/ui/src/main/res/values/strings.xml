@@ -33,4 +33,5 @@
     <string name="label_tag_name">Tag name</string>
     <string name="placeholder_tag_example">e.g. Personal</string>
     <string name="label_existing">Existing:</string>
+    <string name="untitled_note_fallback">Untitled</string>
 </resources>

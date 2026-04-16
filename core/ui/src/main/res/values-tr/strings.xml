@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Yükleme ilerlemesini size göstermek için bildirimleri kullanıyoruz. Bu olmadan, uygulama arka plandayken yedeklemenin başarıyla bitip bitmediğini bilemezsiniz.</string>
     <string name="permission_notification_title">Bildirim izni</string>
     <string name="placeholder_tag_example">ör. Kişisel</string>
+    <string name="untitled_note_fallback">Başlıksız</string>
 </resources>

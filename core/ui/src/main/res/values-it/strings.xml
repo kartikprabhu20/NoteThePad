@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Utilizziamo le notifiche per mostrarti l\'avanzamento del caricamento. Senza questo, non saprai se il backup termina correttamente mentre l\'app è in background.</string>
     <string name="permission_notification_title">Permesso notifiche</string>
     <string name="placeholder_tag_example">es. Personale</string>
+    <string name="untitled_note_fallback">Senza titolo</string>
 </resources>

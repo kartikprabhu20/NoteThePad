@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Мы используем уведомления для отображения прогресса загрузки. Без этого вы не узнаете, завершилось ли резервное копирование успешно, когда приложение находится в фоновом режиме.</string>
     <string name="permission_notification_title">Разрешение на уведомления</string>
     <string name="placeholder_tag_example">напр. Личное</string>
+    <string name="untitled_note_fallback">Без названия</string>
 </resources>

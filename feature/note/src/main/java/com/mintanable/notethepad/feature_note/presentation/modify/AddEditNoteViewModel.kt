@@ -71,6 +71,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -109,6 +110,7 @@ class AddEditNoteViewModel @Inject constructor(
     private var currentRecordingFile: File? = null
     private val imageSuggestionsCache = mutableMapOf<String, List<String>>()
     private var cachedImageBytes: ByteArray? = null
+    private val saveInProgress = AtomicBoolean(false)
 
     private val _uiState = MutableStateFlow(
         AddEditNoteUiState(
@@ -335,43 +337,81 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.SaveNote -> {
+                if (!saveInProgress.compareAndSet(false, true)) return
                 viewModelScope.launch {
-                    val isNew = currentNoteId.isBlank()
-                    _uiState.update { it.copy(isSaving = true) }
-                    saveNote(currentNoteId)
-                        .onSuccess { id ->
-                            if (id.isNotBlank()) {
-                                rescheduleReminder(id)
-                            }
-                            val s = _uiState.value
-                            val attCount = s.attachedImages.size + s.attachedAudios.size
-                            val evt = if (isNew) AnalyticsEvent.NoteCreated(
-                                hasAttachments = attCount > 0,
-                                attachmentCount = attCount,
-                                tagCount = s.tagEntities.size,
-                                contentLen = s.contentRichTextState.document.rawText.length,
-                                isChecklist = s.isCheckboxListAvailable
-                            ) else AnalyticsEvent.NoteUpdated(
-                                hasAttachments = attCount > 0,
-                                attachmentCount = attCount,
-                                tagCount = s.tagEntities.size,
-                                contentLen = s.contentRichTextState.document.rawText.length,
-                                isChecklist = s.isCheckboxListAvailable
-                            )
-                            analyticsTracker.track(evt)
-                            _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
-                            _eventFlow.emit(UiEvent.SaveNote)
-                        }
-                        .onFailure { e ->
-                            _uiState.update { it.copy(isSaving = false) }
-                            _eventFlow.emit(
-                                ShowSnackbar(
-                                    e.message ?: appContext.getString(R.string.msg_save_failed)
-                                )
-                            )
-                        }
-                }
+                    try {
+                        val state = _uiState.value
+                        val rawTitle = state.titleState.richText.rawText
+                        val contentText = state.contentRichTextState.document.rawText
+                        val hasAttachments = state.attachedImages.isNotEmpty() || state.attachedAudios.isNotEmpty()
+                        val hasReminder = state.reminderTime > System.currentTimeMillis()
+                        val hasChecklist = state.isCheckboxListAvailable && state.checkListItems.any { it.text.isNotBlank() }
 
+                        val isNew = currentNoteId.isBlank()
+                        if (isNew && rawTitle.isBlank() && contentText.isBlank() &&
+                            !hasAttachments && !hasReminder && !hasChecklist) {
+                            _eventFlow.emit(UiEvent.SaveNote)
+                            return@launch
+                        }
+
+                        val effectiveTitle = if (rawTitle.isNotBlank()) rawTitle
+                        else contentText.lineSequence()
+                            .map { it.trim() }
+                            .firstOrNull { it.isNotEmpty() }
+                            .orEmpty()
+                            .take(60)
+                            .ifBlank { appContext.getString(R.string.untitled_note_fallback) }
+
+                        if (effectiveTitle != rawTitle) {
+                            _uiState.update {
+                                it.copy(
+                                    titleState = it.titleState.copy(
+                                        richText = RichTextDocument(rawText = effectiveTitle),
+                                        isHintVisible = false
+                                    )
+                                )
+                            }
+                        }
+
+                        _uiState.update { it.copy(isSaving = true) }
+                        saveNote(currentNoteId, titleOverride = effectiveTitle)
+                            .onSuccess { id ->
+                                if (currentNoteId.isBlank() && id.isNotBlank()) {
+                                    currentNoteId = id
+                                }
+                                if (id.isNotBlank()) rescheduleReminder(id)
+                                val s = _uiState.value
+                                val attCount = s.attachedImages.size + s.attachedAudios.size
+                                val evt = if (isNew) AnalyticsEvent.NoteCreated(
+                                    hasAttachments = attCount > 0,
+                                    attachmentCount = attCount,
+                                    tagCount = s.tagEntities.size,
+                                    contentLen = s.contentRichTextState.document.rawText.length,
+                                    isChecklist = s.isCheckboxListAvailable
+                                ) else AnalyticsEvent.NoteUpdated(
+                                    hasAttachments = attCount > 0,
+                                    attachmentCount = attCount,
+                                    tagCount = s.tagEntities.size,
+                                    contentLen = s.contentRichTextState.document.rawText.length,
+                                    isChecklist = s.isCheckboxListAvailable
+                                )
+                                analyticsTracker.track(evt)
+                                _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
+                                _eventFlow.emit(UiEvent.SaveNote)
+                            }
+                            .onFailure { e ->
+                                Log.e("AddEditNoteViewModel", "Save failed", e)
+                                _uiState.update { it.copy(isSaving = false) }
+                                _eventFlow.emit(
+                                    ShowSnackbar(
+                                        e.message ?: appContext.getString(R.string.msg_save_failed)
+                                    )
+                                )
+                            }
+                    } finally {
+                        saveInProgress.set(false)
+                    }
+                }
             }
 
             is AddEditNoteEvent.MakeCopy -> {
@@ -1202,11 +1242,11 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveNote(id: String): Result<String> {
+    private suspend fun saveNote(id: String, titleOverride: String? = null): Result<String> {
         val state = uiState.value
         return noteUseCases.saveNoteWithAttachments.invoke(
             id = id.ifBlank { null },
-            title = state.titleState.richText.rawText,
+            title = titleOverride ?: state.titleState.richText.rawText,
             content = RichTextSerializer.serialize(state.contentRichTextState.document),
             timestamp = System.currentTimeMillis(),
             color = state.noteColor,

@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">Usamos notificações para mostrar o progresso do upload. Sem isso, você não saberá se o backup terminou com sucesso enquanto o aplicativo está em segundo plano.</string>
     <string name="permission_notification_title">Permissão de notificação</string>
     <string name="placeholder_tag_example">ex: Pessoal</string>
+    <string name="untitled_note_fallback">Sem título</string>
 </resources>

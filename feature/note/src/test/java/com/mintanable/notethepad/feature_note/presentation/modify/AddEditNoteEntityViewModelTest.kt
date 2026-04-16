@@ -376,6 +376,7 @@ class AddEditNoteViewModelTest {
             delay(100)
             Result.success("1L")
         }
+        viewModel.onEvent(AddEditNoteEvent.EnteredTitle("My Title"))
         viewModel.eventFlow.test {
             viewModel.uiState.test {
                 awaitItem()
@@ -388,13 +389,14 @@ class AddEditNoteViewModelTest {
     }
 
     @Test
-    fun `Saving a note emits Snackbar event on failure`() = runTest {
+    fun `Saving a note emits only Snackbar on failure and does not navigate`() = runTest {
         coEvery {
             noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } coAnswers {
             delay(100)
-            Result.failure(InvalidNoteException("The title of the note cant be empty"))
+            Result.failure(RuntimeException("storage full"))
         }
+        viewModel.onEvent(AddEditNoteEvent.EnteredTitle("My Title"))
         viewModel.eventFlow.test {
             viewModel.uiState.test {
                 awaitItem()
@@ -403,6 +405,71 @@ class AddEditNoteViewModelTest {
                 assertThat(awaitItem().isSaving).isFalse()
             }
             assertThat(awaitItem()).isInstanceOf(UiEvent.ShowSnackbar::class.java)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `Saving a blank new note discards silently and emits SaveNote`() = runTest {
+        viewModel.eventFlow.test {
+            viewModel.onEvent(AddEditNoteEvent.SaveNote)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.SaveNote::class.java)
+        }
+        coVerify(exactly = 0) {
+            noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun `Saving a note with blank title derives title from content`() = runTest {
+        coEvery {
+            noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+        } coAnswers {
+            delay(100)
+            Result.success("1L")
+        }
+        viewModel.onEvent(
+            AddEditNoteEvent.EnteredContent(TextFieldValue("Buy milk\nMore details", TextRange(0)))
+        )
+        viewModel.eventFlow.test {
+            viewModel.onEvent(AddEditNoteEvent.SaveNote)
+            assertThat(awaitItem()).isInstanceOf(UiEvent.SaveNote::class.java)
+        }
+        coVerify {
+            noteUseCases.saveNoteWithAttachments(
+                id = null,
+                title = "Buy milk",
+                content = any(),
+                timestamp = any(),
+                color = any(),
+                imageUris = any(),
+                audioUris = any(),
+                audioTranscriptions = any(),
+                reminderTime = any(),
+                checkboxItems = any(),
+                tagEntities = any(),
+                backgroundImage = any(),
+                summary = any()
+            )
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `Multiple rapid SaveNote events trigger exactly one save invocation`() = runTest {
+        coEvery {
+            noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+        } coAnswers {
+            delay(100)
+            Result.success("1L")
+        }
+        viewModel.onEvent(AddEditNoteEvent.EnteredTitle("My Title"))
+        viewModel.onEvent(AddEditNoteEvent.SaveNote)
+        viewModel.onEvent(AddEditNoteEvent.SaveNote)
+        viewModel.onEvent(AddEditNoteEvent.SaveNote)
+        advanceUntilIdle()
+        coVerify(exactly = 1) {
+            noteUseCases.saveNoteWithAttachments(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         }
     }
 

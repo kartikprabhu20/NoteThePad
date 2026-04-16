@@ -27,4 +27,5 @@
     <string name="permission_notification_msg">我们使用通知向您展示上传进度。如果没有此项，当应用程序处于后台时，您将不知道备份是否成功完成。</string>
     <string name="permission_notification_title">通知权限</string>
     <string name="placeholder_tag_example">例如：个人</string>
+    <string name="untitled_note_fallback">无标题</string>
 </resources>
