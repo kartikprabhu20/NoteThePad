@@ -67,7 +67,7 @@ class SnapshotTracker @Inject constructor() {
     }
 
     private fun updateStates() {
-        _canUndo.value = undoStack.isNotEmpty()
+        _canUndo.value = undoStack.size >= 2
         _canRedo.value = redoStack.isNotEmpty()
     }
 }

@@ -433,6 +433,7 @@ class AddEditNoteViewModel @Inject constructor(
                             }
                     } finally {
                         saveInProgress.set(false)
+                        snapshotTracker.clear()
                     }
                 }
             }
