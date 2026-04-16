@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Share
@@ -66,6 +67,7 @@ enum class MoreSettingsOptions(
     PIN(R.string.option_pin_widget, Icons.Default.PushPin),
     LABEL(R.string.option_add_label, Icons.AutoMirrored.Filled.Label),
     SEND(R.string.option_send, Icons.Default.Share),
+    EXPORT_PDF(R.string.option_export_pdf, Icons.Default.PictureAsPdf),
     COLLABORATE(R.string.option_collaborate, Icons.Default.People),
     DELETE(R.string.option_delete, Icons.Default.Delete),
     COPY(R.string.option_make_copy, Icons.Default.ContentCopy);

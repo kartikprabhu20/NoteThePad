@@ -12,4 +12,5 @@ sealed class UiEvent{
     data class LaunchCamera(val type: AttachmentType) : UiEvent()
     data class RequestWidgetPin(val noteId: String):UiEvent()
     data class ShareNote(val intent: Intent) : UiEvent()
+    data class ExportPdf(val intent: Intent) : UiEvent()
 }

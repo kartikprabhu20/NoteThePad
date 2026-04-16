@@ -51,6 +51,7 @@ sealed class AddEditNoteEvent {
     data class NavigateZoomedImage(val direction: Int) : AddEditNoteEvent()
     data object ToggleRichTextBar : AddEditNoteEvent()
     data object ShareNote : AddEditNoteEvent()
+    data object ExportAsPdf : AddEditNoteEvent()
     data object OpenCollaborateSheet : AddEditNoteEvent()
     data class InviteCollaborator(val email: String) : AddEditNoteEvent()
     data class RemoveCollaborator(val collaboratorUserId: String) : AddEditNoteEvent()

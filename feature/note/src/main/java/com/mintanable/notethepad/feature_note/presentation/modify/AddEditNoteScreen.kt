@@ -243,6 +243,15 @@ fun AddEditNoteScreen(
                         Intent.createChooser(event.intent, "Send note via…")
                     )
                 }
+
+                is UiEvent.ExportPdf -> {
+                    context.startActivity(
+                        Intent.createChooser(
+                            event.intent,
+                            context.getString(R.string.pdf_share_chooser_title)
+                        )
+                    )
+                }
             }
         }
     }
@@ -559,6 +568,11 @@ fun AddEditNoteScreen(
                             MoreSettingsOptions.SEND -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
                                 viewModel.onEvent(AddEditNoteEvent.ShareNote)
+                            }
+
+                            MoreSettingsOptions.EXPORT_PDF -> {
+                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                                viewModel.onEvent(AddEditNoteEvent.ExportAsPdf)
                             }
 
                             ReminderOptions.DATE_AND_TIME -> {

@@ -40,6 +40,7 @@ import com.mintanable.notethepad.feature_ai.domain.use_cases.TranscribeAudioFile
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.core.common.ReminderScheduler
+import com.mintanable.notethepad.feature_note.data.pdf.NotePdfExporter
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
@@ -105,6 +106,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val getAiModelByName: GetAiModelByName,
     private val analyticsTracker: AnalyticsTracker,
     private val snapshotTracker: SnapshotTracker,
+    private val notePdfExporter: NotePdfExporter,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private var imageQueryJob: Job? = null
@@ -888,6 +890,54 @@ class AddEditNoteViewModel @Inject constructor(
                                 ShowSnackbar(
                                     e.message
                                         ?: appContext.getString(R.string.msg_save_failed_sharing)
+                                )
+                            )
+                        }
+                }
+            }
+
+            is AddEditNoteEvent.ExportAsPdf -> {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isSaving = true) }
+                    saveNote(currentNoteId)
+                        .onSuccess { id ->
+                            if (currentNoteId.isBlank() && id.isNotBlank()) {
+                                currentNoteId = id
+                            }
+                            if (id.isNotBlank()) {
+                                rescheduleReminder(id)
+                            }
+                            runCatching { notePdfExporter.export(_uiState.value) }
+                                .onSuccess { uri ->
+                                    _uiState.update { it.copy(isSaving = false) }
+                                    val subject = _uiState.value.titleState.richText.rawText.trim()
+                                    val intent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "application/pdf"
+                                        putExtra(Intent.EXTRA_STREAM, uri)
+                                        if (subject.isNotEmpty()) {
+                                            putExtra(Intent.EXTRA_SUBJECT, subject)
+                                        }
+                                        clipData = android.content.ClipData.newRawUri(null, uri)
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    _eventFlow.emit(ExportPdf(intent))
+                                }
+                                .onFailure { e ->
+                                    Log.e("AddEditNoteViewModel", "PDF export failed", e)
+                                    _uiState.update { it.copy(isSaving = false) }
+                                    _eventFlow.emit(
+                                        ShowSnackbar(
+                                            e.message
+                                                ?: appContext.getString(R.string.msg_pdf_export_failed)
+                                        )
+                                    )
+                                }
+                        }
+                        .onFailure { e ->
+                            _uiState.update { it.copy(isSaving = false) }
+                            _eventFlow.emit(
+                                ShowSnackbar(
+                                    e.message ?: appContext.getString(R.string.msg_save_failed)
                                 )
                             )
                         }

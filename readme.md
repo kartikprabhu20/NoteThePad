@@ -7,7 +7,7 @@
 ![AI](https://img.shields.io/badge/Agentic-Gemini_AI-orange.svg)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 
-**NoteThePad** is a privacy-focused productivity app that transforms notes into an intelligent workspace. Powered by on-device Gemma models, Gemini Nano, and Gemini 3 Flash, it provides agentic AI features that organize, summarize, and act on your content automatically.
+**NoteThePad** is a privacy-focused productivity app that transforms notes into an intelligent workspace. Powered by on-device Gemma models, Gemini Nano, and Gemini 3 Flash, it provides agentic AI features — including a full conversational **AI Assistant** chat bot with tool-calling — that organize, summarize, and act on your content automatically. Real-time **collaboration**, **undo/redo**, **auto-save**, and **PDF export** round out a polished editing experience.
 
 ---
 
@@ -52,17 +52,30 @@ Local models are downloaded from Hugging Face and run entirely on-device for pri
 ## Key Features
 
 ### Notes & Organization
-- Rich text editing with formatting
+- Rich text editing with formatting (Header, Bullets, Bold, Italic, Underline)
 - Tags/labels with many-to-many relationships
 - Checklists with checkbox conversion
 - Search, sort, and filter by tags, date, color
 - Archive and soft-delete with recovery
 - Calendar view for date-based navigation
+- Auto-save: No save button; changes persist on back-press and before any share/copy/export action
+- Undo / Redo: Per-note history with 50-step stack
+- Export as PDF: Paginated A4 export of title, attached images, body/checklist, and tags; shareable via the Android chooser
 
 ### Multimedia
 - Attach images, audio recordings, and video
 - In-app audio recording and playback
 - Image capture and gallery integration
+
+### AI Assistant (Agentic Chat Bot)
+- Full conversational assistant accessible from the main screen
+- Supports text and audio input; streaming responses with mid-stream stop
+- Tool-calling: schedule reminders, create notes, and other agentic actions via on-device Gemma or Gemini
+
+### Collaboration
+- Invite collaborators to a note by email (Supabase Realtime)
+- Owner / collaborator roles; leave or remove collaborators
+- Live sync across collaborators' devices
 
 ### Theming & Customization
 - Material 3 with light, dark, and system-follow modes
@@ -84,6 +97,9 @@ Local models are downloaded from Hugging Face and run entirely on-device for pri
 - Calendar screen for viewing notes by date
 - Boot-persistent alarm rescheduling
 
+### Analytics & Privacy
+- Mixpanel + Firebase Analytics (opt-in)
+- 
 ---
 
 ## Tech Stack
@@ -108,15 +124,16 @@ Local models are downloaded from Hugging Face and run entirely on-device for pri
 
 ```
 :app                  Entry point, MainActivity, navigation graph
-:core:model           Pure Kotlin DTOs (Note, Settings, AiModel, CheckboxItem)
+:core:model           Pure Kotlin DTOs (Note, Settings, AiModel, CheckboxItem, Collaborator)
 :core:data            Room DB, DAOs, repositories, DataStore, Tink encryption
 :core:common          Utilities, Screen routes, NavigationConstants
 :core:ui              Shared Compose components, Material 3 theme, NoteShapeDrawer
-:core:ai              Gemini/Gemma/Nano clients, ML Kit, MediaPipe, tool calling
+:core:ai              Gemini/Gemma/Nano clients, ML Kit, MediaPipe, agentic tool calling
+:core:analytics       Mixpanel + Firebase Analytics abstraction (opt-in)
 :core:backup          Google Drive backup/restore workers
-:core:network         Supabase sync (Postgrest, Realtime, GoTrue)
+:core:network         Supabase sync + collaboration (Postgrest, Realtime, GoTrue)
 :core:richtext        Rich text Compose components
-:feature:note         Note CRUD screens, reminders, audio recorder
+:feature:note         Note CRUD, undo/redo, auto-save, PDF export, AI Assistant chat bot, collaborators, reminders, audio recorder
 :feature:auth         Firebase auth, Google sign-in
 :feature:settings     Settings UI, AI model selection, onboarding
 :feature:widgets      Glance home screen widgets
@@ -159,6 +176,9 @@ SUPABASE_ANON_KEY=your_supabase_key
 # Backup (core:backup module)
 DRIVE_CLIENT_ID=your_drive_client_id
 DRIVE_CLIENT_SECRET=your_drive_client_secret
+
+# Mixpanel
+MIXPANEL_TOKEN=your_mixpanel_token
 ```
 
 ### Build
