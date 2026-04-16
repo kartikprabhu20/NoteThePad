@@ -64,6 +64,9 @@
     <string name="option_delete">Delete</string>
     <string name="option_make_copy">Make a copy</string>
     <string name="option_send">Send</string>
+    <string name="option_export_pdf">Export as PDF</string>
+    <string name="msg_pdf_export_failed">Could not export PDF</string>
+    <string name="pdf_share_chooser_title">Share PDF…</string>
     <string name="option_collaborate">Collaborate</string>
     <string name="invite_collaborator">Invite by email</string>
     <string name="collaborator_not_found">User not found</string>

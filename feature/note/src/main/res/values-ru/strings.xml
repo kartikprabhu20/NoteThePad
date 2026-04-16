@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">Пожалуйста, сохраните заметку перед созданием сводки</string>
     <string name="btn_analyse">Анализировать</string>
     <string name="hint_image_query">Введите запрос (максимум 50 символов)…</string>
+    <string name="option_export_pdf">Экспортировать как PDF</string>
+    <string name="msg_pdf_export_failed">Не удалось экспортировать PDF</string>
+    <string name="pdf_share_chooser_title">Поделиться PDF…</string>
 </resources>

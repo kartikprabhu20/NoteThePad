@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">सारांशित करने से पहले कृपया नोट सहेजें</string>
     <string name="btn_analyse">विश्लेषण करें</string>
     <string name="hint_image_query">क्वेरी दर्ज करें (अधिकतम 50 वर्ण)…</string>
+    <string name="option_export_pdf">PDF के रूप में निर्यात करें</string>
+    <string name="msg_pdf_export_failed">PDF निर्यात नहीं किया जा सका</string>
+    <string name="pdf_share_chooser_title">PDF साझा करें…</string>
 </resources>

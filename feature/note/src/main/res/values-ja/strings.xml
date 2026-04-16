@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">要約する前にメモを保存してください</string>
     <string name="btn_analyse">分析する</string>
     <string name="hint_image_query">クエリを入力してください (最大 50 文字)…</string>
+    <string name="option_export_pdf">PDFとして書き出す</string>
+    <string name="msg_pdf_export_failed">PDFを書き出せませんでした</string>
+    <string name="pdf_share_chooser_title">PDFを共有…</string>
 </resources>

@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">Vui lòng lưu ghi chú trước khi tóm tắt</string>
     <string name="btn_analyse">Phân tích</string>
     <string name="hint_image_query">Nhập truy vấn (tối đa 50 ký tự)…</string>
+    <string name="option_export_pdf">Xuất dưới dạng PDF</string>
+    <string name="msg_pdf_export_failed">Không thể xuất PDF</string>
+    <string name="pdf_share_chooser_title">Chia sẻ PDF…</string>
 </resources>

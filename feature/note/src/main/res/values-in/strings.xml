@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">Harap simpan catatan sebelum meringkas</string>
     <string name="btn_analyse">Analisis</string>
     <string name="hint_image_query">Masukkan kueri (maksimal 50 karakter)…</string>
+    <string name="option_export_pdf">Ekspor sebagai PDF</string>
+    <string name="msg_pdf_export_failed">Gagal mengekspor PDF</string>
+    <string name="pdf_share_chooser_title">Bagikan PDF…</string>
 </resources>

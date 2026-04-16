@@ -119,4 +119,7 @@
     <string name="msg_save_before_summarize">Please save the note before summarising</string>
     <string name="btn_analyse">Analyse</string>
     <string name="hint_image_query">Enter query (maximum 50 characters)…</string>
+    <string name="option_export_pdf">Export as PDF</string>
+    <string name="msg_pdf_export_failed">Could not export PDF</string>
+    <string name="pdf_share_chooser_title">Share PDF…</string>
 </resources>

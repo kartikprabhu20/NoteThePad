@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">请在总结前保存笔记</string>
     <string name="btn_analyse">分析</string>
     <string name="hint_image_query">输入查询（最多 50 个字符）…</string>
+    <string name="option_export_pdf">导出为 PDF</string>
+    <string name="msg_pdf_export_failed">无法导出 PDF</string>
+    <string name="pdf_share_chooser_title">分享 PDF…</string>
 </resources>

@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">Veuillez enregistrer la note avant de résumer</string>
     <string name="btn_analyse">Analyser</string>
     <string name="hint_image_query">Entrez la requête (maximum 50 caractères)…</string>
+    <string name="option_export_pdf">Exporter au format PDF</string>
+    <string name="msg_pdf_export_failed">Impossible d\'exporter le PDF</string>
+    <string name="pdf_share_chooser_title">Partager le PDF…</string>
 </resources>

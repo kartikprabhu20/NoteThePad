@@ -121,4 +121,7 @@
     <string name="msg_save_before_summarize">يرجى حفظ الملاحظة قبل التلخيص</string>
     <string name="btn_analyse">تحليل</string>
     <string name="hint_image_query">أدخل الاستعلام (بحد أقصى 50 حرفًا)…</string>
+    <string name="option_export_pdf">تصدير كـ PDF</string>
+    <string name="msg_pdf_export_failed">تعذر تصدير PDF</string>
+    <string name="pdf_share_chooser_title">مشاركة PDF…</string>
 </resources>
