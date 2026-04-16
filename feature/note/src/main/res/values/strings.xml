@@ -146,4 +146,7 @@
     <string name="dialog_logout_title">Logout?</string>
     <string name="dialog_logout_message">Are you sure you want to log out?</string>
     <string name="btn_logout">Logout</string>
+
+    <string name="content_description_undo" translatable="false">can undo description</string>
+    <string name="content_description_redo" translatable="false">can redo description</string>
 </resources>

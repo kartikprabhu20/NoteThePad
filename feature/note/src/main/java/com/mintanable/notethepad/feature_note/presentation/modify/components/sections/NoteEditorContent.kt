@@ -1,9 +1,8 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import android.net.Uri
-import com.mintanable.notethepad.core.model.ai.AiCapabilities
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
@@ -27,26 +26,28 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.NotificationAdd
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -72,12 +73,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.core.common.FeatureFlags
+import com.mintanable.notethepad.core.model.ai.AiCapabilities
+import com.mintanable.notethepad.core.model.collaboration.Collaborator
+import com.mintanable.notethepad.core.model.note.CheckboxItem
+import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.core.richtext.model.RichTextState
 import com.mintanable.notethepad.database.db.entity.Attachment
-import com.mintanable.notethepad.core.model.note.CheckboxItem
-import com.mintanable.notethepad.core.common.FeatureFlags
-import com.mintanable.notethepad.core.model.collaboration.Collaborator
-import com.mintanable.notethepad.core.model.note.MediaState
 import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.NoteTextFieldState
@@ -89,6 +91,7 @@ import com.mintanable.notethepad.feature_note.presentation.modify.components.Tex
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.presentation.notes.components.TransparentHintTextField
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEditorContent(
     noteId: String,
@@ -114,7 +117,9 @@ fun NoteEditorContent(
     onEvent: (AddEditNoteEvent) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    isDarkTheme: Boolean = false
+    isDarkTheme: Boolean = false,
+    canUndo: Boolean = false,
+    canRedo: Boolean = false
 ) {
     var activeDragUnCheckIndex by remember { mutableStateOf<String?>(null) }
     var activeDragCheckIndex by remember { mutableStateOf<String?>(null) }
@@ -171,8 +176,6 @@ fun NoteEditorContent(
     }
 
     val density = LocalDensity.current
-    val imeBottom = WindowInsets.ime.getBottom(density)
-    val navBottom = WindowInsets.navigationBars.getBottom(density)
 
     with(sharedTransitionScope) {
         Scaffold(
@@ -221,6 +224,38 @@ fun NoteEditorContent(
                         }
                     }
                 }
+            },
+            topBar = {
+                TopAppBar(
+                    title = { },
+                    windowInsets = WindowInsets.statusBars,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        actionIconContentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    actions = {
+                        IconButton(
+                            onClick = { onEvent(AddEditNoteEvent.Undo) },
+                            enabled = canUndo
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Undo,
+                                contentDescription = stringResource(R.string.content_description_undo)
+                            )
+                        }
+                        IconButton(
+                            onClick = { onEvent(AddEditNoteEvent.Redo) },
+                            enabled = canRedo
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Redo,
+                                contentDescription = stringResource(R.string.content_description_redo)
+                            )
+                        }
+                    }
+                )
             },
             modifier = Modifier.fillMaxSize(),
             floatingActionButton = {

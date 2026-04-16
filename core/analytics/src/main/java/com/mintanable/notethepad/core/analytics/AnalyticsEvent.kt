@@ -240,6 +240,12 @@ sealed class AnalyticsEvent(
         Event.NOTE_ARCHIVED,
         mapOf(Param.ARCHIVED to archived),
     )
+
+    class NoteUndoRedo(action: String) : AnalyticsEvent(
+        Event.NOTE_UNDO_REDO,
+        mapOf(Param.UNDO_REDO to action),
+    )
+
     // endregion
 
     // region Auth
@@ -297,6 +303,7 @@ sealed class AnalyticsEvent(
             const val NOTE_DELETED = "note_deleted"
             const val NOTE_PINNED = "note_pinned"
             const val NOTE_ARCHIVED = "note_archived"
+            const val NOTE_UNDO_REDO = "note_undo_redo"
             const val AUTH_SIGN_IN_ATTEMPTED = "auth_sign_in_attempted"
             const val AUTH_SIGN_IN_RESULT = "auth_sign_in_result"
             const val AUTH_SIGN_OUT = "auth_sign_out"
@@ -339,6 +346,7 @@ sealed class AnalyticsEvent(
             const val COUNT = "count"
             const val PINNED = "pinned"
             const val ARCHIVED = "archived"
+            const val UNDO_REDO = "undo_redo"
             const val METHOD = "method"
             const val SIZE_BYTES = "size_bytes"
             const val PERMISSION_NAME = "permission_name"

@@ -58,4 +58,18 @@ data class AddEditNoteUiState(
     val collaboratorError: String? = null,
     val isOwner: Boolean = true,
     val summary: String = ""
-)
+){
+    fun toEditNoteSnapshot(): EditNoteSnapshot{
+        return EditNoteSnapshot(
+            titleState = this.titleState,
+            contentState = this.contentState,
+            contentRichTextState = this.contentRichTextState,
+            noteColor = this.noteColor,
+            backgroundImage = this.backgroundImage,
+            reminderTime = this.reminderTime,
+            checkListItems = this.checkListItems.toList(),
+            isCheckboxListAvailable = this.isCheckboxListAvailable,
+            tagEntities = this.tagEntities.toList()
+        )
+    }
+}

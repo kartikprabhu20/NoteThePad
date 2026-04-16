@@ -85,6 +85,7 @@ class AddEditNoteViewModelTest {
     private val userPreferencesRepository = mockk<UserPreferencesRepository>(relaxed = true)
     private val getAiModelByName = mockk<GetAiModelByName>(relaxed = true)
     private val analyticsTracker = mockk<AnalyticsTracker>(relaxed = true)
+    private val snapshotTracker = mockk<SnapshotTracker>(relaxed = true)
 
 
     private val appContext = mockk<Context>(relaxed = true)
@@ -96,7 +97,8 @@ class AddEditNoteViewModelTest {
         fileIOUseCases, mediaPlayer, audioMetadataProvider, reminderScheduler,
         tagUseCases, getAutoTagsUseCase, startLiveTranscription, stopLiveTranscription,
         transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase,
-        authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName, analyticsTracker, appContext
+        authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName, analyticsTracker,
+        snapshotTracker, appContext
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -12,6 +12,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.work.*
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.core.common.utils.readAndProcessImage
 import com.mintanable.notethepad.core.model.note.CheckboxItem
@@ -49,9 +52,11 @@ import com.mintanable.notethepad.feature_note.domain.use_case.permissions.Permis
 import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.database.db.repository.CollaborationRepository
 import com.mintanable.notethepad.feature_ai.data.SummarizeNoteWorker
-import com.mintanable.notethepad.core.analytics.AnalyticsEvent
+import com.mintanable.notethepad.core.analytics.AnalyticsEvent.*
 import com.mintanable.notethepad.core.analytics.AnalyticsTracker
+import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.feature_note.R
+import com.mintanable.notethepad.feature_note.presentation.EditNoteSnapshot
 import com.mintanable.notethepad.feature_note.presentation.modify.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -68,6 +73,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -96,6 +104,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val getAiModelByName: GetAiModelByName,
     private val analyticsTracker: AnalyticsTracker,
+    private val snapshotTracker: SnapshotTracker,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private var imageQueryJob: Job? = null
@@ -112,12 +121,24 @@ class AddEditNoteViewModel @Inject constructor(
     private var cachedImageBytes: ByteArray? = null
     private val saveInProgress = AtomicBoolean(false)
 
+    val canUndo = snapshotTracker.canUndo
+    val canRedo = snapshotTracker.canRedo
+
     private val _uiState = MutableStateFlow(
         AddEditNoteUiState(
             noteColor =
                 if (isEditMode) -1 else NoteColors.colors.random().toArgb()
         )
     )
+
+    private val snapshotObserver = _uiState
+        .map { it.toEditNoteSnapshot() }
+        .distinctUntilChanged()
+        .debounce(500L)
+        .onEach { snapshot ->
+            snapshotTracker.applySnapshot(snapshot)
+        }
+        .launchIn(viewModelScope)
 
     private fun observeCurrentUser() {
         viewModelScope.launch {
@@ -144,7 +165,7 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         collaborators = entities.map { entity ->
-                            com.mintanable.notethepad.core.model.collaboration.Collaborator(
+                            Collaborator(
                                 id = entity.id,
                                 noteId = entity.noteId,
                                 userId = entity.collaboratorUserId,
@@ -191,10 +212,10 @@ class AddEditNoteViewModel @Inject constructor(
         )
 
     val existingTags = tagUseCases.getAllTags().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -209,12 +230,13 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(reminderTime = passedReminderTime) }
             }
             if (passedInitialTitle.isNotBlank()) {
-                _uiState.update { it.copy(
-                    titleState = it.titleState.copy(
-                        richText = RichTextDocument(rawText = passedInitialTitle),
-                        isHintVisible = false
+                _uiState.update {
+                    it.copy(
+                        titleState = it.titleState.copy(
+                            richText = RichTextDocument(rawText = passedInitialTitle),
+                            isHintVisible = false
+                        )
                     )
-                )
                 }
             }
         }
@@ -314,7 +336,7 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.ApplyContentFormat -> {
-                analyticsTracker.track(AnalyticsEvent.RichTextFormatApplied(event.type.name.lowercase()))
+                analyticsTracker.track(RichTextFormatApplied(event.type.name.lowercase()))
                 _uiState.update { state ->
                     val newState =
                         RichTextEngine.toggleFormat(state.contentRichTextState, event.type)
@@ -324,7 +346,7 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.ToggleRichTextBar -> {
                 val newShown = !_uiState.value.isRichTextBarActive
-                analyticsTracker.track(AnalyticsEvent.RichTextBarToggled(newShown))
+                analyticsTracker.track(RichTextBarToggled(newShown))
                 _uiState.update { it.copy(isRichTextBarActive = newShown) }
             }
 
@@ -354,13 +376,14 @@ class AddEditNoteViewModel @Inject constructor(
                             return@launch
                         }
 
-                        val effectiveTitle = if (rawTitle.isNotBlank()) rawTitle
-                        else contentText.lineSequence()
-                            .map { it.trim() }
-                            .firstOrNull { it.isNotEmpty() }
-                            .orEmpty()
-                            .take(60)
-                            .ifBlank { appContext.getString(R.string.untitled_note_fallback) }
+                        val effectiveTitle = rawTitle.ifBlank {
+                            contentText.lineSequence()
+                                .map { it.trim() }
+                                .firstOrNull { it.isNotEmpty() }
+                                .orEmpty()
+                                .take(60)
+                                .ifBlank { appContext.getString(R.string.untitled_note_fallback) }
+                        }
 
                         if (effectiveTitle != rawTitle) {
                             _uiState.update {
@@ -382,13 +405,13 @@ class AddEditNoteViewModel @Inject constructor(
                                 if (id.isNotBlank()) rescheduleReminder(id)
                                 val s = _uiState.value
                                 val attCount = s.attachedImages.size + s.attachedAudios.size
-                                val evt = if (isNew) AnalyticsEvent.NoteCreated(
+                                val evt = if (isNew) NoteCreated(
                                     hasAttachments = attCount > 0,
                                     attachmentCount = attCount,
                                     tagCount = s.tagEntities.size,
                                     contentLen = s.contentRichTextState.document.rawText.length,
                                     isChecklist = s.isCheckboxListAvailable
-                                ) else AnalyticsEvent.NoteUpdated(
+                                ) else NoteUpdated(
                                     hasAttachments = attCount > 0,
                                     attachmentCount = attCount,
                                     tagCount = s.tagEntities.size,
@@ -397,7 +420,7 @@ class AddEditNoteViewModel @Inject constructor(
                                 )
                                 analyticsTracker.track(evt)
                                 _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
-                                _eventFlow.emit(UiEvent.SaveNote)
+                                _eventFlow.emit(SaveNote)
                             }
                             .onFailure { e ->
                                 Log.e("AddEditNoteViewModel", "Save failed", e)
@@ -434,7 +457,7 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.DeleteNote -> {
-                analyticsTracker.track(AnalyticsEvent.NoteDeleted())
+                analyticsTracker.track(NoteDeleted())
                 deleteNote()
             }
 
@@ -456,7 +479,12 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.AttachImage -> {
                 if (!_uiState.value.attachedImages.contains(event.uri)) {
                     val attachmentType = AttachmentHelper.getAttachmentType(appContext, event.uri)
-                    analyticsTracker.track(AnalyticsEvent.AttachmentAdded(if(attachmentType == AttachmentType.IMAGE) "image" else "video", event.source))
+                    analyticsTracker.track(
+                        AttachmentAdded(
+                            if (attachmentType == AttachmentType.IMAGE) "image" else "video",
+                            event.source
+                        )
+                    )
                 }
                 _uiState.update {
                     it.copy(
@@ -467,13 +495,13 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.RemoveImage -> {
                 val attachmentType = AttachmentHelper.getAttachmentType(appContext, event.uri)
-                analyticsTracker.track(AnalyticsEvent.AttachmentRemoved(if(attachmentType == AttachmentType.IMAGE) "image" else "video"))
+                analyticsTracker.track(AttachmentRemoved(if (attachmentType == AttachmentType.IMAGE) "image" else "video"))
                 _uiState.update { it.copy(attachedImages = it.attachedImages - event.uri) }
                 viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
             }
 
             is AddEditNoteEvent.RemoveAudio -> {
-                analyticsTracker.track(AnalyticsEvent.AttachmentRemoved("audio"))
+                analyticsTracker.track(AttachmentRemoved("audio"))
                 viewModelScope.launch {
                     _uiState.update { state ->
                         state.copy(
@@ -706,14 +734,14 @@ class AddEditNoteViewModel @Inject constructor(
                 viewModelScope.launch {
                     val contentLen = uiState.value.contentRichTextState.document.rawText.length
                     val modelName = userPreferencesRepository.settingsFlow.first().aiModelName
-                    analyticsTracker.track(AnalyticsEvent.AiAutoTagTriggered(modelName, contentLen))
+                    analyticsTracker.track(AiAutoTagTriggered(modelName, contentLen))
                     _uiState.update { it.copy(isTagSuggestionLoading = true) }
                     getAutoTagsUseCase(
                         title = uiState.value.titleState.richText.rawText,
                         content = uiState.value.contentRichTextState.document.rawText
                     )
                         .onSuccess { suggestions ->
-                            analyticsTracker.track(AnalyticsEvent.AiAutoTagResult(true, suggestions.size))
+                            analyticsTracker.track(AiAutoTagResult(true, suggestions.size))
                             _uiState.update {
                                 it.copy(
                                     isTagSuggestionLoading = false,
@@ -722,7 +750,13 @@ class AddEditNoteViewModel @Inject constructor(
                             }
                         }
                         .onFailure { exeption ->
-                            analyticsTracker.track(AnalyticsEvent.AiAutoTagResult(false, 0, exeption::class.simpleName))
+                            analyticsTracker.track(
+                                AiAutoTagResult(
+                                    false,
+                                    0,
+                                    exeption::class.simpleName
+                                )
+                            )
                             _uiState.update { it.copy(isTagSuggestionLoading = false) }
                             _eventFlow.emit(
                                 ShowSnackbar(
@@ -834,12 +868,14 @@ class AddEditNoteViewModel @Inject constructor(
                                 rescheduleReminder(id)
                             }
                             val s = _uiState.value
-                            analyticsTracker.track(AnalyticsEvent.NoteShared(
-                                hasAttachments = s.attachedImages.isNotEmpty() || s.attachedAudios.isNotEmpty(),
-                                imageCount = s.attachedImages.size,
-                                audioCount = s.attachedAudios.size,
-                                tagCount = s.tagEntities.size
-                            ))
+                            analyticsTracker.track(
+                                NoteShared(
+                                    hasAttachments = s.attachedImages.isNotEmpty() || s.attachedAudios.isNotEmpty(),
+                                    imageCount = s.attachedImages.size,
+                                    audioCount = s.attachedAudios.size,
+                                    tagCount = s.tagEntities.size
+                                )
+                            )
                             _uiState.update { it.copy(isSaving = false) }
 
                             val intent = withContext(Dispatchers.IO) { buildShareIntent() }
@@ -915,7 +951,7 @@ class AddEditNoteViewModel @Inject constructor(
                             ownerUserId = currentUserId ?: "",
                             collaborator = collaborator
                         )
-                        analyticsTracker.track(AnalyticsEvent.CollaboratorInvited(success))
+                        analyticsTracker.track(CollaboratorInvited(success))
                         if (success) {
                             _uiState.update { it.copy(isLoadingCollaborators = false) }
                             _eventFlow.emit(
@@ -944,7 +980,7 @@ class AddEditNoteViewModel @Inject constructor(
                     val userId = currentUserId ?: return@launch
                     val success = collaborationRepository.leaveNote(currentNoteId, userId)
                     if (success) {
-                        _eventFlow.emit(UiEvent.SaveNote) // Use SaveNote to trigger navigation up
+                        _eventFlow.emit(SaveNote) // Use SaveNote to trigger navigation up
                     } else {
                         _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_leave_failed)))
                     }
@@ -962,7 +998,7 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             is AddEditNoteEvent.RemoveCollaborator -> {
-                analyticsTracker.track(AnalyticsEvent.CollaboratorRemoved)
+                analyticsTracker.track(CollaboratorRemoved)
                 viewModelScope.launch {
                     val success = collaborationRepository.removeCollaborator(
                         currentNoteId,
@@ -974,15 +1010,17 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
 
-           is AddEditNoteEvent.SummarizeNote -> {
+            is AddEditNoteEvent.SummarizeNote -> {
                 viewModelScope.launch {
                     val s = _uiState.value
                     val modelName = userPreferencesRepository.settingsFlow.first().aiModelName
-                    analyticsTracker.track(AnalyticsEvent.AiSummarizeTriggered(
-                        model = modelName,
-                        contentLen = s.contentRichTextState.document.rawText.length,
-                        attachmentCount = s.attachedImages.size + s.attachedAudios.size
-                    ))
+                    analyticsTracker.track(
+                        AiSummarizeTriggered(
+                            model = modelName,
+                            contentLen = s.contentRichTextState.document.rawText.length,
+                            attachmentCount = s.attachedImages.size + s.attachedAudios.size
+                        )
+                    )
                     // Save note first so worker has latest data
                     val noteId = if (currentNoteId.isNotBlank()) {
                         saveNote(currentNoteId).getOrNull() ?: currentNoteId
@@ -999,16 +1037,16 @@ class AddEditNoteViewModel @Inject constructor(
                     }
 
                     // Enqueue the worker
-                    val workRequest = androidx.work.OneTimeWorkRequestBuilder<SummarizeNoteWorker>()
-                        .setInputData(androidx.work.workDataOf("note_id" to noteId))
+                    val workRequest = OneTimeWorkRequestBuilder<SummarizeNoteWorker>()
+                        .setInputData(workDataOf("note_id" to noteId))
                         .build()
-                    val workManager = androidx.work.WorkManager.getInstance(appContext)
+                    val workManager = WorkManager.getInstance(appContext)
                     workManager.enqueue(workRequest)
                     _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_summarization_background)))
 
                     // Observe completion to update UI
                     workManager.getWorkInfoByIdFlow(workRequest.id).collect { workInfo ->
-                        if (workInfo?.state == androidx.work.WorkInfo.State.SUCCEEDED) {
+                        if (workInfo?.state == WorkInfo.State.SUCCEEDED) {
                             noteUseCases.getDetailedNote(noteId)?.let { refreshedNote ->
                                 _uiState.update { it.copy(summary = refreshedNote.summary) }
                             }
@@ -1024,6 +1062,33 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.DeleteSummary -> {
                 _uiState.update { it.copy(summary = "") }
+            }
+
+            is AddEditNoteEvent.Redo -> {
+                handleUndoRedoAction(snapshotTracker.redo())
+                analyticsTracker.track(NoteUndoRedo("redo"))
+            }
+            is AddEditNoteEvent.Undo -> {
+                handleUndoRedoAction(snapshotTracker.undo())
+                analyticsTracker.track(NoteUndoRedo("undo"))
+            }
+        }
+    }
+
+    private fun handleUndoRedoAction(snapshot: EditNoteSnapshot?) {
+        snapshot?.let { snap ->
+            _uiState.update {
+                it.copy(
+                    titleState = snap.titleState,
+                    contentState = snap.contentState,
+                    contentRichTextState = snap.contentRichTextState,
+                    noteColor = snap.noteColor,
+                    backgroundImage = snap.backgroundImage,
+                    reminderTime = snap.reminderTime,
+                    checkListItems = snap.checkListItems,
+                    isCheckboxListAvailable = snap.isCheckboxListAvailable,
+                    tagEntities = snap.tagEntities
+                )
             }
         }
     }
@@ -1048,7 +1113,8 @@ class AddEditNoteViewModel @Inject constructor(
         }
 
         val imageUris = state.attachedImages.mapNotNull { fileIOUseCases.createContentFromUri(it) }
-        val audioUris = state.attachedAudios.mapNotNull { fileIOUseCases.createContentFromUri(it.uri.toUri()) }
+        val audioUris =
+            state.attachedAudios.mapNotNull { fileIOUseCases.createContentFromUri(it.uri.toUri()) }
         val allAttachments = ArrayList(imageUris + audioUris)
 
         val textBody = if (title.isNotBlank()) "$title\n\n$body" else body
@@ -1089,9 +1155,15 @@ class AddEditNoteViewModel @Inject constructor(
 
     private fun transcribeAttachedAudio(uriString: String) {
         viewModelScope.launch {
-            val audioDuration = _uiState.value.attachedAudios.find { it.uri == uriString }?.duration ?: 0L
+            val audioDuration =
+                _uiState.value.attachedAudios.find { it.uri == uriString }?.duration ?: 0L
             val modelName = userPreferencesRepository.settingsFlow.first().aiModelName
-            analyticsTracker.track(AnalyticsEvent.AiAudioTranscribeTriggered(audioDuration, modelName))
+            analyticsTracker.track(
+                AiAudioTranscribeTriggered(
+                    audioDuration,
+                    modelName
+                )
+            )
             _uiState.update {
                 it.copy(
                     transcribingUri = uriString,
@@ -1133,7 +1205,13 @@ class AddEditNoteViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isAnalyzingImage = true, imageSuggestions = emptyList(), imageQueryResult = "") }
+            _uiState.update {
+                it.copy(
+                    isAnalyzingImage = true,
+                    imageSuggestions = emptyList(),
+                    imageQueryResult = ""
+                )
+            }
             try {
                 val imageBytes = withContext(Dispatchers.IO) { readUriBytes(uri) }
                 if (imageBytes == null) {
@@ -1142,13 +1220,23 @@ class AddEditNoteViewModel @Inject constructor(
                 }
                 cachedImageBytes = imageBytes
                 val modelName = userPreferencesRepository.settingsFlow.first().aiModelName
-                analyticsTracker.track(AnalyticsEvent.AiImageAnalyzeTriggered(imageBytes.size, modelName))
+                analyticsTracker.track(
+                    AiImageAnalyzeTriggered(
+                        imageBytes.size,
+                        modelName
+                    )
+                )
                 val suggestions = analyzeImageUseCase(imageBytes).take(3)
                 imageSuggestionsCache[cacheKey] = suggestions
-                analyticsTracker.track(AnalyticsEvent.AiImageAnalyzeResult(true, suggestions.size))
-                _uiState.update { it.copy(imageSuggestions = suggestions, isAnalyzingImage = false) }
+                analyticsTracker.track(AiImageAnalyzeResult(true, suggestions.size))
+                _uiState.update {
+                    it.copy(
+                        imageSuggestions = suggestions,
+                        isAnalyzingImage = false
+                    )
+                }
             } catch (e: Exception) {
-                analyticsTracker.track(AnalyticsEvent.AiImageAnalyzeResult(false, 0))
+                analyticsTracker.track(AiImageAnalyzeResult(false, 0))
                 Log.e("AddEditNoteViewModel", "Image analysis failed: ${e.message}")
                 _uiState.update { it.copy(isAnalyzingImage = false) }
             }
@@ -1161,17 +1249,35 @@ class AddEditNoteViewModel @Inject constructor(
         var chunkCount = 0
         imageQueryJob = viewModelScope.launch {
             val modelName = userPreferencesRepository.settingsFlow.first().aiModelName
-            analyticsTracker.track(AnalyticsEvent.AiImageQuerySubmitted(query.length, modelName))
-            _uiState.update { it.copy( isImageQueryLoading = true, imageSuggestions = emptyList(), imageQueryResult = "") }
+            analyticsTracker.track(AiImageQuerySubmitted(query.length, modelName))
+            _uiState.update {
+                it.copy(
+                    isImageQueryLoading = true,
+                    imageSuggestions = emptyList(),
+                    imageQueryResult = ""
+                )
+            }
             try {
                 queryImageUseCase(imageBytes, query).collect { chunk ->
                     chunkCount++
                     _uiState.update { it.copy(imageQueryResult = it.imageQueryResult + chunk) }
                 }
-                analyticsTracker.track(AnalyticsEvent.AiImageQueryResult(true, chunkCount, _uiState.value.imageQueryResult.length))
+                analyticsTracker.track(
+                    AiImageQueryResult(
+                        true,
+                        chunkCount,
+                        _uiState.value.imageQueryResult.length
+                    )
+                )
                 _uiState.update { it.copy(isImageQueryLoading = false) }
             } catch (e: Exception) {
-                analyticsTracker.track(AnalyticsEvent.AiImageQueryResult(false, chunkCount, _uiState.value.imageQueryResult.length))
+                analyticsTracker.track(
+                    AiImageQueryResult(
+                        false,
+                        chunkCount,
+                        _uiState.value.imageQueryResult.length
+                    )
+                )
                 Log.e("AddEditNoteViewModel", "Image query failed: ${e.message}")
                 _uiState.update { it.copy(isImageQueryLoading = false) }
             }
@@ -1182,7 +1288,9 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
             fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri })
-            if(currentNoteId.isNotBlank()) { noteUseCases.deleteNote(currentNoteId) }
+            if (currentNoteId.isNotBlank()) {
+                noteUseCases.deleteNote(currentNoteId)
+            }
             _eventFlow.emit(DeleteNote(currentNoteId))
         }
     }
@@ -1193,12 +1301,13 @@ class AddEditNoteViewModel @Inject constructor(
                 _uiState.update { it.copy(isRecording = false) }
 
                 if (enableLiveTranscription) {
-                    analyticsTracker.track(AnalyticsEvent.AiLiveTranscriptionToggled(false))
+                    analyticsTracker.track(AiLiveTranscriptionToggled(false))
                     stopLiveTranscription()
                     _uiState.update { state ->
                         val oldState = state.contentRichTextState
                         val currentText = oldState.document.rawText
-                        val appendedText = if (currentText.isEmpty()) state.liveTranscription else "\n" + state.liveTranscription
+                        val appendedText =
+                            if (currentText.isEmpty()) state.liveTranscription else "\n" + state.liveTranscription
                         val newText = currentText + appendedText
                         val newTfv = TextFieldValue(
                             text = newText,
@@ -1216,22 +1325,30 @@ class AddEditNoteViewModel @Inject constructor(
                     currentRecordingFile?.let { file ->
                         val uri = Uri.fromFile(file)
                         val duration = audioMetadataProvider.getDuration(uri)
-                        analyticsTracker.track(AnalyticsEvent.AttachmentAudioRecorded(duration))
-                        _uiState.update { it.copy(
-                            attachedAudios = it.attachedAudios + Attachment(uri.toString(), duration)
-                        )}
+                        analyticsTracker.track(AttachmentAudioRecorded(duration))
+                        _uiState.update {
+                            it.copy(
+                                attachedAudios = it.attachedAudios + Attachment(
+                                    uri.toString(),
+                                    duration
+                                )
+                            )
+                        }
                     }
                 }
             } else {
                 if (enableLiveTranscription) {
-                    analyticsTracker.track(AnalyticsEvent.AiLiveTranscriptionToggled(true))
+                    analyticsTracker.track(AiLiveTranscriptionToggled(true))
                     _uiState.update { state -> state.copy(isRecording = true) }
                     startLiveTranscription(onTranscription = { transcript ->
                         Log.d("kptest", "Transcription: $transcript")
                         _uiState.update { it.copy(liveTranscription = it.liveTranscription + " " + transcript) }
                     })
-                }else {
-                    val file = fileIOUseCases.createFile(AttachmentType.AUDIO.extension, AttachmentType.AUDIO.name.lowercase())
+                } else {
+                    val file = fileIOUseCases.createFile(
+                        AttachmentType.AUDIO.extension,
+                        AttachmentType.AUDIO.name.lowercase()
+                    )
                     currentRecordingFile = file
                     file?.let {
                         audioRecorder.startRecording(it)
@@ -1291,7 +1408,11 @@ class AddEditNoteViewModel @Inject constructor(
         }
     }
 
-    fun checkCameraPermission(isGranted: Boolean, shouldShowRationale: Boolean, attachmentType: AttachmentType) {
+    fun checkCameraPermission(
+        isGranted: Boolean,
+        shouldShowRationale: Boolean,
+        attachmentType: AttachmentType
+    ) {
         viewModelScope.launch {
             val hasAskedBefore = permissionUsecases.getCameraPermissionFlag()
             when {
@@ -1305,13 +1426,15 @@ class AddEditNoteViewModel @Inject constructor(
 
     fun checkExactAlarmPermission() {
         viewModelScope.launch {
-            if(!reminderScheduler.canScheduleExactAlarms()){
+            if (!reminderScheduler.canScheduleExactAlarms()) {
                 _uiState.update { it.copy(showAlarmPermissionRationale = true) }
-            } else{
-                _uiState.update { it.copy(
-                    showAlarmPermissionRationale = false,
-                    showDataAndTimePicker = true
-                ) }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        showAlarmPermissionRationale = false,
+                        showDataAndTimePicker = true
+                    )
+                }
             }
         }
     }

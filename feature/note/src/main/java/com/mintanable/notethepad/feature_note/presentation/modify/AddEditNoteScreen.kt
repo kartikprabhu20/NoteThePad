@@ -92,6 +92,8 @@ fun AddEditNoteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val existingTags by viewModel.existingTags.collectAsStateWithLifecycle()
     val aiCapabilities by viewModel.aiCapabilities.collectAsStateWithLifecycle()
+    val canUndo by viewModel.canUndo.collectAsStateWithLifecycle()
+    val canRedo by viewModel.canRedo.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -296,7 +298,9 @@ fun AddEditNoteScreen(
             onEvent = onEvent,
             sharedTransitionScope = sharedTransitionScope,
             animatedVisibilityScope = animatedVisibilityScope,
-            isDarkTheme = isDarkTheme
+            isDarkTheme = isDarkTheme,
+            canUndo = canUndo,
+            canRedo = canRedo
         )
 
         val navigationBarHeight =
