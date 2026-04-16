@@ -13,6 +13,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import androidx.core.content.FileProvider
+import com.mintanable.notethepad.core.richtext.serializer.RichTextSerializer
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
 import com.mintanable.notethepad.file.FileManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -38,9 +39,9 @@ class NotePdfExporter @Inject constructor(
             val renderer = PageRenderer(document)
             renderer.startPage()
 
-            val title = state.titleState.richText.rawText.trim()
-            if (title.isNotEmpty()) {
-                renderer.drawBlock(title, TitlePaint, spacingAfter = 16f)
+            val titleSpanned = RichTextSerializer.toSpannable(state.titleState.richText).trimEndWhitespace()
+            if (titleSpanned.isNotEmpty()) {
+                renderer.drawBlock(titleSpanned, TitlePaint, spacingAfter = 16f)
             }
 
             state.attachedImages.forEach { uri ->
@@ -53,9 +54,9 @@ class NotePdfExporter @Inject constructor(
                     renderer.drawBlock(prefix + item.text, BodyPaint, spacingAfter = 6f)
                 }
             } else {
-                val body = state.contentRichTextState.document.rawText.trim()
-                if (body.isNotEmpty()) {
-                    renderer.drawBlock(body, BodyPaint, spacingAfter = 12f)
+                val bodySpanned = RichTextSerializer.toSpannable(state.contentRichTextState.document).trimEndWhitespace()
+                if (bodySpanned.isNotEmpty()) {
+                    renderer.drawBlock(bodySpanned, BodyPaint, spacingAfter = 12f)
                 }
             }
 
@@ -75,9 +76,22 @@ class NotePdfExporter @Inject constructor(
     }
 
     private fun decodeBitmap(uri: Uri): Bitmap? = try {
-        context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) }
+        val file = fileManager.getFileFromUri(uri.toString())
+        if (file != null && file.exists()) {
+            BitmapFactory.decodeFile(file.absolutePath)
+        } else {
+            context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) }
+        }
     } catch (_: Exception) {
         null
+    }
+
+    private fun CharSequence.trimEndWhitespace(): CharSequence {
+        var end = length
+        while (end > 0 && this[end - 1].isWhitespace()) end--
+        var start = 0
+        while (start < end && this[start].isWhitespace()) start++
+        return if (start == 0 && end == length) this else subSequence(start, end)
     }
 
     private inner class PageRenderer(private val document: PdfDocument) {
@@ -106,7 +120,7 @@ class NotePdfExporter @Inject constructor(
             startPage()
         }
 
-        fun drawBlock(text: String, paint: TextPaint, spacingAfter: Float) {
+        fun drawBlock(text: CharSequence, paint: TextPaint, spacingAfter: Float) {
             val layout = StaticLayout.Builder
                 .obtain(text, 0, text.length, paint, CONTENT_WIDTH)
                 .setAlignment(Layout.Alignment.ALIGN_NORMAL)

@@ -1,5 +1,7 @@
 package com.mintanable.notethepad.core.common
 
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.log10
 import kotlin.math.pow
@@ -15,4 +17,9 @@ fun Long.humanReadableSize(): String {
         this / 1024.0.pow(digitGroups.toDouble()),
         units[digitGroups]
     )
+}
+
+fun Long.humanReadableTime(): String {
+    return SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+        .format(Date(this))
 }
