@@ -1078,11 +1078,24 @@ class AddEditNoteViewModel @Inject constructor(
 
     private fun handleUndoRedoAction(snapshot: EditNoteSnapshot?) {
         snapshot?.let { snap ->
-            _uiState.update {
-                it.copy(
-                    titleState = snap.titleState,
-                    contentState = snap.contentState,
-                    contentRichTextState = snap.contentRichTextState,
+            _uiState.update { state ->
+                val annotatedString = RichTextAnnotator.toAnnotatedString(snap.contentDocument)
+                state.copy(
+                    titleState = state.titleState.copy(
+                        richText = snap.titleDocument,
+                        isHintVisible = snap.titleDocument.rawText.isBlank() && !state.titleState.isFocused
+                    ),
+                    contentState = state.contentState.copy(
+                        richText = snap.contentDocument,
+                        isHintVisible = snap.contentDocument.rawText.isBlank() && !state.contentState.isFocused
+                    ),
+                    contentRichTextState = state.contentRichTextState.copy(
+                        document = snap.contentDocument,
+                        textFieldValue = TextFieldValue(
+                            annotatedString = annotatedString,
+                            selection = TextRange(annotatedString.length)
+                        )
+                    ),
                     noteColor = snap.noteColor,
                     backgroundImage = snap.backgroundImage,
                     reminderTime = snap.reminderTime,

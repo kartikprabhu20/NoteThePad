@@ -61,9 +61,8 @@ data class AddEditNoteUiState(
 ){
     fun toEditNoteSnapshot(): EditNoteSnapshot{
         return EditNoteSnapshot(
-            titleState = this.titleState,
-            contentState = this.contentState,
-            contentRichTextState = this.contentRichTextState,
+            titleDocument = this.titleState.richText,
+            contentDocument = this.contentRichTextState.document,
             noteColor = this.noteColor,
             backgroundImage = this.backgroundImage,
             reminderTime = this.reminderTime,
