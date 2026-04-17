@@ -156,7 +156,13 @@ class SupaFetchWorker @AssistedInject constructor(
 
                     val myCollaborations = collaborationService.getMyCollaborations(userId)
                     val notesIShared = collaborationService.getNotesIShared(userId)
-                    val allCollaboratorDtos = (myCollaborations + notesIShared).distinctBy { it.id }
+                    val involvedNoteIds = (myCollaborations + notesIShared)
+                        .map { it.noteId }
+                        .distinct()
+                    val allCollabsForNotes = involvedNoteIds.flatMap { noteId ->
+                        collaborationService.getCollaborators(noteId)
+                    }
+                    val allCollaboratorDtos = (myCollaborations + notesIShared + allCollabsForNotes).distinctBy { it.id }
                     val collaboratorEntities = allCollaboratorDtos.filter { it.id != null }.map { dto ->
                         CollaboratorEntity(
                             id = dto.id!!,
@@ -167,6 +173,26 @@ class SupaFetchWorker @AssistedInject constructor(
                             collaboratorDisplayName = dto.collaboratorDisplayName,
                             collaboratorPhotoUrl = dto.collaboratorPhotoUrl
                         )
+                    }.toMutableList()
+                    val ownerIds = collaboratorEntities
+                        .groupBy { it.noteId }
+                        .filter { (_, entities) -> entities.none { it.collaboratorUserId == it.ownerUserId } }
+                        .mapValues { (_, entities) -> entities.first().ownerUserId }
+                    for ((noteId, ownerId) in ownerIds) {
+                        val ownerProfile = collaborationService.getUserProfile(ownerId)
+                        if (ownerProfile != null) {
+                            collaboratorEntities.add(
+                                CollaboratorEntity(
+                                    id = "owner_$ownerId",
+                                    noteId = noteId,
+                                    ownerUserId = ownerId,
+                                    collaboratorUserId = ownerId,
+                                    collaboratorEmail = ownerProfile.email,
+                                    collaboratorDisplayName = ownerProfile.displayName,
+                                    collaboratorPhotoUrl = ownerProfile.photoUrl
+                                )
+                            )
+                        }
                     }
                     db.withTransaction {
                         collaboratorDao.deleteAll()

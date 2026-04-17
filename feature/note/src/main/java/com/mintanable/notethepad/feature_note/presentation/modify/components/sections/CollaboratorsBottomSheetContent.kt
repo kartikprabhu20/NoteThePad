@@ -198,7 +198,7 @@ private fun CollaboratorRow(
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
-            } else {
+            } else if(collaborator.isCurrentUser) {
                 TextButton(onClick = onLeave) {
                     Text(
                         stringResource(R.string.leave_note),

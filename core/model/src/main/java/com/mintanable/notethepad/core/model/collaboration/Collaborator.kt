@@ -7,5 +7,6 @@ data class Collaborator(
     val email: String,
     val displayName: String?,
     val photoUrl: String?,
-    val isOwner: Boolean = false
+    val isOwner: Boolean = false,
+    val isCurrentUser: Boolean = false
 )
