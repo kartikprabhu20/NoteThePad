@@ -124,4 +124,7 @@
     <string name="option_export_pdf">Exportar como PDF</string>
     <string name="msg_pdf_export_failed">Não foi possível exportar o PDF</string>
     <string name="pdf_share_chooser_title">Compartilhar PDF…</string>
+    <string name="dialog_delete_title">Excluir nota?</string>
+    <string name="dialog_delete_message">Tem certeza de que deseja excluir esta nota? Esta ação pode ser desfeita a partir da snackbar ou do arquivo.</string>
+    <string name="btn_delete">Excluir</string>
 </resources>

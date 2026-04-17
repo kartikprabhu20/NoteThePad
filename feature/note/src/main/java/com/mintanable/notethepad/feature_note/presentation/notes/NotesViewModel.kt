@@ -183,6 +183,9 @@ class NotesViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val _noteToDelete = MutableStateFlow<DetailedNote?>(null)
+    val noteToDelete = _noteToDelete.asStateFlow()
+
     val noteShape: StateFlow<NoteShape> = getNoteShapeSettings()
         .stateIn(
             scope = viewModelScope,
@@ -232,6 +235,7 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.DeleteNote -> {
                 analyticsTracker.track(AnalyticsEvent.NoteDeleted())
                 viewModelScope.launch {
+                    _noteToDelete.value = null
                     fileIOUseCases.deleteFiles(event.detailedNote.imageUris.map { it.toString() })
                     noteUseCases.deleteNote(event.detailedNote.toNote())
                     recentlyDeletedNote = event.detailedNote
@@ -244,6 +248,10 @@ class NotesViewModel @Inject constructor(
                         )
                     )
                 }
+            }
+
+            is NotesEvent.RequestDeleteNote -> {
+                _noteToDelete.value = event.note
             }
 
             is NotesEvent.RestoreNote -> {

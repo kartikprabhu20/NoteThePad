@@ -124,4 +124,7 @@
     <string name="option_export_pdf">导出为 PDF</string>
     <string name="msg_pdf_export_failed">无法导出 PDF</string>
     <string name="pdf_share_chooser_title">分享 PDF…</string>
+    <string name="dialog_delete_title">删除笔记？</string>
+    <string name="dialog_delete_message">您确定要删除此笔记吗？此操作可以从快消栏 या 归档中撤销।</string>
+    <string name="btn_delete">删除</string>
 </resources>

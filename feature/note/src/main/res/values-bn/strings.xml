@@ -124,4 +124,7 @@
     <string name="option_export_pdf">PDF হিসেবে এক্সপোর্ট করুন</string>
     <string name="msg_pdf_export_failed">PDF এক্সপোর্ট করা যায়নি</string>
     <string name="pdf_share_chooser_title">PDF শেয়ার করুন…</string>
+    <string name="dialog_delete_title">নোটটি মুছে ফেলবেন?</string>
+    <string name="dialog_delete_message">আপনি কি নিশ্চিত যে আপনি এই নোটটি মুছে ফেলতে চান? इस কাজটি স্ন্যাকবার বা আর্কাইভ থেকে পূর্বাবস্থায় ফেরানো যেতে পারে।</string>
+    <string name="btn_delete">मुছে ফেলুন</string>
 </resources>

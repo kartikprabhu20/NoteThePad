@@ -124,4 +124,7 @@
     <string name="option_export_pdf">تصدير كـ PDF</string>
     <string name="msg_pdf_export_failed">تعذر تصدير PDF</string>
     <string name="pdf_share_chooser_title">مشاركة PDF…</string>
+    <string name="dialog_delete_title">حذف الملاحظة؟</string>
+    <string name="dialog_delete_message">هل أنت متأكد من رغبتك في حذف هذه الملاحظة؟ يمكن التراجع عن هذا الإجراء من الشريط السفلي أو من الأرشيف.</string>
+    <string name="btn_delete">حذف</string>
 </resources>

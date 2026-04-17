@@ -57,8 +57,9 @@ data class AddEditNoteUiState(
     val isLoadingCollaborators: Boolean = false,
     val collaboratorError: String? = null,
     val isOwner: Boolean = true,
-    val summary: String = ""
-){
+    val summary: String = "",
+    val showDeleteConfirmation: Boolean = false
+) {
     fun toEditNoteSnapshot(): EditNoteSnapshot{
         return EditNoteSnapshot(
             titleDocument = this.titleState.richText,

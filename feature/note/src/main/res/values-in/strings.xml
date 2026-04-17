@@ -124,4 +124,7 @@
     <string name="option_export_pdf">Ekspor sebagai PDF</string>
     <string name="msg_pdf_export_failed">Gagal mengekspor PDF</string>
     <string name="pdf_share_chooser_title">Bagikan PDF…</string>
+    <string name="dialog_delete_title">Hapus catatan?</string>
+    <string name="dialog_delete_message">Apakah Anda yakin ingin menghapus catatan ini? Tindakan ini dapat dibatalkan dari snackbar atau dari arsip.</string>
+    <string name="btn_delete">Hapus</string>
 </resources>

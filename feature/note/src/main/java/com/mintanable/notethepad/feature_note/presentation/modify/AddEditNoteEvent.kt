@@ -18,6 +18,7 @@ sealed class AddEditNoteEvent {
     data object SaveNote : AddEditNoteEvent()
     data object MakeCopy : AddEditNoteEvent()
     data object DeleteNote : AddEditNoteEvent()
+    data class ToggleDeleteConfirmation(val show: Boolean) : AddEditNoteEvent()
     data class AttachImage(val uri: Uri, val source: String = "gallery") : AddEditNoteEvent()
     data class RemoveImage(val uri: Uri) : AddEditNoteEvent()
     data class RemoveAudio(val uri: String) : AddEditNoteEvent()

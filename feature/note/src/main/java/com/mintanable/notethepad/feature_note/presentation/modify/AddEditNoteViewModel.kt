@@ -487,6 +487,11 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.DeleteNote -> {
                 analyticsTracker.track(NoteDeleted())
                 deleteNote()
+                _uiState.update { it.copy(showDeleteConfirmation = false) }
+            }
+
+            is AddEditNoteEvent.ToggleDeleteConfirmation -> {
+                _uiState.update { it.copy(showDeleteConfirmation = event.show) }
             }
 
             is AddEditNoteEvent.PinNote -> {

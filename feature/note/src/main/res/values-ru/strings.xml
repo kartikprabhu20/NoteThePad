@@ -124,4 +124,7 @@
     <string name="option_export_pdf">Экспортировать как PDF</string>
     <string name="msg_pdf_export_failed">Не удалось экспортировать PDF</string>
     <string name="pdf_share_chooser_title">Поделиться PDF…</string>
+    <string name="dialog_delete_title">Удалить заметку?</string>
+    <string name="dialog_delete_message">Вы уверены, что хотите удалить эту заметку? Это действие можно отменить из снэкбаरा или из архива.</string>
+    <string name="btn_delete">Удалить</string>
 </resources>

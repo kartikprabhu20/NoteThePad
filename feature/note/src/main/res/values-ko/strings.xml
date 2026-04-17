@@ -124,4 +124,7 @@
     <string name="option_export_pdf">PDF로 내보내기</string>
     <string name="msg_pdf_export_failed">PDF를 내보낼 수 없습니다</string>
     <string name="pdf_share_chooser_title">PDF 공유…</string>
+    <string name="dialog_delete_title">메모를 삭제하시겠습니까?</string>
+    <string name="dialog_delete_message">이 메모를 삭제하시겠습니까? 이 작업은 스낵바 또는 아카이브에서 실행 취소할 수 있습니다.</string>
+    <string name="btn_delete">삭제</string>
 </resources>

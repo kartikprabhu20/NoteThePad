@@ -124,4 +124,7 @@
     <string name="option_export_pdf">PDF olarak dışa aktar</string>
     <string name="msg_pdf_export_failed">PDF dışa aktarılamadı</string>
     <string name="pdf_share_chooser_title">PDF paylaş…</string>
+    <string name="dialog_delete_title">Notu sil?</string>
+    <string name="dialog_delete_message">Bu notu silmek istediğinizden emin misiniz? Bu işlem snackbar\'dan veya arşivden geri alınabilir.</string>
+    <string name="btn_delete">Sil</string>
 </resources>

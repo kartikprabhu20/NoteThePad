@@ -152,4 +152,22 @@
 
     <string name="content_description_undo" translatable="false">can undo description</string>
     <string name="content_description_redo" translatable="false">can redo description</string>
+    <string name="dialog_delete_title">Delete note?</string>
+    <string name="dialog_delete_message">Are you sure you want to delete this note? This action can be undone from the snackbar or from the archive.</string>
+    <string name="btn_delete">Delete</string>
+
+<!-- Example of the fix in feature/note/src/main/res/values-it/strings.xml -->
+    <!-- <string name="dialog_stop_ai_message">L\'IA sta ancora rispondendo. Vuoi interromperla e tornare
+        indietro?
+    </string> -->
+
+    <!-- <string name="dialog_delete_message">Sei sicuro di voler eliminare questa nota? Questa azione
+        può essere annullata dalla snackbar o dall\'archivio.
+    </string> -->
+
+
+<!-- Example of the fix in feature/note/src/main/res/values-tr/strings.xml -->
+    <!-- <string name="dialog_delete_message">Bu notu silmek istediğinizden emin misiniz? Bu işlem
+        snackbar\'dan veya arşivden geri alınabilir.
+    </string> -->
 </resources>

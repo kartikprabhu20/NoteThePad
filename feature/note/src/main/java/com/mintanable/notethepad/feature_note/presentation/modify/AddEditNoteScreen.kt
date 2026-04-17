@@ -417,19 +417,29 @@ fun AddEditNoteScreen(
             )
         }
 
-        uiState.settingsDeniedType?.let { type ->
-            PermissionRationaleDialog(
-                permissionRationaleType = if (type == DeniedType.CAMERA)
-                    PermissionRationaleType.CAMERA_DENIED else PermissionRationaleType.MICROPHONE_DENIED,
-                onConfirmClicked = {
-                    viewModel.onEvent(AddEditNoteEvent.DismissDialogs)
-                    NavigatationHelper.openAppSettings(context)
-                },
-                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.DismissDialogs) }
-            )
-
         }
-    }
+
+        if (uiState.showDeleteConfirmation) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.ToggleDeleteConfirmation(false)) },
+                title = { Text(stringResource(R.string.dialog_delete_title)) },
+                text = { Text(stringResource(R.string.dialog_delete_message)) },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.onEvent(AddEditNoteEvent.DeleteNote) }
+                    ) {
+                        Text(stringResource(R.string.btn_delete))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.onEvent(AddEditNoteEvent.ToggleDeleteConfirmation(false)) }
+                    ) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
+            )
+        }
 
     val sheetItems = remember(uiState.currentSheetType) {
         when (uiState.currentSheetType) {
@@ -549,7 +559,7 @@ fun AddEditNoteScreen(
                             }
 
                             MoreSettingsOptions.DELETE -> {
-                                viewModel.onEvent(AddEditNoteEvent.DeleteNote)
+                                viewModel.onEvent(AddEditNoteEvent.ToggleDeleteConfirmation(true))
                             }
 
                             MoreSettingsOptions.PIN -> {
@@ -587,7 +597,6 @@ fun AddEditNoteScreen(
             }
         }
     }
-
     SavingOverlay(uiState.isSaving)
 }
 

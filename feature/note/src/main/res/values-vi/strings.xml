@@ -124,4 +124,7 @@
     <string name="option_export_pdf">Xuất dưới dạng PDF</string>
     <string name="msg_pdf_export_failed">Không thể xuất PDF</string>
     <string name="pdf_share_chooser_title">Chia sẻ PDF…</string>
+    <string name="dialog_delete_title">Xóa ghi chú?</string>
+    <string name="dialog_delete_message">Bạn có chắc chắn muốn xóa ghi chú này không? Hành động này có thể được hoàn tất từ thanh thông báo hoặc từ kho lưu trữ.</string>
+    <string name="btn_delete">Xóa</string>
 </resources>

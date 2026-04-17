@@ -108,6 +108,7 @@ fun NotesScreen(
     val aiAssistantState by aiAssistantViewModel.state.collectAsStateWithLifecycle()
     val aiAssistantEnabled by notesViewModel.aiAssistantEnabled.collectAsStateWithLifecycle()
     val isAiAssistantSupported = BuildConfig.ENABLE_AI_ASSISTANCE && aiAssistantEnabled
+    val noteToDelete by notesViewModel.noteToDelete.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
     var showLogoutConfirmation by rememberSaveable { mutableStateOf(false) }
@@ -309,7 +310,7 @@ fun NotesScreen(
                                 onNoteClicked = onNoteClick,
                                 onDeleteClicked = { note ->
                                     notesViewModel.onEvent(
-                                        NotesEvent.DeleteNote(note)
+                                        NotesEvent.RequestDeleteNote(note)
                                     )
                                 },
                                 onPinClicked = { note ->
@@ -366,6 +367,31 @@ fun NotesScreen(
             dismissButton = {
                 TextButton(
                     onClick = { showLogoutConfirmation = false }
+                ) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            }
+        )
+    }
+
+    noteToDelete?.let { note ->
+        AlertDialog(
+            onDismissRequest = { notesViewModel.onEvent(NotesEvent.RequestDeleteNote(null)) },
+            title = { Text(stringResource(R.string.dialog_delete_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        notesViewModel.onEvent(NotesEvent.DeleteNote(note))
+                        notesViewModel.onEvent(NotesEvent.RequestDeleteNote(null))
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { notesViewModel.onEvent(NotesEvent.RequestDeleteNote(null)) }
                 ) {
                     Text(stringResource(R.string.btn_cancel))
                 }

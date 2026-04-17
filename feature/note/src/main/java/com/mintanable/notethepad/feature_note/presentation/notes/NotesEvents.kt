@@ -17,4 +17,5 @@ sealed class NotesEvent {
     data class EditLabel(val tagEntity: TagEntity) : NotesEvent()
     data class DeleteLabel(val tagEntity: TagEntity) : NotesEvent()
     data object RefreshCloudNotes : NotesEvent()
+    data class RequestDeleteNote(val note: DetailedNote?) : NotesEvent()
 }

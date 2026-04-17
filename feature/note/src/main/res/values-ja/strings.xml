@@ -124,4 +124,7 @@
     <string name="option_export_pdf">PDFとして書き出す</string>
     <string name="msg_pdf_export_failed">PDFを書き出せませんでした</string>
     <string name="pdf_share_chooser_title">PDFを共有…</string>
+    <string name="dialog_delete_title">メモを削除しますか？</string>
+    <string name="dialog_delete_message">このメモを削除してもよろしいですか？この操作はスナックバーまたはアーカイブから元に戻すことができます。</string>
+    <string name="btn_delete">削除</string>
 </resources>

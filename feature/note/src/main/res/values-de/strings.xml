@@ -124,4 +124,7 @@
     <string name="pdf_share_chooser_title">PDF teilen…</string>
     <string name="btn_analyse">Analysieren</string>
     <string name="hint_image_query">Suchanfrage eingeben (maximal 50 Zeichen)…</string>
+    <string name="dialog_delete_title">Notiz löschen?</string>
+    <string name="dialog_delete_message">Sind Sie sicher, dass Sie diese Notiz löschen möchten? Diese Aktion kann über die Snackbar oder das Archiv rückgängig gemacht werden.</string>
+    <string name="btn_delete">Löschen</string>
 </resources>
