@@ -32,6 +32,7 @@ fun LazyListScope.collaboratorsSection(
                         displayName = collaborator.displayName,
                         photoUrl = collaborator.photoUrl,
                         size = 28,
+                        isOwner = collaborator.isOwner,
                         modifier = Modifier.padding(end = 4.dp)
                     )
                 }

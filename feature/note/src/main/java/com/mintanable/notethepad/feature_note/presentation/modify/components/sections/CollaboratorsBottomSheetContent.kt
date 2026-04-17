@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -158,7 +159,8 @@ private fun CollaboratorRow(
             CollaboratorAvatar(
                 displayName = collaborator.displayName,
                 photoUrl = collaborator.photoUrl,
-                size = 40
+                size = 40,
+                isOwner = collaborator.isOwner
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
@@ -213,14 +215,21 @@ fun CollaboratorAvatar(
     displayName: String?,
     photoUrl: String?,
     modifier: Modifier = Modifier,
-    size: Int = 32
+    size: Int = 32,
+    isOwner: Boolean = false
 ) {
+    val ownerBorder = if (isOwner) {
+        Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+    } else {
+        Modifier
+    }
     if (!photoUrl.isNullOrBlank() && photoUrl != "null") {
         AsyncImage(
             model = photoUrl,
             contentDescription = displayName,
             modifier = modifier
                 .size(size.dp)
+                .then(ownerBorder)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
@@ -229,6 +238,7 @@ fun CollaboratorAvatar(
         Box(
             modifier = modifier
                 .size(size.dp)
+                .then(ownerBorder)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center

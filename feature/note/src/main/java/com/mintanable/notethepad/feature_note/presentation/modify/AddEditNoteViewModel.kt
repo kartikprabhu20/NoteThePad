@@ -29,6 +29,7 @@ import com.mintanable.notethepad.database.db.entity.TagEntity
 import com.mintanable.notethepad.database.db.util.AudioMetadataProvider
 import com.mintanable.notethepad.core.model.ai.AiCapabilities
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
+import com.mintanable.notethepad.core.model.settings.User
 import com.mintanable.notethepad.feature_ai.domain.toCapabilities
 import com.mintanable.notethepad.feature_ai.domain.use_cases.AnalyzeImageUseCase
 import com.mintanable.notethepad.feature_ai.domain.use_cases.GetAiModelByName
@@ -117,6 +118,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val isEditMode = passedNoteId.isNotBlank()
     private var currentNoteId: String = ""
     private var currentUserId: String? = null
+    private var currentUser: User? = null
     private var currentOwnerId: String? = null
     private var currentRecordingFile: File? = null
     private val imageSuggestionsCache = mutableMapOf<String, List<String>>()
@@ -146,6 +148,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.getSignedInFirebaseUser().collect { user ->
                 currentUserId = user?.uid
+                currentUser = user
                 updateOwnerStatus()
             }
         }
@@ -165,18 +168,35 @@ class AddEditNoteViewModel @Inject constructor(
                     updateOwnerStatus()
                 }
                 _uiState.update { state ->
+                    val mapped = entities.map { entity ->
+                        Collaborator(
+                            id = entity.id,
+                            noteId = entity.noteId,
+                            userId = entity.collaboratorUserId,
+                            email = entity.collaboratorEmail,
+                            displayName = entity.collaboratorDisplayName,
+                            photoUrl = entity.collaboratorPhotoUrl,
+                            isOwner = entity.collaboratorUserId == entity.ownerUserId
+                        )
+                    }
+                    val hasOwner = mapped.any { it.isOwner }
+                    val user = currentUser
+                    val collaborators = if (!hasOwner && user != null && currentUserId == currentOwnerId && mapped.isNotEmpty()) {
+                        val ownerEntry = Collaborator(
+                            id = "owner_${user.uid}",
+                            noteId = noteId,
+                            userId = user.uid,
+                            email = user.email ?: "",
+                            displayName = user.displayName,
+                            photoUrl = user.photoUrl,
+                            isOwner = true
+                        )
+                        listOf(ownerEntry) + mapped
+                    } else {
+                        mapped
+                    }
                     state.copy(
-                        collaborators = entities.map { entity ->
-                            Collaborator(
-                                id = entity.id,
-                                noteId = entity.noteId,
-                                userId = entity.collaboratorUserId,
-                                email = entity.collaboratorEmail,
-                                displayName = entity.collaboratorDisplayName,
-                                photoUrl = entity.collaboratorPhotoUrl,
-                                isOwner = entity.collaboratorUserId == entity.ownerUserId
-                            )
-                        },
+                        collaborators = collaborators,
                         isLoadingCollaborators = false
                     )
                 }
