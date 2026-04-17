@@ -59,6 +59,7 @@ import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.core.model.collaboration.Collaborator
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.EditNoteSnapshot
+import com.mintanable.notethepad.feature_note.presentation.NoteDataState
 import com.mintanable.notethepad.feature_note.presentation.modify.UiEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -124,6 +125,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val imageSuggestionsCache = mutableMapOf<String, List<String>>()
     private var cachedImageBytes: ByteArray? = null
     private val saveInProgress = AtomicBoolean(false)
+    private var baselineNoteData: NoteDataState? = null
 
     val canUndo = snapshotTracker.canUndo
     val canRedo = snapshotTracker.canRedo
@@ -175,7 +177,8 @@ class AddEditNoteViewModel @Inject constructor(
                         email = entity.collaboratorEmail,
                         displayName = entity.collaboratorDisplayName,
                         photoUrl = entity.collaboratorPhotoUrl,
-                        isOwner = entity.collaboratorUserId == entity.ownerUserId
+                        isOwner = entity.collaboratorUserId == entity.ownerUserId,
+                        isCurrentUser = entity.collaboratorUserId == currentUserId
                     )
                 }
                 val hasOwner = mapped.any { it.isOwner }
@@ -267,6 +270,7 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
         }
+        baselineNoteData = _uiState.value.toNoteDataState()
     }
 
     private fun loadNote(id: String) {
@@ -301,6 +305,7 @@ class AddEditNoteViewModel @Inject constructor(
                         summary = detailedNote.summary
                     )
                 }
+                baselineNoteData = _uiState.value.toNoteDataState()
                 observeCollaborators(id)
             }
         }
@@ -392,13 +397,10 @@ class AddEditNoteViewModel @Inject constructor(
                         val state = _uiState.value
                         val rawTitle = state.titleState.richText.rawText
                         val contentText = state.contentRichTextState.document.rawText
-                        val hasAttachments = state.attachedImages.isNotEmpty() || state.attachedAudios.isNotEmpty()
-                        val hasReminder = state.reminderTime > System.currentTimeMillis()
-                        val hasChecklist = state.isCheckboxListAvailable && state.checkListItems.any { it.text.isNotBlank() }
-
+                      
                         val isNew = currentNoteId.isBlank()
-                        if (isNew && rawTitle.isBlank() && contentText.isBlank() &&
-                            !hasAttachments && !hasReminder && !hasChecklist) {
+                        val currentData = state.toNoteDataState()
+                        if (currentData == baselineNoteData) {
                             _eventFlow.emit(UiEvent.SaveNote)
                             return@launch
                         }
@@ -446,6 +448,7 @@ class AddEditNoteViewModel @Inject constructor(
                                     isChecklist = s.isCheckboxListAvailable
                                 )
                                 analyticsTracker.track(evt)
+                                baselineNoteData = _uiState.value.toNoteDataState()
                                 _uiState.update { it.copy(isSaving = false, zoomedImageUri = null) }
                                 _eventFlow.emit(SaveNote)
                             }

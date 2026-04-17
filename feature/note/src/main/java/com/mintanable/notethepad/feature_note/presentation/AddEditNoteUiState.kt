@@ -60,6 +60,22 @@ data class AddEditNoteUiState(
     val summary: String = "",
     val showDeleteConfirmation: Boolean = false
 ) {
+    fun toNoteDataState(): NoteDataState {
+        return NoteDataState(
+            title = this.titleState.richText.rawText,
+            content = this.contentRichTextState.document.rawText,
+            noteColor = this.noteColor,
+            backgroundImage = this.backgroundImage,
+            attachedImages = this.attachedImages.toList(),
+            attachedAudios = this.attachedAudios.toList(),
+            reminderTime = this.reminderTime,
+            checkListItems = this.checkListItems.toList(),
+            isCheckboxListAvailable = this.isCheckboxListAvailable,
+            tagEntities = this.tagEntities.toList(),
+            summary = this.summary
+        )
+    }
+
     fun toEditNoteSnapshot(): EditNoteSnapshot{
         return EditNoteSnapshot(
             titleDocument = this.titleState.richText,
