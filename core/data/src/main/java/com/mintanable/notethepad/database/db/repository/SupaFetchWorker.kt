@@ -173,17 +173,26 @@ class SupaFetchWorker @AssistedInject constructor(
                         collaboratorDao.insertAll(collaboratorEntities)
 
                         // Duplicate orphaned notes whose collaboration was severed
-                        val newSharedNoteIds = collaboratorEntities
+                        val newSharedIds = collaboratorEntities
                             .filter { it.collaboratorUserId == userId || it.ownerUserId == userId }
                             .map { it.noteId }
                             .toSet()
-                        val removedNoteIds = oldSharedNoteIds - newSharedNoteIds
+                        val removedNoteIds = oldSharedNoteIds - newSharedIds
                         val tagDao = dbManager.database.tagDao()
+                        
+                        if (removedNoteIds.isNotEmpty()) {
+                            Log.i("SupabaseSync", "Found ${removedNoteIds.size} orphaned shared notes to duplicate.")
+                        }
+
                         for (noteId in removedNoteIds) {
                             val local = noteDao.getNoteById(noteId)
+                            // If I'm not the owner and it's removed from shared, duplicate it as my private note
                             if (local != null && local.noteEntity.userId != userId) {
+                                val newId = java.util.UUID.randomUUID().toString()
+                                Log.d("SupabaseSync", "Severed collaboration for note $noteId. Duplicating as private note $newId.")
+                                
                                 val duplicated = local.noteEntity.copy(
-                                    id = java.util.UUID.randomUUID().toString(),
+                                    id = newId,
                                     userId = userId,
                                     lastUpdateTime = System.currentTimeMillis(),
                                     isSynced = false
@@ -205,6 +214,7 @@ class SupaFetchWorker @AssistedInject constructor(
                                                 isSynced = false
                                             )
                                             tagDao.insertTag(copiedTag)
+                                            Log.d("SupabaseSync", "Duplicated shared tag ${tag.tagName} as private tag ${copiedTag.tagId}")
                                             copiedTag.tagId
                                         }
                                     } else {
@@ -222,10 +232,11 @@ class SupaFetchWorker @AssistedInject constructor(
 
                                 noteDao.deleteNoteWithId(noteId)
                                 noteDao.deleteLinksForNote(noteId)
+                                Log.i("SupabaseSync", "Successfully converted shared note $noteId to private note $newId")
                             }
                         }
                     }
-                    Log.d("kptest", "collaborators synced: ${collaboratorEntities.size}")
+                    Log.d("SupabaseSync", "Collaborators synced: ${collaboratorEntities.size}")
                 }
 
             } catch (e: Exception) {

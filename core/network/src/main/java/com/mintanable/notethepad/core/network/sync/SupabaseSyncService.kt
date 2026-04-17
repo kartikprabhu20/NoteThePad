@@ -69,8 +69,8 @@ class SupabaseSyncService @Inject constructor(
     }
 
     suspend fun updateSharedNote(noteDto: NoteDto): Boolean {
+        Log.d("SupabaseSync", "Updating shared note: ${noteDto.id}")
         return try {
-            // Use RPC (POST) instead of .update() (PATCH) to avoid HTTP method issues
             val result = supabaseClient.postgrest.rpc(
                 "update_shared_note",
                 buildJsonObject {
@@ -90,11 +90,13 @@ class SupabaseSyncService @Inject constructor(
             )
             val isSuccess = result.data != "[]" && result.data.isNotEmpty()
             if (isSuccess) {
-                Log.d("Sync", "Shared note updated: ${noteDto.id}")
+                Log.d("SupabaseSync", "Successfully updated shared note: ${noteDto.id}")
+            } else {
+                Log.w("SupabaseSync", "Shared note update returned empty for: ${noteDto.id}")
             }
             isSuccess
         } catch (e: Exception) {
-            Log.e("Sync", "Shared note update error: ${e.message}")
+            Log.e("SupabaseSync", "Error updating shared note ${noteDto.id}: ${e.message}")
             false
         }
     }
@@ -144,6 +146,7 @@ class SupabaseSyncService @Inject constructor(
      */
     suspend fun upsertSharedTag(tagDto: TagDto): Boolean {
         if (tagDto.userId == null) return false
+        Log.d("SupabaseSync", "Upserting shared tag: ${tagDto.tagName} (${tagDto.tagId})")
         return try {
             val result = supabaseClient.postgrest.rpc(
                 "upsert_shared_tag",
@@ -156,10 +159,14 @@ class SupabaseSyncService @Inject constructor(
                 }
             )
             val isSuccess = result.data != "[]" && result.data.isNotEmpty()
-            if (isSuccess) Log.d("SupabaseSync", "Shared tag upserted: ${tagDto.tagId}")
+            if (isSuccess) {
+                Log.d("SupabaseSync", "Shared tag upserted successfully: ${tagDto.tagId}")
+            } else {
+                Log.w("SupabaseSync", "Shared tag upsert returned empty for: ${tagDto.tagId}")
+            }
             isSuccess
         } catch (e: Exception) {
-            Log.e("SupabaseSync", "Shared tag upsert failed: ${e.message}")
+            Log.e("SupabaseSync", "Shared tag upsert failed for ${tagDto.tagId}: ${e.message}")
             false
         }
     }
@@ -170,6 +177,7 @@ class SupabaseSyncService @Inject constructor(
      */
     suspend fun upsertSharedCrossRef(crossRefDto: NoteTagCrossRefDto): Boolean {
         if (crossRefDto.userId == null) return false
+        Log.d("SupabaseSync", "Upserting shared cross-ref: Note ${crossRefDto.noteId} <-> Tag ${crossRefDto.tagId}")
         return try {
             val result = supabaseClient.postgrest.rpc(
                 "upsert_shared_cross_ref",
@@ -182,10 +190,14 @@ class SupabaseSyncService @Inject constructor(
                 }
             )
             val isSuccess = result.data != "[]" && result.data.isNotEmpty()
-            if (isSuccess) Log.d("SupabaseSync", "Shared cross-ref upserted: ${crossRefDto.noteId} <-> ${crossRefDto.tagId}")
+            if (isSuccess) {
+                Log.d("SupabaseSync", "Shared cross-ref upserted successfully for Note ${crossRefDto.noteId}")
+            } else {
+                Log.w("SupabaseSync", "Shared cross-ref upsert returned empty for Note ${crossRefDto.noteId}")
+            }
             isSuccess
         } catch (e: Exception) {
-            Log.e("SupabaseSync", "Shared cross-ref upsert failed: ${e.message}")
+            Log.e("SupabaseSync", "Shared cross-ref upsert failed for Note ${crossRefDto.noteId}: ${e.message}")
             false
         }
     }

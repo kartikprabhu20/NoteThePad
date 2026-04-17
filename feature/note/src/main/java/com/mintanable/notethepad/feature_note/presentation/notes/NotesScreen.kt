@@ -170,14 +170,13 @@ fun NotesScreen(
                         }
 
                         is DrawerItem.NavigationDrawerItem -> {
-                            if (item.title == "Notes") notesViewModel.updateFilter(NotesFilterType.ALL.filter)
-                            else if (item.title == "Reminders") notesViewModel.updateFilter(
-                                NotesFilterType.REMINDERS.filter
-                            )
-                            else if (item.route == Screen.LogOut.route) {
-                                showLogoutConfirmation = true
-                            } else {
-                                navController.navigate(item.route)
+                            when (item.title) {
+                                "Home" -> notesViewModel.updateFilter(NotesFilterType.ALL.filter)
+                                "Reminders" -> notesViewModel.updateFilter(NotesFilterType.REMINDERS.filter)
+                                "Shared" -> notesViewModel.updateFilter(NotesFilterType.SHARED.filter)
+                                "Login" -> navController.navigate(item.route)
+                                "Logout" -> showLogoutConfirmation = true
+                                else -> navController.navigate(item.route)
                             }
                         }
 
