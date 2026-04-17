@@ -38,7 +38,8 @@ class NoteRepositoryImpl @Inject constructor(
     private val supabaseSyncService: SupabaseSyncService,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val authRepository: AuthRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val collaborationRepository: CollaborationRepository
 ) : NoteRepository {
 
     override val isSyncing: Flow<Boolean> = supabaseSyncService.isSyncing
@@ -94,21 +95,35 @@ class NoteRepositoryImpl @Inject constructor(
                 val now = System.currentTimeMillis()
                 val newTagIds = mutableSetOf<String>()
                 tagEntities.forEach { tag ->
-                    val existing = tagDao.getTagByNameIncludeDeleted(tag.tagName)
-                    val resolvedTag = existing?.copy(
-                        userId = tagOwnerId,
-                        lastUpdateTime = now,
-                        isDeleted = false,
-                        isSynced = false
-                    )
-                        ?: tag.copy(
+                    val resolvedTag = if (isSharedNote && tagOwnerId != null) {
+                        val ownerTag = tagDao.getTagByNameAndUserId(tag.tagName, tagOwnerId)
+                        ownerTag?.copy(
+                            lastUpdateTime = now,
+                            isDeleted = false,
+                            isSynced = false
+                        ) ?: tag.copy(
+                            tagId = java.util.UUID.randomUUID().toString(),
                             userId = tagOwnerId,
                             lastUpdateTime = now,
                             isDeleted = false,
                             isSynced = false
                         )
+                    } else {
+                        val existing = tagDao.getTagByNameIncludeDeleted(tag.tagName)
+                        existing?.copy(
+                            userId = tagOwnerId,
+                            lastUpdateTime = now,
+                            isDeleted = false,
+                            isSynced = false
+                        ) ?: tag.copy(
+                            userId = tagOwnerId,
+                            lastUpdateTime = now,
+                            isDeleted = false,
+                            isSynced = false
+                        )
+                    }
 
-                    if (existing != null) {
+                    if (tagDao.getTagById(resolvedTag.tagId) != null) {
                         tagDao.updateTag(resolvedTag)
                     } else {
                         tagDao.insertTag(resolvedTag)
@@ -145,13 +160,24 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteNote(noteEntity: NoteEntity) {
-        val deletedNote = noteEntity.copy(
-            isDeleted = true,
-            lastUpdateTime = System.currentTimeMillis(),
-            isSynced = false
-        )
-        noteDao.updateNote(deletedNote)
-        triggerSync()
+        val collaboratorDao = dbManager.database.collaboratorDao()
+        val collabs = collaboratorDao.getCollaboratorsForNoteOnce(noteEntity.id)
+        val ownerUserId = collabs.firstOrNull()?.ownerUserId
+        val user = authRepository.getSignedInFirebaseUser().first()
+        val currentUserId = user?.uid
+
+        if (ownerUserId != null && currentUserId != null && ownerUserId != currentUserId) {
+            collaborationRepository.leaveNote(noteEntity.id, currentUserId)
+            triggerSync()
+        } else {
+            val deletedNote = noteEntity.copy(
+                isDeleted = true,
+                lastUpdateTime = System.currentTimeMillis(),
+                isSynced = false
+            )
+            noteDao.updateNote(deletedNote)
+            triggerSync()
+        }
     }
 
     override suspend fun deleteNoteWithId(id: String) {

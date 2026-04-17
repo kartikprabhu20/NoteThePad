@@ -61,14 +61,16 @@ object DatabaseModule {
         supabaseSyncService: SupabaseSyncService,
         userPreferencesRepository: UserPreferencesRepository,
         authRepository: AuthRepository,
-        workManager: WorkManager
+        workManager: WorkManager,
+        collaborationRepository: CollaborationRepository
     ): NoteRepository {
         return NoteRepositoryImpl(
             databaseManager,
             supabaseSyncService,
             userPreferencesRepository,
             authRepository,
-            workManager
+            workManager,
+            collaborationRepository
         )
     }
 

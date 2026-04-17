@@ -3,10 +3,18 @@ package com.mintanable.notethepad.database.db.repository
 import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorker
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
 import com.mintanable.notethepad.auth.repository.AuthRepository
 import com.mintanable.notethepad.core.common.FeatureFlags
+import com.mintanable.notethepad.core.model.NoteThePadConstants.SUPA_FETCH_WORKER
 import com.mintanable.notethepad.core.network.sync.CollaborationService
 import com.mintanable.notethepad.core.network.sync.SupabaseSyncService
 import com.mintanable.notethepad.database.db.DatabaseManager
@@ -15,6 +23,7 @@ import com.mintanable.notethepad.database.preference.repository.UserPreferencesR
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
+import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class SupaSyncWorker @AssistedInject constructor(
@@ -24,7 +33,8 @@ class SupaSyncWorker @AssistedInject constructor(
     private val supabaseSyncService: SupabaseSyncService,
     private val collaborationService: CollaborationService,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val workManager: WorkManager
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -146,6 +156,7 @@ class SupaSyncWorker @AssistedInject constructor(
             }
 
             if (allSuccessful) {
+                enqueueFetch()
                 Result.success()
             } else {
                 Result.retry()
@@ -154,5 +165,26 @@ class SupaSyncWorker @AssistedInject constructor(
             Log.e("SupaSyncWorker", "Sync failed: ${e.message}")
             Result.retry()
         }
+    }
+
+    private fun enqueueFetch() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val fetchRequest = OneTimeWorkRequestBuilder<SupaFetchWorker>()
+            .setConstraints(constraints)
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                WorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+
+        workManager.enqueueUniqueWork(
+            SUPA_FETCH_WORKER,
+            ExistingWorkPolicy.REPLACE,
+            fetchRequest
+        )
     }
 }

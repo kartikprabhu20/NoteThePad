@@ -68,9 +68,8 @@ class CollaborationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun leaveNote(noteId: String, userId: String): Boolean {
-        // Create a personal copy BEFORE removing the collaborator record,
-        // so the user keeps a snapshot of the note they can edit and sync.
         val noteDao = dbManager.database.noteDao()
+        val tagDao = dbManager.database.tagDao()
         val local = noteDao.getNoteById(noteId)
         if (local != null && local.noteEntity.userId != userId) {
             val duplicated = local.noteEntity.copy(
@@ -80,6 +79,37 @@ class CollaborationRepositoryImpl @Inject constructor(
                 isSynced = false
             )
             noteDao.inserNote(duplicated)
+
+            val existingRefs = noteDao.getCrossRefsForNote(noteId)
+            existingRefs.filter { !it.isDeleted }.forEach { ref ->
+                val tag = tagDao.getTagById(ref.tagId)
+                val newTagId = if (tag != null && tag.userId != userId) {
+                    val userTag = tagDao.getTagByNameAndUserId(tag.tagName, userId)
+                    if (userTag != null) {
+                        userTag.tagId
+                    } else {
+                        val copiedTag = tag.copy(
+                            tagId = UUID.randomUUID().toString(),
+                            userId = userId,
+                            lastUpdateTime = System.currentTimeMillis(),
+                            isSynced = false
+                        )
+                        tagDao.insertTag(copiedTag)
+                        copiedTag.tagId
+                    }
+                } else {
+                    ref.tagId
+                }
+                noteDao.insertNoteTagCrossRef(
+                    ref.copy(
+                        noteId = duplicated.id,
+                        tagId = newTagId,
+                        userId = userId,
+                        lastUpdateTime = System.currentTimeMillis()
+                    )
+                )
+            }
+
             noteDao.deleteNoteWithId(noteId)
             noteDao.deleteLinksForNote(noteId)
         }

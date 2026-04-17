@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_note.domain.use_case
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.filled.Add
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.common.NotesFilterType
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.database.db.entity.DrawerItem
@@ -26,9 +27,12 @@ class GetNavigationDrawerItems(
             staticItems.forEach { item ->
                 val shouldAdd = when (item) {
                     is DrawerItem.NavigationDrawerItem -> {
-                        if (item.title == "Login") !isLoggedIn
-                        else if (item.title == "Logout") isLoggedIn
-                        else true
+                        when (item.title) {
+                            "Login" -> !isLoggedIn
+                            "Logout" -> isLoggedIn
+                            "Shared" -> isLoggedIn && FeatureFlags.collaborationEnabled
+                            else -> true
+                        }
                     }
 
                     else -> true

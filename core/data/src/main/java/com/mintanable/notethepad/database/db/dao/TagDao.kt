@@ -37,4 +37,7 @@ interface TagDao {
 
     @Query("SELECT * FROM tag_table WHERE tagName = :tagName")
     suspend fun getTagByNameIncludeDeleted(tagName: String): TagEntity?
+
+    @Query("SELECT * FROM tag_table WHERE tagName = :tagName AND userId = :userId")
+    suspend fun getTagByNameAndUserId(tagName: String, userId: String): TagEntity?
 }

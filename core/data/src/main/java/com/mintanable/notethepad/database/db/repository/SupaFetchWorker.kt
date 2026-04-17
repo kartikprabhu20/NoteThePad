@@ -178,6 +178,7 @@ class SupaFetchWorker @AssistedInject constructor(
                             .map { it.noteId }
                             .toSet()
                         val removedNoteIds = oldSharedNoteIds - newSharedNoteIds
+                        val tagDao = dbManager.database.tagDao()
                         for (noteId in removedNoteIds) {
                             val local = noteDao.getNoteById(noteId)
                             if (local != null && local.noteEntity.userId != userId) {
@@ -188,6 +189,37 @@ class SupaFetchWorker @AssistedInject constructor(
                                     isSynced = false
                                 )
                                 noteDao.inserNote(duplicated)
+
+                                val existingRefs = noteDao.getCrossRefsForNote(noteId)
+                                existingRefs.filter { !it.isDeleted }.forEach { ref ->
+                                    val tag = tagDao.getTagById(ref.tagId)
+                                    val newTagId = if (tag != null && tag.userId != userId) {
+                                        val userTag = tagDao.getTagByNameAndUserId(tag.tagName, userId)
+                                        if (userTag != null) {
+                                            userTag.tagId
+                                        } else {
+                                            val copiedTag = tag.copy(
+                                                tagId = java.util.UUID.randomUUID().toString(),
+                                                userId = userId,
+                                                lastUpdateTime = System.currentTimeMillis(),
+                                                isSynced = false
+                                            )
+                                            tagDao.insertTag(copiedTag)
+                                            copiedTag.tagId
+                                        }
+                                    } else {
+                                        ref.tagId
+                                    }
+                                    noteDao.insertNoteTagCrossRef(
+                                        ref.copy(
+                                            noteId = duplicated.id,
+                                            tagId = newTagId,
+                                            userId = userId,
+                                            lastUpdateTime = System.currentTimeMillis()
+                                        )
+                                    )
+                                }
+
                                 noteDao.deleteNoteWithId(noteId)
                                 noteDao.deleteLinksForNote(noteId)
                             }
