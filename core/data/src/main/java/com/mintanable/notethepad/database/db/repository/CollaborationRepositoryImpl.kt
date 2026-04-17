@@ -123,13 +123,46 @@ class CollaborationRepositoryImpl @Inject constructor(
     override suspend fun fetchAndCacheCollaborators(noteId: String): List<CollaboratorEntity> {
         ensureAuth()
         val remote = collaborationService.getCollaborators(noteId)
-        val entities = remote.filter { it.id != null }.map { it.toEntity() }
+        val entities = remote.filter { it.id != null }.map { it.toEntity() }.toMutableList()
+        val hasOwner = entities.any { it.collaboratorUserId == it.ownerUserId }
+        if (!hasOwner && entities.isNotEmpty()) {
+            val ownerId = entities.first().ownerUserId
+            val ownerProfile = collaborationService.getUserProfile(ownerId)
+            if (ownerProfile != null) {
+                entities.add(
+                    0,
+                    CollaboratorEntity(
+                        id = "owner_$ownerId",
+                        noteId = noteId,
+                        ownerUserId = ownerId,
+                        collaboratorUserId = ownerId,
+                        collaboratorEmail = ownerProfile.email,
+                        collaboratorDisplayName = ownerProfile.displayName,
+                        collaboratorPhotoUrl = ownerProfile.photoUrl
+                    )
+                )
+            }
+        }
         collaboratorDao.replaceCollaboratorsForNote(noteId, entities)
         return entities
     }
 
     override fun getSharedNoteIds(userId: String): Flow<List<String>> {
         return collaboratorDao.getSharedNoteIds(userId)
+    }
+
+    override suspend fun getOwnerProfile(userId: String): Collaborator? {
+        ensureAuth()
+        val profile = collaborationService.getUserProfile(userId) ?: return null
+        return Collaborator(
+            id = "owner_${profile.id}",
+            noteId = "",
+            userId = profile.id,
+            email = profile.email,
+            displayName = profile.displayName,
+            photoUrl = profile.photoUrl,
+            isOwner = true
+        )
     }
 
     private fun NoteCollaboratorDto.toEntity() = CollaboratorEntity(

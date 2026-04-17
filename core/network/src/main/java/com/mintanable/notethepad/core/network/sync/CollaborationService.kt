@@ -97,6 +97,20 @@ class CollaborationService @Inject constructor(
         }
     }
 
+    suspend fun getUserProfile(userId: String): UserProfileDto? {
+        return try {
+            supabaseClient.from("user_profiles")
+                .select {
+                    filter { eq("id", userId) }
+                }
+                .decodeList<UserProfileDto>()
+                .firstOrNull()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get user profile: ${e.message}")
+            null
+        }
+    }
+
     suspend fun getCollaborators(noteId: String): List<NoteCollaboratorDto> {
         return try {
             supabaseClient.from("note_collaborators")

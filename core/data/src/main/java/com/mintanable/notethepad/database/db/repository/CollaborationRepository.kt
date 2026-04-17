@@ -12,4 +12,5 @@ interface CollaborationRepository {
     fun getCollaboratorsForNote(noteId: String): Flow<List<CollaboratorEntity>>
     suspend fun fetchAndCacheCollaborators(noteId: String): List<CollaboratorEntity>
     fun getSharedNoteIds(userId: String): Flow<List<String>>
+    suspend fun getOwnerProfile(userId: String): Collaborator?
 }

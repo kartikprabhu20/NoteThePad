@@ -167,21 +167,21 @@ class AddEditNoteViewModel @Inject constructor(
                     currentOwnerId = entities.first().ownerUserId
                     updateOwnerStatus()
                 }
-                _uiState.update { state ->
-                    val mapped = entities.map { entity ->
-                        Collaborator(
-                            id = entity.id,
-                            noteId = entity.noteId,
-                            userId = entity.collaboratorUserId,
-                            email = entity.collaboratorEmail,
-                            displayName = entity.collaboratorDisplayName,
-                            photoUrl = entity.collaboratorPhotoUrl,
-                            isOwner = entity.collaboratorUserId == entity.ownerUserId
-                        )
-                    }
-                    val hasOwner = mapped.any { it.isOwner }
+                val mapped = entities.map { entity ->
+                    Collaborator(
+                        id = entity.id,
+                        noteId = entity.noteId,
+                        userId = entity.collaboratorUserId,
+                        email = entity.collaboratorEmail,
+                        displayName = entity.collaboratorDisplayName,
+                        photoUrl = entity.collaboratorPhotoUrl,
+                        isOwner = entity.collaboratorUserId == entity.ownerUserId
+                    )
+                }
+                val hasOwner = mapped.any { it.isOwner }
+                val collaborators = if (!hasOwner && mapped.isNotEmpty() && currentUserId == currentOwnerId) {
                     val user = currentUser
-                    val collaborators = if (!hasOwner && user != null && currentUserId == currentOwnerId && mapped.isNotEmpty()) {
+                    if (user != null) {
                         val ownerEntry = Collaborator(
                             id = "owner_${user.uid}",
                             noteId = noteId,
@@ -192,9 +192,11 @@ class AddEditNoteViewModel @Inject constructor(
                             isOwner = true
                         )
                         listOf(ownerEntry) + mapped
-                    } else {
-                        mapped
-                    }
+                    } else mapped
+                } else {
+                    mapped
+                }
+                _uiState.update { state ->
                     state.copy(
                         collaborators = collaborators,
                         isLoadingCollaborators = false
@@ -202,10 +204,13 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
         }
-        // Fetch fresh data from remote
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingCollaborators = true) }
-            collaborationRepository.fetchAndCacheCollaborators(noteId)
+            try {
+                collaborationRepository.fetchAndCacheCollaborators(noteId)
+            } catch (e: Exception) {
+                Log.w("AddEditNoteViewModel", "Failed to fetch collaborators: ${e.message}")
+            }
             _uiState.update { it.copy(isLoadingCollaborators = false) }
         }
     }
