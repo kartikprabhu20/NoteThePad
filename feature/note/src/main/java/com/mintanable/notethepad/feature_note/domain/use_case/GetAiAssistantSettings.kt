@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.domain.use_case
 
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.database.preference.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -11,6 +12,6 @@ class GetAiAssistantSettings @Inject constructor(
 ) {
     operator fun invoke(): Flow<Boolean> =
         repository.settingsFlow
-            .map { it.aiAssistantEnabled }
+            .map { it.aiAssistantEnabled && FeatureFlags.aiAssistanceEnabled }
             .distinctUntilChanged()
 }

@@ -200,7 +200,7 @@ class NotesViewModel @Inject constructor(
             initialValue = false
         )
 
-    val aiAssistantEnabled: StateFlow<Boolean> = getAiAssistantSettings()
+    val isAiAssistantSupported: StateFlow<Boolean> = getAiAssistantSettings()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

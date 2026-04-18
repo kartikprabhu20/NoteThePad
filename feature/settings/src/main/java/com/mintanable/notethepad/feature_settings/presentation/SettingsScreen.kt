@@ -48,6 +48,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.components.TimePickerDialog
+import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.model.ai.AiModelDownloadStatus
 import com.mintanable.notethepad.core.model.backup.DriveFileMetadata
 import com.mintanable.notethepad.core.model.backup.LoadStatus
@@ -324,7 +325,7 @@ fun SettingsScreen(
                     )
                 }
 
-                if (BuildConfig.ENABLE_AI_ASSISTANCE) {
+                if (FeatureFlags.aiAssistanceEnabled) {
                     SettingSwitchItem(
                         title = stringResource(R.string.enable_ai_assistant_title),
                         subtitle = stringResource(R.string.enable_ai_assistant_subtitle),

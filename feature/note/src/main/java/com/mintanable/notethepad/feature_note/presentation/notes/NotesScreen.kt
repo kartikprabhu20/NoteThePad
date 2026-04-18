@@ -64,7 +64,6 @@ import com.mintanable.notethepad.database.db.entity.DetailedNote
 import com.mintanable.notethepad.database.db.entity.DrawerItem
 import com.mintanable.notethepad.database.db.entity.NoteEntity
 import com.mintanable.notethepad.core.model.settings.User
-import com.mintanable.notethepad.feature_ai.BuildConfig
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.NavigationDrawerViewModel
 import com.mintanable.notethepad.feature_note.presentation.navigationdrawer.components.AppDrawer
 import com.mintanable.notethepad.feature_note.R
@@ -106,8 +105,7 @@ fun NotesScreen(
     val supaSyncEnabled by notesViewModel.supaSyncEnabled.collectAsStateWithLifecycle()
     val isSupaSyncing by notesViewModel.isSupaSyncing.collectAsStateWithLifecycle()
     val aiAssistantState by aiAssistantViewModel.state.collectAsStateWithLifecycle()
-    val aiAssistantEnabled by notesViewModel.aiAssistantEnabled.collectAsStateWithLifecycle()
-    val isAiAssistantSupported = BuildConfig.ENABLE_AI_ASSISTANCE && aiAssistantEnabled
+    val isAiAssistantSupported by notesViewModel.isAiAssistantSupported.collectAsStateWithLifecycle()
     val noteToDelete by notesViewModel.noteToDelete.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()

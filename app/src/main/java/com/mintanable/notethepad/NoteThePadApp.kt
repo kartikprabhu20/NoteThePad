@@ -29,7 +29,9 @@ class NoteThePadApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        FeatureFlags.init(collaboration = BuildConfig.ENABLE_COLLABORATION)
+        FeatureFlags.init(
+            collaboration = BuildConfig.ENABLE_COLLABORATION,
+            aiAssistance = BuildConfig.ENABLE_AI_ASSISTANCE)
         analyticsTracker.setUserProperty("app_version", BuildConfig.VERSION_NAME)
         createNotificationChannels()
     }
