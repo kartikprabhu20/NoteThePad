@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Notiz löschen?</string>
     <string name="dialog_delete_message">Sind Sie sicher, dass Sie diese Notiz löschen möchten? Diese Aktion kann über die Snackbar oder das Archiv rückgängig gemacht werden.</string>
     <string name="btn_delete">Löschen</string>
+    <string name="dialog_login_and_cloudsync">Anmeldung und CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Stellen Sie sicher, dass Sie sich anmelden und CloudSync in den Einstellungen aktivieren, um mit anderen Benutzern zusammenzuarbeiten.</string>
+    <string name="btn_ok">OK</string>
 </resources>

@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Hapus catatan?</string>
     <string name="dialog_delete_message">Apakah Anda yakin ingin menghapus catatan ini? Tindakan ini dapat dibatalkan dari snackbar atau dari arsip.</string>
     <string name="btn_delete">Hapus</string>
+    <string name="dialog_login_and_cloudsync">Login dan CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Pastikan untuk login dan mengaktifkan CloudSync dari pengaturan untuk berkolaborasi dengan pengguna lain.</string>
+    <string name="btn_ok">Oke</string>
 </resources>

@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Eliminare la nota?</string>
     <string name="dialog_delete_message">Sei sicuro di voler eliminare questa nota? Questa azione può essere annullata dalla snackbar o dall\'archivio.</string>
     <string name="btn_delete">Elimina</string>
+    <string name="dialog_login_and_cloudsync">Accesso e CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Assicurati di accedere e abilitare CloudSync dalle impostazioni per collaborare con altri utenti.</string>
+    <string name="btn_ok">OK</string>
 </resources>

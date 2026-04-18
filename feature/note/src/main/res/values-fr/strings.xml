@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Supprimer la note ?</string>
     <string name="dialog_delete_message">Voulez-vous vraiment supprimer cette note ? Cette action peut être annulée depuis la barre de notification ou depuis l\'archive.</string>
     <string name="btn_delete">Supprimer</string>
+    <string name="dialog_login_and_cloudsync">Connexion et CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Assurez-vous de vous connecter et d\'activer CloudSync depuis les paramètres pour collaborer avec d\'autres utilisateurs.</string>
+    <string name="btn_ok">OK</string>
 </resources>

@@ -27,6 +27,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +51,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_note.R
-import com.mintanable.notethepad.feature_note.presentation.notes.util.NavigatationHelper
 import com.mintanable.notethepad.core.common.FeatureFlags
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.database.db.entity.AttachmentType
@@ -70,7 +70,6 @@ import com.mintanable.notethepad.feature_note.presentation.notes.MoreSettingsOpt
 import com.mintanable.notethepad.feature_note.presentation.notes.ReminderOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EditTextDialog
-import com.mintanable.notethepad.permissions.DeniedType
 import com.mintanable.notethepad.permissions.PermissionRationaleType
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -364,6 +363,21 @@ fun AddEditNoteScreen(
                         onClick = { viewModel.onEvent(AddEditNoteEvent.ConfirmStopImageQuery(false)) }
                     ) {
                         Text(stringResource(R.string.btn_continue))
+                    }
+                }
+            )
+        }
+
+        if (uiState.showLoginAndEnableCloudSyncDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onEvent(AddEditNoteEvent.OpenCollaborateSheet) },
+                title = { Text(stringResource(R.string.dialog_login_and_cloudsync)) },
+                text = { Text(stringResource(R.string.dialog_login_and_enable_cloudsync)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = { viewModel.onEvent(AddEditNoteEvent.OpenCollaborateSheet) }
+                    ) {
+                        Text(stringResource(R.string.btn_ok))
                     }
                 }
             )

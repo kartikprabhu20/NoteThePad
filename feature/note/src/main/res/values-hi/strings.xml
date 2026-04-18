@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">नोट हटाएं?</string>
     <string name="dialog_delete_message">क्या आप वाकई इस नोट को हटाना चाहते हैं? यह क्रिया स्नैकबार या आर्काइव से पूर्ववत की जा सकती है।</string>
     <string name="btn_delete">हटाएं</string>
+    <string name="dialog_login_and_cloudsync">लॉगिन और क्लाउडसिंक (CloudSync)</string>
+    <string name="dialog_login_and_enable_cloudsync">अन्य उपयोगकर्ताओं के साथ सहयोग करने के लिए सेटिंग्स से लॉगिन और क्लाउडसिंक (CloudSync) सक्षम करना सुनिश्चित करें।</string>
+    <string name="btn_ok">ठीक है</string>
 </resources>

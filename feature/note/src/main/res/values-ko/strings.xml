@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">메모를 삭제하시겠습니까?</string>
     <string name="dialog_delete_message">이 메모를 삭제하시겠습니까? 이 작업은 스낵바 또는 아카이브에서 실행 취소할 수 있습니다.</string>
     <string name="btn_delete">삭제</string>
+    <string name="dialog_login_and_cloudsync">로그인 및 CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">다른 사용자와 협업하려면 설정에서 로그인하고 CloudSync를 활성화하십시오。</string>
+    <string name="btn_ok">확인</string>
 </resources>

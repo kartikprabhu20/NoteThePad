@@ -1072,12 +1072,25 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
             AddEditNoteEvent.OpenCollaborateSheet -> {
-                if (currentNoteId.isNotBlank()) {
-                    _uiState.update { it.copy(currentSheetType = BottomSheetType.COLLABORATORS) }
-                } else {
-                    viewModelScope.launch {
-                        _eventFlow.emit(ShowSnackbar(appContext.getString(R.string.msg_save_before_collaborate)))
-                    }
+                if(_uiState.value.showLoginAndEnableCloudSyncDialog){
+                    _uiState.update { it.copy(showLoginAndEnableCloudSyncDialog = false) }
+                    return
+                }
+
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isSaving = true) }
+                    saveNote(currentNoteId)
+                        .onSuccess { id ->
+                            if(currentUser != null && userPreferencesRepository.settingsFlow.first().supaSyncEnabled) {
+                                _uiState.update { it.copy(isSaving = false, currentSheetType = BottomSheetType.COLLABORATORS) }
+                            } else {
+                                _uiState.update { it.copy(isSaving = false, currentSheetType = BottomSheetType.NONE, showLoginAndEnableCloudSyncDialog = true) }
+                            }
+                        }
+                        .onFailure { e ->
+                            _uiState.update { it.copy(isSaving = false, currentSheetType = BottomSheetType.NONE) }
+                            _eventFlow.emit(ShowSnackbar(e.message ?: appContext.getString(R.string.msg_save_failed)))
+                        }
                 }
             }
 

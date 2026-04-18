@@ -56,6 +56,7 @@ data class AddEditNoteUiState(
     val collaborators: List<Collaborator> = emptyList(),
     val isLoadingCollaborators: Boolean = false,
     val collaboratorError: String? = null,
+    val showLoginAndEnableCloudSyncDialog: Boolean = false,
     val isOwner: Boolean = true,
     val summary: String = "",
     val showDeleteConfirmation: Boolean = false

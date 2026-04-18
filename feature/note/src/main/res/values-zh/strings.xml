@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">删除笔记？</string>
     <string name="dialog_delete_message">您确定要删除此笔记吗？此操作可以从快消栏 या 归档中撤销।</string>
     <string name="btn_delete">删除</string>
+    <string name="dialog_login_and_cloudsync">登录和 CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">请务必登录并从设置中启用 CloudSync，以便与其他用户协作。</string>
+    <string name="btn_ok">确定</string>
 </resources>

@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Xóa ghi chú?</string>
     <string name="dialog_delete_message">Bạn có chắc chắn muốn xóa ghi chú này không? Hành động này có thể được hoàn tất từ thanh thông báo hoặc từ kho lưu trữ.</string>
     <string name="btn_delete">Xóa</string>
+    <string name="dialog_login_and_cloudsync">Đăng nhập và CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Hãy đảm bảo đăng nhập và bật CloudSync từ cài đặt để cộng tác với những người dùng khác.</string>
+    <string name="btn_ok">OK</string>
 </resources>

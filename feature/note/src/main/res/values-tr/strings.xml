@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Notu sil?</string>
     <string name="dialog_delete_message">Bu notu silmek istediğinizden emin misiniz? Bu işlem snackbar\'dan veya arşivden geri alınabilir.</string>
     <string name="btn_delete">Sil</string>
+    <string name="dialog_login_and_cloudsync">Giriş ve CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Diğer kullanıcılarla ortak çalışmak için ayarlardan giriş yapıp CloudSync\'i etkinleştirdiğinizden emin olun.</string>
+    <string name="btn_ok">Tamam</string>
 </resources>

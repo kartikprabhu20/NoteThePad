@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">حذف الملاحظة؟</string>
     <string name="dialog_delete_message">هل أنت متأكد من رغبتك في حذف هذه الملاحظة؟ يمكن التراجع عن هذا الإجراء من الشريط السفلي أو من الأرشيف.</string>
     <string name="btn_delete">حذف</string>
+    <string name="dialog_login_and_cloudsync">تسجيل الدخول والمزامنة السحابية (CloudSync)</string>
+    <string name="dialog_login_and_enable_cloudsync">تأكد من تسجيل الدخول وتمكين المزامنة السحابية (CloudSync) من الإعدادات للتعاون مع مستخدمين آخرين.</string>
+    <string name="btn_ok">موافق</string>
 </resources>

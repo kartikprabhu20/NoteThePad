@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">メモを削除しますか？</string>
     <string name="dialog_delete_message">このメモを削除してもよろしいですか？この操作はスナックバーまたはアーカイブから元に戻すことができます。</string>
     <string name="btn_delete">削除</string>
+    <string name="dialog_login_and_cloudsync">ログインとCloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">他のユーザーと共同作業するには、設定からログインしてCloudSyncを有効にしてください。</string>
+    <string name="btn_ok">OK</string>
 </resources>

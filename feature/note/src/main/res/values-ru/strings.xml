@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Удалить заметку?</string>
     <string name="dialog_delete_message">Вы уверены, что хотите удалить эту заметку? Это действие можно отменить из снэкбаरा или из архива.</string>
     <string name="btn_delete">Удалить</string>
+    <string name="dialog_login_and_cloudsync">Вход и CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Обязательно войдите в систему и включите CloudSync в настройках для совместной работы с другими пользователями.</string>
+    <string name="btn_ok">ОК</string>
 </resources>

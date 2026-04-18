@@ -127,4 +127,7 @@
     <string name="dialog_delete_title">Excluir nota?</string>
     <string name="dialog_delete_message">Tem certeza de que deseja excluir esta nota? Esta ação pode ser desfeita a partir da snackbar ou do arquivo.</string>
     <string name="btn_delete">Excluir</string>
+    <string name="dialog_login_and_cloudsync">Login e CloudSync</string>
+    <string name="dialog_login_and_enable_cloudsync">Certifique-se de fazer login e ativar o CloudSync nas configurações para colaborar com outros usuários.</string>
+    <string name="btn_ok">OK</string>
 </resources>
