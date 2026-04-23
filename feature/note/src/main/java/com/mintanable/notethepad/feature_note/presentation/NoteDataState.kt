@@ -11,7 +11,7 @@ data class NoteDataState(
     val noteColor: Int,
     val backgroundImage: Int,
     val attachedImages: List<Uri>,
-    val attachedPaints: List<String>,
+    val attachedPaints: List<Uri>,
     val attachedAudios: List<Attachment>,
     val reminderTime: Long,
     val checkListItems: List<CheckboxItem>,

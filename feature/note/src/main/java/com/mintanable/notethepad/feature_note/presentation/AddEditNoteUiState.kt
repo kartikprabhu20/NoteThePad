@@ -22,7 +22,7 @@ data class AddEditNoteUiState(
     val noteColor: Int = -1,
     val backgroundImage: Int = -1,
     val attachedImages: List<Uri> = emptyList(),
-    val attachedPaints: List<String> = emptyList(),
+    val attachedPaints: List<Uri> = emptyList(),
     val attachedAudios: List<Attachment> = emptyList(),
     val reminderTime: Long = -1L,
     val checkListItems: List<CheckboxItem> = emptyList(),

@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -268,9 +269,9 @@ fun AddEditNoteScreen(
                 ?.savedStateHandle
                 ?.get<String?>(PAINT_OLD_PATH_KEY)
             if (!oldPath.isNullOrBlank() && oldPath != newPath) {
-                viewModel.onEvent(AddEditNoteEvent.RemovePaint(oldPath))
+                viewModel.onEvent(AddEditNoteEvent.RemovePaint(oldPath.toUri()))
             }
-            viewModel.onEvent(AddEditNoteEvent.AttachPaint(newPath))
+            viewModel.onEvent(AddEditNoteEvent.AttachPaint(newPath.toUri()))
             navController.currentBackStackEntry?.savedStateHandle?.apply {
                 set(PAINT_RESULT_KEY, null)
                 set(PAINT_OLD_PATH_KEY, null)
@@ -312,7 +313,7 @@ fun AddEditNoteScreen(
             attachedImages = uiState.attachedImages,
             attachedPaints = uiState.attachedPaints,
             onPaintClick = { path ->
-                navController.navigate(Screen.PaintScreen.passArgs(path))
+                navController.navigate(Screen.PaintScreen.passArgs(path.toString()))
             },
             titleState = uiState.titleState,
             contentState = uiState.contentState,

@@ -37,14 +37,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import com.mintanable.notethepad.NoteColors
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
 import com.mintanable.notethepad.feature_note.presentation.modify.components.MagicButton
 import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
-import java.io.File
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 
@@ -56,9 +54,9 @@ fun LazyListScope.attachedImagesSection(
     isAnalyzeImageSupported: Boolean = false,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    paints: List<String> = emptyList(),
-    onRemovePaint: (String) -> Unit = {},
-    onPaintClick: (String) -> Unit = {}
+    paints: List<Uri> = emptyList(),
+    onRemovePaint: (Uri) -> Unit = {},
+    onPaintClick: (Uri) -> Unit = {}
 ) {
     if (images.isEmpty() && paints.isEmpty()) return
 
@@ -102,7 +100,7 @@ fun LazyListScope.attachedImagesSection(
                     ) { path ->
                         Box {
                             AttachedImageItem(
-                                uri = File(path).toUri(),
+                                uri = path,
                                 onDelete = { onRemovePaint(path) },
                                 onClick = { onPaintClick(path) }
                             )

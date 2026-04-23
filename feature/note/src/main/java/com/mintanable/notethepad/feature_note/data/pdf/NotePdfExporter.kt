@@ -48,6 +48,10 @@ class NotePdfExporter @Inject constructor(
                 decodeBitmap(uri)?.let { renderer.drawImage(it) }
             }
 
+            state.attachedPaints.forEach { uri ->
+                decodeBitmap(uri)?.let { renderer.drawImage(it) }
+            }
+
             if (state.isCheckboxListAvailable) {
                 state.checkListItems.forEach { item ->
                     val prefix = if (item.isChecked) "\u2611 " else "\u2610 "

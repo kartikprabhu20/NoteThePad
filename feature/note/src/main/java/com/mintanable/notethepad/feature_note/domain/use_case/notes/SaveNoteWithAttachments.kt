@@ -39,7 +39,7 @@ class SaveNoteWithAttachments(
         tagEntities: List<TagEntity> = emptyList(),
         backgroundImage: Int = -1,
         summary: String = "",
-        paintUris: List<String> = emptyList()
+        paintUris: List<Uri> = emptyList()
     ) : Result<String> {
 
         Log.d("kptest", "SaveNoteWithAttachments invoke: ${imageUris+audioUris}")
@@ -66,6 +66,11 @@ class SaveNoteWithAttachments(
                }
                json.toString()
            }
+
+           val paintUriList = paintUris.mapNotNull { uri ->
+               fileManager.saveMediaToStorage(uri, fileManager.getAttachmentType(uri).name.lowercase())
+           }
+
            val noteToInsert = if (id != null && id.isNotBlank()) {
                 NoteEntity(
                     id = id,
@@ -79,7 +84,7 @@ class SaveNoteWithAttachments(
                     audioTranscriptions = transcriptionsJson,
                     backgroundImage = backgroundImage,
                     summary = summary,
-                    paintUris = paintUris
+                    paintUris = paintUriList
                 )
             } else {
                 NoteEntity(
@@ -93,7 +98,7 @@ class SaveNoteWithAttachments(
                     audioTranscriptions = transcriptionsJson,
                     backgroundImage = backgroundImage,
                     summary = summary,
-                    paintUris = paintUris
+                    paintUris = paintUriList
                 )
             }
            val newNoteEntityId = repository.insertNote(noteToInsert, tagEntities)

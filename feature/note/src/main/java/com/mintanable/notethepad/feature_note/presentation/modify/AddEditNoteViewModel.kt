@@ -297,7 +297,7 @@ class AddEditNoteViewModel @Inject constructor(
                         noteColor = detailedNote.color,
                         backgroundImage = detailedNote.backgroundImage,
                         attachedImages = detailedNote.imageUris.map { imgString -> imgString.toUri() },
-                        attachedPaints = detailedNote.paintUris,
+                        attachedPaints = detailedNote.paintUris.map { paintString -> paintString.toUri() },
                         attachedAudios = detailedNote.audioAttachments,
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,
@@ -539,15 +539,15 @@ class AddEditNoteViewModel @Inject constructor(
 
             is AddEditNoteEvent.AttachPaint -> {
                 _uiState.update { state ->
-                    if (state.attachedPaints.contains(event.path)) state
-                    else state.copy(attachedPaints = state.attachedPaints + event.path)
+                    if (state.attachedPaints.contains(event.uri)) state
+                    else state.copy(attachedPaints = state.attachedPaints + event.uri)
                 }
             }
 
             is AddEditNoteEvent.RemovePaint -> {
                 analyticsTracker.track(AttachmentRemoved("paint"))
-                _uiState.update { it.copy(attachedPaints = it.attachedPaints - event.path) }
-                viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.path)) }
+                _uiState.update { it.copy(attachedPaints = it.attachedPaints - event.uri) }
+                viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
             }
 
             is AddEditNoteEvent.RemoveAudio -> {
@@ -1412,7 +1412,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
             fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri })
-            fileIOUseCases.deleteFiles(_uiState.value.attachedPaints)
+            fileIOUseCases.deleteFiles(_uiState.value.attachedPaints.map { it.toString() })
             if (currentNoteId.isNotBlank()) {
                 noteUseCases.deleteNote(currentNoteId)
             }
