@@ -40,4 +40,13 @@ sealed class Screen(val route:String){
     data object HelpAndFeedbackScreen : Screen("help_and_feedback_screen")
     data object AiModelSelectionScreen : Screen("ai_model_selection_screen")
     data object OnboardingScreen : Screen("onboarding_screen")
+
+    data object PaintScreen : Screen("paint_screen?attachmentPath={attachmentPath}") {
+        fun passArgs(attachmentPath: String? = null): String {
+            val encoded = attachmentPath?.takeIf { it.isNotBlank() }
+                ?.let { android.net.Uri.encode(it) }
+                .orEmpty()
+            return "paint_screen?attachmentPath=$encoded"
+        }
+    }
 }

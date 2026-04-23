@@ -44,6 +44,7 @@ import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SingleNoteWidgetReceiver
 import com.mintanable.notethepad.feature_note.presentation.modify.AddEditNoteScreen
 import com.mintanable.notethepad.feature_note.presentation.notes.NotesScreen
+import com.mintanable.notethepad.feature_note.presentation.paint.PaintScreen
 import com.mintanable.notethepad.feature_calendar.CalendarScreen
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.feature_settings.SettingsViewModel
@@ -364,6 +365,20 @@ class MainActivity : AppCompatActivity() {
                             composable(route = Screen.HelpAndFeedbackScreen.route) {
                                 HelpAndFeedbackScreen(
                                     onBackPressed = { navController.navigateUp() }
+                                )
+                            }
+                            composable(
+                                route = Screen.PaintScreen.route,
+                                arguments = listOf(
+                                    navArgument(name = "attachmentPath") {
+                                        type = NavType.StringType; nullable = true; defaultValue = null
+                                    }
+                                )
+                            ) {
+                                PaintScreen(
+                                    navController = navController,
+                                    attachmentPath = it.arguments?.getString("attachmentPath")
+                                        ?.takeIf { p -> p.isNotBlank() }
                                 )
                             }
                         }
