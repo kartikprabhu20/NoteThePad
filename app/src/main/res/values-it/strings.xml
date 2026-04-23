@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Apri le Impostazioni e accedi con Google.\nAttiva il backup automatico e scegli una frequenza.\nUsa Esegui backup ora per un backup immediato o Ripristina ora per recuperarne uno precedente.</string>
     <string name="help_item_cloud_sync_title">Abilita la sincronizzazione cloud tra dispositivi</string>
     <string name="help_item_cloud_sync_steps">Accedi con Google dalle Impostazioni o dal cassetto.\nAttiva CloudSync nelle Impostazioni.\nLe tue note vengono sincronizzate in tempo reale sui tuoi dispositivi su cui hai effettuato l\'accesso (i file multimediali non vengono sincronizzati).</string>
+
+    <string name="setting_delete_cloud_data_title">Elimina tutti i dati cloud</string>
+    <string name="setting_delete_cloud_data_subtitle">Rimuovi le tue note da CloudSync e tutti i backup da Google Drive. Le note salvate localmente su questo dispositivo vengono conservate.</string>
+    <string name="dialog_delete_cloud_data_title">Eliminare tutti i dati cloud?</string>
+    <string name="dialog_delete_cloud_data_description">Questo rimuoverà permanentemente le tue note, i tag e i backup da CloudSync (Supabase) e Google Drive. Le note condivise con te da altri utenti e quelle salvate localmente su questo dispositivo non saranno interessate. Questa azione non può essere annullata.</string>
+    <string name="msg_cloud_data_deleted">Dati cloud eliminati</string>
 </resources>

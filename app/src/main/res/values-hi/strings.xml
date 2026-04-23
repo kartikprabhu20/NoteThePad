@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">सेटिंग्स खोलें और Google से साइन इन करें।\nऑटोमैटिक बैकअप चालू करें और फ्रीक्वेंसी चुनें।\nतत्काल बैकअप के लिए अभी बैकअप लें (Backup Now) का उपयोग करें, या पिछले बैकअप को रिकवर करने के लिए अभी रिस्टोर करें (Restore Now) का उपयोग करें।</string>
     <string name="help_item_cloud_sync_title">डिवाइसों के बीच क्लाउड सिंक सक्षम करें</string>
     <string name="help_item_cloud_sync_steps">सेटिंग्स या ड्रॉर से Google के साथ साइन इन करें।\nसेटिंग्स में CloudSync चालू करें।\nआपके नोट्स आपके साइन-इन किए गए डिवाइसों पर रीयल टाइम में सिंक होते हैं (मीडिया सिंक नहीं होता है)।</string>
+
+    <string name="setting_delete_cloud_data_title">सभी क्लाउड डेटा हटाएं</string>
+    <string name="setting_delete_cloud_data_subtitle">अपने नोट्स को क्लाउड सिंक और Google ड्राइव के सभी बैकअप से हटा दें। इस डिवाइस पर स्थानीय रूप से सहेजे गए नोट्स सुरक्षित रहते हैं।</string>
+    <string name="dialog_delete_cloud_data_title">सभी क्लाउड डेटा हटाएं?</string>
+    <string name="dialog_delete_cloud_data_description">यह क्लाउड सिंक (Supabase) और Google ड्राइव से आपके नोट्स, टैग और बैकअप को स्थायी रूप से हटा देता है। अन्य उपयोगकर्ताओं द्वारा आपके साथ साझा किए गए नोट्स और इस डिवाइस पर स्थानीय रूप से सहेजे गए नोट्स प्रभावित नहीं होते हैं। इसे पूर्ववत नहीं किया जा सकता।</string>
+    <string name="msg_cloud_data_deleted">क्लाउड डेटा हटा दिया गया</string>
 </resources>

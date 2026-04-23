@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">افتح الإعدادات وسجل الدخول باستخدام Google.\nقم بتشغيل النسخ الاحتياطي التلقائي واختيار تكرار.\nاستخدم "النسخ الاحتياطي الآن" لنسخ احتياطي فوري، أو "استعادة الآن" لاستعادة نسخة سابقة.</string>
     <string name="help_item_cloud_sync_title">تمكين مزامنة السحابة عبر الأجهزة</string>
     <string name="help_item_cloud_sync_steps">سجل الدخول باستخدام Google من الإعدادات أو الدرج.\nقم بتشغيل مزامنة السحابة (CloudSync) في الإعدادات.\nتتم مزامنة ملاحظاتك في الوقت الفعلي عبر أجهزتك المسجلة الدخول (لا تتم مزامنة الوسائط).</string>
+
+    <string name="setting_delete_cloud_data_title">حذف جميع البيانات السحابية</string>
+    <string name="setting_delete_cloud_data_subtitle">قم بإزالة ملاحظاتك من مزامنة السحابة وجميع النسخ الاحتياطية من Google Drive. يتم الاحتفاظ بالملاحظات المحفوظة محليًا على هذا الجهاز.</string>
+    <string name="dialog_delete_cloud_data_title">حذف جميع البيانات السحابية؟</string>
+    <string name="dialog_delete_cloud_data_description">سيؤدي هذا إلى إزالة ملاحظاتك وعلاماتك ونسخك الاحتياطية نهائيًا من مزامنة السحابة (Supabase) وGoogle Drive. لا تتأثر الملاحظات التي شاركها معك مستخدمون آخرون والملاحظات المحفوظة محليًا على هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="msg_cloud_data_deleted">تم حذف البيانات السحابية</string>
 </resources>

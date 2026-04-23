@@ -58,4 +58,10 @@
 
     <string name="help_item_cloud_sync_title">Enable cloud sync across devices</string>
     <string name="help_item_cloud_sync_steps">Sign in with Google from Settings or the drawer.\nTurn on CloudSync in Settings.\nYour notes sync in real time across your signed-in devices (media isn\'t synced).</string>
+
+    <string name="setting_delete_cloud_data_title">Delete all cloud data</string>
+    <string name="setting_delete_cloud_data_subtitle">Remove your notes from CloudSync and all backups from Google Drive. Notes saved locally on this device are kept.</string>
+    <string name="dialog_delete_cloud_data_title">Delete all cloud data?</string>
+    <string name="dialog_delete_cloud_data_description">This permanently removes your notes, tags, and backups from CloudSync (Supabase) and Google Drive. Notes shared with you by other users, and notes saved locally on this device, are not affected. This cannot be undone.</string>
+    <string name="msg_cloud_data_deleted">Cloud data deleted</string>
 </resources>

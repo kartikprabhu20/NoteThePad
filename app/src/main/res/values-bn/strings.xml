@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">সেটিংস খুলুন এবং গুগল দিয়ে সাইন ইন করুন।\nস্বয়ংক্রিয় ব্যাকআপ চালু করুন এবং একটি ফ্রিকোয়েন্সি চয়ন করুন।\nতাত্ক্ষণিক ব্যাকআপের জন্য ব্যাকআপ নাও (Backup Now) ব্যবহার করুন, অথবা পূর্ববর্তীটি পুনরুদ্ধার করতে রিস্টোর নাও (Restore Now) ব্যবহার করুন।</string>
     <string name="help_item_cloud_sync_title">ডিভাইস জুড়ে ক্লাউড সিঙ্ক সক্ষম করুন</string>
     <string name="help_item_cloud_sync_steps">সেটিংস বা ড্রয়ার থেকে গুগল দিয়ে সাইন ইন করুন।\nসেটিংসে CloudSync চালু করুন।\nআপনার নোটগুলি আপনার সাইন-ইন করা ডিভাইসগুলিতে রিয়েল টাইমে সিঙ্ক হয় (মিডিয়া সিঙ্ক হয় না)।</string>
+
+    <string name="setting_delete_cloud_data_title">সমস্ত ক্লাউড ডেটা মুছুন</string>
+    <string name="setting_delete_cloud_data_subtitle">আপনার নোটগুলি ক্লাউড সিঙ্ক এবং গুগল ড্রাইভের সমস্ত ব্যাকআপ থেকে সরান। এই ডিভাইসে স্থানীয়ভাবে সংরক্ষিত নোটগুলি রাখা হয়েছে।</string>
+    <string name="dialog_delete_cloud_data_title">সমস্ত ক্লাউড ডেটা মুছবেন?</string>
+    <string name="dialog_delete_cloud_data_description">এটি ক্লাউড সিঙ্ক (সুপাবেস) এবং গুগল ড্রাইভ থেকে আপনার নোট, ট্যাগ এবং ব্যাকআপগুলিকে স্থায়ীভাবে সরিয়ে দেয়। অন্য ব্যবহারকারীদের দ্বারা আপনার সাথে ভাগ করা নোট এবং এই ডিভাইসে স্থানীয়ভাবে সংরক্ষিত নোটগুলি প্রভাবিত হয় না। এটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
+    <string name="msg_cloud_data_deleted">ক্লাউড ডেটা মুছে ফেলা হয়েছে</string>
 </resources>

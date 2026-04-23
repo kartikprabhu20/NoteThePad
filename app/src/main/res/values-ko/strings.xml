@@ -45,4 +45,10 @@
 <string name="help_item_backup_restore_steps">설정을 열고 Google로 로그인합니다.\n자동 백업을 켜고 빈도를 선택합니다.\n즉시 백업하려면 \'지금 백업\'을 사용하고, 이전 상태를 복구하려면 \'지금 복원\'을 사용합니다.</string>
     <string name="help_item_cloud_sync_title">기기 간 클라우드 동기화 활성화하기</string>
     <string name="help_item_cloud_sync_steps">설정 또는 드로어에서 Google로 로그인합니다.\n설정에서 CloudSync를 켭니다.\n메모는 로그인된 기기 간에 실시간으로 동기화됩니다(미디어는 동기화되지 않음).</string>
+
+    <string name="setting_delete_cloud_data_title">모든 클라우드 데이터 삭제</string>
+    <string name="setting_delete_cloud_data_subtitle">CloudSync에서 메모를 제거하고 Google 드라이브에서 모든 백업을 삭제합니다. 이 기기에 로컬로 저장된 메모는 유지됩니다.</string>
+    <string name="dialog_delete_cloud_data_title">모든 클라우드 데이터를 삭제할까요?</string>
+    <string name="dialog_delete_cloud_data_description">이 작업은 CloudSync(Supabase) 및 Google 드라이브에서 메모, 태그 및 백업을 영구적으로 제거합니다. 다른 사용자가 공유한 메모와 이 기기에 로컬로 저장된 메모는 영향을 받지 않습니다. 이 작업은 취소할 수 없습니다.</string>
+    <string name="msg_cloud_data_deleted">클라우드 데이터가 삭제됨</string>
 </resources>

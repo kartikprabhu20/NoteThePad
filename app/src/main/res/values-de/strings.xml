@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Öffnen Sie die Einstellungen und melden Sie sich mit Google an.\nSchalten Sie die automatische Sicherung ein und wählen Sie ein Intervall.\nWählen Sie Jetzt sichern für eine sofortige Sicherung oder Jetzt wiederherstellen, um eine vorherige wiederherzustellen.</string>
     <string name="help_item_cloud_sync_title">Cloud-Synchronisierung geräteübergreifend aktivieren</string>
     <string name="help_item_cloud_sync_steps">Melden Sie sich über die Einstellungen oder das Seitenmenü mit Google an.\nAktivieren Sie CloudSync in den Einstellungen.\nIhre Notizen werden in Echtzeit auf Ihren angemeldeten Geräten synchronisiert (Medien werden nicht synchronisiert).</string>
+
+    <string name="setting_delete_cloud_data_title">Alle Cloud-Daten löschen</string>
+    <string name="setting_delete_cloud_data_subtitle">Entfernen Sie Ihre Notizen aus CloudSync und alle Backups aus Google Drive. Lokal auf diesem Gerät gespeicherte Notizen bleiben erhalten.</string>
+    <string name="dialog_delete_cloud_data_title">Alle Cloud-Daten löschen?</string>
+    <string name="dialog_delete_cloud_data_description">Dies entfernt dauerhaft Ihre Notizen, Tags und Backups aus CloudSync (Supabase) und Google Drive. Notizen, die von anderen Benutzern mit Ihnen geteilt wurden, und lokal auf diesem Gerät gespeicherte Notizen sind nicht betroffen. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="msg_cloud_data_deleted">Cloud-Daten gelöscht</string>
 </resources>

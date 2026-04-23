@@ -149,6 +149,11 @@
     <string name="setting_privacy">Privacy</string>
     <string name="setting_analytics_toggle">Share usage data</string>
     <string name="setting_analytics_description">Help improve NoteThePad by sharing anonymous usage data</string>
+    <string name="setting_delete_cloud_data_title">Delete all cloud data</string>
+    <string name="setting_delete_cloud_data_subtitle">Remove your notes from CloudSync and all backups from Google Drive. Notes saved locally on this device are kept.</string>
+    <string name="dialog_delete_cloud_data_title">Delete all cloud data?</string>
+    <string name="dialog_delete_cloud_data_description">This permanently removes your notes, tags, and backups from CloudSync (Supabase) and Google Drive. Notes shared with you by other users, and notes saved locally on this device, are not affected. This cannot be undone.</string>
+    <string name="msg_cloud_data_deleted">Cloud data deleted</string>
 
     <!-- Help and Feedback -->
     <string name="help_and_feedback_title">Help and Feedback</string>

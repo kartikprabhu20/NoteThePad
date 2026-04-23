@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">打开“设置”并使用 Google 登录。\n开启自动备份并选择频率。\n使用“立即备份”进行即时备份，或使用“立即恢复”恢复以前的版本。</string>
     <string name="help_item_cloud_sync_title">启用跨设备云同步</string>
     <string name="help_item_cloud_sync_steps">从“设置”或抽屉中使用 Google 登录。\n在“设置”中开启 CloudSync。\n您的笔记将在已登录设备之间实时同步（媒体文件不进行同步）。</string>
+
+    <string name="setting_delete_cloud_data_title">删除所有云数据</string>
+    <string name="setting_delete_cloud_data_subtitle">从 CloudSync 中删除您的笔记以及从 Google 云端硬盘中删除所有备份。保存在此设备上的本地笔记将被保留。</string>
+    <string name="dialog_delete_cloud_data_title">删除所有云数据？</string>
+    <string name="dialog_delete_cloud_data_description">这将永久从 CloudSync (Supabase) 和 Google 云端硬盘中删除您的笔记、标签和备份。其他用户与您共享的笔记以及保存在此设备上的本地笔记不受影响。此操作无法撤销。</string>
+    <string name="msg_cloud_data_deleted">云数据已删除</string>
 </resources>

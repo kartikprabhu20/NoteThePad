@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Buka Setelan dan masuk with Google.\nAktifkan Cadangan otomatis dan pilih frekuensi.\nGunakan Cadangkan Sekarang untuk pencadangan segera, atau Pulihkan Sekarang untuk memulihkan yang sebelumnya.</string>
     <string name="help_item_cloud_sync_title">Aktifkan sinkronisasi awan antar perangkat</string>
     <string name="help_item_cloud_sync_steps">Masuk dengan Google dari Setelan atau laci.\nAktifkan CloudSync di Setelan.\nCatatan Anda disinkronkan secara real-time di perangkat Anda yang sudah masuk (media tidak disinkronkan).</string>
+
+    <string name="setting_delete_cloud_data_title">Hapus semua data cloud</string>
+    <string name="setting_delete_cloud_data_subtitle">Hapus catatan Anda dari CloudSync dan semua cadangan dari Google Drive. Catatan yang disimpan secara lokal di perangkat ini tetap ada.</string>
+    <string name="dialog_delete_cloud_data_title">Hapus semua data cloud?</string>
+    <string name="dialog_delete_cloud_data_description">Ini akan menghapus catatan, tag, dan cadangan Anda secara permanen dari CloudSync (Supabase) dan Google Drive. Catatan yang dibagikan kepada Anda oleh pengguna lain, dan catatan yang disimpan secara lokal di perangkat ini, tidak akan terpengaruh. Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="msg_cloud_data_deleted">Data cloud dihapus</string>
 </resources>

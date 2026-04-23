@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">設定を開き、Googleでログインします。\n自動バックアップをオンにし、頻度を選択します。\nすぐにバックアップするには「今すぐバックアップ」を、以前の状態に戻すには「今すぐ復元」を使用します。</string>
     <string name="help_item_cloud_sync_title">デバイス間のクラウド同期を有効にする</string>
     <string name="help_item_cloud_sync_steps">設定またはドロワーからGoogleでログインします。\n設定でCloudSyncをオンにします。\nメモは、ログインしているデバイス間でリアルタイムに同期されます（メディアは同期されません）。</string>
+
+    <string name="setting_delete_cloud_data_title">すべてのクラウドデータを削除</string>
+    <string name="setting_delete_cloud_data_subtitle">CloudSyncからノートを削除し、Googleドライブからすべてのバックアップを削除します。このデバイスにローカルに保存されているノートは保持されます。</string>
+    <string name="dialog_delete_cloud_data_title">すべてのクラウドデータを削除しますか？</string>
+    <string name="dialog_delete_cloud_data_description">これにより、CloudSync (Supabase) および Google ドライブからノート、タグ、バックアップが永久に削除されます。他のユーザーから共有されたノートや、このデバイスにローカルに保存されているノートには影響ありません。この操作は取り消せません。</string>
+    <string name="msg_cloud_data_deleted">クラウドデータが削除されました</string>
 </resources>

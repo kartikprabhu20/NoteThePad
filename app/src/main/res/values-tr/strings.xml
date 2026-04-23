@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Ayarlar\'ı açın ve Google ile giriş yapın.\nOtomatik yedeklemeyi açın ve bir sıklık seçin.\nHemen yedeklemek için \"Şimdi Yedekle\"yi, önceki bir yedeklemeyi geri getirmek için \"Şimdi Geri Yükle\"yi kullanın.</string>
     <string name="help_item_cloud_sync_title">Cihazlar arası bulut senkronizasyonunu etkinleştirme</string>
     <string name="help_item_cloud_sync_steps">Ayarlar\'dan veya çekmeceden Google ile giriş yapın.\nAyarlar\'da CloudSync\'i açın.\nNotlarınız, giriş yaptığınız cihazlar arasında gerçek zamanlı olarak senkronize edilir (medya senkronize edilmez).</string>
+
+    <string name="setting_delete_cloud_data_title">Tüm bulut verilerini sil</string>
+    <string name="setting_delete_cloud_data_subtitle">Notlarınızı CloudSync\'ten ve tüm yedekleri Google Drive\'dan kaldırın. Bu cihazda yerel olarak kaydedilen notlar korunur.</string>
+    <string name="dialog_delete_cloud_data_title">Tüm bulut verileri silinsin mi?</string>
+    <string name="dialog_delete_cloud_data_description">Bu işlem notlarınızı, etiketlerinizi ve yedeklerinizi CloudSync (Supabase) ve Google Drive\'dan kalıcı olarak kaldırır. Diğer kullanıcıların sizinle paylaştığı notlar ve bu cihazda yerel olarak kaydedilen notlar etkilenmez. Bu işlem geri alınamaz.</string>
+    <string name="msg_cloud_data_deleted">Bulut verileri silindi</string>
 </resources>

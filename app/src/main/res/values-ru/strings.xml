@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Откройте настройки и войдите в аккаунт Google.\nВключите авторезервирование и выберите частоту.\nИспользуйте «Создать копию сейчас» для немедленного сохранения или «Восстановить сейчас» для возврата к предыдущей копии.</string>
     <string name="help_item_cloud_sync_title">Облачная синхронизация между устройствами</string>
     <string name="help_item_cloud_sync_steps">Войдите в аккаунт Google в настройках или боковом меню.\nВключите CloudSync в настройках.\nВаши заметки будут синхронизироваться в режиме реального времени на всех устройствах, где выполнен вход (медиафайлы не синхронизируются).</string>
+
+    <string name="setting_delete_cloud_data_title">Удалить все облачные данные</string>
+    <string name="setting_delete_cloud_data_subtitle">Удалите свои заметки из CloudSync и все резервные копии из Google Drive. Заметки, сохраненные локально на этом устройстве, сохраняются.</string>
+    <string name="dialog_delete_cloud_data_title">Удалить все облачные данные?</string>
+    <string name="dialog_delete_cloud_data_description">Это навсегда удалит ваши заметки, теги и резервные копии из CloudSync (Supabase) и Google Drive. Заметки, которыми с вами поделились другие пользователи, и заметки, сохраненные локально на этом устройстве, затронуты не будут. Это действие нельзя отменить.</string>
+    <string name="msg_cloud_data_deleted">Облачные данные удалены</string>
 </resources>

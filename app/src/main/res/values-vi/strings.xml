@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Mở Cài đặt và đăng nhập bằng Google.\nBật Sao lưu tự động và chọn tần suất.\nSử dụng Sao lưu ngay để sao lưu ngay lập tức hoặc Khôi phục ngay để khôi phục bản sao lưu trước đó.</string>
     <string name="help_item_cloud_sync_title">Bật đồng bộ hóa đám mây giữa các thiết bị</string>
     <string name="help_item_cloud_sync_steps">Đăng nhập bằng Google từ Cài đặt hoặc ngăn kéo.\nBật CloudSync trong Cài đặt.\nGhi chú của bạn được đồng bộ hóa theo thời gian thực trên các thiết bị đã đăng nhập (tệp đa phương tiện không được đồng bộ hóa).</string>
+
+    <string name="setting_delete_cloud_data_title">Xóa tất cả dữ liệu đám mây</string>
+    <string name="setting_delete_cloud_data_subtitle">Xóa các ghi chú của bạn khỏi CloudSync và tất cả các bản sao lưu khỏi Google Drive. Các ghi chú được lưu cục bộ trên thiết bị này vẫn được giữ lại.</string>
+    <string name="dialog_delete_cloud_data_title">Xóa tất cả dữ liệu đám mây?</string>
+    <string name="dialog_delete_cloud_data_description">Thao tác này sẽ xóa vĩnh viễn các ghi chú, thẻ và bản sao lưu của bạn khỏi CloudSync (Supabase) và Google Drive. Các ghi chú được chia sẻ với bạn bởi người dùng khác và các ghi chú được lưu cục bộ trên thiết bị này sẽ không bị ảnh hưởng. Thao tác này không thể hoàn tác.</string>
+    <string name="msg_cloud_data_deleted">Đã xóa dữ liệu đám mây</string>
 </resources>

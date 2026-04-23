@@ -45,4 +45,10 @@
     <string name="help_item_backup_restore_steps">Abre Configuración e inicia sesión con Google.\nActiva la Copia de seguridad automática y elige una frecuencia.\nUsa Realizar copia ahora para una copia inmediata, o Restaurar ahora para recuperar una anterior.</string>
     <string name="help_item_cloud_sync_title">Activar la sincronización en la nube en todos los dispositivos</string>
     <string name="help_item_cloud_sync_steps">Inicia sesión con Google desde Configuración o el panel lateral.\nActiva CloudSync en Configuración.\nTus notas se sincronizarán en tiempo real en tus dispositivos con sesión iniciada (los archivos multimedia no se sincronizan).</string>
+
+    <string name="setting_delete_cloud_data_title">Eliminar todos los datos en la nube</string>
+    <string name="setting_delete_cloud_data_subtitle">Elimina tus notas de CloudSync y todas las copias de seguridad de Google Drive. Las notas guardadas localmente en este dispositivo se mantienen.</string>
+    <string name="dialog_delete_cloud_data_title">¿Eliminar todos los datos en la nube?</string>
+    <string name="dialog_delete_cloud_data_description">Esto elimina permanentemente sus notas, etiquetas y copias de seguridad de CloudSync (Supabase) y Google Drive. Las notas compartidas con usted por otros usuarios y las notas guardadas localmente en este dispositivo no se ven afectadas. Esto no se puede deshacer.</string>
+    <string name="msg_cloud_data_deleted">Datos en la nube eliminados</string>
 </resources>
