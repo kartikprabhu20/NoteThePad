@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Données cloud supprimées</string>
 
     <string name="option_paint">Peindre</string>
+
+    <string name="paint_clear_canvas">Effacer le canevas</string>
+    <string name="paint_clear_canvas_dialog_title">Effacer le canevas ?</string>
+    <string name="paint_clear_canvas_dialog_message">Cela effacera tout ce que vous avez dessiné. Cette action est irréversible.</string>
+    <string name="btn_clear">Effacer</string>
 </resources>

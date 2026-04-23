@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Đã xóa dữ liệu đám mây</string>
 
     <string name="option_paint">Vẽ</string>
+
+    <string name="paint_clear_canvas">Xóa khung vẽ</string>
+    <string name="paint_clear_canvas_dialog_title">Xóa khung vẽ?</string>
+    <string name="paint_clear_canvas_dialog_message">Thao tác này sẽ xóa mọi thứ bạn đã vẽ. Thao tác này không thể hoàn tác.</string>
+    <string name="btn_clear">Xóa</string>
 </resources>

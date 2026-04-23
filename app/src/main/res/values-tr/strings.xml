@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Bulut verileri silindi</string>
 
     <string name="option_paint">Boya</string>
+
+    <string name="paint_clear_canvas">Tuvali temizle</string>
+    <string name="paint_clear_canvas_dialog_title">Tuval temizlensin mi?</string>
+    <string name="paint_clear_canvas_dialog_message">Bu, çizdiğiniz her şeyi silecektir. Bu işlem geri alınamaz.</string>
+    <string name="btn_clear">Temizle</string>
 </resources>

@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">ক্লাউড ডেটা মুছে ফেলা হয়েছে</string>
 
     <string name="option_paint">পেইন্ট</string>
+
+    <string name="paint_clear_canvas">ক্যানভাস মুছুন</string>
+    <string name="paint_clear_canvas_dialog_title">ক্যানভাস মুছবেন?</string>
+    <string name="paint_clear_canvas_dialog_message">এটি আপনার আঁকা সবকিছু মুছে দেবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
+    <string name="btn_clear">মুছুন</string>
 </resources>

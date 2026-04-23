@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">云数据已删除</string>
 
     <string name="option_paint">画画</string>
+
+    <string name="paint_clear_canvas">清空画布</string>
+    <string name="paint_clear_canvas_dialog_title">清空画布？</string>
+    <string name="paint_clear_canvas_dialog_message">这将擦除您绘制的所有内容。此操作无法撤销。</string>
+    <string name="btn_clear">清空</string>
 </resources>

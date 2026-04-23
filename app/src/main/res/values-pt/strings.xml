@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Dados na nuvem excluídos</string>
 
     <string name="option_paint">Pintar</string>
+
+    <string name="paint_clear_canvas">Limpar tela</string>
+    <string name="paint_clear_canvas_dialog_title">Limpar tela?</string>
+    <string name="paint_clear_canvas_dialog_message">Isso apagará tudo o que você desenhou. Esta ação não pode ser desfeita.</string>
+    <string name="btn_clear">Limpar</string>
 </resources>

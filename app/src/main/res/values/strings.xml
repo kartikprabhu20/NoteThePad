@@ -72,4 +72,9 @@
     <string name="msg_cloud_data_deleted">Cloud data deleted</string>
 
     <string name="option_paint">Paint</string>
+
+    <string name="paint_clear_canvas">Clear canvas</string>
+    <string name="paint_clear_canvas_dialog_title">Clear canvas?</string>
+    <string name="paint_clear_canvas_dialog_message">This will erase everything you\'ve drawn. This action cannot be undone.</string>
+    <string name="btn_clear">Clear</string>
 </resources>

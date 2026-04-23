@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">क्लाउड डेटा हटा दिया गया</string>
 
     <string name="option_paint">पेंट</string>
+
+    <string name="paint_clear_canvas">कैनवास साफ करें</string>
+    <string name="paint_clear_canvas_dialog_title">कैनवास साफ करें?</string>
+    <string name="paint_clear_canvas_dialog_message">यह आपके द्वारा खींची गई हर चीज़ को मिटा देगा। इस क्रिया को पूर्ववत नहीं किया जा सकता है।</string>
+    <string name="btn_clear">साफ करें</string>
 </resources>

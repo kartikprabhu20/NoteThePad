@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">クラウドデータが削除されました</string>
 
     <string name="option_paint">ペイント</string>
+
+    <string name="paint_clear_canvas">キャンバスをクリア</string>
+    <string name="paint_clear_canvas_dialog_title">キャンバスをクリアしますか？</string>
+    <string name="paint_clear_canvas_dialog_message">描いたものがすべて消去されます。この操作は取り消せません。</string>
+    <string name="btn_clear">クリア</string>
 </resources>

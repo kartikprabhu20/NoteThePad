@@ -2,7 +2,9 @@ package com.mintanable.notethepad.feature_note.presentation.paint
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -12,7 +14,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,17 +34,23 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 import kotlinx.coroutines.launch
+
+enum class PaintSheetMode { NONE, BRUSH, ERASER }
 
 const val PAINT_RESULT_KEY = "paintResult"
 const val PAINT_OLD_PATH_KEY = "paintOldPath"
@@ -73,6 +87,7 @@ fun PaintScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaintScreenContent(
     attachmentPath: String?,
@@ -84,29 +99,35 @@ fun PaintScreenContent(
     val canvasColor = android.graphics.Color.WHITE
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var androidCanvas by remember { mutableStateOf<android.graphics.Canvas?>(null) }
+    var androidCanvas by remember { mutableStateOf<Canvas?>(null) }
     var version by remember { mutableIntStateOf(0) }
     var activeTool by remember { mutableStateOf(PaintTool.BRUSH) }
     var isDirty by remember { mutableStateOf(false) }
     var isSaving by remember { mutableStateOf(false) }
+    var sheetMode by remember { mutableStateOf(PaintSheetMode.NONE) }
+    var selectedColor by remember { mutableIntStateOf(NoteColors.colorPairs[0].dark.toArgb()) }
+    var brushSizeDp by remember { mutableStateOf(4.dp) }
+    var eraserSizeDp by remember { mutableStateOf(4.dp) }
+    var showClearDialog by remember { mutableStateOf(false) }
 
-    val strokeWidthPx = with(density) { 4.dp.toPx() }
+    val brushStrokeWidthPx = with(density) { brushSizeDp.toPx() }
+    val eraserStrokeWidthPx = with(density) { eraserSizeDp.toPx() }
 
-    val brushPaint = remember(strokeWidthPx) {
+    val brushPaint = remember(selectedColor, brushStrokeWidthPx) {
         Paint().apply {
-            color = android.graphics.Color.BLACK
+            color = selectedColor
             style = Paint.Style.STROKE
-            strokeWidth = strokeWidthPx
+            strokeWidth = brushStrokeWidthPx
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
             isAntiAlias = true
         }
     }
-    val eraserPaint = remember(strokeWidthPx) {
+    val eraserPaint = remember(eraserStrokeWidthPx) {
         Paint().apply {
             color = canvasColor
             style = Paint.Style.STROKE
-            strokeWidth = strokeWidthPx * 3f
+            strokeWidth = eraserStrokeWidthPx
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
             isAntiAlias = true
@@ -116,12 +137,12 @@ fun PaintScreenContent(
     LaunchedEffect(canvasSize) {
         if (canvasSize.width > 0 && canvasSize.height > 0 && bitmap == null) {
             val newBitmap = createBitmap(canvasSize.width, canvasSize.height)
-            val newCanvas = android.graphics.Canvas(newBitmap)
+            val newCanvas = Canvas(newBitmap)
             if (!attachmentPath.isNullOrBlank()) {
                 val decoded = BitmapFactory.decodeFile(attachmentPath)
                 if (decoded != null) {
-                    val srcRect = android.graphics.Rect(0, 0, decoded.width, decoded.height)
-                    val dstRect = android.graphics.Rect(0, 0, canvasSize.width, canvasSize.height)
+                    val srcRect = Rect(0, 0, decoded.width, decoded.height)
+                    val dstRect = Rect(0, 0, canvasSize.width, canvasSize.height)
                     newCanvas.drawBitmap(decoded, srcRect, dstRect, null)
                     decoded.recycle()
                 } else {
@@ -142,7 +163,16 @@ fun PaintScreenContent(
         onSaveAndExit(bitmap, isDirty)
     }
 
+    fun clearCanvas() {
+        val canvas = androidCanvas ?: return
+        canvas.drawColor(canvasColor)
+        version++
+        isDirty = true
+    }
+
     BackHandler(enabled = !isSaving) { handleBack() }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
         modifier = modifier,
@@ -150,7 +180,16 @@ fun PaintScreenContent(
         bottomBar = {
             PaintBar(
                 activeTool = activeTool,
-                onToolClick = { activeTool = it }
+                onToolClick = { tool ->
+                    if (activeTool == tool) {
+                        sheetMode = when (tool) {
+                            PaintTool.BRUSH -> PaintSheetMode.BRUSH
+                            PaintTool.ERASER -> PaintSheetMode.ERASER
+                        }
+                    } else {
+                        activeTool = tool
+                    }
+                }
             )
         }
     ) { padding ->
@@ -164,7 +203,7 @@ fun PaintScreenContent(
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput(Unit) {
+                    .pointerInput(brushPaint, eraserPaint, activeTool) {
                         var last: Offset? = null
                         detectDragGestures(
                             onDragStart = { start ->
@@ -198,6 +237,50 @@ fun PaintScreenContent(
                     }
                 }
             }
+        }
+
+        if (sheetMode != PaintSheetMode.NONE) {
+            ModalBottomSheet(
+                onDismissRequest = { sheetMode = PaintSheetMode.NONE },
+                sheetState = sheetState
+            ) {
+                when (sheetMode) {
+                    PaintSheetMode.BRUSH -> PaintBrushOptionsSheetContent(
+                        selectedColor = selectedColor,
+                        onColorClick = { selectedColor = it },
+                        selectedSizeDp = brushSizeDp,
+                        onSizeClick = { brushSizeDp = it }
+                    )
+                    PaintSheetMode.ERASER -> PaintEraserOptionsSheetContent(
+                        selectedSizeDp = eraserSizeDp,
+                        onSizeClick = { eraserSizeDp = it },
+                        onClearClick = { showClearDialog = true }
+                    )
+                    PaintSheetMode.NONE -> Unit
+                }
+            }
+        }
+
+        if (showClearDialog) {
+            AlertDialog(
+                onDismissRequest = { showClearDialog = false },
+                title = { Text(stringResource(R.string.paint_clear_canvas_dialog_title)) },
+                text = { Text(stringResource(R.string.paint_clear_canvas_dialog_message)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        clearCanvas()
+                        showClearDialog = false
+                        sheetMode = PaintSheetMode.NONE
+                    }) {
+                        Text(stringResource(R.string.btn_clear))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showClearDialog = false }) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
+            )
         }
     }
 }

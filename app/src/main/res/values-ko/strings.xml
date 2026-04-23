@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">클라우드 데이터가 삭제됨</string>
 
     <string name="option_paint">페인트</string>
+
+    <string name="paint_clear_canvas">캔버스 비우기</string>
+    <string name="paint_clear_canvas_dialog_title">캔버스를 비울까요?</string>
+    <string name="paint_clear_canvas_dialog_message">그린 내용이 모두 삭제됩니다. 이 작업은 취소할 수 없습니다.</string>
+    <string name="btn_clear">비우기</string>
 </resources>

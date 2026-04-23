@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Datos en la nube eliminados</string>
 
     <string name="option_paint">Pintar</string>
+
+    <string name="paint_clear_canvas">Limpiar lienzo</string>
+    <string name="paint_clear_canvas_dialog_title">¿Limpiar lienzo?</string>
+    <string name="paint_clear_canvas_dialog_message">Esto borrará todo lo que has dibujado. Esta acción no se puede deshacer.</string>
+    <string name="btn_clear">Limpiar</string>
 </resources>

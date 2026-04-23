@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Dati cloud eliminati</string>
 
     <string name="option_paint">Dipingi</string>
+
+    <string name="paint_clear_canvas">Pulisci tela</string>
+    <string name="paint_clear_canvas_dialog_title">Pulire la tela?</string>
+    <string name="paint_clear_canvas_dialog_message">Questo cancellerà tutto ciò che hai disegnato. Questa azione non può essere annullata.</string>
+    <string name="btn_clear">Pulisci</string>
 </resources>

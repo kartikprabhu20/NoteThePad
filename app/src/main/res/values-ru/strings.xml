@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">Облачные данные удалены</string>
 
     <string name="option_paint">Рисование</string>
+
+    <string name="paint_clear_canvas">Очистить холст</string>
+    <string name="paint_clear_canvas_dialog_title">Очистить холст?</string>
+    <string name="paint_clear_canvas_dialog_message">Это сотрет все, что вы нарисовали. Это действие нельзя отменить.</string>
+    <string name="btn_clear">Очистить</string>
 </resources>

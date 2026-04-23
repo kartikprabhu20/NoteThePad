@@ -53,4 +53,9 @@
     <string name="msg_cloud_data_deleted">تم حذف البيانات السحابية</string>
 
     <string name="option_paint">رسم</string>
+
+    <string name="paint_clear_canvas">مسح اللوحة</string>
+    <string name="paint_clear_canvas_dialog_title">مسح اللوحة؟</string>
+    <string name="paint_clear_canvas_dialog_message">سيؤدي هذا إلى مسح كل ما رسمته. لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="btn_clear">مسح</string>
 </resources>
