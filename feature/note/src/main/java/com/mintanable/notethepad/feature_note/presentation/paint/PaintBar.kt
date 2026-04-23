@@ -24,7 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mintanable.notethepad.feature_note.R
@@ -74,21 +76,21 @@ fun PaintBar(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             PaintToolButton(
-                icon = Icons.Default.Brush,
+                painter = painterResource(R.drawable.border_color_24),
                 contentDescription = stringResource(R.string.content_description_paint_brush),
                 isSelected = activeTool == PaintTool.BRUSH,
                 onClick = { onToolClick(PaintTool.BRUSH) },
                 modifier = wiggleModifier
             )
             PaintToolButton(
-                icon = Icons.Default.Highlight,
+                painter = painterResource(R.drawable.format_ink_highlighter_24),
                 contentDescription = stringResource(R.string.content_description_highlitger),
                 isSelected = activeTool == PaintTool.HIGHLIGHTER,
                 onClick = { onToolClick(PaintTool.HIGHLIGHTER) },
                 modifier = wiggleModifier
             )
             PaintToolButton(
-                icon = Icons.Default.AutoFixNormal,
+                painter = painterResource(R.drawable.ink_eraser_24),
                 contentDescription = stringResource(R.string.content_description_paint_eraser),
                 isSelected = activeTool == PaintTool.ERASER,
                 onClick = { onToolClick(PaintTool.ERASER) },
@@ -100,7 +102,8 @@ fun PaintBar(
 
 @Composable
 private fun PaintToolButton(
-    icon: ImageVector,
+    icon: ImageVector? = null,
+    painter: Painter? = null,
     contentDescription: String,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -115,14 +118,27 @@ private fun PaintToolButton(
             MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier.size(40.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = if (isSelected)
-                MaterialTheme.colorScheme.onPrimaryContainer
-            else
-                MaterialTheme.colorScheme.onSurfaceVariant
-        )
+
+        if(icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = if (isSelected)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        if(painter != null) {
+            Icon(
+                painter = painter,
+                contentDescription = contentDescription,
+                tint = if (isSelected)
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
