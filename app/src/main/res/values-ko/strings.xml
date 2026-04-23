@@ -42,7 +42,7 @@
     <string name="help_item_pin_widget_title">메모를 홈 화면 위젯으로 고정하기</string>
     <string name="help_item_pin_widget_steps">메모를 엽니다.\n더보기 메뉴(점 3개)를 누르고 위젯으로 고정을 누릅니다.\n홈 화면 배치를 확인합니다.\n메모가 단일 메모 위젯으로 표시됩니다.</string>
     <string name="help_item_backup_restore_title">Google 드라이브를 통한 백업 및 복원</string>
-    <string name="help_item_backup_restore_steps">설정을 열고 Google로 로그인합니다.\n자동 백업을 켜고 빈도를 선택합니다.\n즉시 백업하려면 '지금 백업'을 사용하고, 이전 상태를 복구하려면 '지금 복원'을 사용합니다.</string>
+<string name="help_item_backup_restore_steps">설정을 열고 Google로 로그인합니다.\n자동 백업을 켜고 빈도를 선택합니다.\n즉시 백업하려면 \'지금 백업\'을 사용하고, 이전 상태를 복구하려면 \'지금 복원\'을 사용합니다.</string>
     <string name="help_item_cloud_sync_title">기기 간 클라우드 동기화 활성화하기</string>
     <string name="help_item_cloud_sync_steps">설정 또는 드로어에서 Google로 로그인합니다.\n설정에서 CloudSync를 켭니다.\n메모는 로그인된 기기 간에 실시간으로 동기화됩니다(미디어는 동기화되지 않음).</string>
 </resources>

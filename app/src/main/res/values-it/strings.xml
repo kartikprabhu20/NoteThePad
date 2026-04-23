@@ -34,7 +34,7 @@
     <string name="help_item_collaborate_title">Collabora con altri</string>
     <string name="help_item_collaborate_steps">Accedi con Google e abilita CloudSync nelle Impostazioni.\nApri la nota e tocca il menu Altro (tre puntini).\nTocca Collabora.\nInserisci l\'e-mail del collaboratore e invia l\'invito. Puoi rimuovere collaboratori o lasciare una nota condivisa dalla stessa finestra di dialogo.</string>
     <string name="help_item_ai_assistant_title">Usa l\'Assistente AI</string>
-    <string name="help_item_ai_assistant_steps">Abilita l\'Assistente AI nelle Impostazioni (richiede il download di un modello).\nApri una nota e tocca il pulsante della bacchetta magica.\nDigita una richiesta o tocca il microfono per parlare.\nL'assistente può riassumere, aggiungere tag automaticamente, programmare promemoria e altro ancora.</string>
+<string name="help_item_ai_assistant_steps">Abilita l\'Assistente AI nelle Impostazioni (richiede il download di un modello).\nApri una nota e tocca il pulsante della bacchetta magica.\nDigita una richiesta o tocca il microfono per parlare.\nL\'assistente può riassumere, aggiungere tag automaticamente, programmare promemoria e altro ancora.</string>
     <string name="help_item_tags_title">Organizza le note con i tag</string>
     <string name="help_item_tags_steps">Apri una nota e tocca il menu Altro (tre puntini).\nTocca Aggiungi etichetta e scegli un tag esistente o creane uno nuovo.\nUsa il cassetto laterale per sfogliare le note filtrate per tag.</string>
     <string name="help_item_export_pdf_title">Esporta una nota come PDF</string>
