@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoFixNormal
 import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.Highlight
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -77,6 +78,13 @@ fun PaintBar(
                 contentDescription = stringResource(R.string.content_description_paint_brush),
                 isSelected = activeTool == PaintTool.BRUSH,
                 onClick = { onToolClick(PaintTool.BRUSH) },
+                modifier = wiggleModifier
+            )
+            PaintToolButton(
+                icon = Icons.Default.Highlight,
+                contentDescription = stringResource(R.string.content_description_highlitger),
+                isSelected = activeTool == PaintTool.HIGHLIGHTER,
+                onClick = { onToolClick(PaintTool.HIGHLIGHTER) },
                 modifier = wiggleModifier
             )
             PaintToolButton(

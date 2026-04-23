@@ -2,10 +2,14 @@ package com.mintanable.notethepad.feature_note.presentation.paint
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.BlendMode
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -30,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -50,11 +53,12 @@ import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
 import kotlinx.coroutines.launch
 
-enum class PaintSheetMode { NONE, BRUSH, ERASER }
+enum class PaintSheetMode { NONE, BRUSH, HIGHLIGHTER, ERASER }
 
 const val PAINT_RESULT_KEY = "paintResult"
 const val PAINT_OLD_PATH_KEY = "paintOldPath"
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun PaintScreen(
     navController: NavController,
@@ -87,6 +91,7 @@ fun PaintScreen(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaintScreenContent(
@@ -105,17 +110,22 @@ fun PaintScreenContent(
     var isDirty by remember { mutableStateOf(false) }
     var isSaving by remember { mutableStateOf(false) }
     var sheetMode by remember { mutableStateOf(PaintSheetMode.NONE) }
-    var selectedColor by remember { mutableIntStateOf(NoteColors.colorPairs[0].dark.toArgb()) }
-    var brushSizeDp by remember { mutableStateOf(4.dp) }
-    var eraserSizeDp by remember { mutableStateOf(4.dp) }
     var showClearDialog by remember { mutableStateOf(false) }
 
+    var selectedBrushColor by remember { mutableIntStateOf(NoteColors.colorPairs[0].dark.toArgb()) }
+    var brushSizeDp by remember { mutableStateOf(4.dp) }
     val brushStrokeWidthPx = with(density) { brushSizeDp.toPx() }
+
+    var selectedHighlightColor by remember { mutableIntStateOf(NoteColors.colorPairs[5].dark.toArgb()) }
+    var highlighterSizeDp by remember { mutableStateOf(16.dp) }
+    val highlighterStrokeWidthPx = with(density) { highlighterSizeDp.toPx() }
+
+    var eraserSizeDp by remember { mutableStateOf(4.dp) }
     val eraserStrokeWidthPx = with(density) { eraserSizeDp.toPx() }
 
-    val brushPaint = remember(selectedColor, brushStrokeWidthPx) {
+    val brushPaint = remember(selectedBrushColor, brushStrokeWidthPx) {
         Paint().apply {
-            color = selectedColor
+            color = selectedBrushColor
             style = Paint.Style.STROKE
             strokeWidth = brushStrokeWidthPx
             strokeCap = Paint.Cap.ROUND
@@ -131,6 +141,18 @@ fun PaintScreenContent(
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
             isAntiAlias = true
+        }
+    }
+    val highlighterPaint = remember(selectedHighlightColor, highlighterStrokeWidthPx) {
+        Paint().apply {
+            color = selectedHighlightColor
+            style = Paint.Style.STROKE
+            strokeWidth = highlighterStrokeWidthPx
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            isAntiAlias = true
+            alpha = 128
+            blendMode = BlendMode.MULTIPLY
         }
     }
 
@@ -185,6 +207,7 @@ fun PaintScreenContent(
                         sheetMode = when (tool) {
                             PaintTool.BRUSH -> PaintSheetMode.BRUSH
                             PaintTool.ERASER -> PaintSheetMode.ERASER
+                            PaintTool.HIGHLIGHTER -> PaintSheetMode.HIGHLIGHTER
                         }
                     } else {
                         activeTool = tool
@@ -200,32 +223,40 @@ fun PaintScreenContent(
                 .background(Color.White)
                 .onSizeChanged { canvasSize = it }
         ) {
+            var currentPath by remember { mutableStateOf<Path?>(null) }
+
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput(brushPaint, eraserPaint, activeTool) {
-                        var last: Offset? = null
+                    .pointerInput(brushPaint, eraserPaint, highlighterPaint, activeTool) {
                         detectDragGestures(
                             onDragStart = { start ->
-                                val canvas = androidCanvas ?: return@detectDragGestures
-                                last = start
                                 isDirty = true
-                                val paint = if (activeTool == PaintTool.ERASER) eraserPaint else brushPaint
-                                canvas.drawPoint(start.x, start.y, paint)
-                                version++
+                                currentPath = Path().apply {
+                                    moveTo(start.x, start.y)
+                                }
                             },
                             onDrag = { change, _ ->
-                                val canvas = androidCanvas ?: return@detectDragGestures
                                 change.consume()
-                                val prev = last ?: change.position
-                                val curr = change.position
-                                val paint = if (activeTool == PaintTool.ERASER) eraserPaint else brushPaint
-                                canvas.drawLine(prev.x, prev.y, curr.x, curr.y, paint)
-                                last = curr
+                                currentPath?.lineTo(change.position.x, change.position.y)
                                 version++
                             },
-                            onDragEnd = { last = null },
-                            onDragCancel = { last = null }
+                            onDragEnd = {
+                                val path = currentPath ?: return@detectDragGestures
+                                val canvas = androidCanvas ?: return@detectDragGestures
+                                val paint = when (activeTool) {
+                                    PaintTool.ERASER -> eraserPaint
+                                    PaintTool.HIGHLIGHTER -> highlighterPaint
+                                    else -> brushPaint
+                                }
+                                canvas.drawPath(path, paint)
+                                currentPath = null
+                                version++
+                            },
+                            onDragCancel = {
+                                currentPath = null
+                                version++
+                            }
                         )
                     }
             ) {
@@ -234,6 +265,17 @@ fun PaintScreenContent(
                 if (bmp != null) {
                     drawIntoCanvas { canvas ->
                         canvas.nativeCanvas.drawBitmap(bmp, 0f, 0f, null)
+                    }
+                }
+
+                currentPath?.let { path ->
+                    val paint = when (activeTool) {
+                        PaintTool.ERASER -> eraserPaint
+                        PaintTool.HIGHLIGHTER -> highlighterPaint
+                        else -> brushPaint
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.nativeCanvas.drawPath(path, paint)
                     }
                 }
             }
@@ -246,10 +288,16 @@ fun PaintScreenContent(
             ) {
                 when (sheetMode) {
                     PaintSheetMode.BRUSH -> PaintBrushOptionsSheetContent(
-                        selectedColor = selectedColor,
-                        onColorClick = { selectedColor = it },
+                        selectedColor = selectedBrushColor,
+                        onColorClick = { selectedBrushColor = it },
                         selectedSizeDp = brushSizeDp,
                         onSizeClick = { brushSizeDp = it }
+                    )
+                    PaintSheetMode.HIGHLIGHTER -> PaintBrushOptionsSheetContent(
+                        selectedColor = selectedHighlightColor,
+                        onColorClick = { selectedHighlightColor = it },
+                        selectedSizeDp = highlighterSizeDp,
+                        onSizeClick = { highlighterSizeDp = it }
                     )
                     PaintSheetMode.ERASER -> PaintEraserOptionsSheetContent(
                         selectedSizeDp = eraserSizeDp,
@@ -285,6 +333,7 @@ fun PaintScreenContent(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @ThemePreviews
 @Composable
 fun PaintScreenPreview() {
