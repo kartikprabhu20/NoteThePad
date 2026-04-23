@@ -16,15 +16,11 @@ class PaintViewModel @Inject constructor(
     private val fileManager: FileManager
 ) : ViewModel() {
 
-    suspend fun saveBitmap(bitmap: Bitmap, existingPath: String?): String? = withContext(Dispatchers.IO) {
-        val destFile = if (!existingPath.isNullOrBlank()) {
-            File(existingPath)
-        } else {
-            File(
-                fileManager.getMediaDir(),
-                "paint_${System.currentTimeMillis()}_${UUID.randomUUID()}.png"
-            )
-        }
+    suspend fun saveBitmap(bitmap: Bitmap): String? = withContext(Dispatchers.IO) {
+        val destFile = File(
+            fileManager.getMediaDir(),
+            "paint_${System.currentTimeMillis()}_${UUID.randomUUID()}.png"
+        )
         runCatching {
             FileOutputStream(destFile).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)

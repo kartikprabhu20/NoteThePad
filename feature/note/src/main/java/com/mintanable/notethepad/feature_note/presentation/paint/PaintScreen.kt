@@ -3,8 +3,6 @@ package com.mintanable.notethepad.feature_note.presentation.paint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -33,11 +31,15 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.createBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mintanable.notethepad.theme.NoteThePadTheme
+import com.mintanable.notethepad.theme.ThemePreviews
 import kotlinx.coroutines.launch
 
 const val PAINT_RESULT_KEY = "paintResult"
+const val PAINT_OLD_PATH_KEY = "paintOldPath"
 
 @Composable
 fun PaintScreen(
@@ -46,8 +48,40 @@ fun PaintScreen(
     viewModel: PaintViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
+    PaintScreenContent(
+        attachmentPath = attachmentPath,
+        onSaveAndExit = { bitmap, isDirty ->
+            if (attachmentPath.isNullOrBlank() && !isDirty) {
+                navController.popBackStack()
+                return@PaintScreenContent
+            }
+            if (bitmap == null) {
+                navController.popBackStack()
+                return@PaintScreenContent
+            }
+            scope.launch {
+                val savedPath = viewModel.saveBitmap(bitmap)
+                if (savedPath != null) {
+                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                        set(PAINT_OLD_PATH_KEY, attachmentPath)
+                        set(PAINT_RESULT_KEY, savedPath)
+                    }
+                }
+                navController.popBackStack()
+            }
+        }
+    )
+}
+
+@Composable
+fun PaintScreenContent(
+    attachmentPath: String?,
+    onSaveAndExit: (Bitmap?, Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val density = LocalDensity.current
 
+    val canvasColor = android.graphics.Color.WHITE
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var androidCanvas by remember { mutableStateOf<android.graphics.Canvas?>(null) }
@@ -70,22 +104,18 @@ fun PaintScreen(
     }
     val eraserPaint = remember(strokeWidthPx) {
         Paint().apply {
+            color = canvasColor
             style = Paint.Style.STROKE
             strokeWidth = strokeWidthPx * 3f
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
             isAntiAlias = true
-            xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         }
     }
 
     LaunchedEffect(canvasSize) {
         if (canvasSize.width > 0 && canvasSize.height > 0 && bitmap == null) {
-            val newBitmap = Bitmap.createBitmap(
-                canvasSize.width,
-                canvasSize.height,
-                Bitmap.Config.ARGB_8888
-            )
+            val newBitmap = createBitmap(canvasSize.width, canvasSize.height)
             val newCanvas = android.graphics.Canvas(newBitmap)
             if (!attachmentPath.isNullOrBlank()) {
                 val decoded = BitmapFactory.decodeFile(attachmentPath)
@@ -94,7 +124,11 @@ fun PaintScreen(
                     val dstRect = android.graphics.Rect(0, 0, canvasSize.width, canvasSize.height)
                     newCanvas.drawBitmap(decoded, srcRect, dstRect, null)
                     decoded.recycle()
+                } else {
+                    newCanvas.drawColor(canvasColor)
                 }
+            } else {
+                newCanvas.drawColor(canvasColor)
             }
             bitmap = newBitmap
             androidCanvas = newCanvas
@@ -102,32 +136,16 @@ fun PaintScreen(
         }
     }
 
-    fun saveAndExit() {
+    fun handleBack() {
         if (isSaving) return
-        val currentBitmap = bitmap
-        if (attachmentPath.isNullOrBlank() && !isDirty) {
-            navController.popBackStack()
-            return
-        }
-        if (currentBitmap == null) {
-            navController.popBackStack()
-            return
-        }
         isSaving = true
-        scope.launch {
-            val savedPath = viewModel.saveBitmap(currentBitmap, attachmentPath)
-            if (savedPath != null) {
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(PAINT_RESULT_KEY, savedPath)
-            }
-            navController.popBackStack()
-        }
+        onSaveAndExit(bitmap, isDirty)
     }
 
-    BackHandler(enabled = !isSaving) { saveAndExit() }
+    BackHandler(enabled = !isSaving) { handleBack() }
 
     Scaffold(
+        modifier = modifier,
         contentWindowInsets = WindowInsets.systemBars,
         bottomBar = {
             PaintBar(
@@ -181,5 +199,16 @@ fun PaintScreen(
                 }
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+fun PaintScreenPreview() {
+    NoteThePadTheme {
+        PaintScreenContent(
+            attachmentPath = null,
+            onSaveAndExit = { _, _ -> }
+        )
     }
 }

@@ -70,7 +70,7 @@ fun PaintBar(
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             PaintToolButton(
                 icon = Icons.Default.Brush,

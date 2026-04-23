@@ -70,6 +70,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.MoreSettingsOpt
 import com.mintanable.notethepad.feature_note.presentation.notes.ReminderOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EditTextDialog
+import com.mintanable.notethepad.feature_note.presentation.paint.PAINT_OLD_PATH_KEY
 import com.mintanable.notethepad.feature_note.presentation.paint.PAINT_RESULT_KEY
 import com.mintanable.notethepad.permissions.PermissionRationaleType
 import kotlinx.coroutines.NonCancellable
@@ -262,9 +263,18 @@ fun AddEditNoteScreen(
     val paintResult by (paintResultFlow ?: remember { kotlinx.coroutines.flow.MutableStateFlow<String?>(null) })
         .collectAsStateWithLifecycle()
     LaunchedEffect(paintResult) {
-        paintResult?.let { path ->
-            viewModel.onEvent(AddEditNoteEvent.AttachPaint(path))
-            navController.currentBackStackEntry?.savedStateHandle?.set(PAINT_RESULT_KEY, null)
+        paintResult?.let { newPath ->
+            val oldPath = navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.get<String?>(PAINT_OLD_PATH_KEY)
+            if (!oldPath.isNullOrBlank() && oldPath != newPath) {
+                viewModel.onEvent(AddEditNoteEvent.RemovePaint(oldPath))
+            }
+            viewModel.onEvent(AddEditNoteEvent.AttachPaint(newPath))
+            navController.currentBackStackEntry?.savedStateHandle?.apply {
+                set(PAINT_RESULT_KEY, null)
+                set(PAINT_OLD_PATH_KEY, null)
+            }
         }
     }
 
