@@ -29,7 +29,9 @@ class DatabaseManager @Inject constructor(
             NoteDatabase::class.java,
             NoteDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
+            .addMigrations(
+                NoteDatabase.MIGRATION_17_18
+            )
             .build()
     }
 

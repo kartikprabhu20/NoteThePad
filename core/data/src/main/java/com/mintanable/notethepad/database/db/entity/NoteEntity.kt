@@ -68,7 +68,10 @@ data class NoteEntity(
     val isSynced: Boolean = false,
 
     @SerialName("summary")
-    val summary: String = ""
+    val summary: String = "",
+
+    @SerialName("paint_uris")
+    val paintUris: List<String> = emptyList()
 )
 
 class InvalidNoteException(message: String): Exception(message)
