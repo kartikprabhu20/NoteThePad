@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
@@ -56,6 +57,11 @@ class NavigationDrawerItemRepositoryImpl: NavigationDrawerItemRepository {
                 title = "Login",
                 icon = Icons.AutoMirrored.Filled.Login,
                 route = Screen.FirebaseLoginScreen.route
+            ),
+            DrawerItem.NavigationDrawerItem(
+                title = "Help and Feedback",
+                icon = Icons.AutoMirrored.Filled.HelpOutline,
+                route = Screen.HelpAndFeedbackScreen.route
             ),
             DrawerItem.NavigationDrawerItem(
                 title = "Logout",
