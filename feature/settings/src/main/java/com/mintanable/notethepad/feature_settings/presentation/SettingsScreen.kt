@@ -86,6 +86,7 @@ fun SettingsScreen(
     var showIntervalDialog by rememberSaveable {  mutableStateOf(false) }
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     var showClearBackupDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteCloudDataDialog by rememberSaveable { mutableStateOf(false) }
     var showNoteShapeDialog by rememberSaveable { mutableStateOf(false) }
 
     val currentSettings = state.settings
@@ -381,6 +382,11 @@ fun SettingsScreen(
                         onEvent(SettingsEvent.UpdateAnalyticsEnabled(checked))
                     }
                 )
+                SettingItem(
+                    title = stringResource(R.string.setting_delete_cloud_data_title),
+                    subtitle = stringResource(R.string.setting_delete_cloud_data_subtitle),
+                    onClick = { showDeleteCloudDataDialog = true }
+                )
             }
         }
 
@@ -483,6 +489,35 @@ fun SettingsScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { showClearBackupDialog = false }) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
+            )
+        }
+
+        if (showDeleteCloudDataDialog) {
+            val msgDeleted = stringResource(R.string.msg_cloud_data_deleted)
+            AlertDialog(
+                onDismissRequest = { showDeleteCloudDataDialog = false },
+                title = { Text(stringResource(R.string.dialog_delete_cloud_data_title)) },
+                text = { Text(stringResource(R.string.dialog_delete_cloud_data_description)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDeleteCloudDataDialog = false
+                            onEvent(
+                                SettingsEvent.DeleteAllCloudData(
+                                    onSuccess = { showToast(msgDeleted) },
+                                    onFailure = showToast
+                                )
+                            )
+                        }
+                    ) {
+                        Text(stringResource(R.string.btn_delete), color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteCloudDataDialog = false }) {
                         Text(stringResource(R.string.btn_cancel))
                     }
                 }

@@ -264,5 +264,27 @@ class SupabaseSyncService @Inject constructor(
         }
     }
 
+    suspend fun deleteAllUserData(userId: String): Result<Unit> {
+        require(userId.isNotBlank()) { "userId must not be blank" }
+        return try {
+            supabaseClient.from("note_tag_cross_ref").delete {
+                filter { eq("user_id", userId) }
+            }
+            supabaseClient.from("note_entity").delete {
+                filter { eq("user_id", userId) }
+            }
+            supabaseClient.from("tag_table").delete {
+                filter { eq("user_id", userId) }
+            }
+            supabaseClient.from("note_collaborators").delete {
+                filter { eq("owner_user_id", userId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("SupabaseSync", "deleteAllUserData failed: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
     fun getSupabaseClient() = supabaseClient
 }
