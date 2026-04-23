@@ -98,6 +98,8 @@ fun NoteEditorContent(
     noteColor: Int,
     backgroundImage: Int,
     attachedImages: List<Uri>,
+    attachedPaints: List<String> = emptyList(),
+    onPaintClick: (String) -> Unit = {},
     titleState: NoteTextFieldState,
     contentState: NoteTextFieldState,
     contentRichTextState: RichTextState,
@@ -338,6 +340,9 @@ fun NoteEditorContent(
                         onAnalyzeImageClicked = { onEvent(AddEditNoteEvent.ToggleZoom(attachedImages[0])) },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
+                        paints = attachedPaints,
+                        onRemovePaint = { onEvent(AddEditNoteEvent.RemovePaint(it)) },
+                        onPaintClick = { onPaintClick(it) }
                     )
 
                     item {

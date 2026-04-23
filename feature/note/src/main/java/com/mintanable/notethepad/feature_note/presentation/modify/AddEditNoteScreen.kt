@@ -70,6 +70,7 @@ import com.mintanable.notethepad.feature_note.presentation.notes.MoreSettingsOpt
 import com.mintanable.notethepad.feature_note.presentation.notes.ReminderOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.VideoSourceOptions
 import com.mintanable.notethepad.feature_note.presentation.notes.components.EditTextDialog
+import com.mintanable.notethepad.feature_note.presentation.paint.PAINT_RESULT_KEY
 import com.mintanable.notethepad.permissions.PermissionRationaleType
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -255,6 +256,18 @@ fun AddEditNoteScreen(
         }
     }
 
+    val paintResultFlow = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<String?>(PAINT_RESULT_KEY, null)
+    val paintResult by (paintResultFlow ?: remember { kotlinx.coroutines.flow.MutableStateFlow<String?>(null) })
+        .collectAsStateWithLifecycle()
+    LaunchedEffect(paintResult) {
+        paintResult?.let { path ->
+            viewModel.onEvent(AddEditNoteEvent.AttachPaint(path))
+            navController.currentBackStackEntry?.savedStateHandle?.set(PAINT_RESULT_KEY, null)
+        }
+    }
+
     BackHandler {
         when {
             uiState.zoomedImageUri != null -> {
@@ -287,6 +300,10 @@ fun AddEditNoteScreen(
             noteColor = uiState.noteColor,
             backgroundImage = uiState.backgroundImage,
             attachedImages = uiState.attachedImages,
+            attachedPaints = uiState.attachedPaints,
+            onPaintClick = { path ->
+                navController.navigate(Screen.PaintScreen.passArgs(path))
+            },
             titleState = uiState.titleState,
             contentState = uiState.contentState,
             contentRichTextState = uiState.contentRichTextState,
@@ -537,6 +554,11 @@ fun AddEditNoteScreen(
 
                             AttachmentOptions.AUDIO -> {
                                 viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.AUDIO_SOURCES))
+                            }
+
+                            AttachmentOptions.PAINT -> {
+                                viewModel.onEvent(AddEditNoteEvent.UpdateSheetType(BottomSheetType.NONE))
+                                navController.navigate(Screen.PaintScreen.passArgs())
                             }
 
                             ImageSourceOptions.PHOTO_GALLERY -> {

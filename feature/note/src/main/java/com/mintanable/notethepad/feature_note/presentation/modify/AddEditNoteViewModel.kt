@@ -297,6 +297,7 @@ class AddEditNoteViewModel @Inject constructor(
                         noteColor = detailedNote.color,
                         backgroundImage = detailedNote.backgroundImage,
                         attachedImages = detailedNote.imageUris.map { imgString -> imgString.toUri() },
+                        attachedPaints = detailedNote.paintUris,
                         attachedAudios = detailedNote.audioAttachments,
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,
@@ -534,6 +535,19 @@ class AddEditNoteViewModel @Inject constructor(
                 analyticsTracker.track(AttachmentRemoved(if (attachmentType == AttachmentType.IMAGE) "image" else "video"))
                 _uiState.update { it.copy(attachedImages = it.attachedImages - event.uri) }
                 viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
+            }
+
+            is AddEditNoteEvent.AttachPaint -> {
+                _uiState.update { state ->
+                    if (state.attachedPaints.contains(event.path)) state
+                    else state.copy(attachedPaints = state.attachedPaints + event.path)
+                }
+            }
+
+            is AddEditNoteEvent.RemovePaint -> {
+                analyticsTracker.track(AttachmentRemoved("paint"))
+                _uiState.update { it.copy(attachedPaints = it.attachedPaints - event.path) }
+                viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.path)) }
             }
 
             is AddEditNoteEvent.RemoveAudio -> {
@@ -1398,6 +1412,7 @@ class AddEditNoteViewModel @Inject constructor(
         viewModelScope.launch {
             fileIOUseCases.deleteFiles(_uiState.value.attachedImages.map { it.toString() })
             fileIOUseCases.deleteFiles(_uiState.value.attachedAudios.map { it.uri })
+            fileIOUseCases.deleteFiles(_uiState.value.attachedPaints)
             if (currentNoteId.isNotBlank()) {
                 noteUseCases.deleteNote(currentNoteId)
             }
@@ -1484,7 +1499,8 @@ class AddEditNoteViewModel @Inject constructor(
             checkboxItems = state.checkListItems,
             tagEntities = state.tagEntities,
             backgroundImage = state.backgroundImage,
-            summary = state.summary
+            summary = state.summary,
+            paintUris = state.attachedPaints
         )
     }
 

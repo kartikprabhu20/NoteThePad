@@ -3,6 +3,7 @@ package com.mintanable.notethepad.feature_note.presentation.notes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
@@ -44,7 +45,8 @@ enum class AttachmentOptions(
 ) : AdditionalOption {
     IMAGE(R.string.option_image, Icons.Default.Image),
     VIDEO(R.string.option_video, Icons.Default.Videocam),
-    AUDIO(R.string.option_audio, Icons.Default.Mic);
+    AUDIO(R.string.option_audio, Icons.Default.Mic),
+    PAINT(R.string.option_paint, Icons.Default.Brush);
 
     override val title: String
         @Composable get() = stringResource(titleRes)
