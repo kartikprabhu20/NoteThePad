@@ -58,6 +58,10 @@
     <string name="option_image">Image</string>
     <string name="option_video">Video</string>
     <string name="option_audio">Audio</string>
+    <string name="option_paint">Paint</string>
+    <string name="content_description_paint_brush" translatable="false">Brush</string>
+    <string name="content_description_paint_eraser" translatable="false">Eraser</string>
+    <string name="content_description_attached_paint" translatable="false">Attached sketch</string>
     <string name="option_choose_date_time">Choose a date &amp; time</string>
     <string name="option_pin_widget">Pin as widget</string>
     <string name="option_add_label">Add label</string>

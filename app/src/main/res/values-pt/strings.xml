@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">Excluir todos os dados na nuvem?</string>
     <string name="dialog_delete_cloud_data_description">Isso remove permanentemente suas notas, tags e backups do CloudSync (Supabase) e do Google Drive. Notas compartilhadas com você por outros usuários e notas salvas localmente neste dispositivo não são afetadas. Esta ação não pode ser desfeita.</string>
     <string name="msg_cloud_data_deleted">Dados na nuvem excluídos</string>
+
+    <string name="option_paint">Pintar</string>
 </resources>

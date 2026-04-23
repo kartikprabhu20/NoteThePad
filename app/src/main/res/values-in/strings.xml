@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">Hapus semua data cloud?</string>
     <string name="dialog_delete_cloud_data_description">Ini akan menghapus catatan, tag, dan cadangan Anda secara permanen dari CloudSync (Supabase) dan Google Drive. Catatan yang dibagikan kepada Anda oleh pengguna lain, dan catatan yang disimpan secara lokal di perangkat ini, tidak akan terpengaruh. Tindakan ini tidak dapat dibatalkan.</string>
     <string name="msg_cloud_data_deleted">Data cloud dihapus</string>
+
+    <string name="option_paint">Lukis</string>
 </resources>

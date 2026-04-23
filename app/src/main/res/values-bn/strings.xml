@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">সমস্ত ক্লাউড ডেটা মুছবেন?</string>
     <string name="dialog_delete_cloud_data_description">এটি ক্লাউড সিঙ্ক (সুপাবেস) এবং গুগল ড্রাইভ থেকে আপনার নোট, ট্যাগ এবং ব্যাকআপগুলিকে স্থায়ীভাবে সরিয়ে দেয়। অন্য ব্যবহারকারীদের দ্বারা আপনার সাথে ভাগ করা নোট এবং এই ডিভাইসে স্থানীয়ভাবে সংরক্ষিত নোটগুলি প্রভাবিত হয় না। এটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
     <string name="msg_cloud_data_deleted">ক্লাউড ডেটা মুছে ফেলা হয়েছে</string>
+
+    <string name="option_paint">পেইন্ট</string>
 </resources>

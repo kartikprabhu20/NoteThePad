@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">すべてのクラウドデータを削除しますか？</string>
     <string name="dialog_delete_cloud_data_description">これにより、CloudSync (Supabase) および Google ドライブからノート、タグ、バックアップが永久に削除されます。他のユーザーから共有されたノートや、このデバイスにローカルに保存されているノートには影響ありません。この操作は取り消せません。</string>
     <string name="msg_cloud_data_deleted">クラウドデータが削除されました</string>
+
+    <string name="option_paint">ペイント</string>
 </resources>

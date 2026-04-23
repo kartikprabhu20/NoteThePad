@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">모든 클라우드 데이터를 삭제할까요?</string>
     <string name="dialog_delete_cloud_data_description">이 작업은 CloudSync(Supabase) 및 Google 드라이브에서 메모, 태그 및 백업을 영구적으로 제거합니다. 다른 사용자가 공유한 메모와 이 기기에 로컬로 저장된 메모는 영향을 받지 않습니다. 이 작업은 취소할 수 없습니다.</string>
     <string name="msg_cloud_data_deleted">클라우드 데이터가 삭제됨</string>
+
+    <string name="option_paint">페인트</string>
 </resources>

@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">Alle Cloud-Daten löschen?</string>
     <string name="dialog_delete_cloud_data_description">Dies entfernt dauerhaft Ihre Notizen, Tags und Backups aus CloudSync (Supabase) und Google Drive. Notizen, die von anderen Benutzern mit Ihnen geteilt wurden, und lokal auf diesem Gerät gespeicherte Notizen sind nicht betroffen. Dies kann nicht rückgängig gemacht werden.</string>
     <string name="msg_cloud_data_deleted">Cloud-Daten gelöscht</string>
+
+    <string name="option_paint">Malen</string>
 </resources>

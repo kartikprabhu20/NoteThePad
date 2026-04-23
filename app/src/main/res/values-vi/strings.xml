@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">Xóa tất cả dữ liệu đám mây?</string>
     <string name="dialog_delete_cloud_data_description">Thao tác này sẽ xóa vĩnh viễn các ghi chú, thẻ và bản sao lưu của bạn khỏi CloudSync (Supabase) và Google Drive. Các ghi chú được chia sẻ với bạn bởi người dùng khác và các ghi chú được lưu cục bộ trên thiết bị này sẽ không bị ảnh hưởng. Thao tác này không thể hoàn tác.</string>
     <string name="msg_cloud_data_deleted">Đã xóa dữ liệu đám mây</string>
+
+    <string name="option_paint">Vẽ</string>
 </resources>

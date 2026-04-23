@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">删除所有云数据？</string>
     <string name="dialog_delete_cloud_data_description">这将永久从 CloudSync (Supabase) 和 Google 云端硬盘中删除您的笔记、标签和备份。其他用户与您共享的笔记以及保存在此设备上的本地笔记不受影响。此操作无法撤销。</string>
     <string name="msg_cloud_data_deleted">云数据已删除</string>
+
+    <string name="option_paint">画画</string>
 </resources>

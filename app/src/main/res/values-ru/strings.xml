@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">Удалить все облачные данные?</string>
     <string name="dialog_delete_cloud_data_description">Это навсегда удалит ваши заметки, теги и резервные копии из CloudSync (Supabase) и Google Drive. Заметки, которыми с вами поделились другие пользователи, и заметки, сохраненные локально на этом устройстве, затронуты не будут. Это действие нельзя отменить.</string>
     <string name="msg_cloud_data_deleted">Облачные данные удалены</string>
+
+    <string name="option_paint">Рисование</string>
 </resources>

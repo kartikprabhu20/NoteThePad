@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">¿Eliminar todos los datos en la nube?</string>
     <string name="dialog_delete_cloud_data_description">Esto elimina permanentemente sus notas, etiquetas y copias de seguridad de CloudSync (Supabase) y Google Drive. Las notas compartidas con usted por otros usuarios y las notas guardadas localmente en este dispositivo no se ven afectadas. Esto no se puede deshacer.</string>
     <string name="msg_cloud_data_deleted">Datos en la nube eliminados</string>
+
+    <string name="option_paint">Pintar</string>
 </resources>

@@ -70,4 +70,6 @@
     <string name="dialog_delete_cloud_data_title">Delete all cloud data?</string>
     <string name="dialog_delete_cloud_data_description">This permanently removes your notes, tags, and backups from CloudSync (Supabase) and Google Drive. Notes shared with you by other users, and notes saved locally on this device, are not affected. This cannot be undone.</string>
     <string name="msg_cloud_data_deleted">Cloud data deleted</string>
+
+    <string name="option_paint">Paint</string>
 </resources>

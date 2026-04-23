@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">حذف جميع البيانات السحابية؟</string>
     <string name="dialog_delete_cloud_data_description">سيؤدي هذا إلى إزالة ملاحظاتك وعلاماتك ونسخك الاحتياطية نهائيًا من مزامنة السحابة (Supabase) وGoogle Drive. لا تتأثر الملاحظات التي شاركها معك مستخدمون آخرون والملاحظات المحفوظة محليًا على هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.</string>
     <string name="msg_cloud_data_deleted">تم حذف البيانات السحابية</string>
+
+    <string name="option_paint">رسم</string>
 </resources>

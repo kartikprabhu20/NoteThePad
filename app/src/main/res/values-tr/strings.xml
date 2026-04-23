@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">Tüm bulut verileri silinsin mi?</string>
     <string name="dialog_delete_cloud_data_description">Bu işlem notlarınızı, etiketlerinizi ve yedeklerinizi CloudSync (Supabase) ve Google Drive\'dan kalıcı olarak kaldırır. Diğer kullanıcıların sizinle paylaştığı notlar ve bu cihazda yerel olarak kaydedilen notlar etkilenmez. Bu işlem geri alınamaz.</string>
     <string name="msg_cloud_data_deleted">Bulut verileri silindi</string>
+
+    <string name="option_paint">Boya</string>
 </resources>

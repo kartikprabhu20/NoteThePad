@@ -51,4 +51,6 @@
     <string name="dialog_delete_cloud_data_title">सभी क्लाउड डेटा हटाएं?</string>
     <string name="dialog_delete_cloud_data_description">यह क्लाउड सिंक (Supabase) और Google ड्राइव से आपके नोट्स, टैग और बैकअप को स्थायी रूप से हटा देता है। अन्य उपयोगकर्ताओं द्वारा आपके साथ साझा किए गए नोट्स और इस डिवाइस पर स्थानीय रूप से सहेजे गए नोट्स प्रभावित नहीं होते हैं। इसे पूर्ववत नहीं किया जा सकता।</string>
     <string name="msg_cloud_data_deleted">क्लाउड डेटा हटा दिया गया</string>
+
+    <string name="option_paint">पेंट</string>
 </resources>
