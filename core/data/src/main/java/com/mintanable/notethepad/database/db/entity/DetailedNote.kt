@@ -18,7 +18,8 @@ data class DetailedNote (
     val backgroundImage: Int = -1,
     val lastUpdateTime: Long = 0L,
     val isSynced: Boolean = false,
-    val summary: String = ""
+    val summary: String = "",
+    val paintUris: List<String> = emptyList()
 ){
     fun toNote(): NoteEntity{
         val json = JSONObject()
@@ -37,7 +38,8 @@ data class DetailedNote (
             audioTranscriptions = json.toString(),
             backgroundImage = backgroundImage,
             isSynced = isSynced,
-            summary = summary
+            summary = summary,
+            paintUris = paintUris
         )
     }
 }

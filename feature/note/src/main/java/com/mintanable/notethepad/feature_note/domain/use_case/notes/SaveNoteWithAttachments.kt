@@ -38,7 +38,8 @@ class SaveNoteWithAttachments(
         checkboxItems: List<CheckboxItem>,
         tagEntities: List<TagEntity> = emptyList(),
         backgroundImage: Int = -1,
-        summary: String = ""
+        summary: String = "",
+        paintUris: List<String> = emptyList()
     ) : Result<String> {
 
         Log.d("kptest", "SaveNoteWithAttachments invoke: ${imageUris+audioUris}")
@@ -77,7 +78,8 @@ class SaveNoteWithAttachments(
                     reminderTime = reminderTime,
                     audioTranscriptions = transcriptionsJson,
                     backgroundImage = backgroundImage,
-                    summary = summary
+                    summary = summary,
+                    paintUris = paintUris
                 )
             } else {
                 NoteEntity(
@@ -90,7 +92,8 @@ class SaveNoteWithAttachments(
                     reminderTime = reminderTime,
                     audioTranscriptions = transcriptionsJson,
                     backgroundImage = backgroundImage,
-                    summary = summary
+                    summary = summary,
+                    paintUris = paintUris
                 )
             }
            val newNoteEntityId = repository.insertNote(noteToInsert, tagEntities)

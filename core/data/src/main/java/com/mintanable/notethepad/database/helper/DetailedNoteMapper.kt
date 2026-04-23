@@ -71,7 +71,8 @@ class DetailedNoteMapper @Inject constructor(
             backgroundImage = noteEntity.backgroundImage,
             lastUpdateTime = noteEntity.lastUpdateTime,
             isSynced = noteEntity.isSynced,
-            summary = noteEntity.summary
+            summary = noteEntity.summary,
+            paintUris = noteEntity.paintUris
         )
     }
 }
