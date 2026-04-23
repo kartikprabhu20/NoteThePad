@@ -29,6 +29,10 @@ sealed class SettingsEvent {
     data object DismissDownloadDialog : SettingsEvent()
     data object SignOut : SettingsEvent()
     data class ClearAppData(val onFailure: (String) -> Unit) : SettingsEvent()
+    data class DeleteAllCloudData(
+        val onSuccess: () -> Unit,
+        val onFailure: (String) -> Unit
+    ) : SettingsEvent()
     data object RequestDownloadAudioTranscriber : SettingsEvent()
     data object ConfirmDownloadAudioTranscriber : SettingsEvent()
     data object DismissDownloadAudioTranscriberDialog : SettingsEvent()

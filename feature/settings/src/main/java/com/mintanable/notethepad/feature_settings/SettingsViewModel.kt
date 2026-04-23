@@ -42,6 +42,7 @@ import com.mintanable.notethepad.feature_ai.data.GeminiAudioModelDownloadWorker
 import com.mintanable.notethepad.core.analytics.AnalyticsEvent
 import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.core.analytics.internal.AnalyticsPreferences
+import com.mintanable.notethepad.feature_settings.domain.use_case.DeleteAllCloudDataUseCase
 import com.mintanable.notethepad.feature_settings.domain.use_case.DeleteFileUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -90,6 +91,7 @@ class SettingsViewModel @Inject constructor(
     private val downloadGeminiAudioTranscriberUseCase: DownloadGeminiAudioTranscriberUseCase,
     private val noteRepository: NoteRepository,
     private val deleteFileUsecase: DeleteFileUsecase,
+    private val deleteAllCloudDataUseCase: DeleteAllCloudDataUseCase,
     private val analyticsTracker: AnalyticsTracker,
     private val analyticsPreferences: AnalyticsPreferences
 ) : ViewModel() {
@@ -271,6 +273,7 @@ class SettingsViewModel @Inject constructor(
             }
             SettingsEvent.SignOut -> signOut()
             is SettingsEvent.ClearAppData -> clearAppData(event.onFailure)
+            is SettingsEvent.DeleteAllCloudData -> deleteAllCloudData(event.onSuccess, event.onFailure)
             SettingsEvent.RequestDownloadAudioTranscriber -> _showDownloadAudioTranscriberDialog.value = true
             SettingsEvent.ConfirmDownloadAudioTranscriber -> confirmDownloadAudioTranscriber()
             SettingsEvent.DismissDownloadAudioTranscriberDialog -> _showDownloadAudioTranscriberDialog.value = false
@@ -300,6 +303,20 @@ class SettingsViewModel @Inject constructor(
                 .onFailure { error ->
                     onFailure(error.message ?: "Failed to clear app data")
                 }
+            _isAuthorisingBackup.value = false
+        }
+    }
+
+    private fun deleteAllCloudData(onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            if (!canPerformNetworkTask(onFailure)) return@launch
+            _isAuthorisingBackup.value = true
+            deleteAllCloudDataUseCase()
+                .onSuccess {
+                    refreshTrigger.emit(Unit)
+                    onSuccess()
+                }
+                .onFailure { err -> onFailure(err.message ?: "Failed to delete cloud data") }
             _isAuthorisingBackup.value = false
         }
     }
