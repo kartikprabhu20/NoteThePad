@@ -39,9 +39,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.mintanable.notethepad.NoteColors
+import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AttachedImageItem
 import com.mintanable.notethepad.feature_note.presentation.modify.components.MagicButton
+import com.mintanable.notethepad.feature_note.presentation.notes.util.AttachmentHelper
 import java.io.File
 import com.mintanable.notethepad.theme.NoteThePadTheme
 import com.mintanable.notethepad.theme.ThemePreviews
@@ -123,20 +125,22 @@ fun LazyListScope.attachedImagesSection(
                     }
                 }
 
-                with(animatedVisibilityScope) {
-                    MagicButton(
-                        title = stringResource(R.string.analyze_images),
-                        isVisible = isAnalyzeImageSupported,
-                        modifier = Modifier.fillMaxWidth()
-                            .animateEnterExit(
-                                enter = fadeIn(tween(300)),
-                                exit = fadeOut(tween(100)) // Keep the exit fast
-                            ),
-                        shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
-                        onButtonClicked = onAnalyzeImageClicked,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
+                if(images.filter { AttachmentHelper.getAttachmentType(LocalContext.current, it) == AttachmentType.IMAGE }.isNotEmpty()) {
+                    with(animatedVisibilityScope) {
+                        MagicButton(
+                            title = stringResource(R.string.analyze_images),
+                            isVisible = isAnalyzeImageSupported,
+                            modifier = Modifier.fillMaxWidth()
+                                .animateEnterExit(
+                                    enter = fadeIn(tween(300)),
+                                    exit = fadeOut(tween(100)) // Keep the exit fast
+                                ),
+                            shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp),
+                            onButtonClicked = onAnalyzeImageClicked,
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                    }
                 }
             }
         }
