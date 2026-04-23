@@ -149,4 +149,55 @@
     <string name="setting_privacy">Privacy</string>
     <string name="setting_analytics_toggle">Share usage data</string>
     <string name="setting_analytics_description">Help improve NoteThePad by sharing anonymous usage data</string>
+
+    <!-- Help and Feedback -->
+    <string name="help_and_feedback_title">Help and Feedback</string>
+    <string name="help_section_header">How to…</string>
+    <string name="feedback_section_header">Feedback</string>
+    <string name="help_email_us_title">Email us</string>
+    <string name="help_email_us_subtitle">mintanables@gmail.com</string>
+    <string name="help_rate_us_title">Rate on Play Store</string>
+    <string name="help_rate_us_subtitle">Let us know what you think</string>
+    <string name="feedback_email_subject">NoteThePad feedback</string>
+    <string name="msg_no_email_app">No email app found on this device</string>
+    <string name="msg_no_play_store">Play Store not available</string>
+
+    <string name="help_item_create_note_title">Create a note</string>
+    <string name="help_item_create_note_steps">Tap the floating + button on the Notes screen.\nEnter a title and start typing in the content field.\nPress the back arrow — your note saves automatically.</string>
+
+    <string name="help_item_checklist_title">Make a checklist note</string>
+    <string name="help_item_checklist_steps">Open or create a note.\nTap the checkbox icon in the bottom action bar.\nEnable the checklist toggle.\nType each item on its own line and tap the box to check it off.</string>
+
+    <string name="help_item_rich_text_title">Format text (bold, italic, bullets)</string>
+    <string name="help_item_rich_text_steps">Select the text in the content space.\nClick on the Text formatting icon in the bottom action bar. \nThe text formatting toolbar appears at the bottom.\nTap Bold, Italic, Underline, or Bullet list to apply.</string>
+
+    <string name="help_item_attachments_title">Add images, audio, or video</string>
+    <string name="help_item_attachments_steps">Open or create a note.\nTap the attach (paperclip) icon in the bottom action bar.\nChoose Camera, Gallery, Audio, or Video.\nThe media appears inline in the note.</string>
+
+    <string name="help_item_reminder_title">Set a reminder on a note</string>
+    <string name="help_item_reminder_steps">Open or create a note.\nTap the bell (reminder) icon in the bottom action bar.\nPick a date and time.\nThe alarm is scheduled and a reminder badge appears on the note.</string>
+
+    <string name="help_item_share_note_title">Share a note</string>
+    <string name="help_item_share_note_steps">Open the note you want to share.\nTap the three-dot More menu.\nTap Share.\nChoose the app to share via (email, messaging, etc.).</string>
+
+    <string name="help_item_collaborate_title">Collaborate with others</string>
+    <string name="help_item_collaborate_steps">Sign in with Google and enable CloudSync in Settings.\nOpen the note and tap the three-dot More menu.\nTap Collaborate.\nEnter the collaborator\'s email and send the invite. You can remove collaborators or leave a shared note from the same dialog.</string>
+
+    <string name="help_item_ai_assistant_title">Use the AI Assistant</string>
+    <string name="help_item_ai_assistant_steps">Enable the AI Assistant in Settings (requires a model download).\nOpen a note and tap the magic-wand button.\nType a request, or tap the microphone to speak.\nThe assistant can summarize, auto-tag, schedule reminders, and more.</string>
+
+    <string name="help_item_tags_title">Organize notes with tags</string>
+    <string name="help_item_tags_steps">Open a note and tap the three-dot More menu.\nTap Add label and pick an existing tag or create a new one.\nUse the side drawer to browse notes filtered by tag.</string>
+
+    <string name="help_item_export_pdf_title">Export a note as PDF</string>
+    <string name="help_item_export_pdf_steps">Open the note.\nTap the three-dot More menu.\nTap Export as PDF.\nChoose where to share or save the generated file.</string>
+
+    <string name="help_item_pin_widget_title">Pin a note as a home-screen widget</string>
+    <string name="help_item_pin_widget_steps">Open the note.\nTap the three-dot More menu and tap Pin as widget.\nConfirm placement on the home screen.\nThe note appears as a Single Note widget.</string>
+
+    <string name="help_item_backup_restore_title">Back up and restore via Google Drive</string>
+    <string name="help_item_backup_restore_steps">Open Settings and sign in with Google.\nTurn on Automatic backup and pick a frequency.\nUse Backup Now for an immediate backup, or Restore Now to recover a previous one.</string>
+
+    <string name="help_item_cloud_sync_title">Enable cloud sync across devices</string>
+    <string name="help_item_cloud_sync_steps">Sign in with Google from Settings or the drawer.\nTurn on CloudSync in Settings.\nYour notes sync in real time across your signed-in devices (media isn\'t synced).</string>
 </resources>
