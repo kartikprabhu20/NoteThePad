@@ -544,12 +544,14 @@ class AddEditNoteViewModel @Inject constructor(
                     if (state.attachedPaints.contains(event.uri)) state
                     else state.copy(attachedPaints = state.attachedPaints + event.uri)
                 }
+                analyticsTracker.track(AttachmentAdded("paint", "canvas"))
             }
 
             is AddEditNoteEvent.RemovePaint -> {
                 analyticsTracker.track(AttachmentRemoved("paint"))
                 _uiState.update { it.copy(attachedPaints = it.attachedPaints - event.uri) }
                 viewModelScope.launch { fileIOUseCases.deleteFiles(listOf(event.uri.toString())) }
+                analyticsTracker.track(AttachmentRemoved("paint"))
             }
 
             is AddEditNoteEvent.RemoveAudio -> {
