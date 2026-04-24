@@ -34,7 +34,7 @@ class FileManager @Inject constructor(
             try {
                 val internalFile = getFileFromInternalUri(uri)
                 if (internalFile != null && internalFile.exists()) {
-                    return@withContext internalFile.absolutePath
+                    return@withContext Uri.fromFile(internalFile).toString()
                 }
                 val extension = getExtensionFromUri(uri)
                 val fileName = (if(prefix.isNullOrBlank()) "media" else "$prefix")+ "_${System.currentTimeMillis()}_${UUID.randomUUID()}.$extension"
@@ -45,11 +45,22 @@ class FileManager @Inject constructor(
                         input.copyTo(output)
                     }
                 }
-                destFile.absolutePath
+                Uri.fromFile(destFile).toString()
             } catch (e: Exception) {
                 Log.e("FileManager", "Error saving media", e)
                 null
             }
+        }
+    }
+
+    fun resolveToContentUri(stored: String): Uri? {
+        val file = getFileFromUri(stored) ?: return null
+        if (!file.exists()) return null
+        return try {
+            FileProvider.getUriForFile(context, authority, file)
+        } catch (e: Exception) {
+            Log.e("FileManager", "Error resolving $stored to content URI", e)
+            null
         }
     }
 

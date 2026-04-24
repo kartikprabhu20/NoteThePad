@@ -1,6 +1,7 @@
 package com.mintanable.notethepad.feature_note.presentation.paint
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.mintanable.notethepad.file.FileManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +46,7 @@ class PaintViewModel @Inject constructor(
             FileOutputStream(destFile).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             }
-            destFile.absolutePath
+            Uri.fromFile(destFile).toString()
         }.getOrNull()
     }
 }

@@ -48,6 +48,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
 import com.mintanable.notethepad.feature_note.presentation.AddEditNoteUiState
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.file.AttachmentHelper
+import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.permissions.DeniedType
 import com.mintanable.notethepad.feature_note.presentation.notes.BottomSheetType
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
@@ -109,6 +110,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val snapshotTracker: SnapshotTracker,
     private val notePdfExporter: NotePdfExporter,
+    private val fileManager: FileManager,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private var imageQueryJob: Job? = null
@@ -296,8 +298,8 @@ class AddEditNoteViewModel @Inject constructor(
                         ),
                         noteColor = detailedNote.color,
                         backgroundImage = detailedNote.backgroundImage,
-                        attachedImages = detailedNote.imageUris.map { imgString -> imgString.toUri() },
-                        attachedPaints = detailedNote.paintUris.map { paintString -> paintString.toUri() },
+                        attachedImages = detailedNote.imageUris.mapNotNull { fileManager.resolveToContentUri(it) },
+                        attachedPaints = detailedNote.paintUris.mapNotNull { fileManager.resolveToContentUri(it) },
                         attachedAudios = detailedNote.audioAttachments,
                         reminderTime = detailedNote.reminderTime,
                         checkListItems = detailedNote.checkListItems,

@@ -36,6 +36,7 @@ import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCa
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.permissions.PermissionUsecases
 import com.mintanable.notethepad.feature_note.domain.use_case.tags.TagUseCases
+import com.mintanable.notethepad.file.FileManager
 import com.mintanable.notethepad.permissions.DeniedType
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -88,6 +89,7 @@ class AddEditNoteViewModelTest {
     private val analyticsTracker = mockk<AnalyticsTracker>(relaxed = true)
     private val snapshotTracker = mockk<SnapshotTracker>(relaxed = true)
     private val pdfExporter = mockk<NotePdfExporter>(relaxed = true)
+    private val fileManager = mockk<FileManager>(relaxed = true)
 
 
     private val appContext = mockk<Context>(relaxed = true)
@@ -100,7 +102,7 @@ class AddEditNoteViewModelTest {
         tagUseCases, getAutoTagsUseCase, startLiveTranscription, stopLiveTranscription,
         transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase,
         authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName, analyticsTracker,
-        snapshotTracker, pdfExporter,appContext
+        snapshotTracker, pdfExporter, fileManager, appContext
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
