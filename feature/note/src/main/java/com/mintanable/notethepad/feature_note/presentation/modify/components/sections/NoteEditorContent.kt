@@ -36,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AttachFile
@@ -230,6 +231,14 @@ fun NoteEditorContent(
             topBar = {
                 TopAppBar(
                     title = { },
+                    navigationIcon = {
+                        IconButton(onClick = { onEvent(AddEditNoteEvent.SaveNote) }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.content_description_back)
+                            )
+                        }
+                    },
                     windowInsets = WindowInsets.statusBars,
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
