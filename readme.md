@@ -23,6 +23,11 @@
 | <img src="metadata/playstore_5.png" width="250"> | <img src="metadata/playstore_6.png" width="250"> | <img src="metadata/playstore_7.png" width="250"> | <img src="metadata/playstore_8.png" width="250"> |
 |      *Header, Paragraphs, Bullets, B, I, U*      |       *Summarize text, recordings, images*       |              *One-click assistance*              |      *Single or Notelist, for quick access*      |
 
+|            **Integrated Paint canvas**            |  
+|:-------------------------------------------------:|
+| <img src="metadata/playstore_11.png" width="250"> | 
+|         *Creativity, Sketch, Handwriting*         |      
+
 ---
 
 ## Agentic AI
