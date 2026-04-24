@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_note.presentation.paint
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.BlendMode
@@ -9,7 +10,6 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.os.Build
 import android.util.Log
-import androidx.core.net.toUri
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
@@ -33,6 +33,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,6 +43,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -61,10 +63,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -120,8 +124,16 @@ fun PaintScreenContent(
 ) {
     val density = LocalDensity.current
     val context = LocalContext.current
+    val view = LocalView.current
     val displayMetrics = context.resources.displayMetrics
     val canvasDensity = displayMetrics.densityDpi
+
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+        }
+    }
 
     val canvasColor = android.graphics.Color.WHITE
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
@@ -307,8 +319,7 @@ fun PaintScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .border(width = with(density) { 4.toDp() }, color = Color.Black)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
                 .onSizeChanged { canvasSize = it }
         ) {
             var scale by remember { mutableStateOf(1f) }
