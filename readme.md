@@ -26,7 +26,7 @@
 |            **Integrated Paint canvas**            |  
 |:-------------------------------------------------:|
 | <img src="metadata/playstore_11.png" width="250"> | 
-|         *Creativity, Sketch, Handwriting*         |      
+|         *Sketching & Handwriting*         |      
 
 ---
 
@@ -67,7 +67,9 @@ Local models are downloaded from Hugging Face and run entirely on-device for pri
 - Undo / Redo: Per-note history with 50-step stack
 - Export as PDF: Paginated A4 export of title, attached images, body/checklist, and tags; shareable via the Android chooser
 
-### Multimedia
+### Multimedia & Creativity
+- Integrated Paint Canvas: High-precision drawing engine for sketches, diagrams, and handwriting
+- Multi-Tool Support: Brush, Highlighter, and Eraser with customizable colors and stroke sizes
 - Attach images, audio recordings, and video
 - In-app audio recording and playback
 - Image capture and gallery integration
