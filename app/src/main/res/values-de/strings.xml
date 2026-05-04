@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">Leinwand leeren?</string>
     <string name="paint_clear_canvas_dialog_message">Dies wird alles löschen, was Sie gezeichnet haben. Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="btn_clear">Leeren</string>
+    <string name="option_add">Hinzufügen</string>
+    <string name="checklist_add_item_hint">Listenelement</string>
 </resources>

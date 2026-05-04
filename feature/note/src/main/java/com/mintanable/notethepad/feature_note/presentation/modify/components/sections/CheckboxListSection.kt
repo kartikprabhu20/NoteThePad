@@ -1,12 +1,14 @@
 package com.mintanable.notethepad.feature_note.presentation.modify.components.sections
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,6 +16,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material3.Checkbox
@@ -22,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +38,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -57,36 +66,50 @@ fun LazyListScope.checkboxListSection(
     onEnterPressed: (CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
     onListOrderUpdated: (List<CheckboxItem>) -> Unit,
+    onDeleteItem: (String) -> Unit,
+    onAddItemClicked: () -> Unit,
+    onBackspaceOnEmpty: (String) -> Unit,
     onDragStateChangedChecked: (String?) -> Unit,
     onDragStateChangedUnChecked: (String?) -> Unit
 ) {
 
     val uncheckedList = items.filter { !it.isChecked }
     val checkedList = items.filter { it.isChecked }
+    val flatOrder = uncheckedList + checkedList
 
     checkboxGroup(
         activeDragIndex = activeDragCheckIndex,
         items = uncheckedList,
         focusRequesters = focusRequesters,
         isDoneGroup = false,
+        previousIdProvider = { groupIndex ->
+            val flatIndex = groupIndex
+            flatOrder.getOrNull(flatIndex - 1)?.id
+        },
         onMove = { from, to ->
             val newUncheckedList = uncheckedList.toMutableList().apply { add(to, removeAt(from)) }
             onListOrderUpdated(newUncheckedList + checkedList)
         },
         onEnterPressed = onEnterPressed,
         onItemChanged = onItemChanged,
-        onDeletePressed = { index ->
-            val newUncheckedList = uncheckedList.toMutableList().apply { removeAt(index) }
-            onListOrderUpdated(newUncheckedList + checkedList)
-        },
+        onDeletePressed = onDeleteItem,
+        onBackspaceOnEmpty = onBackspaceOnEmpty,
         onDragStateChanged = onDragStateChangedChecked
-        
     )
+
+    item(key = "add-item-row") {
+        AddItemRow(
+            modifier = Modifier.animateItem(),
+            onClick = onAddItemClicked
+        )
+    }
 
     if (uncheckedList.isNotEmpty() && checkedList.isNotEmpty()) {
         item(key = "divider") {
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                modifier = Modifier
+                    .animateItem()
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -96,15 +119,17 @@ fun LazyListScope.checkboxListSection(
         items = checkedList,
         focusRequesters = focusRequesters,
         isDoneGroup = true,
+        previousIdProvider = { groupIndex ->
+            val flatIndex = uncheckedList.size + groupIndex
+            flatOrder.getOrNull(flatIndex - 1)?.id
+        },
         onMove = { from, to ->
             val newCheckedList = checkedList.toMutableList().apply { add(to, removeAt(from)) }
             onListOrderUpdated(uncheckedList + newCheckedList)
         },
         onItemChanged = onItemChanged,
-        onDeletePressed = { index ->
-            val newCheckedList = checkedList.toMutableList().apply { removeAt(index) }
-            onListOrderUpdated(uncheckedList + newCheckedList)
-        },
+        onDeletePressed = onDeleteItem,
+        onBackspaceOnEmpty = onBackspaceOnEmpty,
         onEnterPressed = onEnterPressed,
         onDragStateChanged = onDragStateChangedUnChecked
     )
@@ -115,13 +140,15 @@ fun CheckboxRow(
     item: CheckboxItem,
     isHeld: Boolean,
     focusRequester: FocusRequester,
+    previousFocusRequester: FocusRequester?,
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(),
     isSingleLine: Boolean = false,
     onEnterPressed:(CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
-    onDeletePressed: (String) -> Unit
+    onDeletePressed: (String) -> Unit,
+    onBackspaceOnEmpty: (String) -> Unit
 ) {
     LaunchedEffect(item.id) {
         if (item.text.isEmpty()) {
@@ -165,7 +192,19 @@ fun CheckboxRow(
                 .padding(top = 14.dp, bottom = 8.dp)
                 .padding(horizontal = 4.dp)
                 .weight(1F)
-                .focusRequester(focusRequester),
+                .focusRequester(focusRequester)
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown &&
+                        event.key == Key.Backspace &&
+                        item.text.isEmpty()
+                    ) {
+                        previousFocusRequester?.requestFocus()
+                        onBackspaceOnEmpty(item.id)
+                        true
+                    } else {
+                        false
+                    }
+                },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next
             ),
@@ -189,30 +228,84 @@ fun CheckboxRow(
     }
 }
 
+@Composable
+fun AddItemRow(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .padding(top = 12.dp)
+                .size(24.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                .size(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(R.string.option_add),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Text(
+            text = stringResource(R.string.checklist_add_item_hint),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            fontSize = 16.sp,
+            modifier = Modifier
+                .padding(top = 14.dp, bottom = 8.dp)
+                .padding(horizontal = 4.dp)
+                .weight(1F)
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(8.dp)
+                .size(24.dp)
+        )
+    }
+}
+
 fun LazyListScope.checkboxGroup(
     activeDragIndex: String?,
     items: List<CheckboxItem>,
     focusRequesters: MutableMap<String, FocusRequester>,
     isDoneGroup: Boolean,
+    previousIdProvider: (Int) -> String?,
     onMove: (Int, Int) -> Unit,
     onEnterPressed: (CheckboxItem) -> Unit,
     onItemChanged: (CheckboxItem) -> Unit,
-    onDeletePressed: (Int) -> Unit,
+    onDeletePressed: (String) -> Unit,
+    onBackspaceOnEmpty: (String) -> Unit,
     onDragStateChanged: (String?) -> Unit,
 ) {
     itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
         val requester = focusRequesters.getOrPut(item.id) { FocusRequester() }
+        val previousRequester = previousIdProvider(index)?.let { focusRequesters[it] }
         val isHeld = item.id == activeDragIndex
         CheckboxRow(
             item = item,
             isHeld = isHeld,
             focusRequester = requester,
+            previousFocusRequester = previousRequester,
             textStyle = TextStyle(
                 textDecoration = if (isDoneGroup) TextDecoration.LineThrough else TextDecoration.None,
                 color = if (isDoneGroup) Color.Gray else Color.Black
             ),
             modifier = Modifier
-                .animateItem()
+                .animateItem(fadeInSpec = null, fadeOutSpec = null)
                 .zIndex(if (isHeld) 1f else 0f)
                 .graphicsLayer {
                     shadowElevation = if (isHeld) 10f else 0f
@@ -225,7 +318,8 @@ fun LazyListScope.checkboxGroup(
                 ),
             onEnterPressed = onEnterPressed,
             onItemChanged = onItemChanged,
-            onDeletePressed = { onDeletePressed(index) }
+            onDeletePressed = onDeletePressed,
+            onBackspaceOnEmpty = onBackspaceOnEmpty
         )
     }
 }
@@ -315,6 +409,9 @@ fun PreviewCheckboxListSection(){
                     onEnterPressed = {},
                     onItemChanged = {},
                     onListOrderUpdated = {},
+                    onDeleteItem = {},
+                    onAddItemClicked = {},
+                    onBackspaceOnEmpty = {},
                     onDragStateChangedChecked = {},
                     onDragStateChangedUnChecked = { },
                 )

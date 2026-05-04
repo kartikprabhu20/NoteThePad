@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">キャンバスをクリアしますか？</string>
     <string name="paint_clear_canvas_dialog_message">描いたものがすべて消去されます。この操作は取り消せません。</string>
     <string name="btn_clear">クリア</string>
+    <string name="option_add">追加</string>
+    <string name="checklist_add_item_hint">リストアイテム</string>
 </resources>

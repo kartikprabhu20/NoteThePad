@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">Limpar tela?</string>
     <string name="paint_clear_canvas_dialog_message">Isso apagará tudo o que você desenhou. Esta ação não pode ser desfeita.</string>
     <string name="btn_clear">Limpar</string>
+    <string name="option_add">Adicionar</string>
+    <string name="checklist_add_item_hint">Item da lista</string>
 </resources>

@@ -752,6 +752,14 @@ class AddEditNoteViewModel @Inject constructor(
                 }
             }
 
+            is AddEditNoteEvent.RemoveChecklistItem -> {
+                _uiState.update { state ->
+                    state.copy(
+                        checkListItems = state.checkListItems.filterNot { it.id == event.id }
+                    )
+                }
+            }
+
             is AddEditNoteEvent.ShowLabelDialog -> {
                 _uiState.update { it.copy(showAddNewTagDialog = true) }
             }

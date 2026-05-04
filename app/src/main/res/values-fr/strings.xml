@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">Effacer le canevas ?</string>
     <string name="paint_clear_canvas_dialog_message">Cela effacera tout ce que vous avez dessiné. Cette action est irréversible.</string>
     <string name="btn_clear">Effacer</string>
+    <string name="option_add">Ajouter</string>
+    <string name="checklist_add_item_hint">Élément de la liste</string>
 </resources>

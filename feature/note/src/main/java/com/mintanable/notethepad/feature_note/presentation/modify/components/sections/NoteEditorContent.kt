@@ -161,6 +161,13 @@ fun NoteEditorContent(
         }
     }
 
+    LaunchedEffect(checkListItems.size) {
+        if (isCheckboxListAvailable && checkListItems.isNotEmpty()) {
+            val target = (lazyListState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0)
+            lazyListState.animateScrollToItem(target)
+        }
+    }
+
     val extraBottomPadding by animateDpAsState(
         targetValue = when {
             showMagicButton || showSummarizeButton -> 56.dp
@@ -186,7 +193,7 @@ fun NoteEditorContent(
             containerColor = Color.Transparent,
             bottomBar = {
                 CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
-                    Box(modifier = Modifier.imePadding()) {
+                    Box {
                         AnimatedContent(
                             targetState = isRichTextBarActive,
                             label = "BottomBarSwitch"
@@ -268,7 +275,9 @@ fun NoteEditorContent(
                     }
                 )
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
             floatingActionButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -425,6 +434,11 @@ fun NoteEditorContent(
                             onListOrderUpdated = { orderedList ->
                                 onEvent(AddEditNoteEvent.UpdateCheckList(orderedList))
                             },
+                            onDeleteItem = { id -> onEvent(AddEditNoteEvent.RemoveChecklistItem(id)) },
+                            onAddItemClicked = {
+                                onEvent(AddEditNoteEvent.AddChecklistItem(CheckboxItem(text = "", isChecked = false)))
+                            },
+                            onBackspaceOnEmpty = { id -> onEvent(AddEditNoteEvent.RemoveChecklistItem(id)) },
                             onDragStateChangedChecked = { activeDragCheckIndex = it },
                             onDragStateChangedUnChecked = { activeDragUnCheckIndex = it }
                         )

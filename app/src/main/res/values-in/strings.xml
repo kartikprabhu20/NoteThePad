@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">Bersihkan kanvas?</string>
     <string name="paint_clear_canvas_dialog_message">Ini akan menghapus semua yang telah Anda gambar. Tindakan ini tidak dapat dibatalkan.</string>
     <string name="btn_clear">Bersihkan</string>
+    <string name="option_add">Tambahkan</string>
+    <string name="checklist_add_item_hint">Item daftar</string>
 </resources>

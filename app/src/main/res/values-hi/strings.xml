@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">कैनवास साफ करें?</string>
     <string name="paint_clear_canvas_dialog_message">यह आपके द्वारा खींची गई हर चीज़ को मिटा देगा। इस क्रिया को पूर्ववत नहीं किया जा सकता है।</string>
     <string name="btn_clear">साफ करें</string>
+    <string name="option_add">जोड़ें</string>
+    <string name="checklist_add_item_hint">सूची का आइटम</string>
 </resources>

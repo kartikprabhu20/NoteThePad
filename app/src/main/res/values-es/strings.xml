@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">¿Limpiar lienzo?</string>
     <string name="paint_clear_canvas_dialog_message">Esto borrará todo lo que has dibujado. Esta acción no se puede deshacer.</string>
     <string name="btn_clear">Limpiar</string>
+    <string name="option_add">Añadir</string>
+    <string name="checklist_add_item_hint">Elemento de la lista</string>
 </resources>

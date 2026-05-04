@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">Очистить холст?</string>
     <string name="paint_clear_canvas_dialog_message">Это сотрет все, что вы нарисовали. Это действие нельзя отменить.</string>
     <string name="btn_clear">Очистить</string>
+    <string name="option_add">Добавить</string>
+    <string name="checklist_add_item_hint">Элемент списка</string>
 </resources>

@@ -38,6 +38,7 @@ sealed class AddEditNoteEvent {
     data object ToggleCheckbox : AddEditNoteEvent()
     data class UpdateCheckList(val list: List<CheckboxItem>) : AddEditNoteEvent()
     data class AddChecklistItem(val previousCheckItem: CheckboxItem) : AddEditNoteEvent()
+    data class RemoveChecklistItem(val id: String) : AddEditNoteEvent()
     data object PinNote : AddEditNoteEvent()
     data object ShowLabelDialog : AddEditNoteEvent()
     data class InsertLabel(val tagName: String) : AddEditNoteEvent()

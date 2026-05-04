@@ -58,4 +58,6 @@
     <string name="paint_clear_canvas_dialog_title">Xóa khung vẽ?</string>
     <string name="paint_clear_canvas_dialog_message">Thao tác này sẽ xóa mọi thứ bạn đã vẽ. Thao tác này không thể hoàn tác.</string>
     <string name="btn_clear">Xóa</string>
+    <string name="option_add">Thêm</string>
+    <string name="checklist_add_item_hint">Mục danh sách</string>
 </resources>
