@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Pin a specific note to your home screen</string>
     <string name="widget_title_note_collection">Note collection</string>
     <string name="widget_title_single_note">Single Note</string>
+    <string name="widget_title_daily_reminders">Today\'s reminders</string>
+    <string name="widget_title_weekly_reminders">Weekly reminders</string>
+    <string name="widget_description_weekly_reminders">Pick a day this week and view its reminders</string>
+    <string name="widget_title_monthly_calendar">Monthly calendar</string>
+    <string name="widget_title_quick_action">Quick capture</string>
+    <string name="widget_empty_today">No reminders today</string>
+    <string name="widget_empty_day">No reminders on %1$s</string>
 </resources>

@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Fixieren Sie eine bestimmte Notiz auf Ihrem Startbildschirm</string>
     <string name="widget_title_note_collection">Notizsammlung</string>
     <string name="widget_title_single_note">Einzelne Notiz</string>
+    <string name="widget_title_daily_reminders">Heutige Erinnerungen</string>
+    <string name="widget_title_weekly_reminders">Wöchentliche Erinnerungen</string>
+    <string name="widget_description_weekly_reminders">Wählen Sie einen Tag in dieser Woche und sehen Sie seine Erinnerungen</string>
+    <string name="widget_title_monthly_calendar">Monatskalender</string>
+    <string name="widget_title_quick_action">Schnellerfassung</string>
+    <string name="widget_empty_today">Keine Erinnerungen heute</string>
+    <string name="widget_empty_day">Keine Erinnerungen am %1$s</string>
 </resources>

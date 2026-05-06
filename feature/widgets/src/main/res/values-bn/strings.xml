@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">আপনার হোম স্ক্রিনে একটি নির্দিষ্ট নোট পিন করুন</string>
     <string name="widget_title_note_collection">নোট সংগ্রহ</string>
     <string name="widget_title_single_note">একটি নোট</string>
+    <string name="widget_title_daily_reminders">আজকের রিমাইন্ডার</string>
+    <string name="widget_title_weekly_reminders">সাপ্তাহিক রিমাইন্ডার</string>
+    <string name="widget_description_weekly_reminders">এই সপ্তাহের একটি দিন বেছে নিন এবং এর রিমাইন্ডারগুলো দেখুন</string>
+    <string name="widget_title_monthly_calendar">মাসিক ক্যালেন্ডার</string>
+    <string name="widget_title_quick_action">কুইক ক্যাপচার</string>
+    <string name="widget_empty_today">আজ কোনও রিমাইন্ডার নেই</string>
+    <string name="widget_empty_day">%1$s-এ কোনও রিমাইন্ডার নেই</string>
 </resources>

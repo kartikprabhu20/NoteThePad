@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Giriş ekranınıza belirli bir notu sabitleyin</string>
     <string name="widget_title_note_collection">Not Koleksiyonu</string>
     <string name="widget_title_single_note">Tek Not</string>
+    <string name="widget_title_daily_reminders">Bugünün hatırlatıcıları</string>
+    <string name="widget_title_weekly_reminders">Haftalık hatırlatıcılar</string>
+    <string name="widget_description_weekly_reminders">Bu hafta bir gün seçin ve hatırlatıcılarını görüntüleyin</string>
+    <string name="widget_title_monthly_calendar">Aylık takvim</string>
+    <string name="widget_title_quick_action">Hızlı yakalama</string>
+    <string name="widget_empty_today">Bugün hatırlatıcı yok</string>
+    <string name="widget_empty_day">%1$s tarihinde hatırlatıcı yok</string>
 </resources>

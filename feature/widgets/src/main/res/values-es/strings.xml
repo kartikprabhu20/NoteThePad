@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Anclar una nota específica a la pantalla de inicio</string>
     <string name="widget_title_note_collection">Colección de notas</string>
     <string name="widget_title_single_note">Nota individual</string>
+    <string name="widget_title_daily_reminders">Recordatorios de hoy</string>
+    <string name="widget_title_weekly_reminders">Recordatorios semanales</string>
+    <string name="widget_description_weekly_reminders">Elige un día de esta semana y mira sus recordatorios</string>
+    <string name="widget_title_monthly_calendar">Calendario mensual</string>
+    <string name="widget_title_quick_action">Captura rápida</string>
+    <string name="widget_empty_today">No hay recordatorios hoy</string>
+    <string name="widget_empty_day">No hay recordatorios el %1$s</string>
 </resources>

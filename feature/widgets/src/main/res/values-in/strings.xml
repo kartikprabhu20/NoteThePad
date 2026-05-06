@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Sematkan catatan tertentu ke layar beranda</string>
     <string name="widget_title_note_collection">Koleksi catatan</string>
     <string name="widget_title_single_note">Catatan Tunggal</string>
+    <string name="widget_title_daily_reminders">Pengingat hari ini</string>
+    <string name="widget_title_weekly_reminders">Pengingat mingguan</string>
+    <string name="widget_description_weekly_reminders">Pilih satu hari dalam minggu ini dan lihat pengingatnya</string>
+    <string name="widget_title_monthly_calendar">Kalender bulanan</string>
+    <string name="widget_title_quick_action">Tangkapan cepat</string>
+    <string name="widget_empty_today">Tidak ada pengingat hari ini</string>
+    <string name="widget_empty_day">Tidak ada pengingat pada %1$s</string>
 </resources>

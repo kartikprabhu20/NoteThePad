@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">होम स्क्रीन पर एक विशिष्ट नोट पिन करें</string>
     <string name="widget_title_note_collection">नोट संग्रह</string>
     <string name="widget_title_single_note">एकल नोट</string>
+    <string name="widget_title_daily_reminders">आज के रिमाइंडर</string>
+    <string name="widget_title_weekly_reminders">साप्ताहिक रिमाइंडर</string>
+    <string name="widget_description_weekly_reminders">इस सप्ताह का एक दिन चुनें और उसके रिमाइंडर देखें</string>
+    <string name="widget_title_monthly_calendar">मासिक कैलेंडर</string>
+    <string name="widget_title_quick_action">त्वरित कैप्चर</string>
+    <string name="widget_empty_today">आज कोई रिमाइंडर नहीं</string>
+    <string name="widget_empty_day">%1$s को कोई रिमाइंडर नहीं</string>
 </resources>

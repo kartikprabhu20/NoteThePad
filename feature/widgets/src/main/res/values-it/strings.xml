@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Fissa una nota specifica sulla schermata home</string>
     <string name="widget_title_note_collection">Collezione di note</string>
     <string name="widget_title_single_note">Nota singola</string>
+    <string name="widget_title_daily_reminders">Promemoria di oggi</string>
+    <string name="widget_title_weekly_reminders">Promemoria settimanali</string>
+    <string name="widget_description_weekly_reminders">Scegli un giorno di questa settimana e visualizza i suoi promemoria</string>
+    <string name="widget_title_monthly_calendar">Calendario mensile</string>
+    <string name="widget_title_quick_action">Acquisizione rapida</string>
+    <string name="widget_empty_today">Nessun promemoria oggi</string>
+    <string name="widget_empty_day">Nessun promemoria il %1$s</string>
 </resources>

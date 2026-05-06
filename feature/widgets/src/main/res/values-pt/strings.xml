@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Fixar uma nota específica na tela inicial</string>
     <string name="widget_title_note_collection">Coleção de Notas</string>
     <string name="widget_title_single_note">Nota Única</string>
+    <string name="widget_title_daily_reminders">Lembretes de hoje</string>
+    <string name="widget_title_weekly_reminders">Lembretes semanais</string>
+    <string name="widget_description_weekly_reminders">Escolha um dia desta semana e veja seus lembretes</string>
+    <string name="widget_title_monthly_calendar">Calendário mensal</string>
+    <string name="widget_title_quick_action">Captura rápida</string>
+    <string name="widget_empty_today">Sem lembretes hoje</string>
+    <string name="widget_empty_day">Nenhum lembrete em %1$s</string>
 </resources>

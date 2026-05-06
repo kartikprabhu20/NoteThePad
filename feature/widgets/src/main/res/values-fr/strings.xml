@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Épingler une note spécifique sur votre écran d\'accueil</string>
     <string name="widget_title_note_collection">Collection de notes</string>
     <string name="widget_title_single_note">Note unique</string>
+    <string name="widget_title_daily_reminders">Rappels du jour</string>
+    <string name="widget_title_weekly_reminders">Rappels hebdomadaires</string>
+    <string name="widget_description_weekly_reminders">Choisissez un jour de cette semaine et affichez ses rappels</string>
+    <string name="widget_title_monthly_calendar">Calendrier mensuel</string>
+    <string name="widget_title_quick_action">Capture rapide</string>
+    <string name="widget_empty_today">Aucun rappel aujourd\'hui</string>
+    <string name="widget_empty_day">Aucun rappel le %1$s</string>
 </resources>

@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">특정 메모를 홈 화면에 고정</string>
     <string name="widget_title_note_collection">메모 컬렉션</string>
     <string name="widget_title_single_note">단일 메모</string>
+    <string name="widget_title_daily_reminders">오늘의 리마인더</string>
+    <string name="widget_title_weekly_reminders">주간 리마인더</string>
+    <string name="widget_description_weekly_reminders">이번 주에서 날짜를 선택하고 리마인더 확인하기</string>
+    <string name="widget_title_monthly_calendar">월간 캘린더</string>
+    <string name="widget_title_quick_action">빠른 캡처</string>
+    <string name="widget_empty_today">오늘의 리마인더 없음</string>
+    <string name="widget_empty_day">%1$s에 리마인더 없음</string>
 </resources>

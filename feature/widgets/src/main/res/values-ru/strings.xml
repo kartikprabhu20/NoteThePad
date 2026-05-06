@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Закрепить выбранную заметку на главном экране</string>
     <string name="widget_title_note_collection">Коллекция заметок</string>
     <string name="widget_title_single_note">Одна заметка</string>
+    <string name="widget_title_daily_reminders">Напоминания на сегодня</string>
+    <string name="widget_title_weekly_reminders">Еженедельные напоминания</string>
+    <string name="widget_description_weekly_reminders">Выберите день на этой неделе, чтобы посмотреть напоминания</string>
+    <string name="widget_title_monthly_calendar">Ежемесячный календарь</string>
+    <string name="widget_title_quick_action">Быстрый захват</string>
+    <string name="widget_empty_today">На сегодня нет напоминаний</string>
+    <string name="widget_empty_day">На %1$s нет напоминаний</string>
 </resources>

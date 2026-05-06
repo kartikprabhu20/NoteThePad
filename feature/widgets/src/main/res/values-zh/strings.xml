@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">将特定笔记固定到主屏幕</string>
     <string name="widget_title_note_collection">笔记集合</string>
     <string name="widget_title_single_note">单条笔记</string>
+    <string name="widget_title_daily_reminders">今天的提醒</string>
+    <string name="widget_title_weekly_reminders">每周提醒</string>
+    <string name="widget_description_weekly_reminders">选择本周的一天并查看其提醒</string>
+    <string name="widget_title_monthly_calendar">月历</string>
+    <string name="widget_title_quick_action">快速记录</string>
+    <string name="widget_empty_today">今天没有提醒</string>
+    <string name="widget_empty_day">%1$s 没有提醒</string>
 </resources>

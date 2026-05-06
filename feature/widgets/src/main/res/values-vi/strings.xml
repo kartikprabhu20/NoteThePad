@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">Ghim một ghi chú cụ thể vào màn hình chính</string>
     <string name="widget_title_note_collection">Bộ sưu tập ghi chú</string>
     <string name="widget_title_single_note">Ghi chú đơn</string>
+    <string name="widget_title_daily_reminders">Lời nhắc hôm nay</string>
+    <string name="widget_title_weekly_reminders">Lời nhắc hằng tuần</string>
+    <string name="widget_description_weekly_reminders">Chọn một ngày trong tuần này và xem lời nhắc</string>
+    <string name="widget_title_monthly_calendar">Lịch hằng tháng</string>
+    <string name="widget_title_quick_action">Chụp nhanh</string>
+    <string name="widget_empty_today">Không có lời nhắc hôm nay</string>
+    <string name="widget_empty_day">Không có lời nhắc vào %1$s</string>
 </resources>

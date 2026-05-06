@@ -5,6 +5,25 @@
     <string name="widget_title_note_collection">Note collection</string>
     <string name="widget_description_note_collection">View the most recent notes</string>
 
+    <string name="widget_title_daily_reminders">Today\'s reminders</string>
+    <string name="widget_description_daily_reminders" translatable="false">See all of today\'s reminders at a glance</string>
+    <string name="widget_title_weekly_reminders">Weekly reminders</string>
+    <string name="widget_description_weekly_reminders">Pick a day this week and view its reminders</string>
+    <string name="widget_title_monthly_calendar">Monthly calendar</string>
+    <string name="widget_description_monthly_calendar" translatable="false">Browse the month and view reminders for any date</string>
+    <string name="widget_title_quick_action">Quick capture</string>
+    <string name="widget_description_quick_action" translatable="false">One-tap shortcuts to start a new note</string>
+
+    <string name="widget_empty_today">No reminders today</string>
+    <string name="widget_empty_day">No reminders on %1$s</string>
+    <string name="widget_cd_previous_month" translatable="false">Previous month</string>
+    <string name="widget_cd_next_month" translatable="false">Next month</string>
+    <string name="widget_qa_cd_camera" translatable="false">New note with photo</string>
+    <string name="widget_qa_cd_video" translatable="false">New note with video</string>
+    <string name="widget_qa_cd_audio" translatable="false">New note with audio</string>
+    <string name="widget_qa_cd_text" translatable="false">New text note</string>
+    <string name="widget_qa_cd_checklist" translatable="false">New checklist note</string>
+
     <string name="msg_no_note_found">No note found</string>
     <string name="msg_add_notes_prompt">Please go to the app and add some notes</string>
     <string name="title_recent_notes">Recent Notes</string>

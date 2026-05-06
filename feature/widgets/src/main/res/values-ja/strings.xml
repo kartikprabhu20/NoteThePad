@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">特定のメモをホーム画面に固定する</string>
     <string name="widget_title_note_collection">メモコレクション</string>
     <string name="widget_title_single_note">単一のメモ</string>
+    <string name="widget_title_daily_reminders">今日のリマインダー</string>
+    <string name="widget_title_weekly_reminders">週間のリマインダー</string>
+    <string name="widget_description_weekly_reminders">今週の日にちを選択してリマインダーを表示</string>
+    <string name="widget_title_monthly_calendar">月間カレンダー</string>
+    <string name="widget_title_quick_action">クイックキャプチャ</string>
+    <string name="widget_empty_today">今日のリマインダーはありません</string>
+    <string name="widget_empty_day">%1$s のリマインダーはありません</string>
 </resources>

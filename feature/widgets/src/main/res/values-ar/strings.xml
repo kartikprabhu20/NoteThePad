@@ -9,4 +9,11 @@
     <string name="widget_description_single_note">تثبيت ملاحظة محددة على شاشتك الرئيسية</string>
     <string name="widget_title_note_collection">مجموعة الملاحظات</string>
     <string name="widget_title_single_note">ملاحظة واحدة</string>
+    <string name="widget_title_daily_reminders">تذكيرات اليوم</string>
+    <string name="widget_title_weekly_reminders">التذكيرات الأسبوعية</string>
+    <string name="widget_description_weekly_reminders">اختر يوماً في هذا الأسبوع واعرض تذكيراته</string>
+    <string name="widget_title_monthly_calendar">التقويم الشهري</string>
+    <string name="widget_title_quick_action">الالتقاط السريع</string>
+    <string name="widget_empty_today">لا توجد تذكيرات اليوم</string>
+    <string name="widget_empty_day">لا توجد تذكيرات في %1$s</string>
 </resources>
