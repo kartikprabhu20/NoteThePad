@@ -102,8 +102,12 @@ class MainActivity : AppCompatActivity() {
                         }
                         val launchEditScreen = currentIntent?.getBooleanExtra(NavigationConstants.LAUNCH_EDIT_SCREEN, false) ?: false
                         if(launchEditScreen){
-                            navController.navigate(Screen.AddEditNoteScreen.passArgs())
+                            val initialAction = currentIntent?.getStringExtra(NavigationConstants.EXTRA_INITIAL_ACTION)
+                            navController.navigate(
+                                Screen.AddEditNoteScreen.passArgs(initialAction = initialAction)
+                            )
                             currentIntent?.removeExtra(NavigationConstants.LAUNCH_EDIT_SCREEN)
+                            currentIntent?.removeExtra(NavigationConstants.EXTRA_INITIAL_ACTION)
                         }
                     }
                     val showToast = { message: String ->
@@ -229,6 +233,9 @@ class MainActivity : AppCompatActivity() {
                                         type = NavType.LongType; defaultValue = -1L
                                     },
                                     navArgument(name = "initialTitle") {
+                                        type = NavType.StringType; nullable = true; defaultValue = null
+                                    },
+                                    navArgument(name = "initialAction") {
                                         type = NavType.StringType; nullable = true; defaultValue = null
                                     }
                                 )
