@@ -11,23 +11,27 @@ sealed class Screen(val route:String){
         }
     }
     data object AddEditNoteScreen : Screen(
-        "add_edit_note_screen?noteId={noteId}&reminderTime={reminderTime}&initialTitle={initialTitle}"
+        "add_edit_note_screen?noteId={noteId}&reminderTime={reminderTime}&initialTitle={initialTitle}&initialAction={initialAction}"
     ) {
         fun passArgs(
             noteId: String? = null,
             reminderTime: Long = -1L,
-            initialTitle: String? = null
+            initialTitle: String? = null,
+            initialAction: String? = null
         ): String {
             val encodedTitle = if (!initialTitle.isNullOrBlank()) {
                 android.net.Uri.encode(initialTitle)
             } else null
 
-            val baseRoute = "add_edit_note_screen?noteId=${noteId ?: ""}&reminderTime=$reminderTime"
-            return if (encodedTitle != null) {
-                "$baseRoute&initialTitle=$encodedTitle"
-            } else {
-                baseRoute
+            var route = "add_edit_note_screen?noteId=${noteId ?: ""}&reminderTime=$reminderTime"
+            if (encodedTitle != null) {
+                route += "&initialTitle=$encodedTitle"
             }
+            if (!initialAction.isNullOrBlank()) {
+
+                route += "&initialAction=$initialAction"
+            }
+            return route
         }
     }
 

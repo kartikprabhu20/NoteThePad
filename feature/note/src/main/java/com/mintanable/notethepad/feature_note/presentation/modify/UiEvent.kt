@@ -13,4 +13,5 @@ sealed class UiEvent{
     data class RequestWidgetPin(val noteId: String):UiEvent()
     data class ShareNote(val intent: Intent) : UiEvent()
     data class ExportPdf(val intent: Intent) : UiEvent()
+    data class TriggerInitialAction(val action: String) : UiEvent()
 }
