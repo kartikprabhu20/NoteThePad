@@ -30,6 +30,8 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import androidx.glance.preview.ExperimentalGlancePreviewApi
+import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -40,6 +42,7 @@ import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.EventRow
 import com.mintanable.notethepad.feature_widgets.presentation.components.RoundedScrollingLazyColumn
 import com.mintanable.notethepad.feature_widgets.presentation.utils.ChangeCalendarMonthAction
+import com.mintanable.notethepad.feature_widgets.presentation.utils.LargeWidgetPreview
 import com.mintanable.notethepad.feature_widgets.presentation.utils.MonthlyWidgetKeys
 import com.mintanable.notethepad.feature_widgets.presentation.utils.NoteListLayoutTextStyles
 import com.mintanable.notethepad.feature_widgets.presentation.utils.SelectCalendarDayAction
@@ -55,6 +58,7 @@ import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle as JavaTextStyle
 import java.util.Locale
@@ -110,7 +114,7 @@ private fun parseYearMonth(value: String?): YearMonth? =
     value?.let { runCatching { YearMonth.parse(it) }.getOrNull() }
 
 @Composable
-private fun MonthlyContent(
+internal fun MonthlyContent(
     events: List<WidgetEvent>,
     today: LocalDate,
     selectedDate: LocalDate,
@@ -264,9 +268,13 @@ private fun DayCell(
 ) {
     val cellBackground = when {
         isSelected -> GlanceModifier
+            .padding(bottom = 4.dp)
+            .padding(horizontal = 6.dp)
             .background(GlanceTheme.colors.primary)
             .cornerRadius(10.dp)
         isToday -> GlanceModifier
+            .padding(bottom = 4.dp)
+            .padding(horizontal = 6.dp)
             .background(GlanceTheme.colors.primaryContainer)
             .cornerRadius(10.dp)
         else -> GlanceModifier
@@ -310,6 +318,88 @@ private fun DayCell(
                             if (isSelected) GlanceTheme.colors.onPrimary
                             else GlanceTheme.colors.primary
                         )
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 400, heightDp = 600)
+@LargeWidgetPreview
+@Composable
+fun MonthlyContentPreview() {
+    val today = LocalDate.now()
+    val displayedMonth = YearMonth.from(today)
+    val events = listOf(
+        WidgetEvent(
+            noteId = "1",
+            title = "Project Kickoff",
+            reminderTime = today.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            color = 0xFF6200EE.toInt()
+        ),
+        WidgetEvent(
+            noteId = "2",
+            title = "Doctor Appointment",
+            reminderTime = today.plusDays(2).atTime(14, 30).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            color = 0xFF03DAC6.toInt()
+        ),
+        WidgetEvent(
+            noteId = "3",
+            title = "Dinner with family",
+            reminderTime = today.minusDays(1).atTime(19, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            color = 0xFF018786.toInt()
+        )
+    )
+    GlanceTheme {
+        MonthlyContent(
+            events = events,
+            today = today,
+            selectedDate = today,
+            displayedMonth = displayedMonth
+        )
+    }
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview
+@Composable
+fun DayCellPreview() {
+    val today = LocalDate.now()
+    GlanceTheme {
+        Box(modifier = GlanceModifier.padding(16.dp)) {
+            Row {
+                DayCell(
+                    date = today,
+                    isCurrentMonth = true,
+                    isSelected = false,
+                    isToday = true,
+                    hasEvents = true,
+                    modifier = GlanceModifier.size(40.dp)
+                )
+                DayCell(
+                    date = today.plusDays(1),
+                    isCurrentMonth = true,
+                    isSelected = true,
+                    isToday = false,
+                    hasEvents = false,
+                    modifier = GlanceModifier.size(40.dp)
+                )
+                DayCell(
+                    date = today.plusDays(2),
+                    isCurrentMonth = true,
+                    isSelected = false,
+                    isToday = false,
+                    hasEvents = true,
+                    modifier = GlanceModifier.size(40.dp)
+                )
+                DayCell(
+                    date = today.minusMonths(1).withDayOfMonth(28),
+                    isCurrentMonth = false,
+                    isSelected = false,
+                    isToday = false,
+                    hasEvents = false,
+                    modifier = GlanceModifier.size(40.dp)
                 )
             }
         }

@@ -24,8 +24,11 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import androidx.glance.preview.ExperimentalGlancePreviewApi
+import androidx.glance.preview.Preview
 import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.feature_widgets.R
+import com.mintanable.notethepad.feature_widgets.presentation.utils.MediumWidgetPreview
 import com.mintanable.notethepad.feature_widgets.presentation.utils.buildOpenNoteIntent
 
 class QuickActionWidget : GlanceAppWidget() {
@@ -124,5 +127,15 @@ private fun QuickActionIcon(
                 colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimaryContainer)
             )
         }
+    }
+}
+
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview(widthDp = 300, heightDp = 100)
+@MediumWidgetPreview
+@Composable
+fun QuickActionContentPreview() {
+    GlanceTheme {
+        QuickActionContent()
     }
 }

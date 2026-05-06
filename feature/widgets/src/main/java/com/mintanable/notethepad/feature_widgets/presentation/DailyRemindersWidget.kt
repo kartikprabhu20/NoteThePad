@@ -25,6 +25,7 @@ import com.mintanable.notethepad.feature_widgets.R
 import com.mintanable.notethepad.feature_widgets.presentation.components.EventRow
 import com.mintanable.notethepad.feature_widgets.presentation.components.RoundedScrollingLazyColumn
 import com.mintanable.notethepad.feature_widgets.presentation.components.WidgetTitleBar
+import com.mintanable.notethepad.feature_widgets.presentation.utils.MediumWidgetPreview
 import com.mintanable.notethepad.feature_widgets.presentation.utils.NoteListLayoutTextStyles
 import com.mintanable.notethepad.feature_widgets.presentation.utils.RefreshNoteWidgetCallback
 import com.mintanable.notethepad.feature_widgets.presentation.utils.WidgetEntryPoint
@@ -33,6 +34,7 @@ import com.mintanable.notethepad.feature_widgets.presentation.utils.eventsForDay
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -68,7 +70,7 @@ class DailyRemindersWidget : GlanceAppWidget() {
 }
 
 @Composable
-private fun DailyRemindersContent(events: List<WidgetEvent>) {
+internal fun DailyRemindersContent(events: List<WidgetEvent>) {
     val context = LocalContext.current
     val today = LocalDate.now()
     val todayLabel = today.format(
@@ -116,5 +118,34 @@ private fun DailyRemindersContent(events: List<WidgetEvent>) {
                 )
             }
         }
+    }
+}
+
+@MediumWidgetPreview
+@Composable
+fun DailyRemindersContentPreview() {
+    val today = LocalDate.now()
+    val events = listOf(
+        WidgetEvent(
+            noteId = "1",
+            title = "Morning Meeting",
+            reminderTime = today.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            color = 0xFF6200EE.toInt()
+        ),
+        WidgetEvent(
+            noteId = "2",
+            title = "Lunch with Team",
+            reminderTime = today.atTime(12, 30).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            color = 0xFF03DAC6.toInt()
+        ),
+        WidgetEvent(
+            noteId = "3",
+            title = "Call with Client",
+            reminderTime = today.atTime(15, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+            color = 0xFF018786.toInt()
+        )
+    )
+    GlanceTheme {
+        DailyRemindersContent(events = events)
     }
 }
