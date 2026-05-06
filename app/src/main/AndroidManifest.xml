@@ -122,5 +122,45 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/single_note_widget_info" />
         </receiver>
+
+        <receiver
+            android:name="com.mintanable.notethepad.feature_widgets.presentation.utils.DailyRemindersWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_title_daily_reminders">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/daily_reminders_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name="com.mintanable.notethepad.feature_widgets.presentation.utils.WeeklyRemindersWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_title_weekly_reminders">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/weekly_reminders_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name="com.mintanable.notethepad.feature_widgets.presentation.utils.MonthlyCalendarWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_title_monthly_calendar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/monthly_calendar_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name="com.mintanable.notethepad.feature_widgets.presentation.utils.QuickActionWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_title_quick_action">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/quick_action_widget_info" />
+        </receiver>
     </application>
 </manifest>

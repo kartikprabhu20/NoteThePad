@@ -57,4 +57,7 @@ dependencies {
     implementation("androidx.glance:glance-material3:1.1.1")
     implementation("androidx.glance:glance-appwidget-preview:1.1.1")
     implementation("androidx.glance:glance-preview:1.1.1")
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation("com.google.truth:truth:1.4.2")
 }
