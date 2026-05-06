@@ -5,6 +5,7 @@
     android:minResizeWidth="200dp"
     android:minResizeHeight="50dp"
     android:updatePeriodMillis="0"
+    android:previewImage="@drawable/quick_action_widget_preview"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:label="@string/widget_title_quick_action"
     android:description="@string/widget_description_quick_action"

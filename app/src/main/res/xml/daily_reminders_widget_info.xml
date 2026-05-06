@@ -5,6 +5,7 @@
     android:minResizeWidth="150dp"
     android:minResizeHeight="100dp"
     android:updatePeriodMillis="0"
+    android:previewImage="@drawable/daily_widget_preview"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:label="@string/widget_title_daily_reminders"
     android:description="@string/widget_description_daily_reminders"
