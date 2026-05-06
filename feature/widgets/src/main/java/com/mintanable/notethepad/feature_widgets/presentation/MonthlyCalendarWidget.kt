@@ -19,8 +19,8 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -71,10 +71,6 @@ class MonthlyCalendarWidget : GlanceAppWidget() {
         val entryPoint = EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java)
         val repository = entryPoint.noteRepository()
 
-        val prefs = getAppWidgetState<Preferences>(context, id)
-        val storedDate = prefs[MonthlyWidgetKeys.SELECTED_DATE]
-        val storedMonth = prefs[MonthlyWidgetKeys.DISPLAYED_MONTH]
-
         val eventsFlow = repository.getNotes(NoteOrder.Date(OrderType.Ascending)).map { list ->
             list.mapNotNull { noteWithTags ->
                 val note = noteWithTags.noteEntity
@@ -91,6 +87,9 @@ class MonthlyCalendarWidget : GlanceAppWidget() {
 
         provideContent {
             val events by eventsFlow.collectAsState(initial = emptyList())
+            val prefs = currentState<Preferences>()
+            val storedDate = prefs[MonthlyWidgetKeys.SELECTED_DATE]
+            val storedMonth = prefs[MonthlyWidgetKeys.DISPLAYED_MONTH]
             val today = LocalDate.now()
             val selected = parseDate(storedDate) ?: today
             val displayedMonth = parseYearMonth(storedMonth) ?: YearMonth.from(today)

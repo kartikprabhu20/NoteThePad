@@ -6,7 +6,6 @@ import androidx.glance.action.ActionParameters
 import androidx.glance.action.actionParametersOf
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.appwidget.updateAll
 import com.mintanable.notethepad.feature_widgets.presentation.MonthlyCalendarWidget
 import java.time.YearMonth
 
@@ -26,6 +25,6 @@ class ChangeCalendarMonthAction : ActionCallback {
                 ?: YearMonth.now()
             prefs[MonthlyWidgetKeys.DISPLAYED_MONTH] = current.plusMonths(delta.toLong()).toString()
         }
-        MonthlyCalendarWidget().updateAll(context)
+        MonthlyCalendarWidget().update(context, glanceId)
     }
 }

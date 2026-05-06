@@ -7,7 +7,6 @@ import androidx.glance.action.ActionParameters
 import androidx.glance.action.actionParametersOf
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.appwidget.updateAll
 import com.mintanable.notethepad.feature_widgets.presentation.WeeklyRemindersWidget
 
 object WeeklyWidgetKeys {
@@ -28,6 +27,6 @@ class SelectWeekDayAction : ActionCallback {
         updateAppWidgetState(context, glanceId) { prefs ->
             prefs[WeeklyWidgetKeys.SELECTED_DATE] = date
         }
-        WeeklyRemindersWidget().updateAll(context)
+        WeeklyRemindersWidget().update(context, glanceId)
     }
 }

@@ -16,9 +16,9 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -66,8 +66,6 @@ class WeeklyRemindersWidget : GlanceAppWidget() {
         val entryPoint = EntryPointAccessors.fromApplication(context, WidgetEntryPoint::class.java)
         val repository = entryPoint.noteRepository()
 
-        val storedDate = getAppWidgetState<Preferences>(context, id)[WeeklyWidgetKeys.SELECTED_DATE]
-
         val eventsFlow = repository.getNotes(NoteOrder.Date(OrderType.Ascending)).map { list ->
             list.mapNotNull { noteWithTags ->
                 val note = noteWithTags.noteEntity
@@ -84,6 +82,7 @@ class WeeklyRemindersWidget : GlanceAppWidget() {
 
         provideContent {
             val events by eventsFlow.collectAsState(initial = emptyList())
+            val storedDate = currentState<Preferences>()[WeeklyWidgetKeys.SELECTED_DATE]
             val today = LocalDate.now()
             val selected = parseLocalDateOrNull(storedDate) ?: today
 
