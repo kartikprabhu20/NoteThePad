@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -53,6 +54,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.mintanable.notethepad.components.PermissionRationaleDialog
 import com.mintanable.notethepad.feature_note.R
 import com.mintanable.notethepad.core.common.FeatureFlags
+import com.mintanable.notethepad.core.common.NavigationConstants
 import com.mintanable.notethepad.core.common.Screen
 import com.mintanable.notethepad.database.db.entity.AttachmentType
 import com.mintanable.notethepad.feature_note.presentation.modify.components.AudioRecorderUI
@@ -181,6 +183,7 @@ fun AddEditNoteScreen(
     }
 
     val focusManager = LocalFocusManager.current
+    val contentFocusRequester = remember { FocusRequester() }
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
             when (event) {
@@ -253,6 +256,19 @@ fun AddEditNoteScreen(
                             context.getString(R.string.pdf_share_chooser_title)
                         )
                     )
+                }
+
+                is UiEvent.TriggerInitialAction -> when (event.action) {
+                    NavigationConstants.INITIAL_ACTION_CAMERA ->
+                        checkAndRequestCameraPermission(AttachmentType.IMAGE)
+                    NavigationConstants.INITIAL_ACTION_VIDEO ->
+                        checkAndRequestCameraPermission(AttachmentType.VIDEO)
+                    NavigationConstants.INITIAL_ACTION_AUDIO ->
+                        checkAndRequestMicrophonePermission()
+                    NavigationConstants.INITIAL_ACTION_TEXT ->
+                        contentFocusRequester.requestFocus()
+                    NavigationConstants.INITIAL_ACTION_CHECKLIST ->
+                        viewModel.onEvent(AddEditNoteEvent.ToggleCheckbox)
                 }
             }
         }
@@ -336,7 +352,8 @@ fun AddEditNoteScreen(
             animatedVisibilityScope = animatedVisibilityScope,
             isDarkTheme = isDarkTheme,
             canUndo = canUndo,
-            canRedo = canRedo
+            canRedo = canRedo,
+            contentFocusRequester = contentFocusRequester
         )
 
         val navigationBarHeight =

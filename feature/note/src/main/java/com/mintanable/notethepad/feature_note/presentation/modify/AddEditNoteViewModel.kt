@@ -118,6 +118,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val passedNoteId: String = savedStateHandle.get<String>("noteId") ?: ""
     private val passedReminderTime: Long = savedStateHandle.get<Long>("reminderTime") ?: -1L
     private val passedInitialTitle: String = savedStateHandle.get<String>("initialTitle") ?: ""
+    private val passedInitialAction: String = savedStateHandle.get<String>("initialAction") ?: ""
     private val isEditMode = passedNoteId.isNotBlank()
     private var currentNoteId: String = ""
     private var currentUserId: String? = null
@@ -249,7 +250,7 @@ class AddEditNoteViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>(replay = 1)
     val eventFlow = _eventFlow.asSharedFlow()
 
     val videoPlayerEngine: ExoPlayer? = mediaPlayer.exoPlayer
@@ -269,6 +270,11 @@ class AddEditNoteViewModel @Inject constructor(
                             isHintVisible = false
                         )
                     )
+                }
+            }
+            if (passedInitialAction.isNotBlank()) {
+                viewModelScope.launch {
+                    _eventFlow.emit(TriggerInitialAction(passedInitialAction))
                 }
             }
         }
