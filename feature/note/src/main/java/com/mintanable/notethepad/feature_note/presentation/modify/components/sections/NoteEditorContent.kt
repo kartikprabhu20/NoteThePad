@@ -62,6 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -122,7 +123,8 @@ fun NoteEditorContent(
     animatedVisibilityScope: AnimatedVisibilityScope,
     isDarkTheme: Boolean = false,
     canUndo: Boolean = false,
-    canRedo: Boolean = false
+    canRedo: Boolean = false,
+    contentFocusRequester: FocusRequester? = null
 ) {
     var activeDragUnCheckIndex by remember { mutableStateOf<String?>(null) }
     var activeDragCheckIndex by remember { mutableStateOf<String?>(null) }
@@ -400,19 +402,25 @@ fun NoteEditorContent(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (!isCheckboxListAvailable) {
+                            val contentModifier = Modifier
+                                .fillMaxHeight()
+                                .let { m ->
+                                    if (contentFocusRequester != null) {
+                                        m.focusRequester(contentFocusRequester)
+                                    } else m
+                                }
+                                .sharedBounds(
+                                    sharedContentState = sharedTransitionScope.rememberSharedContentState(
+                                        key = "note-content-${noteId}"
+                                    ),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    boundsTransform = { _, _ -> tween() },
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                )
                             TransparentHintTextField(
                                 value = contentRichTextState.textFieldValue,
                                 hint = contentState.hint,
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .sharedBounds(
-                                        sharedContentState = sharedTransitionScope.rememberSharedContentState(
-                                            key = "note-content-${noteId}"
-                                        ),
-                                        animatedVisibilityScope = animatedVisibilityScope,
-                                        boundsTransform = { _, _ -> tween() },
-                                        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
-                                    ),
+                                modifier = contentModifier,
                                 isHintVisible = contentState.isHintVisible,
                                 onValueChange = { onEvent(AddEditNoteEvent.EnteredContent(it)) },
                                 textStyle = MaterialTheme.typography.bodyLarge,
