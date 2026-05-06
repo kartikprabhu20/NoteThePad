@@ -98,6 +98,10 @@ Local models are downloaded from Hugging Face and run entirely on-device for pri
 ### Widgets
 - **Single Note Widget** - Pin any note to home screen with Glance 1.1.1
 - **Notes List Widget** - Recent notes overview on home screen
+- **Quick Action Widget** – Launch directly into a new note using the camera, video, audio recorder, text, or checklist with one tap from your home screen.
+- **Daily Schedule Widget** – Keep track of your day with a focused view of today's reminders and upcoming appointments.
+- **Weekly Planner Widget** – Stay ahead of your week with a horizontal calendar view and a list of your most important upcoming tasks.
+- **Monthly Calendar Widget** – Manage long-term goals with a full monthly overview that highlights days with scheduled reminders and events.
 
 ### Reminders & Calendar
 - Per-note reminders with exact alarm scheduling
