@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -33,6 +34,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import com.mintanable.notethepad.core.model.note.NoteOrder
 import com.mintanable.notethepad.core.model.note.OrderType
 import com.mintanable.notethepad.feature_widgets.R
@@ -195,15 +197,14 @@ private fun DayCell(
             )
         )
 
-    val cellBackground = when {
-        isSelected -> GlanceModifier
-            .background(GlanceTheme.colors.primary)
-            .cornerRadius(12.dp)
-        isToday -> GlanceModifier
-            .background(GlanceTheme.colors.primaryContainer)
-            .cornerRadius(12.dp)
-        else -> GlanceModifier
+    val backgroundColor: ColorProvider = when {
+        isSelected -> GlanceTheme.colors.primary
+        isToday -> GlanceTheme.colors.primaryContainer
+        else -> ColorProvider(Color.Transparent)
     }
+    val cellBackground = GlanceModifier
+        .background(backgroundColor)
+        .cornerRadius(12.dp)
 
     Box(
         modifier = baseModifier,
