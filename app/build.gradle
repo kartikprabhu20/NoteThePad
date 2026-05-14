@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace 'com.mintanable.notethepad'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.mintanable.notethepad"
@@ -38,6 +38,10 @@ android {
         buildConfigField("Boolean", "ENABLE_AI_ASSISTANCE", "false")
 
         resConfigs "en", "en-rGB", "ar", "bn", "de", "es", "fr", "hi", "in", "it", "ja", "ko", "pt", "ru", "tr", "vi", "zh"
+
+        ksp {
+            arg("appfunctions:aggregateAppFunctions", "true")
+        }
     }
     signingConfigs {
         create("release") {
@@ -173,6 +177,7 @@ dependencies {
     implementation project(':feature:widgets')
     implementation project(':feature:settings')
     implementation project(':feature:calendar')
+    implementation project(':feature:appfunctions')
 
     canaryImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
@@ -206,6 +211,7 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:2.57"
     ksp "com.google.dagger:hilt-android-compiler:2.57"
+    ksp 'androidx.appfunctions:appfunctions-compiler:1.0.0-alpha01'
     implementation "androidx.hilt:hilt-work:1.3.0"
     ksp "androidx.hilt:hilt-compiler:1.3.0"
 

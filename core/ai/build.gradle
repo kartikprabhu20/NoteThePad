@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace 'com.mintanable.notethepad.feature_ai'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         minSdk 26
