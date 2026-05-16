@@ -24,7 +24,9 @@ class NoteAppFunctionsTest {
 
         val result = appFunctions.createNote(appFunctionContext, "title", "content")
 
-        assertThat(result).isEqualTo("generated-id")
+        assertThat(result.id).isEqualTo("generated-id")
+        assertThat(result.title).isEqualTo("title")
+        assertThat(result.content).isEqualTo("content")
         assertThat(captured.captured.title).isEqualTo("title")
         assertThat(captured.captured.content).isEqualTo("content")
         coVerify(exactly = 1) { repository.insertNote(any(), emptyList()) }
@@ -40,12 +42,13 @@ private class TestableNoteAppFunctions(private val noteRepository: NoteRepositor
         appFunctionContext: AppFunctionContext,
         title: String,
         content: String,
-    ): String {
+    ): Note {
         val entity = NoteEntity(
             title = title,
             content = content,
             timestamp = System.currentTimeMillis(),
         )
-        return noteRepository.insertNote(entity, emptyList())
+        val id = noteRepository.insertNote(entity, emptyList())
+        return Note(id = id, title = title, content = content)
     }
 }

@@ -4,23 +4,32 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import androidx.appfunctions.service.AppFunctionConfiguration
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.mintanable.notethepad.appfunctions.AppNoteAppFunctions
 import com.mintanable.notethepad.core.model.NoteThePadConstants.BACKUP_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.model.NoteThePadConstants.DOWNLOAD_MODEL_NOTIFICATION_CHANNEL_ID
 import com.mintanable.notethepad.core.analytics.AnalyticsTracker
 import com.mintanable.notethepad.core.common.FeatureFlags
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
+import javax.inject.Provider
 
 @HiltAndroidApp
-class NoteThePadApp : Application(), Configuration.Provider {
+class NoteThePadApp :
+    Application(),
+    Configuration.Provider,
+    AppFunctionConfiguration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var appFunctions: Provider<AppNoteAppFunctions>
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -35,6 +44,14 @@ class NoteThePadApp : Application(), Configuration.Provider {
         analyticsTracker.setUserProperty("app_version", BuildConfig.VERSION_NAME)
         createNotificationChannels()
     }
+
+    override val appFunctionConfiguration: AppFunctionConfiguration
+        get() = AppFunctionConfiguration
+            .Builder()
+            .addEnclosingClassFactory(AppNoteAppFunctions::class.java) {
+                appFunctions.get()
+            }
+            .build()
 
     private fun createNotificationChannels() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

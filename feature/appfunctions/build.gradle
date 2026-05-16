@@ -28,9 +28,9 @@ dependencies {
     implementation project(':core:data')
 
     // AppFunctions (AndroidX)
-    api 'androidx.appfunctions:appfunctions:1.0.0-alpha01'
-    api 'androidx.appfunctions:appfunctions-service:1.0.0-alpha01'
-    ksp 'androidx.appfunctions:appfunctions-compiler:1.0.0-alpha01'
+    api 'androidx.appfunctions:appfunctions:1.0.0-alpha08'
+    api 'androidx.appfunctions:appfunctions-service:1.0.0-alpha08'
+    ksp 'androidx.appfunctions:appfunctions-compiler:1.0.0-alpha08'
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.57"
