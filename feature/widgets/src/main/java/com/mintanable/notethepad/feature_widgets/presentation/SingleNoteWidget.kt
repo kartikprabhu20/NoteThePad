@@ -4,6 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -44,37 +46,47 @@ import com.mintanable.notethepad.feature_widgets.presentation.utils.SmallWidgetP
 import com.mintanable.notethepad.feature_widgets.presentation.utils.WidgetEntryPoint
 import com.mintanable.notethepad.feature_widgets.repository.NoteWidgetPrefs
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 class SingleNoteWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
         val noteId = NoteWidgetPrefs.getNoteId(context, appWidgetId)
 
-        val note = if (noteId.isNotEmpty()) {
-            val entryPoint = EntryPointAccessors.fromApplication(
-                context,
-                WidgetEntryPoint::class.java
-            )
-            val noteWithTags = entryPoint.noteRepository().getNoteById(noteId)
-            noteWithTags?.let {
-                entryPoint.detailedNoteMapper().toDetailedNote(it.noteEntity, it.tagEntities)
+        val entryPoint = EntryPointAccessors.fromApplication(
+            context,
+            WidgetEntryPoint::class.java
+        )
+        val repository = entryPoint.noteRepository()
+        val mapper = entryPoint.detailedNoteMapper()
+
+        val noteFlow = if (noteId.isNotEmpty()) {
+            repository.getNotesByIds(listOf(noteId)).map { list ->
+                list.firstOrNull()?.let {
+                    mapper.toDetailedNote(it.noteEntity, it.tagEntities)
+                }
             }
-        } else null
+        } else {
+            flowOf<DetailedNote?>(null)
+        }
 
         provideContent {
+            val note by noteFlow.collectAsState(initial = null)
             val intent = Intent(NavigationConstants.ACTION_OPEN_NOTE).apply {
                 component =
                     ComponentName(context.packageName, NavigationConstants.MAIN_ACTIVITY_CLASS)
                 if (note != null) {
-                    putExtra(NavigationConstants.EXTRA_NOTE_ID, note.id)
+                    putExtra(NavigationConstants.EXTRA_NOTE_ID, note?.id)
                 }
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
 
             GlanceTheme {
                 Box(modifier = GlanceModifier.fillMaxSize()) {
-                    if (note != null) {
-                        NoteItem(note, actionStartActivity(intent))
+                    val currentNote = note
+                    if (currentNote != null) {
+                        NoteItem(currentNote, actionStartActivity(intent))
                     } else {
                         NoteItem(
                             DetailedNote(

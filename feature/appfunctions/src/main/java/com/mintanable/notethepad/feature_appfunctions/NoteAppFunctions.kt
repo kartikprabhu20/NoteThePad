@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.first
 class NoteAppFunctions {
 
     suspend fun listNotes(appFunctionContext: AppFunctionContext): List<Note> {
-        val repository = repository(appFunctionContext)
-        val notes = repository.getNotes(NoteOrder.Date(OrderType.Descending)).first()
+        val notes = entryPoint(appFunctionContext).noteRepository()
+            .getNotes(NoteOrder.Date(OrderType.Descending)).first()
         return notes
             .filter { !it.noteEntity.isDeleted }
             .map { it.noteEntity.toAppFunctionNote() }
@@ -32,13 +32,14 @@ class NoteAppFunctions {
         title: String,
         content: String,
     ): Note {
-        val repository = repository(appFunctionContext)
+        val ep = entryPoint(appFunctionContext)
         val entity = NoteEntity(
             title = title,
             content = content,
             timestamp = System.currentTimeMillis(),
         )
-        val id = repository.insertNote(entity, emptyList())
+        val id = ep.noteRepository().insertNote(entity, emptyList())
+        ep.widgetRefresher().refresh()
         return entity.copy(id = id).toAppFunctionNote()
     }
 
@@ -48,7 +49,8 @@ class NoteAppFunctions {
         title: String?,
         content: String?,
     ): Note? {
-        val repository = repository(appFunctionContext)
+        val ep = entryPoint(appFunctionContext)
+        val repository = ep.noteRepository()
         val existing = repository.getNoteById(noteId)?.noteEntity ?: return null
         val updated = existing.copy(
             title = title ?: existing.title,
@@ -57,6 +59,7 @@ class NoteAppFunctions {
             isSynced = false,
         )
         repository.updateNoteEntity(updated)
+        ep.widgetRefresher().refresh()
         return updated.toAppFunctionNote()
     }
 
@@ -64,19 +67,20 @@ class NoteAppFunctions {
         appFunctionContext: AppFunctionContext,
         noteId: String,
     ): Boolean {
-        val repository = repository(appFunctionContext)
+        val ep = entryPoint(appFunctionContext)
+        val repository = ep.noteRepository()
         repository.getNoteById(noteId) ?: return false
         repository.deleteNoteWithId(noteId)
+        ep.widgetRefresher().refresh()
         return true
     }
 
-    private fun repository(appFunctionContext: AppFunctionContext) =
+    private fun entryPoint(appFunctionContext: AppFunctionContext): AppFunctionsEntryPoint =
         EntryPointAccessors
             .fromApplication(
                 appFunctionContext.context.applicationContext,
                 AppFunctionsEntryPoint::class.java,
             )
-            .noteRepository()
 }
 
 private fun NoteEntity.toAppFunctionNote() = Note(

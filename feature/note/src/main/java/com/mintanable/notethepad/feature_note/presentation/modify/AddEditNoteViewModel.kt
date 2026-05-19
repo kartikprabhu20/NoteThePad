@@ -41,6 +41,7 @@ import com.mintanable.notethepad.feature_ai.domain.use_cases.TranscribeAudioFile
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.core.common.ReminderScheduler
+import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.feature_note.data.pdf.NotePdfExporter
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
@@ -111,6 +112,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val snapshotTracker: SnapshotTracker,
     private val notePdfExporter: NotePdfExporter,
     private val fileManager: FileManager,
+    private val widgetRefresher: WidgetRefresher,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private var imageQueryJob: Job? = null
@@ -1434,6 +1436,7 @@ class AddEditNoteViewModel @Inject constructor(
             if (currentNoteId.isNotBlank()) {
                 noteUseCases.deleteNote(currentNoteId)
             }
+            widgetRefresher.refresh()
             _eventFlow.emit(DeleteNote(currentNoteId))
         }
     }
@@ -1504,7 +1507,7 @@ class AddEditNoteViewModel @Inject constructor(
 
     private suspend fun saveNote(id: String, titleOverride: String? = null): Result<String> {
         val state = uiState.value
-        return noteUseCases.saveNoteWithAttachments.invoke(
+        val result = noteUseCases.saveNoteWithAttachments.invoke(
             id = id.ifBlank { null },
             title = titleOverride ?: state.titleState.richText.rawText,
             content = RichTextSerializer.serialize(state.contentRichTextState.document),
@@ -1520,6 +1523,10 @@ class AddEditNoteViewModel @Inject constructor(
             summary = state.summary,
             paintUris = state.attachedPaints
         )
+        if (result.isSuccess) {
+            widgetRefresher.refresh()
+        }
+        return result
     }
 
     private fun rescheduleReminder(id: String) {

@@ -31,6 +31,7 @@ import com.mintanable.notethepad.feature_ai.domain.use_cases.TranscribeAudioFile
 import com.mintanable.notethepad.feature_note.domain.repository.AudioRecorder
 import com.mintanable.notethepad.feature_note.domain.repository.MediaPlayer
 import com.mintanable.notethepad.core.common.ReminderScheduler
+import com.mintanable.notethepad.core.common.WidgetRefresher
 import com.mintanable.notethepad.feature_note.data.pdf.NotePdfExporter
 import com.mintanable.notethepad.feature_note.domain.use_case.fileio.FileIOUseCases
 import com.mintanable.notethepad.feature_note.domain.use_case.notes.NoteUseCases
@@ -90,6 +91,7 @@ class AddEditNoteViewModelTest {
     private val snapshotTracker = mockk<SnapshotTracker>(relaxed = true)
     private val pdfExporter = mockk<NotePdfExporter>(relaxed = true)
     private val fileManager = mockk<FileManager>(relaxed = true)
+    private val widgetRefresher = mockk<WidgetRefresher>(relaxed = true)
 
 
     private val appContext = mockk<Context>(relaxed = true)
@@ -102,7 +104,7 @@ class AddEditNoteViewModelTest {
         tagUseCases, getAutoTagsUseCase, startLiveTranscription, stopLiveTranscription,
         transcribeAudioFileUseCase, analyzeImageUseCase, queryImageUseCase,
         authRepository, collaborationRepository, userPreferencesRepository, getAiModelByName, analyticsTracker,
-        snapshotTracker, pdfExporter, fileManager, appContext
+        snapshotTracker, pdfExporter, fileManager, widgetRefresher, appContext
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
