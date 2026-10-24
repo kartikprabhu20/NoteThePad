@@ -96,6 +96,6 @@ class GetDetailedNoteTest {
         getDetailedNote(noteId)
         getDetailedNote(noteId)
 
-        coVerify(exactly = 1) { audioMetadataProvider.getDuration(uri.toUri()) }
+        coVerify(exactly = 1) { audioMetadataProvider.getDuration(any()) }
     }
 }

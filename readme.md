@@ -160,7 +160,7 @@ Dependency flow: `:feature` -> `:core` -> `:core:model`. No circular or feature-
 ### Prerequisites
 - Android Studio Ladybug or later
 - JDK 17 (system default Java 23 breaks Gradle)
-- Android SDK 35 (Min SDK 26)
+- Android SDK 36 (Min SDK 26)
 
 ### Clone & Build
 

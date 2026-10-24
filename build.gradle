@@ -21,6 +21,9 @@ subprojects {
             if (details.requested.group == 'io.ktor') {
                 details.useVersion "2.3.12"
             }
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion "2.1.0"
+            }
         }
     }
 }

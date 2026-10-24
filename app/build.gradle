@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.mintanable.notethepad"
         minSdk 26
-        targetSdk 35
+        targetSdk 36
 
         def refName = System.getenv("GITHUB_REF_NAME") ?: "1.0.0"
         def rawBuildNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "1"

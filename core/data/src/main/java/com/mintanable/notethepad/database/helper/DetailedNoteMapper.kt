@@ -1,6 +1,5 @@
 package com.mintanable.notethepad.database.helper
 
-import androidx.collection.LruCache
 import androidx.core.net.toUri
 import com.mintanable.notethepad.core.common.CheckboxConvertors
 import com.mintanable.notethepad.core.common.DispatcherProvider
@@ -14,6 +13,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.util.Collections
+import java.util.LinkedHashMap
 import javax.inject.Inject
 
 class DetailedNoteMapper @Inject constructor(
@@ -22,7 +23,13 @@ class DetailedNoteMapper @Inject constructor(
     private val noteDao: NoteDao
 ) {
 
-    private val durationCache = LruCache<String, Long>(100)
+    private val durationCache: MutableMap<String, Long> = Collections.synchronizedMap(
+        object : LinkedHashMap<String, Long>(100, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Long>?): Boolean {
+                return size > 100
+            }
+        }
+    )
 
     suspend fun toDetailedNote(noteEntity: NoteEntity, tagEntities: List<TagEntity> = emptyList()): DetailedNote = withContext(dispatchers.default) {
 
