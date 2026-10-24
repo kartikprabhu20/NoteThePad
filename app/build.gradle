@@ -111,29 +111,7 @@ android {
     }
 }
 
-// Workaround for androidx.appfunctions (through 1.0.0-alpha08): the @AppFunction annotation
-// does not expose `restrictCallersWithExecuteAppFunctions`. Without it the platform defaults
-// to TRUE, which blocks callers that only hold android.permission.EXECUTE_APP_FUNCTIONS (i.e.
-// apps holding the ASSISTANT role but not the signature-only EXECUTE_APP_FUNCTIONS_TRUSTED).
-// Patch the KSP-generated v2 XML to set the flag to false so the assistant role is sufficient.
-// alpha02+ wires the v2 property into the service manifest, so the patched XML is actually read.
-tasks.matching { it.name.startsWith("ksp") && it.name.endsWith("Kotlin") }.configureEach { kspTask ->
-    kspTask.doLast {
-        def variantDir = kspTask.name.replaceFirst(/^ksp/, "").replaceFirst(/Kotlin$/, "").uncapitalize()
-        def xml = file("build/generated/ksp/${variantDir}/resources/assets/app_functions_v2.xml")
-        if (xml.exists()) {
-            def text = xml.text
-            if (!text.contains("<restrictCallersWithExecuteAppFunctions>")) {
-                def patched = text.replaceAll(
-                    /(<enabledByDefault>[^<]*<\/enabledByDefault>)/,
-                    '$1\n        <restrictCallersWithExecuteAppFunctions>false</restrictCallersWithExecuteAppFunctions>'
-                )
-                xml.text = patched
-                println "Patched ${xml} to allow non-trusted AppFunction callers"
-            }
-        }
-    }
-}
+
 
 android.applicationVariants.all { variant ->
     def type = variant.buildType.name
