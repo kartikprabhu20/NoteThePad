@@ -205,8 +205,22 @@ fun PaintScreenContent(
             newCanvas.density = canvasDensity
             val decoded = attachmentPath?.takeIf { it.isNotBlank() }?.let { pathOrUri ->
                 runCatching {
-                    context.contentResolver.openInputStream(pathOrUri.toUri())?.use { input ->
-                        BitmapFactory.decodeStream(input)
+                    val uri = pathOrUri.toUri()
+                    val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        BitmapFactory.decodeStream(input, null, boundsOptions)
+                    }
+                    val reqW = canvasSize.width
+                    val reqH = canvasSize.height
+                    var sampleSize = 1
+                    if (boundsOptions.outHeight > reqH || boundsOptions.outWidth > reqW) {
+                        val hRatio = (boundsOptions.outHeight.toFloat() / reqH.toFloat()).toInt()
+                        val wRatio = (boundsOptions.outWidth.toFloat() / reqW.toFloat()).toInt()
+                        sampleSize = maxOf(1, maxOf(hRatio, wRatio))
+                    }
+                    val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        BitmapFactory.decodeStream(input, null, decodeOptions)
                     }
                 }.onFailure { Log.e("PaintScreen", "Failed to load $pathOrUri", it) }.getOrNull()
             }

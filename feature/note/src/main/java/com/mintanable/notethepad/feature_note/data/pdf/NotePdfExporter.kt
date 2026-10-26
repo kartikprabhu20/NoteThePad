@@ -79,15 +79,35 @@ class NotePdfExporter @Inject constructor(
         FileProvider.getUriForFile(context, fileManager.authority, outFile)
     }
 
-    private fun decodeBitmap(uri: Uri): Bitmap? = try {
+    private fun decodeBitmap(uri: Uri, maxDimension: Int = 1200): Bitmap? = try {
         val file = fileManager.getFileFromUri(uri.toString())
         if (file != null && file.exists()) {
-            BitmapFactory.decodeFile(file.absolutePath)
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(file.absolutePath, options)
+            val sampleSize = calculateInSampleSize(options, maxDimension, maxDimension)
+            val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+            BitmapFactory.decodeFile(file.absolutePath, decodeOptions)
         } else {
-            context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) }
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+            val sampleSize = calculateInSampleSize(options, maxDimension, maxDimension)
+            val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+            context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, decodeOptions) }
         }
     } catch (_: Exception) {
         null
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+        if (height > reqHeight || width > reqWidth) {
+            val heightRatio = (height.toFloat() / reqHeight.toFloat()).toInt()
+            val widthRatio = (width.toFloat() / reqWidth.toFloat()).toInt()
+            inSampleSize = maxOf(heightRatio, widthRatio)
+        }
+        return maxOf(1, inSampleSize)
     }
 
     private fun CharSequence.trimEndWhitespace(): CharSequence {

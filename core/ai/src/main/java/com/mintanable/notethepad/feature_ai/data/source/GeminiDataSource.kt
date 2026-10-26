@@ -1,5 +1,6 @@
 package com.mintanable.notethepad.feature_ai.data.source
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
@@ -31,7 +32,7 @@ class GeminiDataSource(private val apiKey: String) {
 
     suspend fun analyzeImage(imageBytes: ByteArray): List<String> {
         return try {
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size) ?: return emptyList()
+            val bitmap = decodeDownsampledBitmap(imageBytes) ?: return emptyList()
             val prompt = """
                 Analyze this image and suggest exactly 3 short action phrases the user might want to do with it.
                 Rules:
@@ -60,7 +61,7 @@ class GeminiDataSource(private val apiKey: String) {
     }
 
     fun queryImage(imageBytes: ByteArray, query: String): Flow<String> = flow {
-        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size) ?: return@flow
+        val bitmap = decodeDownsampledBitmap(imageBytes) ?: return@flow
         val inputContent = content {
             image(bitmap)
             text(query)
@@ -73,7 +74,7 @@ class GeminiDataSource(private val apiKey: String) {
 
     suspend fun describeImage(imageBytes: ByteArray): String? {
         return try {
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size) ?: return null
+            val bitmap = decodeDownsampledBitmap(imageBytes) ?: return null
             val inputContent = content {
                 image(bitmap)
                 text("Describe this image in 10-20 words or convert to text if it contains text.")
@@ -117,5 +118,29 @@ class GeminiDataSource(private val apiKey: String) {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    private fun decodeDownsampledBitmap(imageBytes: ByteArray, maxDimension: Int = 1024): Bitmap? {
+        val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size, boundsOptions)
+        if (boundsOptions.outWidth <= 0 || boundsOptions.outHeight <= 0) return null
+
+        val sampleSize = calculateInSampleSize(boundsOptions, maxDimension, maxDimension)
+        val decodeOptions = BitmapFactory.Options().apply {
+            inSampleSize = sampleSize
+        }
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size, decodeOptions)
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+        if (height > reqHeight || width > reqWidth) {
+            val heightRatio = (height.toFloat() / reqHeight.toFloat()).toInt()
+            val widthRatio = (width.toFloat() / reqWidth.toFloat()).toInt()
+            inSampleSize = maxOf(heightRatio, widthRatio)
+        }
+        return maxOf(1, inSampleSize)
     }
 }
