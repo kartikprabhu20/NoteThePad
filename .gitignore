@@ -34,3 +34,5 @@ google-services.json
 .mcp.json
 CLAUDE.md
 graphify-out
+/.claude
+/brag-output*
