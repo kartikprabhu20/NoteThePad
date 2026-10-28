@@ -9,6 +9,11 @@
 
 **NoteThePad** is a privacy-focused productivity app that transforms notes into an intelligent workspace. Powered by on-device Gemma models, Gemini Nano, and Gemini 3 Flash, it provides agentic AI features — including a full conversational **AI Assistant** chat bot with tool-calling — that organize, summarize, and act on your content automatically. Real-time **collaboration**, **undo/redo**, **auto-save**, and **PDF export** round out a polished editing experience.
 
+<p align="center">
+  <video src="metadata/teaser.mp4" width="100%" controls autoplay loop muted></video>
+</p>
+
+
 ---
 
 ## Screenshots
